@@ -117,6 +117,7 @@ export const ja = {
   },
   sticky: {
     starGithub: "GitHub でスター",
+    supportStripePix: "コーヒーおごってくれる？",
   },
   settings: {
     title: "設定",

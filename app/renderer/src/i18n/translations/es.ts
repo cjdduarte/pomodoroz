@@ -118,6 +118,7 @@ export const es = {
   },
   sticky: {
     starGithub: "Marca estrella en GitHub",
+    supportStripePix: "¿Me invitas un café?",
   },
   settings: {
     title: "Configuración",

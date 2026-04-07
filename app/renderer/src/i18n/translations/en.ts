@@ -117,6 +117,7 @@ export const en = {
   },
   sticky: {
     starGithub: "Star it on GitHub",
+    supportStripePix: "Buy me a coffee?",
   },
   settings: {
     title: "Settings",

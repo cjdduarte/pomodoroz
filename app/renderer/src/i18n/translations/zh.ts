@@ -114,6 +114,7 @@ export const zh = {
   },
   sticky: {
     starGithub: "在 GitHub 上点星",
+    supportStripePix: "请我喝杯咖啡吗？",
   },
   settings: {
     title: "设置",
