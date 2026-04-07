@@ -16,7 +16,7 @@
 | Fase 2 - Remover Lerna              | Depois     | Nao iniciado | 1d         | Medio | Simplificar monorepo            |
 | Fase 3 - Scripts -> `yarn exec`     | Depois     | Nao iniciado | 0.5d       | Baixo | Portabilidade de scripts        |
 | Fase 4 - CI matrix minima           | Depois     | Nao iniciado | 1d         | Medio | Reprodutibilidade e gates       |
-| Fase U - Auto Update do fork        | Agora      | Nao iniciado | 1d         | Medio | Publicar feed e validar upgrade |
+| Fase U - Auto Update do fork        | Agora      | Em andamento | 1d         | Medio | Publicar feed e validar upgrade |
 | Fase 5 - Hooks tooling              | Opcional   | Nao iniciado | 0.5d       | Baixo | Reduzir overhead de hooks       |
 | Fase 6 - `electron-vite`            | Opcional   | Nao iniciado | 1d         | Medio | Melhorar DX de dev              |
 | Fase 7 - Vitest no renderer         | Opcional   | Nao iniciado | 1d         | Medio | Ganho de velocidade em testes   |
@@ -250,12 +250,12 @@ Entrega esperada:
 
 Nota de escopo: esta secao trata de validacoes de produto/release (incluindo app empacotado), separadas da Fase 4 de CI.
 
-| Pendencia                                                 | Origem                   | Status                         |
-| --------------------------------------------------------- | ------------------------ | ------------------------------ |
-| Always On Top em Linux/Wayland                            | Consolidado (2026-04-07) | Aberto                         |
-| Validacao de matriz completa empacotada (Win/macOS/Linux) | Consolidado (2026-04-07) | Aberto                         |
-| Gamificacao (streaks, XP, achievements)                   | Consolidado (2026-04-07) | Ideacao                        |
-| Updater: feed proprio do fork                             | Consolidado (2026-04-07) | Em planejamento (execucao 6.5) |
+| Pendencia                                                 | Origem                   | Status                      |
+| --------------------------------------------------------- | ------------------------ | --------------------------- |
+| Always On Top em Linux/Wayland                            | Consolidado (2026-04-07) | Aberto                      |
+| Validacao de matriz completa empacotada (Win/macOS/Linux) | Consolidado (2026-04-07) | Aberto                      |
+| Gamificacao (streaks, XP, achievements)                   | Consolidado (2026-04-07) | Ideacao                     |
+| Updater: feed proprio do fork                             | Consolidado (2026-04-07) | Em andamento (execucao 6.5) |
 
 ### 6.1 Melhorias futuras nao bloqueantes (referencia consolidada)
 

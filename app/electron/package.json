@@ -49,6 +49,14 @@
     "appId": "com.cjdduarte.pomodoroz",
     "copyright": "Copyright © 2026 ${author}",
     "afterSign": "./electron-builder/afterSign.js",
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "cjdduarte",
+        "repo": "pomodoroz",
+        "releaseType": "release"
+      }
+    ],
     "files": [
       "build"
     ],

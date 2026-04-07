@@ -1,0 +1,94 @@
+name: Release Auto Update
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Target to publish"
+        required: true
+        default: "all"
+        type: choice
+        options:
+          - all
+          - windows
+          - linux
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-autoupdate-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release-windows:
+    if: ${{ github.event_name == 'push' || github.event.inputs.target == 'all' || github.event.inputs.target == 'windows' }}
+    runs-on: windows-latest
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: yarn
+
+      - name: Validate GH_TOKEN
+        shell: pwsh
+        run: |
+          if (-not $env:GH_TOKEN) {
+            Write-Error "GH_TOKEN secret is required to publish release assets."
+            exit 1
+          }
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Build workspace
+        run: yarn build
+
+      - name: Publish Windows NSIS (x64)
+        run: yarn workspace pomodoroz run eb --win nsis --x64 --publish always
+
+  release-linux:
+    if: ${{ github.event_name == 'push' || github.event.inputs.target == 'all' || github.event.inputs.target == 'linux' }}
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: yarn
+
+      - name: Validate GH_TOKEN
+        run: |
+          if [ -z "${GH_TOKEN}" ]; then
+            echo "GH_TOKEN secret is required to publish release assets."
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Build workspace
+        run: yarn build
+
+      - name: Publish Linux AppImage (x64)
+        run: yarn workspace pomodoroz run eb --linux AppImage --x64 --publish always
