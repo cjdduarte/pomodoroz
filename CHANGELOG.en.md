@@ -1,0 +1,113 @@
+# Changelog
+
+> [Versão em português](CHANGELOG.md)
+
+> **Pomodoroz** is a fork of [Pomatez](https://github.com/zidoro/pomatez) by [Roldan Montilla Jr](https://github.com/roldanjr).
+> Forked on 2026-03-25 from Pomatez v1.10.0.
+> Thanks to the original author for the solid foundation.
+
+## [26.4.7] - 2026-04-07 (Initial Pomodoroz Release)
+
+### Scope
+
+- Consolidates all post-fork work through **2026-04-07** before first public release.
+- Classification below is relative to the original **Pomatez v1.10.0** baseline.
+
+### Added
+
+- **Statistics module** — full report screen with focus/break/idle time tracking, completed cycles, daily flow chart, and per-task breakdown. Data 100% local.
+- **Study Rotation Grid** — list/grid toggle in Tasks with per-card daily status (`white/green/red`) and persisted state.
+- **Grid card actions** — right-click selection keeps Timer sync behavior (normal mode navigates to Timer; compact mode collapses after selection).
+- **Compact Grid Expansion** — grid available in compact mode with resize/collapse IPC integration.
+- **Draw button (`Sortear`)** — optional via Settings; phase-based draw (`white -> green`, then `green -> red`) without navigating to Timer.
+- **Grid color-loop setting** — optional manual loop on card click (`red -> white`) controlled in Settings.
+- **Grid columns control** — selector (`Auto / 1 / 2 / 3`) in toolbar with persisted preference across normal and compact modes.
+- **Tasks import/export (JSON)** — Settings supports exporting/importing task lists/cards with schema validation, `version`, UUID regeneration, and merge/replace option.
+- **Reset time to Idle (focus only)** — new Settings toggle (`Back may count as Idle`) with `Yes/No/Cancel` confirmation on reset.
+- **Custom notification sound** — select between default bell or custom sound file in Settings.
+- **0-minute breaks** — short/long break sliders allow 0 minutes (auto-skip break).
+- **Compact task display** — expanded `CompactTaskDisplay` with actions menu (done/skip/delete) in all modes, replacing the old `PriorityCard`.
+- **Native quit confirmation** — localized dialog in Electron main (pt/en).
+- **Update IPC flow** — end-to-end `UPDATE_AVAILABLE` / `INSTALL_UPDATE` for fork-stage policy.
+- **i18n** — translations for Statistics in pt, en, es, ja, zh.
+- **Strict mode warning i18n** — localized Timer warning bubble text using `timer.strictModeNotice` in all locales.
+
+### Changed
+
+- **Electron-only** — Tauri/Rust runtime fully removed from codebase and scripts.
+- **React 19** — migrated from React 16 with `createRoot`.
+- **Vite 8** — replaced CRA as default dev/build workflow.
+- **TypeScript 6** — upgraded from 4.x with tsconfig alignment.
+- **React Router 7** — migrated from v5 (`Switch`/`withRouter` removed).
+- **Router imports normalization** — renderer imports now use `react-router` package directly.
+- **Redux Toolkit 2** — upgraded from 1.x.
+- **@dnd-kit** — replaced `react-beautiful-dnd` for drag-and-drop.
+- **Lerna 9** — upgraded monorepo runner from v7.
+- **Electron 41** — upgraded from earlier version.
+- **Electron sandbox** — enabled `sandbox: true` with preload adapted.
+- **Updater hardened** — skips check safely when config files missing (dev/`--dir`).
+- **Statistics UI** — "Time Distribution" section removed; "By Task List" promoted; default period changed to "today".
+- **Compact mode height** — corrected in Electron main (`getCompactHeight()`).
+- **Grid color model simplified** — removed orange stage from day colors; legacy saved states migrate on load.
+- **Grid typography refinement** — card title weight aligned with List view.
+- **ESLint stack modernization** — renderer lint migrated to ESLint v9 flat config.
+- **i18n stack refresh** — `react-i18next` 17 and `i18next` 26.
+- **Electron dependency refresh** — `electron-builder` 26, `electron-updater` 6, and `electron-store` 11.
+- **Vite config migration (Rolldown)** — `rollupOptions` to `rolldownOptions` for Vite 8 compatibility.
+- **Styled-components prop forwarding hardening** — `StyleSheetManager.shouldForwardProp` combining `@emotion/is-prop-valid` with project-specific blocked props.
+- **Notarization package migration** — replaced deprecated `electron-notarize` with `@electron/notarize`.
+- **Tasks textarea autosize migration** — now uses `react-textarea-autosize`.
+- **Notification backend migration (Electron main)** — replaced `node-notifier` with native `Notification` API.
+- **Tasks undo/redo state migration** — replaced `redux-undo` with internal history reducer (`past/present/future`).
+- **Router dependency cleanup** — removed residual `react-router-dom` after full migration to `react-router`.
+- **Redux action typing cleanup** — `AnyAction` updated to `UnknownAction` (RTK 2 recommendation).
+- **Keyboard event modernization** — replaced `onkeypress`/`keyCode` with `onkeydown` + `e.key === "Enter"`.
+- **React 19 ref-pattern alignment** — replaced `React.forwardRef` with ref-as-prop in `TaskDetails`, `Checkbox`, and `Radio`.
+- **Timer footer actions (P2.5 G1)** — actions trigger now uses `option-x` icon; without active task, opens dropdown directly.
+- **Post-break switch flow (P2.5 G2)** — "Switch" in post-break prompt now opens the rotation grid.
+- **Tasks list right-click parity (P2.5 G3)** — list mode now mirrors grid behavior.
+- **Grouped Grid mode (P2.5 G4)** — `Group/Ungroup` toggle with persisted preference and flat full-width list separators.
+- **Grid toolbar icon affordance (P2.5 G4)** — `Reset`, `Draw`, and `Group/Ungroup` use icon-only controls with localized tooltips.
+- **Grouped card density refinement** — grouped mode renders shorter cards.
+- **Tasks list priority action refinement** — clicking `Priority List` also selects the first pending card.
+- **Rebranding** — renamed from Pomatez to Pomodoroz (`com.cjdduarte.pomodoroz`).
+
+### Fixed
+
+- **Reset-to-idle tracking hotfix** — fixed `CounterProvider` initialization order (`ReferenceError`).
+- **Tray behavior consistency** — main process now keeps in-memory tray behavior state synchronized via `SET_TRAY_BEHAVIOR`.
+- **Fullscreen break state restoration** — fullscreen cycle now restores previous window state.
+- **Fullscreen visual/native synchronization + Wayland robustness** — fullscreen UI applies only after native confirmation, with Linux/Wayland fallback.
+- **Timer display** — clamped to zero (no more negative `0-1 : 0-1`).
+- **SVG progress ring** — protected against division by zero.
+- **Countdown interval** — fallback of 1000ms when `count % 1 === 0`.
+- **Timer controls visibility (strict mode)** — restored compact mode button visibility; strict warning renders in overlay.
+- **Task progression from actions menu (P2.5 G1)** — `Done` and `Skip` now auto-advance to the next pending task.
+- **Delete action progression (post-P2.5)** — deleting the active task follows the same auto-advance rule.
+- **Skip target correctness (P2.5 G1)** — `skipTaskCard` now skips the selected card instead of always the first pending.
+- **Tasks list context-menu guard (P2.5 G3)** — right-click on completed cards is ignored.
+- **Task form cancel warning (post-P2.5)** — fixed `"Form submission canceled"` by setting `type="button"`.
+- **Renderer dependency resilience** — added direct `uuid` dependency in renderer.
+- **Compact grid scrollbar parity** — compact-mode grid now preserves vertical scrollbar behavior.
+
+### Removed
+
+- **Legacy repository scaffolding** — `.travis.yml`, `snap/`, and `.devcontainer/` removed.
+- **Tauri/Rust** — entire `app/tauri` directory, Cargo files, and related scripts.
+- **CRA** — `react-scripts` and `react-app-env.d.ts` removed.
+- **react-beautiful-dnd** — replaced by `@dnd-kit`.
+- **use-stay-awake** — replaced by internal hook (Wake Lock API with fallback).
+- **`v8-compile-cache`** — removed (unused on Node 24 / Electron 41).
+- **`regenerator-runtime`** — removed (legacy Babel async polyfill not needed).
+- **`say`** — removed (audio `.wav` assets remain versioned).
+- **`autosize` / `@types/autosize`** — removed after migration to `react-textarea-autosize`.
+- **`node-notifier` / `@types/node-notifier`** — removed after migration to native Electron notifications.
+- **`redux-undo`** — removed after migration to internal undo/redo handling.
+- **`react-router-dom`** — removed after full migration to `react-router` imports.
+- **PriorityCard** — replaced by `CompactTaskDisplay`.
+- **Google Analytics** — removed.
+- **Discord community link** — removed from Settings.
+
+---
+
+_For the original Pomatez changelog prior to the fork, see the [Pomatez repository](https://github.com/zidoro/pomatez/blob/master/CHANGELOG.md)._

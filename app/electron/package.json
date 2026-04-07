@@ -1,0 +1,112 @@
+{
+  "name": "pomodoroz",
+  "version": "26.4.7",
+  "private": true,
+  "license": "MIT",
+  "main": "./build/main.js",
+  "author": {
+    "name": "Carlos Duarte",
+    "email": "cjdduarte@gmail.com",
+    "url": "https://github.com/cjdduarte"
+  },
+  "repository": "https://github.com/cjdduarte/pomodoroz",
+  "description": "Pomodoro timer with task management and statistics for Windows, Mac, and Linux.",
+  "scripts": {
+    "prepare": "yarn build",
+    "clean": "rimraf dist/ build/",
+    "predev:main": "wait-on http://127.0.0.1:3000",
+    "dev:main": "nodemon --exec \"yarn build && electron .\"",
+    "predev:main:vite": "wait-on http://localhost:3000",
+    "dev:main:vite": "cross-env ELECTRON_RENDERER_URL=http://localhost:3000 nodemon --exec \"yarn build && electron .\"",
+    "start": "yarn dev:main",
+    "start:vite": "yarn dev:main:vite",
+    "build": "node ../../node_modules/typescript/bin/tsc && copyfiles -u 2 \"src/assets/*\" build/assets",
+    "eb": "cross-env npm_config_user_agent=traversal npm_execpath=traversal electron-builder",
+    "build:mwl": "yarn eb -mwl --ia32 --x64 --arm64",
+    "build:dir": "yarn eb --dir",
+    "build:win": "yarn eb --win --ia32 --x64 --publish=never",
+    "build:win-all": "yarn eb --win --ia32 --x64 --arm64 --publish=never",
+    "build:win-x64": "yarn eb --win --x64 --publish=never",
+    "build:win-ia32": "yarn eb --win --ia32 --publish=never",
+    "build:win-arm64": "yarn eb --win --arm64 --publish=never",
+    "build:mac": "yarn eb --mac --publish=never",
+    "build:mac-all": "yarn eb --mac --x64 --arm64 --publish=never",
+    "build:mac-x64": "yarn eb --mac --x64 --publish=never",
+    "build:mac-arm64": "yarn eb --mac --arm64 --publish=never",
+    "build:linux": "yarn eb --linux --x64 --arm64 --publish=never",
+    "build:linux-all": "yarn eb --linux --x64 --armv7l --arm64 --publish=never",
+    "build:linux-x64": "yarn eb --linux --publish=never",
+    "build:linux-armv7l": "yarn eb --linux --armv7l --publish=never",
+    "build:linux-arm64": "yarn eb --linux --arm64 --publish=never",
+    "build:snap": "yarn eb --linux snap",
+    "release:mw": "yarn eb --publish always --mac --win",
+    "release": "yarn eb --publish always",
+    "lint": "node ../../node_modules/typescript/bin/tsc --noEmit",
+    "test": "jest --watchAll"
+  },
+  "build": {
+    "productName": "Pomodoroz",
+    "appId": "com.cjdduarte.pomodoroz",
+    "copyright": "Copyright © 2026 ${author}",
+    "afterSign": "./electron-builder/afterSign.js",
+    "files": [
+      "build"
+    ],
+    "mac": {
+      "artifactName": "Pomodoroz-v${version}-mac-${arch}.${ext}",
+      "category": "public.app-category.productivity",
+      "icon": "./build/assets/logo-dark@2x.png"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "portable"
+        },
+        {
+          "target": "nsis"
+        }
+      ],
+      "icon": "./build/assets/logo-dark.ico"
+    },
+    "portable": {
+      "artifactName": "Pomodoroz-v${version}-win-${arch}-portable.${ext}"
+    },
+    "nsis": {
+      "artifactName": "Pomodoroz-v${version}-win-${arch}-setup.${ext}"
+    },
+    "linux": {
+      "artifactName": "Pomodoroz-v${version}-linux-${arch}.${ext}",
+      "target": [
+        "AppImage",
+        "deb",
+        "rpm"
+      ],
+      "icon": "./build/assets/",
+      "category": "Utility"
+    },
+    "snap": {
+      "category": "Utility"
+    }
+  },
+  "dependencies": {
+    "@pomodoroz/shareables": "^1.0.0",
+    "electron-is-dev": "^3.0.1",
+    "electron-log": "^5.4.3",
+    "electron-store": "^11.0.2",
+    "electron-updater": "^6.8.3",
+    "lodash.debounce": "^4.0.8"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.29.0",
+    "@electron/notarize": "^3.1.1",
+    "@types/jest": "^30.0.0",
+    "@types/lodash.debounce": "^4.0.6",
+    "babel-jest": "^30.3.0",
+    "electron": "41.1.1",
+    "electron-builder": "^26.8.1",
+    "electron-devtools-installer": "^4.0.0",
+    "jest": "^30.3.0",
+    "nodemon": "^3.1.14",
+    "ts-jest": "^29.4.9"
+  }
+}

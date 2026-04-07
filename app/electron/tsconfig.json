@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node10",
+    "ignoreDeprecations": "6.0",
+    "allowJs": false,
+    "noEmit": false,
+    "outDir": "./build",
+    "rootDir": "./src",
+    "types": ["node", "jest"],
+    "removeComments": true
+  },
+  "include": ["src"]
+}

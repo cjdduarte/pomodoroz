@@ -1,0 +1,80 @@
+{
+  "name": "@pomodoroz/renderer",
+  "version": "26.4.7",
+  "private": true,
+  "license": "MIT",
+  "author": {
+    "name": "Carlos Duarte",
+    "email": "cjdduarte@gmail.com",
+    "url": "https://github.com/cjdduarte"
+  },
+  "description": "Pomodoro timer with task management and statistics for Windows, Mac, and Linux.",
+  "homepage": "./",
+  "scripts": {
+    "clean": "rimraf build/",
+    "prebuild": "yarn clean && copyfiles -u 3 \"src/assets/logos/*\" ../electron/src/assets",
+    "build": "vite build",
+    "postbuild": "copyfiles -u 1 \"build/**/*\" ../electron/build",
+    "dev:renderer": "vite --host localhost --port 3000 --strictPort",
+    "start": "yarn dev:renderer",
+    "start:vite": "yarn dev:renderer",
+    "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\""
+  },
+  "babelMacros": {
+    "styledComponents": {
+      "fileName": false,
+      "pure": true
+    }
+  },
+  "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "@emotion/is-prop-valid": "^1.4.0",
+    "@pomodoroz/shareables": "*",
+    "@reduxjs/toolkit": "^2.11.2",
+    "@types/node": "25.5.2",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "i18next": "^26.0.2",
+    "is-electron": "^2.2.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-i18next": "^17.0.1",
+    "react-is": "^19.2.4",
+    "react-markdown": "^10.1.0",
+    "react-redux": "^9.2.0",
+    "react-router": "7.14.0",
+    "react-textarea-autosize": "^8.5.9",
+    "redux": "^5.0.1",
+    "styled-components": "^6.3.12",
+    "uuid": "^13.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.29.0",
+    "@babel/plugin-syntax-flow": "^7.28.6",
+    "@babel/plugin-transform-react-jsx": "^7.28.6",
+    "@eslint/js": "^9.39.4",
+    "@typescript-eslint/eslint-plugin": "^8.58.0",
+    "@typescript-eslint/parser": "^8.58.0",
+    "@vitejs/plugin-react": "^6.0.0",
+    "eslint": "^9.39.4",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "globals": "^17.4.0",
+    "vite": "^8.0.5",
+    "vite-plugin-svgr": "^4.5.0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

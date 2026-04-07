@@ -1,0 +1,20 @@
+{
+  "name": "@pomodoroz/shareables",
+  "version": "1.0.0",
+  "private": true,
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "source": "src/index.ts",
+  "license": "MIT",
+  "files": [
+    "build"
+  ],
+  "scripts": {
+    "prepare": "yarn build",
+    "start": "rollup -c -w",
+    "start:vite": "rollup -c -w",
+    "build": "rollup -c",
+    "lint": "node ../../node_modules/typescript/bin/tsc --noEmit -p tsconfig.lint.json",
+    "dev:renderer": "rollup -c"
+  }
+}
