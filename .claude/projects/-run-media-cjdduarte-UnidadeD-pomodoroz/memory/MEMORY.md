@@ -1,1 +1,0 @@
-- [Decisoes Tecnicas 2026](../../../../docs/DECISOES_TECNICAS_2026.md) — fonte unica de migracao tecnica, pendencias e stack alvo
