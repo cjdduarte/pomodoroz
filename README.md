@@ -7,6 +7,18 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/cjdduarte/pomodoroz/releases/latest"><img alt="release" src="https://img.shields.io/github/v/release/cjdduarte/pomodoroz?label=release&color=blue"></a>
+  <a href="https://github.com/cjdduarte/pomodoroz/releases"><img alt="downloads" src="https://img.shields.io/github/downloads/cjdduarte/pomodoroz/total?label=downloads&color=green"></a>
+  <a href="LICENSE"><img alt="license" src="https://img.shields.io/github/license/cjdduarte/pomodoroz?label=license&color=yellow"></a>
+</p>
+
+<p align="center">
+  <img src="assets/timerA.png" alt="Pomodoroz - Tema Claro" width="340">
+  &nbsp;&nbsp;
+  <img src="assets/timerB.png" alt="Pomodoroz - Tema Escuro" width="340">
+</p>
+
+<p align="center">
   <br>
   <a href="#-sobre">Sobre</a>
   .
