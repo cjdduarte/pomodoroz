@@ -16,6 +16,7 @@
 | Fase 2 - Remover Lerna              | Depois     | Nao iniciado | 1d         | Medio | Simplificar monorepo            |
 | Fase 3 - Scripts -> `yarn exec`     | Depois     | Nao iniciado | 0.5d       | Baixo | Portabilidade de scripts        |
 | Fase 4 - CI matrix minima           | Depois     | Nao iniciado | 1d         | Medio | Reprodutibilidade e gates       |
+| Fase U - Auto Update do fork        | Agora      | Nao iniciado | 1d         | Medio | Publicar feed e validar upgrade |
 | Fase 5 - Hooks tooling              | Opcional   | Nao iniciado | 0.5d       | Baixo | Reduzir overhead de hooks       |
 | Fase 6 - `electron-vite`            | Opcional   | Nao iniciado | 1d         | Medio | Melhorar DX de dev              |
 | Fase 7 - Vitest no renderer         | Opcional   | Nao iniciado | 1d         | Medio | Ganho de velocidade em testes   |
@@ -153,6 +154,7 @@ yarn workspace pomodoroz run test --watchAll=false --runInBand
   - matrix minima: Linux + Windows
   - gates: lint -> build -> test -> build:dir
   - Node fixo v24 e lockfile imutavel
+  - esta fase cobre CI de codigo-fonte; validacao empacotada Win/macOS/Linux fica na secao de produto/release
 - Criterio de saida:
   - pipeline executando para PR e push
   - falha de gate bloqueando merge
@@ -189,6 +191,7 @@ Escopo recomendado para iniciar sem alto risco:
 Entrega esperada:
 
 - PR pequeno, reversivel, sem mudanca estrutural do build.
+- Regra de corte: primeiro PR contem somente Fase 0. Fase 1 entra em PR seguinte.
 
 ---
 
@@ -211,6 +214,7 @@ Entrega esperada:
 - Decisao: manter.
 - Motivo: SQLite adiciona complexidade nativa sem necessidade imediata.
 - Reavaliar: quando houver demanda clara por consultas complexas.
+- Observacao: manter `electron-store` neste ciclo, sem remocao/substituicao isolada.
 
 ### Redux Toolkit -> Zustand
 
@@ -244,12 +248,14 @@ Entrega esperada:
 
 ## 6. Pendencias de Produto (Nao-tooling)
 
-| Pendencia                                                 | Origem                   | Status                           |
-| --------------------------------------------------------- | ------------------------ | -------------------------------- |
-| Always On Top em Linux/Wayland                            | Consolidado (2026-04-07) | Aberto                           |
-| Validacao de matriz completa empacotada (Win/macOS/Linux) | Consolidado (2026-04-07) | Aberto                           |
-| Gamificacao (streaks, XP, achievements)                   | Consolidado (2026-04-07) | Ideacao                          |
-| Updater: feed proprio do fork                             | Consolidado (2026-04-07) | Bloqueado ate publicacao oficial |
+Nota de escopo: esta secao trata de validacoes de produto/release (incluindo app empacotado), separadas da Fase 4 de CI.
+
+| Pendencia                                                 | Origem                   | Status                         |
+| --------------------------------------------------------- | ------------------------ | ------------------------------ |
+| Always On Top em Linux/Wayland                            | Consolidado (2026-04-07) | Aberto                         |
+| Validacao de matriz completa empacotada (Win/macOS/Linux) | Consolidado (2026-04-07) | Aberto                         |
+| Gamificacao (streaks, XP, achievements)                   | Consolidado (2026-04-07) | Ideacao                        |
+| Updater: feed proprio do fork                             | Consolidado (2026-04-07) | Em planejamento (execucao 6.5) |
 
 ### 6.1 Melhorias futuras nao bloqueantes (referencia consolidada)
 
@@ -324,6 +330,158 @@ Objetivo: aumentar engajamento e motivacao do usuario com mecanicas de jogo no f
 
 - Em ideacao. Nenhum codigo implementado.
 - Aguardando definicao de escopo minimo e aprovacao para iniciar.
+
+### 6.5 Auto Update do fork (guia completo de implementacao)
+
+Objetivo: habilitar atualizacao automatica de forma controlada, com foco em Windows e Linux AppImage.
+
+Estado atual (2026-04-07):
+
+- Fluxo tecnico base ja existe no codigo:
+  - main/electron: `activateAutoUpdate`, eventos `UPDATE_AVAILABLE` e `INSTALL_UPDATE`.
+  - renderer: UI de update na tela de Settings.
+- Bloqueio atual: feed proprio do fork ainda nao operacional em release oficial.
+- Linux sem `APPIMAGE` continua com skip explicito de checagem (comportamento intencional no codigo atual).
+
+Escopo desta implementacao:
+
+- Inclui:
+  - publicacao de release com metadados de update.
+  - validacao end-to-end do fluxo em app empacotado.
+  - documentacao de operacao e rollback.
+- Nao inclui:
+  - alterar regra Linux sem `APPIMAGE`.
+  - mudar stack (Yarn/Lerna) para destravar updater.
+  - introduzir servidor proprio fora de GitHub Releases neste ciclo.
+
+#### 6.5.1 Requisitos minimos
+
+1. Repositorio do fork com Releases ativas no GitHub.
+2. Token de publicacao (`GH_TOKEN`) disponivel no ambiente de release (local ou CI).
+3. Build empacotado gerando metadados de update:
+   - Linux AppImage: `latest-linux.yml` + `.AppImage`.
+   - Windows NSIS: `latest.yml` + instalador NSIS.
+4. Versao nova maior que a instalada no cliente.
+
+Observacoes:
+
+- Scripts `build:*` usam `--publish=never` (nao publicam feed).
+- Publicacao usa scripts `release`/`release:mw` com `--publish always`.
+
+#### 6.5.2 Passo a passo (operacao recomendada)
+
+Passo 1 - Preparar versao:
+
+1. Definir nova versao (ex.: `26.4.9`).
+2. Atualizar changelog da versao.
+3. Validar definicao dos scripts de release (sem publicar ainda):
+   - raiz: `release` e `release:mw` em `package.json`
+   - electron: `release` e `release:mw` em `app/electron/package.json`
+4. Validar baseline:
+   - `yarn lint`
+   - `yarn build`
+   - `yarn build:dir`
+
+Passo 2 - Publicar artefatos com feed:
+
+1. Exportar token no ambiente:
+   - `GH_TOKEN=<token>`
+2. Publicar release:
+   - todos os alvos: `yarn release`
+   - mac + windows: `yarn release:mw`
+   - linux dedicado: executar release linux em job/plataforma linux quando necessario.
+3. Confirmar no Release publicado a presenca de:
+   - Windows: instalador NSIS + `latest.yml`.
+   - Linux: `.AppImage` + `latest-linux.yml`.
+
+Passo 3 - Validar cliente (E2E):
+
+1. Instalar versao anterior no ambiente de teste.
+2. Abrir app empacotado conectado a internet.
+3. Verificar recebimento de `UPDATE_AVAILABLE` na UI.
+4. Acionar `Install Now` e confirmar reinicio com nova versao.
+
+#### 6.5.3 Matriz de comportamento por plataforma
+
+| Plataforma/Canal                  | Resultado esperado                                                 |
+| --------------------------------- | ------------------------------------------------------------------ |
+| Windows (NSIS)                    | Checa update, baixa, notifica, instala com `quitAndInstall()`      |
+| macOS                             | Fora do escopo deste ciclo de ativacao (validar em ciclo dedicado) |
+| Linux AppImage                    | Checa update quando `APPIMAGE` presente                            |
+| Linux empacotado sem `APPIMAGE`   | Nao checa update (skip intencional)                                |
+| Linux via pacote de distro (AUR)  | Atualizacao deve seguir gerenciador de pacotes, nao fluxo in-app   |
+| Ambiente dev sem `dev-app-update` | Nao checa update (skip intencional)                                |
+
+#### 6.5.4 Como funciona no Manjaro (resumo pratico)
+
+- Se o usuario roda binario AppImage: auto update pode funcionar.
+- Se o usuario instala por pacote de distro/AUR: fluxo in-app deve ser tratado como nao suportado neste ciclo.
+- Acao recomendada para pacote de distro: orientar atualizacao via gerenciador do sistema.
+
+#### 6.5.5 Criterios de aceite
+
+- [ ] Release com metadados de update publicados e acessiveis.
+- [ ] Windows: upgrade automatico validado de versao N -> N+1.
+- [ ] Linux AppImage: upgrade automatico validado de versao N -> N+1.
+- [ ] Linux sem `APPIMAGE`: skip esperado registrado (sem erro fatal).
+- [ ] CHANGELOG atualizado com status da ativacao.
+- [ ] Pendencia "Updater: feed proprio do fork" atualizada para Concluido.
+
+#### 6.5.6 Rollback
+
+1. Interromper publicacoes de release com feed automatico.
+2. Publicar hotfix sem promover update automatico, se necessario.
+3. Manter cliente na versao estavel anterior enquanto corrige pipeline/feed.
+4. Reabrir pendencia no documento tecnico com causa raiz e proximo passo.
+
+#### 6.5.7 Relacao com fases de tooling (importante)
+
+- Migracao Yarn/Lerna/CI melhora previsibilidade de release, mas nao e prerequisito tecnico direto do updater.
+- O destravamento real do auto update depende de:
+  - feed/metadados corretos no release publicado.
+  - validacao por plataforma no binario empacotado.
+
+#### 6.5.8 Code signing e notarizacao (risco conhecido)
+
+- Windows: sem assinatura de codigo, o SmartScreen pode exibir alerta adicional na instalacao/update.
+- macOS: auto update exige assinatura/notarizacao corretas; este ciclo nao inclui ativacao oficial do auto update no macOS.
+- O projeto ja possui `afterSign` para notarizacao no macOS, condicionado a variaveis de ambiente de chave Apple.
+
+### 6.6 Checklist de Execucao por PR/Release (Auto Update)
+
+PR-AU-01 - Preparacao e validacao local:
+
+- [ ] Definir versao alvo e atualizar changelog.
+- [ ] Confirmar scripts `release` e `release:mw` presentes e executaveis.
+- [ ] Executar baseline (`lint`, `build`, `build:dir`).
+- [ ] Revisar secao 6.5 para garantir escopo/nao escopo.
+
+PR-AU-02 - Publicacao de feed (pipeline/release):
+
+- [ ] Configurar `GH_TOKEN` no ambiente de publicacao.
+- [ ] Publicar release com `--publish always`.
+- [ ] Confirmar metadados de update no release (Windows `latest.yml`, Linux `latest-linux.yml`).
+- [ ] Confirmar upload dos binarios-alvo (NSIS e AppImage).
+
+PR-AU-03 - Validacao E2E Windows:
+
+- [ ] Instalar versao N.
+- [ ] Publicar N+1.
+- [ ] Verificar recebimento de `UPDATE_AVAILABLE`.
+- [ ] Executar `Install Now` e validar reinicio em N+1.
+
+PR-AU-04 - Validacao E2E Linux AppImage:
+
+- [ ] Instalar versao N via AppImage.
+- [ ] Publicar N+1 com `latest-linux.yml`.
+- [ ] Validar check/download/install em AppImage.
+- [ ] Registrar comportamento esperado de skip fora de AppImage.
+
+PR-AU-05 - Encerramento e governanca:
+
+- [ ] Atualizar status da pendencia de updater na secao 6 (Concluido quando pronto).
+- [ ] Registrar resultado no CHANGELOG (ativacao e limites por plataforma).
+- [ ] Se houver regressao, aplicar rollback da secao 6.5.6 e reabrir pendencia.
 
 ---
 
