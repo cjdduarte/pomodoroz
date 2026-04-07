@@ -6,15 +6,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Pomodoroz is a cross-platform Pomodoro desktop app (Electron-only), forked from [Pomatez](https://github.com/zidoro/pomatez). It is a standalone desktop app with no server or cloud — all data is local.
 
-Authoritative architecture/status document: `AGENTS.md`.
+Operational agent rules: `AGENTS.md`.
 Implemented changes tracked in: `CHANGELOG.md`.
-Future roadmap tracked in: `README.md` (Open Roadmap section).
+Technical decisions, roadmap, and pending items tracked in: `docs/DECISOES_TECNICAS_2026.md`.
 
 ## Repository Layout
 
 ```text
 <repo-root>/                     # Git root AND monorepo root
-├── AGENTS.md                    # Architecture/status source of truth
+├── AGENTS.md                    # Agent operation rules (no roadmap/history duplication)
 ├── CLAUDE.md                    # This file
 ├── package.json                 # Root workspace config (Lerna + Yarn Classic)
 ├── app/
@@ -120,7 +120,7 @@ Renderer persists state in `localStorage`. Electron uses `electron-store` for na
 - `sandbox: true` enabled on BrowserWindow
 - Preload script adapted for sandbox constraints
 - IPC channels typed via `@pomodoroz/shareables`
-- Auto-updater disabled (fork has no release channel yet — see updater policy in `AGENTS.md`)
+- Auto-updater disabled (fork has no release channel yet — see updater policy in `docs/DECISOES_TECNICAS_2026.md`)
 
 ## Known Non-Blocking Warnings
 
@@ -130,7 +130,7 @@ Renderer persists state in `localStorage`. Electron uses `electron-store` for na
 
 ## Key Policies
 
-- **Updater**: Keep auto-update disabled until fork has its own release channel. Do not point to the original Pomatez feed. Details in `AGENTS.md`.
-- **Documentation**: Log implemented changes in `CHANGELOG.md`. Track future work in `README.md`. Architecture decisions in `AGENTS.md`.
+- **Updater**: Keep auto-update disabled until fork has its own release channel. Do not point to the original Pomatez feed. Details in `docs/DECISOES_TECNICAS_2026.md`.
+- **Documentation**: Log implemented changes in `CHANGELOG.md`. Track future work and technical decisions in `docs/DECISOES_TECNICAS_2026.md`. Keep `AGENTS.md` for agent operational rules.
 - **Language**: Code in English. Logs/comments in Portuguese (PT-BR) where appropriate.
 - **Dependencies**: Explain options and wait for confirmation before adding new libraries.
