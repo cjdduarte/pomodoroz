@@ -19,6 +19,9 @@ on:
 permissions:
   contents: write
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 concurrency:
   group: release-autoupdate-${{ github.ref }}
   cancel-in-progress: false
@@ -49,6 +52,9 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
+
+      - name: Build shareables package
+        run: yarn workspace @pomodoroz/shareables run build
 
       - name: Lint
         run: yarn lint
@@ -83,6 +89,9 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
+
+      - name: Build shareables package
+        run: yarn workspace @pomodoroz/shareables run build
 
       - name: Lint
         run: yarn lint
