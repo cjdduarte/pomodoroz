@@ -1,10 +1,20 @@
 # Changelog
 
-> [Versão em português](CHANGELOG.md)
+> [Portuguese version](CHANGELOG.md)
 
 > **Pomodoroz** is a fork of [Pomatez](https://github.com/zidoro/pomatez) by [Roldan Montilla Jr](https://github.com/roldanjr).
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
+
+## [26.4.8] - 2026-04-07
+
+### Changed
+
+- **Renderer build dependency** — `vite` updated from `8.0.6` to `8.0.7`.
+
+### Note
+
+- This release does not add new end-user features; it is a dependency maintenance update.
 
 ## [26.4.7] - 2026-04-07 (Initial Pomodoroz Release)
 

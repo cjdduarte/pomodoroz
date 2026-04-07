@@ -6,6 +6,16 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.4.8] - 2026-04-07
+
+### Alterado
+
+- **Dependência de build do renderer** — `vite` atualizado de `8.0.6` para `8.0.7`.
+
+### Observação
+
+- Esta versão não introduz funcionalidades novas no app; é um ajuste de manutenção de dependência.
+
 ## [26.4.7] - 2026-04-07 (Release inicial do Pomodoroz)
 
 ### Escopo
