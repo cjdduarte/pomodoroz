@@ -22,4 +22,3 @@ yarn-error.log*
 *.iml
 /lerna-debug.log
 /release/
-/scripts/
