@@ -90,5 +90,5 @@ help with local development.
 
 This project uses Husky + lint-staged for pre-commit checks.
 
-- Hooks are installed automatically when you run `yarn install` in `pomodoroz/`.
+- Hooks are installed automatically when you run `yarn install` in the repository root.
 - To run the same checks manually, use `yarn lint-staged`.

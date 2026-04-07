@@ -6,7 +6,7 @@
     "app/*"
   ],
   "scripts": {
-    "prepare": "cd .. && ./pomodoroz/node_modules/.bin/husky pomodoroz/.husky",
+    "prepare": "husky .husky",
     "commit": "git-cz",
     "dev:renderer": "lerna run dev:renderer --stream",
     "dev:main": "lerna run dev:main --stream",
@@ -24,7 +24,7 @@
     "build:snap": "yarn build && lerna run build:snap --stream",
     "release:mw": "yarn build && lerna run release:mw --stream",
     "release": "yarn build && lerna run release --stream",
-    "version:sync": "node ../scripts/version-sync.mjs",
+    "version:sync": "node scripts/version-sync.mjs",
     "clean": "lerna exec -- rimraf build/ dist/",
     "format": "prettier --write .",
     "lint": "yarn workspace @pomodoroz/renderer run lint && yarn workspace pomodoroz run lint && yarn workspace @pomodoroz/shareables run lint"
