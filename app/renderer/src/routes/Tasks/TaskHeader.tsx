@@ -103,7 +103,7 @@ const TaskHeader: React.FC<Props> = ({
         {...(!editing ? dragHandleAttributes : {})}
         {...(!editing ? dragHandleListeners : {})}
       >
-        <SVG name="option-y" />
+        <SVG name="grip" />
       </StyledTaskHeaderDragHandle>
       <StyledTaskHeaderOption onClick={() => setShowOptions(true)}>
         <SVG name="option-x" />

@@ -7,7 +7,7 @@ import {
 } from "react";
 
 interface TargetOutside<T extends HTMLElement = HTMLElement> {
-  ref: RefObject<T>;
+  ref: RefObject<T | null>;
   eventType?: keyof DocumentEventMap;
 }
 

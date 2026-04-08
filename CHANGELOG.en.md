@@ -13,6 +13,9 @@
 - **PT-BR support wording normalized.**
 - **Cross-list drag visual stabilized** — when dragging a task to another list, the card no longer visually snaps back to the source list before drop.
 - **Drag preview aligned with real card UI** — drag overlay now reuses the same card styling (width, layout, and icons), improving visual consistency while moving tasks.
+- **Top list icons visually separated** — list drag button now uses a grip icon, reducing visual ambiguity with the actions menu (`...`) button.
+- **SVG typing aligned for TypeScript 6** — `*.svg` module now declares named `ReactComponent` in `src/typings.d.ts`, removing `TS2614` in the icons index.
+- **`useTargetOutside` hook aligned with React refs in TS6** — `ref` now accepts `RefObject<T | null>`, removing `TS2322` in `TaskHeader` and other `useRef(..., null)` call sites.
 
 ## [26.4.13] - 2026-04-08
 

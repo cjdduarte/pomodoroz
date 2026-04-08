@@ -25,6 +25,7 @@ import {
   OptionYSVG,
   AlertSVG,
   ExpandSVG,
+  GripSVG,
   LaptopSVG,
   NapSVG,
   MugSVG,
@@ -61,7 +62,8 @@ export type SVGTypes = {
     | "refresh"
     | "alert"
     | "chevron-down"
-    | "expand";
+    | "expand"
+    | "grip";
 };
 
 const SVG: React.FC<SVGTypes> = ({ name, size, style }) => {
@@ -122,6 +124,8 @@ const SVG: React.FC<SVGTypes> = ({ name, size, style }) => {
       return <ChevronDownSVG />;
     case "expand":
       return <ExpandSVG style={style} />;
+    case "grip":
+      return <GripSVG />;
     default:
       return <TimerSVG />;
   }

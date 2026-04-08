@@ -13,6 +13,9 @@
 - **Texto de apoio padronizado no PT-BR.**
 - **Drag visual entre listas estabilizado** — ao arrastar uma tarefa para outra lista, o card não “salta” de volta visualmente para a lista de origem antes do drop.
 - **Preview de arraste alinhado ao card real** — overlay de drag agora reaproveita o mesmo estilo do cartão da lista (largura, layout e ícones), melhorando a consistência visual durante o movimento.
+- **Ícones de lista diferenciados no topo** — botão de arrastar lista agora usa ícone de grip, reduzindo ambiguidade visual com o botão de ações (`...`).
+- **Tipagem SVG ajustada para TypeScript 6** — módulo `*.svg` agora declara `ReactComponent` nomeado em `src/typings.d.ts`, eliminando o `TS2614` no índice de ícones.
+- **Hook `useTargetOutside` compatível com refs React 19/TS6** — `ref` agora aceita `RefObject<T | null>`, removendo `TS2322` em `TaskHeader` e outros usos com `useRef(..., null)`.
 
 ## [26.4.13] - 2026-04-08
 
