@@ -61,6 +61,11 @@ yarn build:win
 yarn build:mac
 yarn build:linux
 yarn build:mwl               # All platforms
+
+# Release helper scripts (version + tag + push)
+yarn release:tag -- 26.4.10
+yarn release:tag:dry -- 26.4.10
+yarn release:tag:ps -- -Version 26.4.10
 ```
 
 Validation wrapper scripts:
@@ -120,7 +125,8 @@ Renderer persists state in `localStorage`. Electron uses `electron-store` for na
 - `sandbox: true` enabled on BrowserWindow
 - Preload script adapted for sandbox constraints
 - IPC channels typed via `@pomodoroz/shareables`
-- Auto-updater disabled (fork has no release channel yet — see updater policy in `docs/DECISOES_TECNICAS_2026.md`)
+- Auto-updater active via GitHub Releases for Windows (NSIS) and Linux AppImage
+- Linux packaged without `APPIMAGE` keeps explicit updater skip by design
 
 ## Known Non-Blocking Warnings
 
@@ -130,7 +136,8 @@ Renderer persists state in `localStorage`. Electron uses `electron-store` for na
 
 ## Key Policies
 
-- **Updater**: Keep auto-update disabled until fork has its own release channel. Do not point to the original Pomatez feed. Details in `docs/DECISOES_TECNICAS_2026.md`.
+- **Updater**: Keep release feed on this fork (`cjdduarte/pomodoroz`). Do not point updater to original Pomatez feed. Details in `docs/DECISOES_TECNICAS_2026.md`.
 - **Documentation**: Log implemented changes in `CHANGELOG.md`. Track future work and technical decisions in `docs/DECISOES_TECNICAS_2026.md`. Keep `AGENTS.md` for agent operational rules.
+- **Release Notes Source of Truth**: GitHub Release title/notes are generated from `CHANGELOG.md` section `## [x.y.z]`. Always update both `CHANGELOG.md` and `CHANGELOG.en.md` before tag/release.
 - **Language**: Code in English. Logs/comments in Portuguese (PT-BR) where appropriate.
 - **Dependencies**: Explain options and wait for confirmation before adding new libraries.

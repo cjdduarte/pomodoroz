@@ -6,6 +6,18 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.4.9] - 2026-04-07
+
+### Alterado
+
+- **Auto update do fork ativado em release** — pipeline de publicação agora gera e publica metadados de update no GitHub Releases para Windows (`latest.yml`) e Linux AppImage (`latest-linux.yml`).
+- **Fluxo de release automatizado (CI)** — novo workflow dedicado para publicação de artefatos de update por plataforma.
+
+### Validado
+
+- **Windows (NSIS)** — detecção de atualização de `26.4.8` para `26.4.9` confirmada.
+- **Linux (AppImage)** — artefatos e metadados de atualização publicados com sucesso.
+
 ## [26.4.8] - 2026-04-07
 
 ### Alterado

@@ -46,6 +46,26 @@ Regra: este arquivo NAO replica cronologia de mudancas, tabelas de decisoes, roa
 - Pendencias futuras, decisoes e plano tecnico: registrar em `docs/DECISOES_TECNICAS_2026.md`.
 - Nao criar specs/checklists soltos na raiz para temas que ja existem no documento tecnico unico.
 
+### Regra de ligacao CHANGELOG <-> Release (obrigatoria)
+
+1. Fonte oficial das notas da GitHub Release: secao da versao em `CHANGELOG.md` (`## [x.y.z]`).
+2. Antes de criar tag/release, a IA deve inserir/atualizar:
+   - `CHANGELOG.md` (pt)
+   - `CHANGELOG.en.md` (en)
+3. Scripts de release (`release.sh`/`release.ps1`) devem falhar se a versao nao existir nos 2 changelogs.
+4. Workflow de release sincroniza titulo/notas a partir do `CHANGELOG.md`; sem conteudo, cai em texto generico de fallback.
+5. Regra operacional: nao criar tag `v*` sem entrada valida no changelog da versao.
+
+Template minimo recomendado por versao:
+
+```md
+## [x.y.z] - YYYY-MM-DD
+
+### Changed
+
+- Item 1
+```
+
 ---
 
 ## Fluxo de Scripts (baseline)

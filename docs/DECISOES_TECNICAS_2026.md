@@ -16,7 +16,7 @@
 | Fase 2 - Remover Lerna              | Depois     | Nao iniciado | 1d         | Medio | Simplificar monorepo            |
 | Fase 3 - Scripts -> `yarn exec`     | Depois     | Nao iniciado | 0.5d       | Baixo | Portabilidade de scripts        |
 | Fase 4 - CI matrix minima           | Depois     | Nao iniciado | 1d         | Medio | Reprodutibilidade e gates       |
-| Fase U - Auto Update do fork        | Agora      | Em andamento | 1d         | Medio | Publicar feed e validar upgrade |
+| Fase U - Auto Update do fork        | Agora      | Concluido    | 1d         | Medio | Publicar feed e validar upgrade |
 | Fase 5 - Hooks tooling              | Opcional   | Nao iniciado | 0.5d       | Baixo | Reduzir overhead de hooks       |
 | Fase 6 - `electron-vite`            | Opcional   | Nao iniciado | 1d         | Medio | Melhorar DX de dev              |
 | Fase 7 - Vitest no renderer         | Opcional   | Nao iniciado | 1d         | Medio | Ganho de velocidade em testes   |
@@ -243,6 +243,31 @@ Entrega esperada:
 4. Updates major pendentes no renderer:
    - `eslint` e `@eslint/js` 10.x
    - `vite-plugin-svgr` 5.x
+5. Evoluir `scripts/check-updates.sh` com modo `full` (somente relatorio) para cobrir:
+   - auditoria de vulnerabilidades (`yarn audit`, sem auto-fix)
+   - checagem de versoes de GitHub Actions usadas nos workflows
+   - manter modo atual como padrao (sem quebra do fluxo interativo)
+
+### 5.1 Tarefa planejada - `check-updates --full`
+
+Objetivo:
+
+- Ampliar visibilidade tecnica (dependencias + seguranca + CI) sem mudar comportamento padrao do script.
+
+Escopo minimo:
+
+- Novo modo de execucao em leitura (`report --full`).
+- Exibir resumo separado:
+  - dependencias diretas desatualizadas (ja existente)
+  - vulnerabilidades reportadas por audit
+  - actions desatualizadas em `.github/workflows/*.yml`
+- Nao alterar dependencias automaticamente nesse modo.
+
+Criterio de saida:
+
+- Execucao `./scripts/check-updates.sh report --full` funcionando.
+- Saida autoexplicativa com secoes `Dependencies`, `Audit` e `GitHub Actions`.
+- Documentacao de uso atualizada em `scripts/check-updates.sh --help` e `README`/doc tecnica.
 
 ---
 
@@ -250,12 +275,12 @@ Entrega esperada:
 
 Nota de escopo: esta secao trata de validacoes de produto/release (incluindo app empacotado), separadas da Fase 4 de CI.
 
-| Pendencia                                                 | Origem                   | Status                      |
-| --------------------------------------------------------- | ------------------------ | --------------------------- |
-| Always On Top em Linux/Wayland                            | Consolidado (2026-04-07) | Aberto                      |
-| Validacao de matriz completa empacotada (Win/macOS/Linux) | Consolidado (2026-04-07) | Aberto                      |
-| Gamificacao (streaks, XP, achievements)                   | Consolidado (2026-04-07) | Ideacao                     |
-| Updater: feed proprio do fork                             | Consolidado (2026-04-07) | Em andamento (execucao 6.5) |
+| Pendencia                                                 | Origem                   | Status                     |
+| --------------------------------------------------------- | ------------------------ | -------------------------- |
+| Always On Top em Linux/Wayland                            | Consolidado (2026-04-07) | Aberto                     |
+| Validacao de matriz completa empacotada (Win/macOS/Linux) | Consolidado (2026-04-07) | Aberto                     |
+| Gamificacao (streaks, XP, achievements)                   | Consolidado (2026-04-07) | Ideacao                    |
+| Updater: feed proprio do fork                             | Consolidado (2026-04-07) | Concluido (release 26.4.9) |
 
 ### 6.1 Melhorias futuras nao bloqueantes (referencia consolidada)
 
@@ -374,10 +399,15 @@ Passo 1 - Preparar versao:
 
 1. Definir nova versao (ex.: `26.4.9`).
 2. Atualizar changelog da versao.
-3. Validar definicao dos scripts de release (sem publicar ainda):
+3. Preparar commit/tag com script dedicado (independente de `validar-tudo`):
+   - Unix: `yarn release:tag -- <versao>`
+   - PowerShell: `yarn release:tag:ps -- -Version <versao>`
+4. (Opcional) validar sem efeitos colaterais:
+   - `yarn release:tag:dry -- <versao>`
+5. Validar definicao dos scripts de release (sem publicar ainda):
    - raiz: `release` e `release:mw` em `package.json`
    - electron: `release` e `release:mw` em `app/electron/package.json`
-4. Validar baseline:
+6. Validar baseline:
    - `yarn lint`
    - `yarn build`
    - `yarn build:dir`
@@ -390,7 +420,8 @@ Passo 2 - Publicar artefatos com feed:
    - todos os alvos: `yarn release`
    - mac + windows: `yarn release:mw`
    - linux dedicado: executar release linux em job/plataforma linux quando necessario.
-3. Confirmar no Release publicado a presenca de:
+3. Workflow `Release Auto Update` sincroniza titulo/notas da release com a secao da versao em `CHANGELOG.md` (quando disparado por tag `v*`).
+4. Confirmar no Release publicado a presenca de:
    - Windows: instalador NSIS + `latest.yml`.
    - Linux: `.AppImage` + `latest-linux.yml`.
 
@@ -400,6 +431,11 @@ Passo 3 - Validar cliente (E2E):
 2. Abrir app empacotado conectado a internet.
 3. Verificar recebimento de `UPDATE_AVAILABLE` na UI.
 4. Acionar `Install Now` e confirmar reinicio com nova versao.
+
+Regra obrigatoria para a proxima release:
+
+- A proxima versao publicada (N+1) so deve ser considerada concluida apos teste E2E real de update partindo da ultima versao publica (N).
+- Validacao minima obrigatoria: Windows NSIS (`latest.yml`) e Linux AppImage (`latest-linux.yml`).
 
 #### 6.5.3 Matriz de comportamento por plataforma
 
@@ -420,12 +456,12 @@ Passo 3 - Validar cliente (E2E):
 
 #### 6.5.5 Criterios de aceite
 
-- [ ] Release com metadados de update publicados e acessiveis.
-- [ ] Windows: upgrade automatico validado de versao N -> N+1.
-- [ ] Linux AppImage: upgrade automatico validado de versao N -> N+1.
-- [ ] Linux sem `APPIMAGE`: skip esperado registrado (sem erro fatal).
-- [ ] CHANGELOG atualizado com status da ativacao.
-- [ ] Pendencia "Updater: feed proprio do fork" atualizada para Concluido.
+- [x] Release com metadados de update publicados e acessiveis.
+- [x] Windows: upgrade automatico validado de versao N -> N+1.
+- [x] Linux AppImage: metadados/artefatos de update publicados e validados em release.
+- [x] Linux sem `APPIMAGE`: skip esperado registrado (sem erro fatal).
+- [x] CHANGELOG atualizado com status da ativacao.
+- [x] Pendencia "Updater: feed proprio do fork" atualizada para Concluido.
 
 #### 6.5.6 Rollback
 
@@ -447,7 +483,35 @@ Passo 3 - Validar cliente (E2E):
 - macOS: auto update exige assinatura/notarizacao corretas; este ciclo nao inclui ativacao oficial do auto update no macOS.
 - O projeto ja possui `afterSign` para notarizacao no macOS, condicionado a variaveis de ambiente de chave Apple.
 
+#### 6.5.9 Politica de canal e download (decisao atual)
+
+Canal suportado para auto update in-app neste ciclo:
+
+- Windows: somente instalador NSIS (`latest.yml` + setup NSIS).
+- Linux: somente AppImage (`latest-linux.yml` + `.AppImage`).
+
+Fora do canal de auto update in-app neste ciclo:
+
+- Windows portable: distribuicao permitida, mas sem fluxo de update automatico.
+- Linux `deb`/`rpm`/AUR: atualizacao via gerenciador de pacotes da distribuicao.
+
+Politica de download (estado atual):
+
+- `electron-updater` permanece com comportamento padrao (`autoDownload` implicito).
+- A UI atual trata "Install Now" como etapa de instalacao do update ja baixado.
+
+Revisao futura (opcional):
+
+- Se houver demanda por controle manual de banda/download, avaliar `autoDownload = false` com acao explicita de download no renderer.
+
 ### 6.6 Checklist de Execucao por PR/Release (Auto Update)
+
+PR-AU-00 - Gate obrigatorio da proxima release (N+1):
+
+- [ ] Instalar versao publica atual (N) em ambiente limpo.
+- [ ] Publicar versao N+1.
+- [ ] Validar update N -> N+1 no app real (nao apenas build local).
+- [ ] Registrar resultado no CHANGELOG da N+1.
 
 PR-AU-01 - Preparacao e validacao local:
 

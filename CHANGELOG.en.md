@@ -6,6 +6,18 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.4.9] - 2026-04-07
+
+### Changed
+
+- **Fork auto-update activated in release flow** — publishing pipeline now generates and uploads update metadata to GitHub Releases for Windows (`latest.yml`) and Linux AppImage (`latest-linux.yml`).
+- **Automated release workflow (CI)** — new dedicated workflow to publish platform update artifacts.
+
+### Validated
+
+- **Windows (NSIS)** — update detection from `26.4.8` to `26.4.9` confirmed.
+- **Linux (AppImage)** — update artifacts and metadata published successfully.
+
 ## [26.4.8] - 2026-04-07
 
 ### Changed

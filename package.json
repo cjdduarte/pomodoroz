@@ -25,6 +25,10 @@
     "release:mw": "yarn build && lerna run release:mw --stream",
     "release": "yarn build && lerna run release --stream",
     "version:sync": "node scripts/version-sync.mjs",
+    "release:tag": "./scripts/release.sh",
+    "release:tag:dry": "./scripts/release.sh --dry-run",
+    "release:tag:skip-validate": "./scripts/release.sh --skip-validate",
+    "release:tag:ps": "pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/release.ps1",
     "clean": "lerna exec -- rimraf build/ dist/",
     "format": "prettier --write .",
     "lint": "yarn workspace @pomodoroz/renderer run lint && yarn workspace pomodoroz run lint && yarn workspace @pomodoroz/shareables run lint"
