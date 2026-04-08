@@ -6,6 +6,25 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.4.10] - 2026-04-08
+
+### Fixed
+
+- **Safer update installation trigger** — `quitAndInstall()` now runs only when the `"Quit and Install"` action is explicitly confirmed in the notification callback.
+- **Updater listener registration order** — updater events (`update-available`, `download-progress`, `update-downloaded`) are now registered before `checkForUpdates()`, reducing race risk on fast responses.
+- **Consistent update state typing** — renderer `updateBody` was normalized to `string`, with safe fallback for legacy persisted state.
+
+### Changed
+
+- **Release notes workflow hardening** — CI now fails with explicit error messages when `CHANGELOG.md` is missing the tagged version section or when that section is empty.
+- **Script-based release flow** — added dedicated release scripts (`scripts/release.sh` and `scripts/release.ps1`) and root shortcuts (`release:tag*`) in `package.json`.
+
+### Documentation
+
+- **CHANGELOG <-> Release policy formalized** — changelog/tag/release-notes linkage is now explicitly documented in `AGENTS.md`, `CLAUDE.md`, and `docs/DECISOES_TECNICAS_2026.md`.
+- **Auto-update channel policy clarified** — current in-app support is explicitly scoped to Windows NSIS and Linux AppImage; portable/deb/rpm/AUR remain out of in-app auto-update scope.
+- **Dependency visibility planning** — added planned task to evolve `check-updates.sh` with `report --full` coverage (dependencies + audit + GitHub Actions).
+
 ## [26.4.9] - 2026-04-07
 
 ### Changed
