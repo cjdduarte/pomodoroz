@@ -5,6 +5,8 @@ import { useNavigate } from "react-router";
 import {
   DndContext,
   DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
   PointerSensor,
   closestCenter,
   useSensor,
@@ -46,6 +48,25 @@ type TimerNavigationState = {
     cardId: string;
   };
 };
+type DragListData = {
+  type: "list";
+  listId: string;
+};
+type DragCardData = {
+  type: "card";
+  listId: string;
+  cardId: string;
+};
+type DragCardContainerData = {
+  type: "card-container";
+  listId: string;
+};
+type ActiveDragCardPreview = {
+  listId: string;
+  cardId: string;
+  text: string;
+  done: boolean;
+};
 
 const getInitialViewMode = (): ViewMode => {
   const savedViewMode = getFromStorage<string>(
@@ -64,6 +85,8 @@ export default function Tasks() {
   const dispatch = useAppDispatch();
   const [viewMode, setViewMode] =
     useState<ViewMode>(getInitialViewMode);
+  const [activeDragCardPreview, setActiveDragCardPreview] =
+    useState<ActiveDragCardPreview | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -72,6 +95,37 @@ export default function Tasks() {
   );
 
   const onListAdd = (value: string) => dispatch(addTaskList(value));
+
+  const onDragStart = ({ active }: DragStartEvent) => {
+    const activeData = active.data.current as
+      | DragListData
+      | DragCardData
+      | undefined;
+
+    if (!activeData || activeData.type !== "card") {
+      setActiveDragCardPreview(null);
+      return;
+    }
+
+    const sourceList = tasks.present.find(
+      (list) => list._id === activeData.listId
+    );
+    const sourceCard = sourceList?.cards.find(
+      (card) => card._id === activeData.cardId
+    );
+
+    if (!sourceCard) {
+      setActiveDragCardPreview(null);
+      return;
+    }
+
+    setActiveDragCardPreview({
+      listId: activeData.listId,
+      cardId: activeData.cardId,
+      text: sourceCard.text,
+      done: sourceCard.done,
+    });
+  };
 
   const handleGridSelect = useCallback(
     (listId: string, cardId?: string) => {
@@ -104,36 +158,21 @@ export default function Tasks() {
   );
 
   const onDragEnd = ({ active, over }: DragEndEvent) => {
+    setActiveDragCardPreview(null);
+
     if (!over) {
       return;
     }
 
     const activeData = active.data.current as
-      | {
-          type: "list";
-          listId: string;
-        }
-      | {
-          type: "card";
-          listId: string;
-          cardId: string;
-        }
+      | DragListData
+      | DragCardData
       | undefined;
 
     const overData = over.data.current as
-      | {
-          type: "list";
-          listId: string;
-        }
-      | {
-          type: "card";
-          listId: string;
-          cardId: string;
-        }
-      | {
-          type: "card-container";
-          listId: string;
-        }
+      | DragListData
+      | DragCardData
+      | DragCardContainerData
       | undefined;
 
     if (!activeData || !overData) {
@@ -295,6 +334,8 @@ export default function Tasks() {
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
+      onDragStart={onDragStart}
+      onDragCancel={() => setActiveDragCardPreview(null)}
       onDragEnd={onDragEnd}
     >
       <StyledTaskMain>
@@ -331,6 +372,30 @@ export default function Tasks() {
           </SortableContext>
         </StyledTaskContainer>
       </StyledTaskMain>
+      <DragOverlay>
+        {activeDragCardPreview ? (
+          <div
+            style={{
+              width: "min(92vw, 52rem)",
+              padding: "0.5rem 1rem",
+              borderRadius: "3px",
+              border: "1px solid var(--color-border-input-primary)",
+              borderBottomColor: "var(--color-border-input-secondary)",
+              backgroundColor: "var(--color-bg-task-card)",
+              color: "var(--color-body-text)",
+              boxShadow: "0 6px 18px -8px var(--color-shadow-primary)",
+              whiteSpace: "pre-wrap",
+              wordBreak: "break-word",
+              opacity: activeDragCardPreview.done ? 0.7 : 1,
+              textDecoration: activeDragCardPreview.done
+                ? "line-through"
+                : "none",
+            }}
+          >
+            {activeDragCardPreview.text}
+          </div>
+        ) : null}
+      </DragOverlay>
     </DndContext>
   );
 }

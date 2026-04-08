@@ -11,6 +11,7 @@
 ### Corrigido
 
 - **Texto de apoio padronizado no PT-BR.**
+- **Drag visual entre listas estabilizado** — ao arrastar uma tarefa para outra lista, o card não “salta” de volta visualmente para a lista de origem antes do drop.
 
 ## [26.4.13] - 2026-04-08
 

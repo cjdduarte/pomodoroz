@@ -11,6 +11,7 @@
 ### Fixed
 
 - **PT-BR support wording normalized.**
+- **Cross-list drag visual stabilized** — when dragging a task to another list, the card no longer visually snaps back to the source list before drop.
 
 ## [26.4.13] - 2026-04-08
 

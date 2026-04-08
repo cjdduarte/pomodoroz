@@ -123,11 +123,13 @@ export const StyledCard = styled.div<CardProps>`
   transition:
     box-shadow 320ms ease-out,
     background-color 320ms ease-out,
-    border-color 320ms ease-out;
+    border-color 320ms ease-out,
+    opacity 120ms ease-out;
 
   ${(p) =>
     (p.isDragging &&
       css`
+        opacity: 0.2;
         border-color: var(--color-bg-task-card-focus) !important;
         background-color: var(--color-bg-task-card-focus) !important;
         box-shadow: 0 2px 8px -2px var(--color-shadow-primary);
