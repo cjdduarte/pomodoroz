@@ -49,6 +49,21 @@ export function activateAutoUpdate({
       !isPackagedLinuxWithoutAppImage
     : fs.existsSync(devUpdaterConfigPath);
 
+  if (onCheckingUpdates)
+    autoUpdater.on("checking-for-update", onCheckingUpdates);
+
+  if (onUpdateAvailable)
+    autoUpdater.on("update-available", onUpdateAvailable);
+
+  if (onUpdateNotAvailable)
+    autoUpdater.on("update-not-available", onUpdateNotAvailable);
+
+  if (onDownloadProgress)
+    autoUpdater.on("download-progress", onDownloadProgress);
+
+  if (onUpdateDownloaded)
+    autoUpdater.on("update-downloaded", onUpdateDownloaded);
+
   if (shouldCheckForUpdates) {
     autoUpdater.checkForUpdates().catch((error) => {
       logger.error("[Updater] checkForUpdates failed:", error);
@@ -69,21 +84,6 @@ export function activateAutoUpdate({
       );
     }
   }
-
-  if (onCheckingUpdates)
-    autoUpdater.on("checking-for-update", onCheckingUpdates);
-
-  if (onUpdateAvailable)
-    autoUpdater.on("update-available", onUpdateAvailable);
-
-  if (onUpdateNotAvailable)
-    autoUpdater.on("update-not-available", onUpdateNotAvailable);
-
-  if (onDownloadProgress)
-    autoUpdater.on("download-progress", onDownloadProgress);
-
-  if (onUpdateDownloaded)
-    autoUpdater.on("update-downloaded", onUpdateDownloaded);
 
   return autoUpdater;
 }

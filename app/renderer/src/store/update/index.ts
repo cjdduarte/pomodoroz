@@ -3,7 +3,7 @@ import { getFromStorage } from "utils";
 
 export type UpdateTypes = {
   updateVersion: string;
-  updateBody: string | undefined;
+  updateBody: string;
 };
 
 type UploadPayload<T extends keyof UpdateTypes> = PayloadAction<
@@ -11,12 +11,23 @@ type UploadPayload<T extends keyof UpdateTypes> = PayloadAction<
 >;
 
 const defaultUpdateStatus: Readonly<UpdateTypes> = Object.freeze({
-  updateBody: undefined,
+  updateBody: "",
   updateVersion: "",
 });
 
-const storedState = getFromStorage<{ update?: UpdateTypes }>("state");
-const updateStatus = storedState?.update || defaultUpdateStatus;
+const storedState = getFromStorage<{ update?: Partial<UpdateTypes> }>(
+  "state"
+);
+const updateStatus: UpdateTypes = {
+  updateVersion:
+    typeof storedState?.update?.updateVersion === "string"
+      ? storedState.update.updateVersion
+      : defaultUpdateStatus.updateVersion,
+  updateBody:
+    typeof storedState?.update?.updateBody === "string"
+      ? storedState.update.updateBody
+      : defaultUpdateStatus.updateBody,
+};
 
 const initialState: UpdateTypes = updateStatus;
 

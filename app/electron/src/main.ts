@@ -1029,10 +1029,8 @@ if (!onlySingleInstance) {
           // Keep a single explicit action to preserve current update UX.
           actions: ["Quit and Install" /*, "Install it Later"*/],
           callback: (err, response) => {
-            if (!err) {
-              //if (response === "quit and install") {
+            if (!err && response === "quit and install") {
               appUpdater?.quitAndInstall();
-              //}
             }
           },
         });
