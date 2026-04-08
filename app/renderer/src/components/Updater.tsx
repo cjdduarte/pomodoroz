@@ -2,6 +2,7 @@ import React from "react";
 import Header from "./Header";
 import styled from "styled-components/macro";
 import ReactMarkdown from "react-markdown";
+import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "hooks/storeHooks";
 import { setIgnoreUpdate } from "../store";
 import { setUpdateBody, setUpdateVersion } from "../store/update";
@@ -47,12 +48,13 @@ const IgnoreVersion = styled.div`
 
 const Updater: React.FC = () => {
   const update = useAppSelector((state) => state.update);
+  const { t } = useTranslation();
 
   const dispatch = useAppDispatch();
 
   return (
     <UpdateWrapper>
-      <Header heading={"An update is available"} />
+      <Header heading={t("updater.heading")} />
       <UpdateDescriptionPreviewer
         className="md-previewer"
         $hasValue={true}
@@ -65,7 +67,7 @@ const Updater: React.FC = () => {
             ),
           }}
         >
-          {update.updateBody || "No update body found"}
+          {update.updateBody || t("updater.noUpdateBody")}
         </ReactMarkdown>
       </UpdateDescriptionPreviewer>
 
@@ -74,15 +76,18 @@ const Updater: React.FC = () => {
           <StyledButtonPrimary
             onClick={() => {
               const invokeConnector = getInvokeConnector();
-              new window.Notification("Opening Release Page", {
-                body: "Your browser will open the latest release notes and installer.",
-              });
+              new window.Notification(
+                t("updater.openingReleaseTitle"),
+                {
+                  body: t("updater.openingReleaseBody"),
+                }
+              );
               invokeConnector?.send(OPEN_RELEASE_PAGE);
               dispatch(setUpdateVersion(""));
               dispatch(setUpdateBody(""));
             }}
           >
-            Open Release Page
+            {t("updater.openReleasePage")}
           </StyledButtonPrimary>
           <StyledButtonNormal
             onClick={() => {
@@ -90,7 +95,7 @@ const Updater: React.FC = () => {
               dispatch(setUpdateBody(""));
             }}
           >
-            Remind Me Later
+            {t("updater.remindMeLater")}
           </StyledButtonNormal>
         </StyledTaskForm>
         <IgnoreVersion
@@ -99,7 +104,7 @@ const Updater: React.FC = () => {
             dispatch(setUpdateBody(""));
           }}
         >
-          Ignore This Version
+          {t("updater.ignoreThisVersion")}
         </IgnoreVersion>
       </ActionButtons>
     </UpdateWrapper>

@@ -190,6 +190,16 @@ export const en = {
         "Import completed (replace): {{lists}} lists and {{cards}} tasks.",
     },
   },
+  updater: {
+    heading: "An update is available",
+    noUpdateBody: "No update body found",
+    openingReleaseTitle: "Opening Release Page",
+    openingReleaseBody:
+      "Your browser will open the latest release notes and installer.",
+    openReleasePage: "Open Release Page",
+    remindMeLater: "Remind Me Later",
+    ignoreThisVersion: "Ignore This Version",
+  },
   statistics: {
     title: "Report",
     period: "Period",

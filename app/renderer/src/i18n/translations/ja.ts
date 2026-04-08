@@ -190,6 +190,16 @@ export const ja = {
         "インポート完了（置換）: {{lists}} リスト / {{cards}} タスク。",
     },
   },
+  updater: {
+    heading: "アップデートがあります",
+    noUpdateBody: "アップデート内容が見つかりません",
+    openingReleaseTitle: "リリースページを開いています",
+    openingReleaseBody:
+      "ブラウザで最新のリリースノートとインストーラーを開きます。",
+    openReleasePage: "リリースページを開く",
+    remindMeLater: "後で通知する",
+    ignoreThisVersion: "このバージョンを無視",
+  },
   statistics: {
     title: "レポート",
     period: "期間",

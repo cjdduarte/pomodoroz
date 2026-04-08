@@ -499,6 +499,9 @@ Politica de download (estado atual):
 
 - `electron-updater` permanece com comportamento padrao (`autoDownload` implicito).
 - A UI atual trata "Install Now" como etapa de instalacao do update ja baixado.
+- Hardening Windows NSIS (2026-04-08):
+  - `shortcutName` e criacao de atalhos explicitos no bloco `nsis`.
+  - `nsis.include` com `customInstall` para recriar atalho ausente no Start Menu apos install/update.
 
 Revisao futura (opcional):
 
@@ -533,6 +536,8 @@ PR-AU-03 - Validacao E2E Windows:
 - [ ] Publicar N+1.
 - [ ] Verificar recebimento de `UPDATE_AVAILABLE`.
 - [ ] Executar `Install Now` e validar reinicio em N+1.
+- [ ] Confirmar entrada `Pomodoroz` no Start Menu (busca e lista alfabetica).
+- [ ] Confirmar arquivo `.lnk` em `%APPDATA%\Microsoft\Windows\Start Menu\Programs\`.
 
 PR-AU-04 - Validacao E2E Linux AppImage:
 

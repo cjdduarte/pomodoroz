@@ -80,7 +80,12 @@
       "artifactName": "Pomodoroz-v${version}-win-${arch}-portable.${ext}"
     },
     "nsis": {
-      "artifactName": "Pomodoroz-v${version}-win-${arch}-setup.${ext}"
+      "artifactName": "Pomodoroz-v${version}-win-${arch}-setup.${ext}",
+      "include": "./electron-builder/installer.nsh",
+      "shortcutName": "Pomodoroz",
+      "uninstallDisplayName": "Pomodoroz",
+      "createStartMenuShortcut": true,
+      "createDesktopShortcut": true
     },
     "linux": {
       "artifactName": "Pomodoroz-v${version}-linux-${arch}.${ext}",
@@ -110,7 +115,7 @@
     "@types/jest": "^30.0.0",
     "@types/lodash.debounce": "^4.0.6",
     "babel-jest": "^30.3.0",
-    "electron": "41.1.1",
+    "electron": "41.2.0",
     "electron-builder": "^26.8.1",
     "electron-devtools-installer": "^4.0.0",
     "jest": "^30.3.0",

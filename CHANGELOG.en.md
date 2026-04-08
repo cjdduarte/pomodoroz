@@ -6,6 +6,23 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.4.12] - 2026-04-08
+
+### Fixed
+
+- **Windows installer shortcut hardening (NSIS)** — `nsis` config now explicitly sets `shortcutName`, `createStartMenuShortcut`, and `createDesktopShortcut`.
+- **Fallback for missing Start Menu shortcut** — new NSIS include (`electron-builder/installer.nsh`) recreates the shortcut when it is missing after install/update.
+- **No redundant version in Windows "Installed apps" title** — NSIS `uninstallDisplayName` is now set to `Pomodoroz`, keeping version only in the details row.
+- **Renderer Updater i18n** — update screen copy and release-page notification text now use `updater.*` keys in pt/en/es/ja/zh.
+
+### Changed
+
+- **Safe dependency updates** — `electron` (`41.1.1 -> 41.2.0`), `i18next` (`26.0.3 -> 26.0.4`), `@typescript-eslint/eslint-plugin` (`8.58.0 -> 8.58.1`), and `@typescript-eslint/parser` (`8.58.0 -> 8.58.1`).
+
+### Note
+
+- Change is limited to the Windows NSIS target; Linux/AppImage flow remains unchanged.
+
 ## [26.4.11] - 2026-04-08
 
 ### Changed

@@ -182,6 +182,15 @@ export const zh = {
         "导入完成（替换）：{{lists}} 个列表，{{cards}} 个任务。",
     },
   },
+  updater: {
+    heading: "发现可用更新",
+    noUpdateBody: "未找到更新说明",
+    openingReleaseTitle: "正在打开发布页面",
+    openingReleaseBody: "浏览器将打开最新的发布说明和安装程序。",
+    openReleasePage: "打开发布页面",
+    remindMeLater: "稍后提醒我",
+    ignoreThisVersion: "忽略此版本",
+  },
   statistics: {
     title: "报告",
     period: "周期",

@@ -191,6 +191,16 @@ export const es = {
         "Importación completada (reemplazar): {{lists}} listas y {{cards}} tareas.",
     },
   },
+  updater: {
+    heading: "Hay una actualización disponible",
+    noUpdateBody: "No se encontró descripción de la actualización",
+    openingReleaseTitle: "Abriendo página de release",
+    openingReleaseBody:
+      "Tu navegador abrirá las notas de versión y el instalador más reciente.",
+    openReleasePage: "Abrir página de release",
+    remindMeLater: "Recordármelo más tarde",
+    ignoreThisVersion: "Ignorar esta versión",
+  },
   statistics: {
     title: "Informe",
     period: "Período",

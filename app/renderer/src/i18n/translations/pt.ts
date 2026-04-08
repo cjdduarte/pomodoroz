@@ -190,6 +190,16 @@ export const pt = {
         "Importação concluída (substituir): {{lists}} listas e {{cards}} tarefas.",
     },
   },
+  updater: {
+    heading: "Uma atualização está disponível",
+    noUpdateBody: "Nenhuma nota de atualização encontrada",
+    openingReleaseTitle: "Abrindo página de release",
+    openingReleaseBody:
+      "Seu navegador abrirá as notas de versão e o instalador mais recente.",
+    openReleasePage: "Abrir página de release",
+    remindMeLater: "Lembrar mais tarde",
+    ignoreThisVersion: "Ignorar esta versão",
+  },
   statistics: {
     title: "Relatório",
     period: "Período",

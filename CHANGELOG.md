@@ -6,6 +6,23 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.4.12] - 2026-04-08
+
+### Corrigido
+
+- **Hardening de atalhos no instalador Windows (NSIS)** — configuração `nsis` agora define explicitamente `shortcutName`, `createStartMenuShortcut` e `createDesktopShortcut`.
+- **Fallback para atalho ausente no Start Menu** — novo include NSIS (`electron-builder/installer.nsh`) recria o atalho quando ele não existir após instalação/update.
+- **Nome em "Aplicativos instalados" sem redundância de versão** — `uninstallDisplayName` no NSIS foi definido como `Pomodoroz`, mantendo a versão apenas no campo de detalhes do Windows.
+- **i18n do Updater no renderer** — textos da tela de atualização e da notificação de abertura de release agora usam chaves `updater.*` em pt/en/es/ja/zh.
+
+### Alterado
+
+- **Atualizações seguras de dependências** — `electron` (`41.1.1 -> 41.2.0`), `i18next` (`26.0.3 -> 26.0.4`), `@typescript-eslint/eslint-plugin` (`8.58.0 -> 8.58.1`) e `@typescript-eslint/parser` (`8.58.0 -> 8.58.1`).
+
+### Observação
+
+- Ajuste restrito ao alvo Windows NSIS; fluxo Linux/AppImage permanece inalterado.
+
 ## [26.4.11] - 2026-04-08
 
 ### Alterado
