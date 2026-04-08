@@ -7,8 +7,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Pomodoroz is a cross-platform Pomodoro desktop app (Electron-only), forked from [Pomatez](https://github.com/zidoro/pomatez). It is a standalone desktop app with no server or cloud — all data is local.
 
 Operational agent rules: `AGENTS.md`.
-Implemented changes tracked in: `CHANGELOG.md`.
-Technical decisions, roadmap, and pending items tracked in: `docs/DECISOES_TECNICAS_2026.md`.
+Implemented changes tracked in: `CHANGELOG.md` and `CHANGELOG.en.md`.
+Technical decisions, roadmap, and pending items tracked in: `docs/DECISOES_TECNICAS_2026.md` and `docs/DECISOES_TECNICAS_2026.en.md`.
 
 ## Repository Layout
 
@@ -136,8 +136,8 @@ Renderer persists state in `localStorage`. Electron uses `electron-store` for na
 
 ## Key Policies
 
-- **Updater**: Keep release feed on this fork (`cjdduarte/pomodoroz`). Do not point updater to original Pomatez feed. Details in `docs/DECISOES_TECNICAS_2026.md`.
-- **Documentation**: Log implemented changes in `CHANGELOG.md`. Track future work and technical decisions in `docs/DECISOES_TECNICAS_2026.md`. Keep `AGENTS.md` for agent operational rules.
+- **Updater**: Keep release feed on this fork (`cjdduarte/pomodoroz`). Do not point updater to original Pomatez feed. Details in `docs/DECISOES_TECNICAS_2026.md` and `docs/DECISOES_TECNICAS_2026.en.md`.
+- **Documentation**: Log implemented changes in `CHANGELOG.md` and `CHANGELOG.en.md`. Track future work and technical decisions in `docs/DECISOES_TECNICAS_2026.md` and `docs/DECISOES_TECNICAS_2026.en.md`. Keep `AGENTS.md` for agent operational rules.
 - **Release Notes Source of Truth**: GitHub Release title/notes are generated from `CHANGELOG.md` section `## [x.y.z]`. Always update both `CHANGELOG.md` and `CHANGELOG.en.md` before tag/release.
 - **Language**: Code in English. Logs/comments in Portuguese (PT-BR) where appropriate.
 - **Dependencies**: Explain options and wait for confirmation before adding new libraries.

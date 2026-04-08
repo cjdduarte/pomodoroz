@@ -2,6 +2,7 @@
 
 > Documento unico de decisoes: o que sera migrado, o que nao sera, e porque.
 > Consolida pendencias tecnicas/de produto e discussoes de stack.
+> English companion: [docs/DECISOES_TECNICAS_2026.en.md](docs/DECISOES_TECNICAS_2026.en.md)
 >
 > Data de referencia: 2026-04-07
 
@@ -280,6 +281,7 @@ Nota de escopo: esta secao trata de validacoes de produto/release (incluindo app
 | Always On Top em Linux/Wayland                            | Consolidado (2026-04-07) | Aberto                     |
 | Validacao de matriz completa empacotada (Win/macOS/Linux) | Consolidado (2026-04-07) | Aberto                     |
 | Gamificacao (streaks, XP, achievements)                   | Consolidado (2026-04-07) | Ideacao                    |
+| Melhorias de foco adaptavel (presets, extend, pausas)     | Consolidado (2026-04-08) | Ideacao                    |
 | Updater: feed proprio do fork                             | Consolidado (2026-04-07) | Concluido (release 26.4.9) |
 
 ### 6.1 Melhorias futuras nao bloqueantes (referencia consolidada)
@@ -287,6 +289,7 @@ Nota de escopo: esta secao trata de validacoes de produto/release (incluindo app
 - [ ] Always On Top em Linux/Wayland (comportamento depende de window manager/compositor)
 - [ ] Validacao de matriz completa empacotada (Windows/macOS/Linux) em ciclo de release dedicado
 - [ ] Gamificacao: sistema de conquistas, streaks, XP e niveis baseados em ciclos de foco completados
+- [ ] Foco adaptavel: presets de cadencia, estender sessao, sugestao de pausa (ver secao 6.7)
 
 ### 6.2 Itens para validacao final (Settings)
 
@@ -552,6 +555,54 @@ PR-AU-05 - Encerramento e governanca:
 - [ ] Registrar resultado no CHANGELOG (ativacao e limites por plataforma).
 - [ ] Se houver regressao, aplicar rollback da secao 6.5.6 e reabrir pendencia.
 
+<a id="adaptive-focus-candidates"></a>
+
+### 6.7 Melhorias candidatas — foco adaptavel (hipoteses)
+
+Origem: feedback real de comunidades TDAH (Reddit r/ADHD, artigos clinicos, relatos de usuarios).
+Nenhuma destas e compromisso fechado — sao hipoteses a validar.
+
+Contexto: o Pomodoro classico 25/5 tende a receber adesao mais limitada entre pessoas com TDAH.
+Quase todo mundo que diz "funciona" usa uma versao modificada. As queixas mais comuns sao:
+
+1. Interromper hiperfoco e destrutivo.
+2. Paralisia de inicio — saber que vai trabalhar 25 min nao ajuda a comecar.
+3. A pausa vira doomscroll em vez de descanso real.
+4. Timer rigido gera ansiedade, nao foco.
+
+O Pomodoroz ja cobre parte dessas queixas (duracoes de 1-120 min, breaks de 0 min, modo rigoroso, notificacoes progressivas, grade de rotacao com sorteio). As melhorias abaixo cobrem lacunas restantes.
+
+#### Proximo ciclo (prioridade alta)
+
+| #   | Feature                  | Esforco | Descricao                                                                                                      | Metrica de sucesso                                  |
+| --- | ------------------------ | ------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| 1   | Presets de cadencia      | Baixo   | Botoes em Settings: So comeca (5/1), Sprint (10/3), Classico (25/5), Flow (50/10). Preenche campos existentes. | % de sessoes iniciadas via preset vs. config manual |
+| 2   | Estender sessao (+5/+10) | Medio   | Ao fim do foco, opcao "Continuar +5/+10 min" antes de iniciar pausa. Resolve queixa #1 de hiperfocadores.      | Reducao de skips/resets durante sessao de foco      |
+| 3   | Sugestao de pausa        | Baixo   | Texto rotativo na tela de pausa: "Beba agua", "Alongue", "Respire fundo". Sem tela de celular.                 | Queda de cancelamento/skip durante pausa            |
+
+#### Backlog (avaliar apos proximo ciclo)
+
+| #   | Feature                  | Esforco | Descricao                                                                                       | Metrica de sucesso                          |
+| --- | ------------------------ | ------- | ----------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| 4   | Hotkey global play/pause | Baixo   | Ex: `Alt+Shift+P` para iniciar/pausar timer sem abrir a janela. Infra de hotkeys ja existe.     | Adocao do hotkey (medicao local, sem envio) |
+| 5   | Relatorio de cadencia    | Medio   | Em Estatisticas: "Suas sessoes mais produtivas duraram ~15 min". Usa dados existentes do store. | Engajamento com tela de Estatisticas        |
+| 6   | Mensagem motivacional    | Baixo   | "Voce completou 3 ciclos hoje" ao fim de cada foco. Reforco positivo.                           | Sessoes consecutivas por dia                |
+| 7   | Reverse Pomodoro         | Medio   | Modo invertido: pausa longa -> check-in curto 2-3 min -> pausa. Para dias de baixa energia.     | Uso em dias com 0 ciclos normais            |
+| 8   | Sons ambiente            | Alto    | White noise / lo-fi durante foco. Muito pedido, mas exige assets de audio e UI nova.            | % de sessoes com som ativo                  |
+| 9   | Modo "sem julgamento"    | Baixo   | Opcao de esconder contagem de ciclos/estatisticas. Para dias ruins.                             | Retencao em dias de baixo uso               |
+
+#### Principios
+
+- Nenhuma melhoria deve adicionar rigidez — o diferencial e adaptabilidade.
+- Dados 100% locais, mesmo padrao do app.
+- Implementar incrementalmente; cada item deve ser util isolado.
+- Validar com uso real antes de expandir escopo.
+
+#### Status
+
+- Em ideacao. Nenhum codigo implementado.
+- Prioridade do proximo ciclo definida (items 1-3).
+
 ---
 
 ## 7. Impacto nos Compilados
@@ -614,6 +665,7 @@ Aplicar em toda fase/PR de migracao:
 ## 11. Fontes
 
 - CHANGELOG.md
-- README.md / README.en.md
+- README.md / README.pt-BR.md
+- docs/DECISOES_TECNICAS_2026.en.md
 - CLAUDE.md
 - Conversas tecnicas de 2026-04-07

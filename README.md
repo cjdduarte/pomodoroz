@@ -1,9 +1,11 @@
 <h1 align="center">Pomodoroz</h1>
 
-<h3 align="center">Foco. Pausa. Progresso.</h3>
+<h3 align="center">Flexible focus. Smarter breaks. Real progress.</h3>
+
+<p align="center"><em>Adaptive Focus Timer — 25/5 is a starting point, not a rule.</em></p>
 
 <p align="center">
-  <a href="README.en.md">English version</a>
+  <a href="README.pt-BR.md">Portuguese version</a>
 </p>
 
 <p align="center">
@@ -13,148 +15,214 @@
 </p>
 
 <p align="center">
-  <img src="assets/timerA.png" alt="Pomodoroz - Tema Claro" width="340">
+  <img src="assets/timerA.png" alt="Pomodoroz - Light Theme" width="340">
   &nbsp;&nbsp;
-  <img src="assets/timerB.png" alt="Pomodoroz - Tema Escuro" width="340">
+  <img src="assets/timerB.png" alt="Pomodoroz - Dark Theme" width="340">
 </p>
 
 <p align="center">
   <br>
-  <a href="#-sobre">Sobre</a>
+  <a href="#-about">About</a>
   .
-  <a href="#-funcionalidades">Funcionalidades</a>
+  <a href="#-features">Features</a>
   .
-  <a href="#-instalação">Instalação</a>
+  <a href="#-installation">Installation</a>
   .
-  <a href="#-desenvolvimento">Desenvolvimento</a>
+  <a href="#-development">Development</a>
   .
-  <a href="#-contribuindo">Contribuindo</a>
+  <a href="#-contributing">Contributing</a>
   .
-  <a href="#-privacidade">Privacidade</a>
+  <a href="#-privacy">Privacy</a>
   .
-  <a href="#-licença">Licença</a>
+  <a href="#-license">License</a>
   <br>
   <br>
 </p>
 
-## 🔗 Sobre
+## 🔗 About
 
-**Pomodoroz** é um fork do [Pomatez](https://github.com/zidoro/pomatez) por [Roldan Montilla Jr](https://github.com/roldanjr), iniciado em 2026-03-25.
+**Pomodoroz** is a fork of [Pomatez](https://github.com/zidoro/pomatez) by [Roldan Montilla Jr](https://github.com/roldanjr), started on 2026-03-25. Thanks to the original author for the solid foundation.
 
-Este fork consolida o projeto como **Electron-only** (Tauri/Rust removido), adiciona módulo de **Estatísticas**, **Grade de Rotação de Estudos** e moderniza toda a stack.
+### Why does this fork exist?
 
-Agradecimento ao autor original pela base sólida.
+**Pomatez already supports flexible session timing** (it is not locked to 25/5).  
+Pomodoroz is not about "fixing flexibility"; it focuses on adding workflow features for common friction points: starting tasks, choosing what to do next, staying aware of time, and making breaks actually restorative.
 
-### O que mudou em relação ao Pomatez original
+### Quick Start (suggested presets)
 
-- Módulo de **Estatísticas** com gráfico diário, tempo por tarefa e filtros de período.
-- **Grade de Rotação** com status diário por cartão (branco/verde/vermelho), sorteio por fase e modo agrupado.
-- **Importação/Exportação de tarefas** em JSON com validação e merge/substituição.
-- **Modo compacto aprimorado** com grade expansível e menu de ações.
-- **Voltar pode contar como Ocioso** — opção para reclassificar tempo de foco ao resetar.
-- **Som de notificação customizável** e **breaks de 0 minutos** (pula automaticamente).
-- Ações do Timer refinadas, seleção por clique direito e progressão automática de tarefas.
-- Stack modernizada: React 19, Vite 8, TypeScript 6, React Router 7, Redux Toolkit 2, @dnd-kit, ESLint 9.
+- **Just Start** — 5 min focus / 1 min break
+- **Sprint** — 10 min focus / 3 min break
+- **Classic** — 25 min focus / 5 min break
+- **Flow** — 50 min focus / 10 min break
 
-Para o histórico completo, veja o [CHANGELOG.md](CHANGELOG.md).
+### What this fork adds on top of Pomatez
 
-## ✨ Funcionalidades
+**Task initiation paralysis**
+
+- **Study Rotation Grid** with daily card status.
+- **Draw button** to pick the next task when you get stuck on "where do I start?".
+
+**Time awareness**
+
+- **Progressive notifications** (60s and 30s before transitions).
+- **Voice assistance** with audio session-status cues.
+
+**Break quality**
+
+- **Fullscreen breaks** to reduce distraction and encourage real rest.
+- **0-minute breaks** (auto-skip) when you want to keep momentum.
+
+**Structure on hard days**
+
+- **Strict mode** (no pause/skip/reset once started).
+- **Back may count as Idle** for honest mid-focus reset tracking.
+
+**Progress visibility**
+
+- **Statistics module** (daily chart, per-task time, focus/break/idle by period).
+- **Per-task-list breakdown** with accumulated time and completed cycles.
+
+**Quality of life**
+
+- **JSON task import/export** (validation + merge/replace).
+- **Enhanced compact mode** with expandable grid and actions menu.
+- **Custom notification sounds**.
+- **Right-click task selection** integrated with Timer flow.
+
+> **Note:** Pomodoroz is a productivity tool, not medical advice. If you have an ADHD diagnosis or suspect you might, seek professional support.
+
+### Evidence and history
+
+- Implemented deliveries: [CHANGELOG.en.md](CHANGELOG.en.md)
+- Candidate improvements (not implemented yet): [docs/DECISOES_TECNICAS_2026.en.md#adaptive-focus-candidates](docs/DECISOES_TECNICAS_2026.en.md#adaptive-focus-candidates)
+
+## ✨ Features
 
 ### Timer
-- Modos: **Foco**, **Pausa curta**, **Pausa longa** e **Pausas especiais** (horários configuráveis).
-- Controles: iniciar, pausar, pular, resetar.
-- Rodadas de sessão configuráveis.
-- **Modo rigoroso** — impede pausar/pular/resetar uma vez iniciado.
-- **Início automático** do foco após a pausa.
-- **Breaks de 0 minutos** — pula a pausa automaticamente.
-- **Animação de progresso** (desativável).
 
-### Tarefas
-- Criar listas e tarefas com descrição.
-- Arrastar e soltar para reordenar (listas e cartões).
-- Marcar como concluído, pular ou excluir.
-- **Desfazer/Refazer** (Ctrl+Z / Ctrl+Shift+Z).
-- **Importação/Exportação** em JSON com validação, regeneração de IDs e opção merge ou substituição.
+- Modes: **Focus**, **Short break**, **Long break**, and **Special breaks** (configurable times).
+- Controls: start, pause, skip, reset.
+- Configurable session rounds.
+- **Strict mode** — prevents pausing/skipping/resetting once started.
+- **Auto-start** focus after break ends.
+- **0-minute breaks** — auto-skip breaks.
+- **Progress animation** (can be disabled).
 
-### Grade de Rotação de Estudos
-- Alternância entre visualização em **lista** e **grade**.
-- Status diário por cartão: branco → verde → vermelho.
-- **Botão Sortear** — seleção aleatória por fase (branco→verde, depois verde→vermelho).
-- **Colunas**: Auto / 1 / 2 / 3 (preferência persistente).
-- **Modo agrupado** — separadores por lista com toggle Agrupar/Desagrupar.
-- **Reset de cores** com confirmação e reset automático diário.
-- Clique direito seleciona a tarefa ativa e navega ao Timer.
+### Tasks
 
-### Estatísticas
-- **Períodos**: Hoje, Semana (7d), Mês (30d), Tudo.
-- Cartões resumo: tempo de foco, pausa, ocioso e ciclos completos.
-- **Gráfico diário** (foco/pausa/ocioso empilhados).
-- **Detalhamento por lista de tarefas** com tempo e ciclos.
-- Limpeza de dados com confirmação (semana, mês ou tudo).
+- Create lists and tasks with descriptions.
+- Drag-and-drop reordering (lists and cards).
+- Mark as done, skip, or delete.
+- **Undo/Redo** (Ctrl+Z / Ctrl+Shift+Z).
+- **Import/Export** in JSON with validation, ID regeneration, and merge or replace options.
 
-### Modo Compacto
-- Interface mínima para telas pequenas.
-- **Grade expansível** dentro do modo compacto.
-- Menu de ações (concluir/pular/excluir) no display de tarefa.
-- Prompt pós-pausa para continuar ou abrir a grade.
+### Study Rotation Grid
 
-### Notificações
-- **Nenhuma** — sem notificação.
-- **Normal** — notifica a cada pausa.
-- **Extra** — notifica 60s antes da pausa, 30s antes do fim e no início.
-- **Som customizável** — sino padrão ou arquivo de áudio personalizado.
-- **Assistente de voz** — aviso sonoro sobre status da sessão.
+- Toggle between **list** and **grid** view.
+- Daily card status: white → green → red.
+- **Draw button** — random phase-based selection (white→green, then green→red).
+- **Columns**: Auto / 1 / 2 / 3 (persistent preference).
+- **Grouped mode** — list separators with Group/Ungroup toggle.
+- **Color reset** with confirmation and automatic daily reset.
+- Right-click selects the active task and navigates to Timer.
 
-### Aparência e Sistema
-- **Tema escuro** com opção de seguir o tema do sistema.
-- **Barra de título nativa** — alterna entre custom e nativa do SO.
-- **Sempre no topo** — mantém a janela acima das demais.
-- **Minimizar/Fechar para bandeja** com indicador de progresso no ícone.
-- **Abrir no login** (macOS/Windows).
+### Statistics
 
-### Atalhos de Teclado
-- `Alt+Shift+H` — Ocultar app.
-- `Alt+Shift+S` — Mostrar app.
-- `Alt+Shift+T` — Alternar tema.
-- `Ctrl+Z` / `Ctrl+Shift+Z` — Desfazer/Refazer em Tarefas.
+- **Periods**: Today, Week (7d), Month (30d), All.
+- Summary cards: focus time, break time, idle time, and completed cycles.
+- **Daily flow chart** (stacked focus/break/idle).
+- **Per-task-list breakdown** with time and cycles.
+- Data clearing with confirmation (week, month, or all).
 
-### Idiomas
-- Português (BR), Inglês, Espanhol, Japonês, Chinês.
-- Detecção automática do idioma do sistema.
+### Compact Mode
 
-### Tela cheia durante pausas
-- Ocupa a tela inteira durante a pausa para forçar o descanso.
-- Estabilidade em estados compacto/minimizado/oculto.
+- Minimal UI for small screens.
+- **Expandable grid** within compact mode.
+- Actions menu (done/skip/delete) on task display.
+- Post-break prompt to continue or open the grid.
 
-## 💻 Instalação
+### Notifications
 
-Disponível para Windows, macOS e Linux.
+- **None** — no notifications.
+- **Normal** — notifies on every break.
+- **Extra** — notifies 60s before break, 30s before break ends, and on break start.
+- **Custom sound** — default bell or custom audio file.
+- **Voice assistance** — audio cue about session status.
 
-Baixe a versão mais recente na [página de Releases](https://github.com/cjdduarte/pomodoroz/releases/latest).
+### Appearance & System
 
-### Compilar do Código-Fonte
+- **Dark theme** with follow-system-theme option.
+- **Native titlebar** — toggle between custom and OS-native.
+- **Always on top** — keeps the window above others.
+- **Minimize/Close to tray** with progress indicator on tray icon.
+- **Open at login** (macOS/Windows).
+
+### Keyboard Shortcuts
+
+- `Alt+Shift+H` — Hide app.
+- `Alt+Shift+S` — Show app.
+- `Alt+Shift+T` — Toggle theme.
+- `Ctrl+Z` / `Ctrl+Shift+Z` — Undo/Redo in Tasks.
+
+### Languages
+
+- Portuguese (BR), English, Spanish, Japanese, Chinese.
+- Automatic system language detection.
+
+### Fullscreen Breaks
+
+- Fills the entire screen during breaks to encourage rest.
+- Stable across compact/minimized/hidden window states.
+
+## 🚧 Coming Soon
+
+Improvements informed by real feedback from users who deal with focus difficulties and ADHD. See details at [docs/DECISOES_TECNICAS_2026.en.md](docs/DECISOES_TECNICAS_2026.en.md#adaptive-focus-candidates).
+
+- **Cadence presets** — Just Start (5/1), Sprint (10/3), Classic (25/5), Flow (50/10).
+- **Extend session** — "+5 min" / "+10 min" when in hyperfocus, without breaking your flow.
+- **Break suggestions** — rotating tips (drink water, stretch, breathe) to avoid doomscrolling.
+
+## 💻 Installation
+
+Available for Windows, macOS, and Linux.
+
+Download the latest version from the [Releases page](https://github.com/cjdduarte/pomodoroz/releases/latest).
+
+> **In-app update note:** the automatic in-app channel is currently focused on Windows (NSIS) and Linux (AppImage).
+
+### Local Install Scripts
+
+```sh
+./scripts/install.sh
+./scripts/install.ps1
+./scripts/uninstall.sh
+./scripts/uninstall.ps1
+```
+
+### Build From Source
 
 ```sh
 yarn install
-yarn build:dir    # Build desempacotado
+yarn build:dir    # Unpacked build
 yarn build:linux  # Linux (AppImage, deb, rpm)
 yarn build:win    # Windows (portable + setup)
 yarn build:mac    # macOS
 ```
 
-## 🛠️ Desenvolvimento
+## 🛠️ Development
 
-### Requisitos
+### Requirements
+
 - Node.js v24
 - Yarn Classic (1.x)
 
-### Comandos
+### Commands
 
 ```sh
 yarn dev:app          # Electron + Vite renderer
-yarn dev:renderer     # Renderer only (Vite em localhost:3000)
-yarn lint             # Lint/typecheck do monorepo
-yarn build:dir        # Build desempacotado
+yarn dev:renderer     # Renderer only (Vite on localhost:3000)
+yarn lint             # Monorepo lint/typecheck
+yarn build:dir        # Unpacked build
 ```
 
 ### Stack
@@ -162,21 +230,21 @@ yarn build:dir        # Build desempacotado
 - Electron 41
 - React 19 + Vite 8 + TypeScript 6
 - React Router 7 + Redux Toolkit 2
-- @dnd-kit (arrastar e soltar)
+- @dnd-kit (drag-and-drop)
 - Styled Components
 - i18next
 - Lerna 9 + Yarn Classic
 
-## 🤝 Contribuindo
+## 🤝 Contributing
 
-Veja [CONTRIBUTING.md](CONTRIBUTING.md) para detalhes.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
-## 🔒 Privacidade
+## 🔒 Privacy
 
-Pomodoroz **não coleta nenhum dado**. Todas as informações (tarefas, configurações, estatísticas) ficam armazenadas localmente na sua máquina.
+Pomodoroz **does not collect any data**. All information (tasks, settings, statistics) is stored locally on your machine.
 
-## 📄 Licença
+## 📄 License
 
 MIT © [Carlos Duarte](https://github.com/cjdduarte)
 
-Trabalho original: MIT © [Roldan Montilla Jr](https://github.com/roldanjr) — [Pomatez](https://github.com/zidoro/pomatez)
+Original work: MIT © [Roldan Montilla Jr](https://github.com/roldanjr) — [Pomatez](https://github.com/zidoro/pomatez)

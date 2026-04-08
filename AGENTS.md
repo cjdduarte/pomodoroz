@@ -3,8 +3,8 @@
 ## Fontes Oficiais (sem duplicacao)
 
 - [CHANGELOG.md](CHANGELOG.md): historico do que JA foi implementado.
-- [docs/DECISOES_TECNICAS_2026.md](docs/DECISOES_TECNICAS_2026.md): decisoes tecnicas, stack alvo, roadmap e pendencias abertas.
-- [README.md](README.md) / [README.en.md](README.en.md): visao de produto, instalacao e uso.
+- [docs/DECISOES_TECNICAS_2026.md](docs/DECISOES_TECNICAS_2026.md) / [docs/DECISOES_TECNICAS_2026.en.md](docs/DECISOES_TECNICAS_2026.en.md): decisoes tecnicas, stack alvo, roadmap e pendencias abertas.
+- [README.md](README.md) / [README.pt-BR.md](README.pt-BR.md): visao de produto, instalacao e uso.
 - [CLAUDE.md](CLAUDE.md): guia operacional para Claude Code.
 
 Regra: este arquivo NAO replica cronologia de mudancas, tabelas de decisoes, roadmap detalhado, nem backlog funcional. Essas informacoes ficam centralizadas nos documentos acima.
