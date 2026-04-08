@@ -12,6 +12,7 @@
 
 - **PT-BR support wording normalized.**
 - **Cross-list drag visual stabilized** — when dragging a task to another list, the card no longer visually snaps back to the source list before drop.
+- **Drag preview aligned with real card UI** — drag overlay now reuses the same card styling (width, layout, and icons), improving visual consistency while moving tasks.
 
 ## [26.4.13] - 2026-04-08
 

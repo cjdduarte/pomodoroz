@@ -12,6 +12,7 @@
 
 - **Texto de apoio padronizado no PT-BR.**
 - **Drag visual entre listas estabilizado** — ao arrastar uma tarefa para outra lista, o card não “salta” de volta visualmente para a lista de origem antes do drop.
+- **Preview de arraste alinhado ao card real** — overlay de drag agora reaproveita o mesmo estilo do cartão da lista (largura, layout e ícones), melhorando a consistência visual durante o movimento.
 
 ## [26.4.13] - 2026-04-08
 

@@ -37,6 +37,7 @@ import {
 } from "./TaskListGrid.styles";
 
 import TaskFormButton from "./TaskFormButton";
+import TaskCardDragOverlay from "./TaskCardDragOverlay";
 import TaskInnerList from "./TaskInnerList";
 import TaskListGrid from "./TaskListGrid";
 
@@ -62,10 +63,9 @@ type DragCardContainerData = {
   listId: string;
 };
 type ActiveDragCardPreview = {
-  listId: string;
-  cardId: string;
   text: string;
   done: boolean;
+  width?: number;
 };
 
 const getInitialViewMode = (): ViewMode => {
@@ -120,10 +120,9 @@ export default function Tasks() {
     }
 
     setActiveDragCardPreview({
-      listId: activeData.listId,
-      cardId: activeData.cardId,
       text: sourceCard.text,
       done: sourceCard.done,
+      width: active.rect.current.initial?.width,
     });
   };
 
@@ -374,26 +373,11 @@ export default function Tasks() {
       </StyledTaskMain>
       <DragOverlay>
         {activeDragCardPreview ? (
-          <div
-            style={{
-              width: "min(92vw, 52rem)",
-              padding: "0.5rem 1rem",
-              borderRadius: "3px",
-              border: "1px solid var(--color-border-input-primary)",
-              borderBottomColor: "var(--color-border-input-secondary)",
-              backgroundColor: "var(--color-bg-task-card)",
-              color: "var(--color-body-text)",
-              boxShadow: "0 6px 18px -8px var(--color-shadow-primary)",
-              whiteSpace: "pre-wrap",
-              wordBreak: "break-word",
-              opacity: activeDragCardPreview.done ? 0.7 : 1,
-              textDecoration: activeDragCardPreview.done
-                ? "line-through"
-                : "none",
-            }}
-          >
-            {activeDragCardPreview.text}
-          </div>
+          <TaskCardDragOverlay
+            text={activeDragCardPreview.text}
+            done={activeDragCardPreview.done}
+            width={activeDragCardPreview.width}
+          />
         ) : null}
       </DragOverlay>
     </DndContext>
