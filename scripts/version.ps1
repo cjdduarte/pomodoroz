@@ -10,7 +10,9 @@ function Show-Usage {
 Uso:
   ./scripts/version.ps1 [-Version <versao>] [-DryRun]
 
-Sem -Version, sugere automaticamente a data de hoje (yy.m.d)
+Sem -Version, sugere automaticamente usando:
+  ano/mes atual (yy.m) + ultimo patch de tag local vyy.m.*
+  exemplo: v26.4.10 -> sugestao 26.4.11; ao virar mes sem tag, 26.5.1
 e pede confirmacao antes de executar.
 
 Obs.: se informar com zero a esquerda (ex.: 26.03.25), sera normalizado para 26.3.25.
@@ -46,9 +48,66 @@ function Normalize-Version {
     return "$major.$minor.$patch$suffix"
 }
 
+function Get-SuggestedVersion {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$RepoRoot
+    )
+
+    $now = Get-Date
+    $currentMajor = [int]$now.ToString("yy")
+    $currentMinor = [int]$now.ToString("MM")
+    $maxPatch = $null
+
+    try {
+        $tags = & git -C $RepoRoot tag -l "v[0-9]*.[0-9]*.[0-9]*" 2>$null
+        if ($LASTEXITCODE -eq 0 -and $tags) {
+            foreach ($tag in $tags) {
+                $normalizedTag = $tag.Trim()
+                if (-not $normalizedTag) {
+                    continue
+                }
+
+                if ($normalizedTag.StartsWith("v")) {
+                    $normalizedTag = $normalizedTag.Substring(1)
+                }
+
+                $tagMatch = [regex]::Match(
+                    $normalizedTag,
+                    '^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)$'
+                )
+
+                if (-not $tagMatch.Success) {
+                    continue
+                }
+
+                $tagMajor = [int]$tagMatch.Groups["major"].Value
+                $tagMinor = [int]$tagMatch.Groups["minor"].Value
+                $tagPatch = [int]$tagMatch.Groups["patch"].Value
+
+                if ($tagMajor -ne $currentMajor -or $tagMinor -ne $currentMinor) {
+                    continue
+                }
+
+                if ($null -eq $maxPatch -or $tagPatch -gt $maxPatch) {
+                    $maxPatch = $tagPatch
+                }
+            }
+        }
+    } catch {
+        # Fallback: sem tags legiveis, inicia patch em 1 no mes atual.
+    }
+
+    if ($null -eq $maxPatch) {
+        return "$currentMajor.$currentMinor.1"
+    }
+
+    return "$currentMajor.$currentMinor.$($maxPatch + 1)"
+}
+
 $ROOT = Split-Path -Parent $PSScriptRoot
 $APP_DIR = $ROOT
-$SUGGESTED_VERSION = Get-Date -Format "yy.M.d"
+$SUGGESTED_VERSION = Get-SuggestedVersion -RepoRoot $ROOT
 $versionFromPrompt = $false
 
 if ($Version -eq "-h" -or $Version -eq "--help") {
@@ -74,7 +133,7 @@ $rawVersion = $Version
 $Version = Normalize-Version -RawVersion $rawVersion
 
 $command = "yarn version:sync $Version"
-Write-Host "Versao sugerida de hoje: $SUGGESTED_VERSION"
+Write-Host "Versao sugerida (data + tags locais): $SUGGESTED_VERSION"
 if ($rawVersion -ne $Version) {
     Write-Host "Versao normalizada: $rawVersion -> $Version"
 }

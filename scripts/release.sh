@@ -3,7 +3,44 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 APP_DIR="$ROOT"
-SUGGESTED_VERSION="$((10#$(date +%y))).$((10#$(date +%m))).$((10#$(date +%d)))"
+
+get_suggested_version() {
+  local current_major current_minor
+  local max_patch=0
+  local found=0
+
+  current_major="$((10#$(date +%y)))"
+  current_minor="$((10#$(date +%m)))"
+
+  if command -v git >/dev/null 2>&1 && git -C "$APP_DIR" rev-parse --git-dir >/dev/null 2>&1; then
+    while IFS= read -r tag; do
+      [[ -z "$tag" ]] && continue
+      tag="${tag#v}"
+
+      if [[ "$tag" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+        local tag_major tag_minor tag_patch
+        tag_major="$((10#${BASH_REMATCH[1]}))"
+        tag_minor="$((10#${BASH_REMATCH[2]}))"
+        tag_patch="$((10#${BASH_REMATCH[3]}))"
+
+        if (( tag_major == current_major && tag_minor == current_minor )); then
+          if (( found == 0 || tag_patch > max_patch )); then
+            max_patch="$tag_patch"
+            found=1
+          fi
+        fi
+      fi
+    done < <(git -C "$APP_DIR" tag -l "v[0-9]*.[0-9]*.[0-9]*")
+  fi
+
+  if (( found == 1 )); then
+    printf "%s.%s.%s" "$current_major" "$current_minor" "$((max_patch + 1))"
+  else
+    printf "%s.%s.1" "$current_major" "$current_minor"
+  fi
+}
+
+SUGGESTED_VERSION="$(get_suggested_version)"
 
 DRY_RUN=0
 SKIP_VALIDATE=0
@@ -27,6 +64,10 @@ Uso:
   ./scripts/release.sh --dry-run [versao]
   ./scripts/release.sh --skip-validate [versao]
   ./scripts/release.sh --no-push [versao]
+
+Sem argumento, sugere automaticamente usando:
+  ano/mes atual (yy.m) + ultimo patch de tag local vyy.m.*
+  exemplo: v26.4.10 -> sugestao 26.4.11; ao virar mes sem tag, 26.5.1
 
 Fluxo:
   1) valida repo limpo e branch atual
@@ -114,7 +155,7 @@ if ! [[ "$TARGET_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-.+][0-9A-Za-z.-]+)?$ ]]; 
   die "Versao invalida: $TARGET_VERSION"
 fi
 
-printf "Versao sugerida de hoje: %s\n" "$SUGGESTED_VERSION"
+printf "Versao sugerida (data + tags locais): %s\n" "$SUGGESTED_VERSION"
 if [[ "$TARGET_VERSION_RAW" != "$TARGET_VERSION" ]]; then
   printf "Versao normalizada: %s -> %s\n" "$TARGET_VERSION_RAW" "$TARGET_VERSION"
 fi
