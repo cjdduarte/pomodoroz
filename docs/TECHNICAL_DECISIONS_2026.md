@@ -1,7 +1,7 @@
 # Technical Decisions 2026 - Pomodoroz
 
 > English companion document for planning and technical decisions.
-> Portuguese source remains available at `docs/DECISOES_TECNICAS_2026.md`.
+> Portuguese source remains available at `docs/DECISOES_TECNICAS_2026.pt-BR.md`.
 >
 > Reference date: 2026-04-07
 
@@ -664,6 +664,6 @@ Apply to every migration phase/PR:
 
 - CHANGELOG.md / CHANGELOG.en.md
 - README.md / README.pt-BR.md
-- docs/DECISOES_TECNICAS_2026.md
+- docs/DECISOES_TECNICAS_2026.pt-BR.md
 - CLAUDE.md
 - Technical discussions from 2026-04-07

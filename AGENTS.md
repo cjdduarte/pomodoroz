@@ -3,7 +3,7 @@
 ## Fontes Oficiais (sem duplicacao)
 
 - [CHANGELOG.md](CHANGELOG.md): historico do que JA foi implementado.
-- [docs/DECISOES_TECNICAS_2026.md](docs/DECISOES_TECNICAS_2026.md) / [docs/DECISOES_TECNICAS_2026.en.md](docs/DECISOES_TECNICAS_2026.en.md): decisoes tecnicas, stack alvo, roadmap e pendencias abertas.
+- [docs/TECHNICAL_DECISIONS_2026.md](docs/TECHNICAL_DECISIONS_2026.md) / [docs/DECISOES_TECNICAS_2026.pt-BR.md](docs/DECISOES_TECNICAS_2026.pt-BR.md): decisoes tecnicas, stack alvo, roadmap e pendencias abertas.
 - [README.md](README.md) / [README.pt-BR.md](README.pt-BR.md): visao de produto, instalacao e uso.
 - [CLAUDE.md](CLAUDE.md): guia operacional para Claude Code.
 
@@ -43,7 +43,7 @@ Regra: este arquivo NAO replica cronologia de mudancas, tabelas de decisoes, roa
 ## Politica de Documentacao
 
 - Implementado apos o fork: registrar em `CHANGELOG.md`.
-- Pendencias futuras, decisoes e plano tecnico: registrar em `docs/DECISOES_TECNICAS_2026.md`.
+- Pendencias futuras, decisoes e plano tecnico: registrar em `docs/TECHNICAL_DECISIONS_2026.md`.
 - Nao criar specs/checklists soltos na raiz para temas que ja existem no documento tecnico unico.
 
 ### Regra de ligacao CHANGELOG <-> Release (obrigatoria)

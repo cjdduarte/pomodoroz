@@ -2,7 +2,7 @@
 
 > Documento unico de decisoes: o que sera migrado, o que nao sera, e porque.
 > Consolida pendencias tecnicas/de produto e discussoes de stack.
-> English companion: [docs/DECISOES_TECNICAS_2026.en.md](docs/DECISOES_TECNICAS_2026.en.md)
+> English companion: [TECHNICAL_DECISIONS_2026.md](TECHNICAL_DECISIONS_2026.md)
 >
 > Data de referencia: 2026-04-07
 
@@ -666,6 +666,6 @@ Aplicar em toda fase/PR de migracao:
 
 - CHANGELOG.md
 - README.md / README.pt-BR.md
-- docs/DECISOES_TECNICAS_2026.en.md
+- docs/TECHNICAL_DECISIONS_2026.md
 - CLAUDE.md
 - Conversas tecnicas de 2026-04-07

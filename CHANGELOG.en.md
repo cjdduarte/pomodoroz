@@ -80,7 +80,7 @@
 
 ### Documentation
 
-- **CHANGELOG <-> Release policy formalized** — changelog/tag/release-notes linkage is now explicitly documented in `AGENTS.md`, `CLAUDE.md`, and `docs/DECISOES_TECNICAS_2026.md`.
+- **CHANGELOG <-> Release policy formalized** — changelog/tag/release-notes linkage is now explicitly documented in `AGENTS.md`, `CLAUDE.md`, and `docs/TECHNICAL_DECISIONS_2026.md`.
 - **Auto-update channel policy clarified** — current in-app support is explicitly scoped to Windows NSIS and Linux AppImage; portable/deb/rpm/AUR remain out of in-app auto-update scope.
 - **Dependency visibility planning** — added planned task to evolve `check-updates.sh` with `report --full` coverage (dependencies + audit + GitHub Actions).
 
