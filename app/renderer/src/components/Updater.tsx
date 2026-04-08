@@ -46,11 +46,76 @@ const IgnoreVersion = styled.div`
   cursor: pointer;
 `;
 
+const HTML_TAG_REGEX = /<\/?[a-z][\s\S]*>/i;
+const HTML_ENTITY_REGEX = /&(?:[a-zA-Z]+|#\d+|#x[0-9A-Fa-f]+);/;
+
+const decodeHtmlEntities = (value: string): string => {
+  if (typeof window === "undefined" || !HTML_ENTITY_REGEX.test(value)) {
+    return value;
+  }
+
+  const textarea = window.document.createElement("textarea");
+  textarea.innerHTML = value;
+  return textarea.value;
+};
+
+const getReadableUpdateBody = (rawBody: string): string => {
+  const normalizedBody = decodeHtmlEntities(rawBody);
+
+  if (
+    !HTML_TAG_REGEX.test(normalizedBody) ||
+    typeof window === "undefined"
+  ) {
+    return normalizedBody;
+  }
+
+  const parser = new window.DOMParser();
+  const doc = parser.parseFromString(normalizedBody, "text/html");
+
+  doc.querySelectorAll("br").forEach((element) => {
+    element.replaceWith(doc.createTextNode("\n"));
+  });
+
+  doc.querySelectorAll("li").forEach((element) => {
+    element.insertBefore(doc.createTextNode("- "), element.firstChild);
+    element.appendChild(doc.createTextNode("\n"));
+  });
+
+  [
+    "p",
+    "div",
+    "section",
+    "article",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "pre",
+    "blockquote",
+  ].forEach((tag) => {
+    doc.querySelectorAll(tag).forEach((element) => {
+      element.appendChild(doc.createTextNode("\n\n"));
+    });
+  });
+
+  const textContent = doc.body.textContent ?? "";
+  return textContent.replace(/\n{3,}/g, "\n\n").trim();
+};
+
 const Updater: React.FC = () => {
   const update = useAppSelector((state) => state.update);
   const { t } = useTranslation();
 
   const dispatch = useAppDispatch();
+  const updateBody = React.useMemo(() => {
+    const rawBody = update.updateBody?.trim();
+    if (!rawBody) {
+      return t("updater.noUpdateBody");
+    }
+    return getReadableUpdateBody(rawBody);
+  }, [t, update.updateBody]);
 
   return (
     <UpdateWrapper>
@@ -67,7 +132,7 @@ const Updater: React.FC = () => {
             ),
           }}
         >
-          {update.updateBody || t("updater.noUpdateBody")}
+          {updateBody}
         </ReactMarkdown>
       </UpdateDescriptionPreviewer>
 

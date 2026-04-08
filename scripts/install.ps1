@@ -16,6 +16,29 @@ function Die($message) {
     exit 1
 }
 
+function Get-LatestAppImageCandidate {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Path,
+        [Parameter(Mandatory = $true)]
+        [string]$Filter
+    )
+
+    return Get-ChildItem -Path $Path -Filter $Filter -File |
+        Sort-Object `
+            @{ Expression = {
+                    if ($_.Name -match '^Pomodoroz-v(?<ver>\d+\.\d+\.\d+)-linux-') {
+                        [version]$Matches.ver
+                    }
+                    else {
+                        [version]"0.0.0"
+                    }
+                }
+            }, `
+            @{ Expression = { $_.Name } } |
+        Select-Object -Last 1
+}
+
 if (-not $IsLinux) {
     Die "Este script suporta apenas Linux."
 }
@@ -108,14 +131,10 @@ if (-not (Test-Path $distDir)) {
     Die "Diretorio de dist nao encontrado: $distDir"
 }
 
-$appImageCandidate = Get-ChildItem -Path $distDir -Filter "Pomodoroz-v*-linux-$appImageArchPattern.AppImage" -File |
-    Sort-Object Name |
-    Select-Object -Last 1
+$appImageCandidate = Get-LatestAppImageCandidate -Path $distDir -Filter "Pomodoroz-v*-linux-$appImageArchPattern.AppImage"
 
 if (-not $appImageCandidate) {
-    $appImageCandidate = Get-ChildItem -Path $distDir -Filter "Pomodoroz-v*-linux-*.AppImage" -File |
-        Sort-Object Name |
-        Select-Object -Last 1
+    $appImageCandidate = Get-LatestAppImageCandidate -Path $distDir -Filter "Pomodoroz-v*-linux-*.AppImage"
 }
 
 if (-not $appImageCandidate) {

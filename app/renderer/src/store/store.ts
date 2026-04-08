@@ -26,7 +26,10 @@ const store = configureStore({
   },
 });
 
-if (!getFromStorage("state")) {
+const persistedRootState = getFromStorage("state");
+export const isFreshInstallProfile = !persistedRootState;
+
+if (!persistedRootState) {
   saveToStorage("state", {
     config: store.getState().config,
     settings: store.getState().settings,

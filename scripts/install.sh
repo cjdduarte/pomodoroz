@@ -130,13 +130,23 @@ case "$ARCH_RAW" in
 esac
 
 if [[ -n "$ARCH_PATTERN" ]]; then
-  APPIMAGE_CANDIDATE="$(find "$DIST_DIR" -maxdepth 1 -type f -name "Pomodoroz-v*-linux-${ARCH_PATTERN}.AppImage" | sort | tail -n 1 || true)"
+  APPIMAGE_CANDIDATE="$(
+    find "$DIST_DIR" -maxdepth 1 -type f \
+      -name "Pomodoroz-v*-linux-${ARCH_PATTERN}.AppImage" |
+      sort -V |
+      tail -n 1 || true
+  )"
 else
   APPIMAGE_CANDIDATE=""
 fi
 
 if [[ -z "${APPIMAGE_CANDIDATE}" ]]; then
-  APPIMAGE_CANDIDATE="$(find "$DIST_DIR" -maxdepth 1 -type f -name "Pomodoroz-v*-linux-*.AppImage" | sort | tail -n 1 || true)"
+  APPIMAGE_CANDIDATE="$(
+    find "$DIST_DIR" -maxdepth 1 -type f \
+      -name "Pomodoroz-v*-linux-*.AppImage" |
+      sort -V |
+      tail -n 1 || true
+  )"
 fi
 
 [[ -n "${APPIMAGE_CANDIDATE}" ]] || die "Nenhum AppImage encontrado em ${DIST_DIR}."

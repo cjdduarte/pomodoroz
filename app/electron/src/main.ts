@@ -618,6 +618,16 @@ const applyInAppAutoUpdatePreference = (
   appUpdater.autoInstallOnAppQuit = enableInAppAutoUpdate;
 };
 
+const requestUpdateCheck = (reason: string): void => {
+  if (!appUpdater) return;
+  appUpdater.checkForUpdates().catch((error) => {
+    console.log(
+      `[Updater] Error while checking updates (${reason}):`,
+      error
+    );
+  });
+};
+
 const isSafeExternalUrl = (url: string): boolean => {
   try {
     const parsedUrl = new URL(url);
@@ -1025,6 +1035,9 @@ if (!onlySingleInstance) {
     const enableInAppAutoUpdate = isInAppAutoUpdateEnabled();
     appUpdater = activateAutoUpdate({
       enableInAppAutoUpdate,
+      // Run first check only after renderer syncs policy to avoid
+      // stale persisted values forcing unwanted behavior on fresh profile.
+      checkOnInit: false,
       onErrorUpdating: (error) => {
         console.log("[Updater] Error while checking updates:", error);
       },
@@ -1169,14 +1182,7 @@ ipcMain.on(SET_IN_APP_AUTO_UPDATE, (_event, payload: unknown) => {
 
   applyInAppAutoUpdatePreference(enableInAppAutoUpdate);
 
-  if (enableInAppAutoUpdate && appUpdater) {
-    appUpdater.checkForUpdates().catch((error) => {
-      console.log(
-        "[Updater] Error while rechecking updates after enabling in-app auto update:",
-        error
-      );
-    });
-  }
+  requestUpdateCheck("policy sync");
 });
 
 ipcMain.on(SHOW_WINDOW, () => {

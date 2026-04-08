@@ -30,6 +30,13 @@ import {
 import { InvokeConnector } from "../InvokeConnector";
 import { useTrayIconUpdates } from "hooks/useTrayIconUpdates";
 import { setUpdateBody, setUpdateVersion } from "store/update";
+import { getFromStorage } from "utils";
+import { isFreshInstallProfile } from "store";
+
+const AUTO_UPDATE_POLICY_PROMPT_SEEN_KEY =
+  "auto-update-policy-prompt-seen";
+const AUTO_UPDATE_POLICY_PROMPT_PENDING_KEY =
+  "auto-update-policy-prompt-pending-choice";
 
 const IPC_ERROR_MESSAGE =
   "Falha ao comunicar com o processo nativo. Reinicie o app.";
@@ -168,6 +175,19 @@ export const ElectronConnectorProvider = ({
   }, [sendToMain, settings.openAtLogin]);
 
   useEffect(() => {
+    const hasSeenPrompt =
+      getFromStorage<boolean>(AUTO_UPDATE_POLICY_PROMPT_SEEN_KEY) ===
+      true;
+    const hasPendingChoice =
+      getFromStorage<boolean>(AUTO_UPDATE_POLICY_PROMPT_PENDING_KEY) ===
+      true;
+    const shouldDeferPolicySync =
+      hasPendingChoice || (isFreshInstallProfile && !hasSeenPrompt);
+
+    if (shouldDeferPolicySync) {
+      return;
+    }
+
     sendToMain(SET_IN_APP_AUTO_UPDATE, {
       enableInAppAutoUpdate: settings.enableInAppAutoUpdate,
     });

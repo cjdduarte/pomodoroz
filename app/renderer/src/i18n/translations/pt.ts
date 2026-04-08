@@ -133,7 +133,7 @@ export const pt = {
     languagePortuguese: "Português (Brasil)",
     alertHeading: "Olá 👋,",
     alertBody:
-      "Se você gostou deste app, considere dar uma estrela no projeto no GitHub para mostrar seu ❤️ e apoio.",
+      "Se curtir o app, considere dar uma ⭐ no GitHub e/ou me pagar um ☕.",
     alwaysOnTop: "Sempre no topo",
     compactMode: "Modo compacto",
     showGridRandomButton: "Mostrar botão Sortear no grid",
@@ -151,6 +151,11 @@ export const pt = {
     voiceAssistance: "Assistência por voz",
     openAtLogin: "Abrir ao iniciar sessão",
     inAppAutoUpdate: "Auto update no app",
+    autoUpdatePromptTitle: "Atualizações automáticas",
+    autoUpdatePromptBody:
+      "Deseja que o app baixe e instale novas versões automaticamente? Você pode mudar isso depois em Ajustes.",
+    autoUpdatePromptEnable: "Sim, atualizar automaticamente",
+    autoUpdatePromptNotifyOnly: "Não, apenas avisar",
     notificationSound: "Som de notificação",
     notificationSoundDefault: "Som padrão do app",
     notificationSoundCustom: "Som personalizado",

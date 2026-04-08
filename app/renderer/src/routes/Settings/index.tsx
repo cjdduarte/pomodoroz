@@ -20,10 +20,11 @@ export default function Settings() {
   const alertState = getFromStorage<string>("alert") || null;
 
   const update = useAppSelector((state) => state.update);
+  const settings = useAppSelector((state) => state.settings);
 
   const [alert, setAlert] = useState(alertState);
 
-  return update.updateBody ? (
+  return update.updateBody && !settings.enableInAppAutoUpdate ? (
     <Updater />
   ) : (
     <StyledSettings>

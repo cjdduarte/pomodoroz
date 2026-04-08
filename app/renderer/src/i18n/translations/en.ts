@@ -133,7 +133,7 @@ export const en = {
     languagePortuguese: "Portuguese (Brazil)",
     alertHeading: "Hi 👋,",
     alertBody:
-      "If you liked this app, please consider starring this project on GitHub to show your ❤️ and support.",
+      "If you like the app, consider giving it a ⭐ on GitHub and/or buying me a ☕.",
     alwaysOnTop: "Always On Top",
     compactMode: "Compact Mode",
     showGridRandomButton: "Show Draw button in grid",
@@ -151,6 +151,11 @@ export const en = {
     voiceAssistance: "Voice Assistance",
     openAtLogin: "Open At Login",
     inAppAutoUpdate: "In-app Auto Update",
+    autoUpdatePromptTitle: "Automatic updates",
+    autoUpdatePromptBody:
+      "Do you want the app to download and install new versions automatically? You can change this later in Settings.",
+    autoUpdatePromptEnable: "Yes, update automatically",
+    autoUpdatePromptNotifyOnly: "No, notify only",
     notificationSound: "Notification Sound",
     notificationSoundDefault: "App default sound",
     notificationSoundCustom: "Custom sound",

@@ -14,14 +14,22 @@
 - **Fallback para atalho ausente no Start Menu** — novo include NSIS (`electron-builder/installer.nsh`) recria o atalho quando ele não existir após instalação/update.
 - **Nome em "Aplicativos instalados" sem redundância de versão** — `uninstallDisplayName` no NSIS foi definido como `Pomodoroz`, mantendo a versão apenas no campo de detalhes do Windows.
 - **i18n do Updater no renderer** — textos da tela de atualização e da notificação de abertura de release agora usam chaves `updater.*` em pt/en/es/ja/zh.
+- **Release notes HTML legíveis no Updater** — quando `releaseNotes` chega em HTML, a tela converte para texto estruturado antes de renderizar, evitando exibição de tags cruas.
+- **Compatibilidade com release notes HTML escapado** — quando o corpo chega com entidades (`&lt;p&gt;...`), o Updater agora decodifica antes de normalizar/renderizar.
+- **Mensagem de apoio atualizada em Ajustes** — banner one-time agora menciona as duas formas de apoio (⭐ GitHub e ☕ café), alinhando texto com os botões do rodapé.
+- **Persistência do prompt inicial de update corrigida** — se o app for fechado antes de escolher `Sim/Não`, o prompt volta a aparecer na próxima abertura até haver decisão explícita.
+- **Check inicial de update adiado até escolha explícita** — em perfil novo, o main não faz `checkForUpdates()` no boot; a primeira checagem ocorre só após o usuário escolher `Sim/Não` no prompt de política.
+- **Tela de release notes ocultada no modo automático** — quando `Auto update no app` está ativo, Ajustes não força a tela `Updater`; o fluxo fica nas notificações nativas de download/instalação.
+- **Seleção do AppImage local corrigida no install script** — `scripts/install.sh` e `scripts/install.ps1` agora escolhem o artefato mais novo por versão (`sort -V`/`[version]`), evitando instalar build antigo como `26.4.8` quando já existe `26.4.12`.
 
 ### Alterado
 
 - **Atualizações seguras de dependências** — `electron` (`41.1.1 -> 41.2.0`), `i18next` (`26.0.3 -> 26.0.4`), `@typescript-eslint/eslint-plugin` (`8.58.0 -> 8.58.1`) e `@typescript-eslint/parser` (`8.58.0 -> 8.58.1`).
+- **Escolha inicial de política de update** — em perfil novo (instalação/dados limpos), o app mostra um prompt na primeira abertura para selecionar `auto update` ou `apenas avisar`; a decisão fica persistida e pode ser alterada depois em Ajustes.
 
 ### Observação
 
-- Ajuste restrito ao alvo Windows NSIS; fluxo Linux/AppImage permanece inalterado.
+- Esta versão inclui ajustes em Windows (NSIS), renderer/main (fluxo de update) e scripts de instalação local Linux (AppImage).
 
 ## [26.4.11] - 2026-04-08
 

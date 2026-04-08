@@ -14,14 +14,22 @@
 - **Fallback for missing Start Menu shortcut** — new NSIS include (`electron-builder/installer.nsh`) recreates the shortcut when it is missing after install/update.
 - **No redundant version in Windows "Installed apps" title** — NSIS `uninstallDisplayName` is now set to `Pomodoroz`, keeping version only in the details row.
 - **Renderer Updater i18n** — update screen copy and release-page notification text now use `updater.*` keys in pt/en/es/ja/zh.
+- **Readable HTML release notes in Updater** — when `releaseNotes` arrives as HTML, the screen now normalizes it to structured text before rendering, avoiding raw tag output.
+- **Escaped HTML release notes compatibility** — when notes arrive with escaped entities (`&lt;p&gt;...`), Updater now decodes them before normalization/rendering.
+- **Settings support message updated** — one-time banner now mentions both support paths (⭐ GitHub and ☕ coffee), matching the footer action buttons.
+- **First-run update prompt persistence fixed** — if the app is closed before choosing `Yes/No`, the prompt is shown again on next launch until the user makes an explicit choice.
+- **Initial update check deferred until explicit choice** — on a fresh profile, main no longer runs `checkForUpdates()` at boot; the first check runs only after the user picks `Yes/No` in the policy prompt.
+- **Release notes screen hidden in automatic mode** — when `In-app Auto Update` is enabled, Settings no longer forces the `Updater` screen; download/install flow stays on native notifications.
+- **Local AppImage selection fixed in install scripts** — `scripts/install.sh` and `scripts/install.ps1` now pick the newest artifact by version (`sort -V`/`[version]`), avoiding old installs like `26.4.8` when `26.4.12` is already available.
 
 ### Changed
 
 - **Safe dependency updates** — `electron` (`41.1.1 -> 41.2.0`), `i18next` (`26.0.3 -> 26.0.4`), `@typescript-eslint/eslint-plugin` (`8.58.0 -> 8.58.1`), and `@typescript-eslint/parser` (`8.58.0 -> 8.58.1`).
+- **First-run update policy choice** — on a fresh profile (clean install/data), the app now shows a one-time prompt on first open to choose `in-app auto update` or `notify only`; the choice is persisted and can be changed later in Settings.
 
 ### Note
 
-- Change is limited to the Windows NSIS target; Linux/AppImage flow remains unchanged.
+- This release includes updates across Windows (NSIS), renderer/main (update flow), and Linux local install scripts (AppImage).
 
 ## [26.4.11] - 2026-04-08
 

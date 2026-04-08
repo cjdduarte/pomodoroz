@@ -11,6 +11,7 @@ import path from "path";
 
 type AutoUpdateProps = {
   enableInAppAutoUpdate?: boolean;
+  checkOnInit?: boolean;
   onErrorUpdating?: (error: unknown) => void;
   onCheckingUpdates?: () => void;
   onUpdateAvailable?: (info: UpdateInfo) => void;
@@ -21,6 +22,7 @@ type AutoUpdateProps = {
 
 export function activateAutoUpdate({
   enableInAppAutoUpdate = false,
+  checkOnInit = true,
   onErrorUpdating,
   onCheckingUpdates,
   onUpdateAvailable,
@@ -69,13 +71,15 @@ export function activateAutoUpdate({
   if (onUpdateDownloaded)
     autoUpdater.on("update-downloaded", onUpdateDownloaded);
 
-  if (shouldCheckForUpdates) {
+  if (checkOnInit && shouldCheckForUpdates) {
     autoUpdater.checkForUpdates().catch((error) => {
       logger.error("[Updater] checkForUpdates failed:", error);
       onErrorUpdating?.(error);
     });
   } else {
-    if (isPackagedLinuxWithoutAppImage) {
+    if (!checkOnInit) {
+      logger.info("[Updater] Initial check deferred by configuration");
+    } else if (isPackagedLinuxWithoutAppImage) {
       logger.info(
         "[Updater] Skipping update check on Linux packaged app without APPIMAGE env"
       );

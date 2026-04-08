@@ -129,7 +129,8 @@ export const zh = {
     languageJapanese: "日语",
     languagePortuguese: "葡萄牙语（巴西）",
     alertHeading: "你好 👋,",
-    alertBody: "如果你喜欢这个应用，请考虑在 GitHub 上点星以示支持。",
+    alertBody:
+      "如果你喜欢这个应用，欢迎在 GitHub 点个⭐，和/或请我喝杯☕。",
     alwaysOnTop: "始终置顶",
     compactMode: "紧凑模式",
     showGridRandomButton: "在网格中显示随机按钮",
@@ -147,6 +148,11 @@ export const zh = {
     voiceAssistance: "语音辅助",
     openAtLogin: "开机自启",
     inAppAutoUpdate: "应用内自动更新",
+    autoUpdatePromptTitle: "自动更新",
+    autoUpdatePromptBody:
+      "你希望应用自动下载并安装新版本吗？你之后可以在“设置”里修改。",
+    autoUpdatePromptEnable: "是，自动更新",
+    autoUpdatePromptNotifyOnly: "否，仅通知",
     notificationSound: "通知声音",
     notificationSoundDefault: "应用默认声音",
     notificationSoundCustom: "自定义声音",

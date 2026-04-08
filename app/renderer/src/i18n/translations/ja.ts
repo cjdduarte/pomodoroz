@@ -133,7 +133,7 @@ export const ja = {
     languagePortuguese: "ポルトガル語（ブラジル）",
     alertHeading: "こんにちは 👋,",
     alertBody:
-      "このアプリが気に入ったら、GitHub でスターを付けて応援してください。",
+      "このアプリが気に入ったら、GitHubで⭐を付けてくれるか、☕をごちそうしてくれると嬉しいです。",
     alwaysOnTop: "常に最前面",
     compactMode: "コンパクトモード",
     showGridRandomButton: "グリッドに抽選ボタンを表示",
@@ -151,6 +151,11 @@ export const ja = {
     voiceAssistance: "音声アシスタント",
     openAtLogin: "ログイン時に起動",
     inAppAutoUpdate: "アプリ内自動アップデート",
+    autoUpdatePromptTitle: "自動アップデート",
+    autoUpdatePromptBody:
+      "新しいバージョンを自動でダウンロードしてインストールしますか？この設定は後で設定画面から変更できます。",
+    autoUpdatePromptEnable: "はい、自動更新する",
+    autoUpdatePromptNotifyOnly: "いいえ、通知のみ",
     notificationSound: "通知サウンド",
     notificationSoundDefault: "アプリ既定サウンド",
     notificationSoundCustom: "カスタムサウンド",
