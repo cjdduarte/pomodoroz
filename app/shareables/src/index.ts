@@ -12,6 +12,9 @@ export const MINIMIZE_WINDOW = "MINIMIZE_WINDOW";
 export const CLOSE_WINDOW = "CLOSE_WINDOW";
 export const SHOW_WINDOW = "SHOW_WINDOW";
 export const UPDATE_AVAILABLE = "UPDATE_AVAILABLE";
+export const SET_IN_APP_AUTO_UPDATE = "SET_IN_APP_AUTO_UPDATE";
+export const OPEN_RELEASE_PAGE = "OPEN_RELEASE_PAGE";
+// Deprecated channel kept for one transition cycle.
 export const INSTALL_UPDATE = "INSTALL_UPDATE";
 export const FULLSCREEN_BREAK_ENTERED = "FULLSCREEN_BREAK_ENTERED";
 export const FULLSCREEN_BREAK_EXITED = "FULLSCREEN_BREAK_EXITED";
@@ -36,6 +39,8 @@ export const TO_MAIN = [
   MINIMIZE_WINDOW,
   CLOSE_WINDOW,
   SHOW_WINDOW,
+  SET_IN_APP_AUTO_UPDATE,
+  OPEN_RELEASE_PAGE,
   INSTALL_UPDATE,
   EXPORT_TASKS_DIALOG,
   IMPORT_TASKS_DIALOG,
@@ -83,6 +88,10 @@ export type SetOpenAtLoginPayload = {
 
 export type SetUiThemePayload = {
   isDarkMode: boolean;
+};
+
+export type SetInAppAutoUpdatePayload = {
+  enableInAppAutoUpdate: boolean;
 };
 
 export type MinimizeWindowPayload = {
@@ -141,19 +150,23 @@ export type ToMainPayloadMap = {
                     ? [string]
                     : K extends typeof SET_UI_THEME
                       ? [SetUiThemePayload]
-                      : K extends typeof MINIMIZE_WINDOW
-                        ? [MinimizeWindowPayload]
-                        : K extends typeof CLOSE_WINDOW
-                          ? [CloseWindowPayload]
-                          : K extends typeof SHOW_WINDOW
-                            ? []
-                            : K extends typeof INSTALL_UPDATE
+                      : K extends typeof SET_IN_APP_AUTO_UPDATE
+                        ? [SetInAppAutoUpdatePayload]
+                        : K extends typeof MINIMIZE_WINDOW
+                          ? [MinimizeWindowPayload]
+                          : K extends typeof CLOSE_WINDOW
+                            ? [CloseWindowPayload]
+                            : K extends typeof SHOW_WINDOW
                               ? []
-                              : K extends typeof EXPORT_TASKS_DIALOG
-                                ? [ExportTasksDialogPayload]
-                                : K extends typeof IMPORT_TASKS_DIALOG
+                              : K extends typeof OPEN_RELEASE_PAGE
+                                ? []
+                                : K extends typeof INSTALL_UPDATE
                                   ? []
-                                  : never;
+                                  : K extends typeof EXPORT_TASKS_DIALOG
+                                    ? [ExportTasksDialogPayload]
+                                    : K extends typeof IMPORT_TASKS_DIALOG
+                                      ? []
+                                      : never;
 };
 
 export type FromMainPayloadMap = {

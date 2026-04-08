@@ -150,6 +150,7 @@ export const en = {
     closeToTray: "Close To Tray",
     voiceAssistance: "Voice Assistance",
     openAtLogin: "Open At Login",
+    inAppAutoUpdate: "In-app Auto Update",
     notificationSound: "Notification Sound",
     notificationSoundDefault: "App default sound",
     notificationSoundCustom: "Custom sound",

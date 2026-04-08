@@ -150,6 +150,7 @@ export const ja = {
     closeToTray: "トレイに閉じる",
     voiceAssistance: "音声アシスタント",
     openAtLogin: "ログイン時に起動",
+    inAppAutoUpdate: "アプリ内自動アップデート",
     notificationSound: "通知サウンド",
     notificationSoundDefault: "アプリ既定サウンド",
     notificationSoundCustom: "カスタムサウンド",

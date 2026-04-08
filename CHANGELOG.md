@@ -6,6 +6,26 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.4.11] - 2026-04-08
+
+### Alterado
+
+- **Política de update configurável em Ajustes** — novo toggle `Auto update no app`; por padrão o app fica em modo aviso+redirecionamento para release, e quando ativado volta para download/instalação in-app.
+- **Contrato IPC do updater refinado** — adicionados `SET_IN_APP_AUTO_UPDATE` e `OPEN_RELEASE_PAGE`; `INSTALL_UPDATE` permanece como alias de compatibilidade por um ciclo.
+- **Versão visível em Ajustes** — cabeçalho de Configurações agora exibe `vX.Y.Z` de forma discreta.
+- **Guard de download com log explícito** — quando um update termina de baixar com o modo in-app desativado, o main registra log e ignora o prompt de instalação de forma transparente.
+- **Sugestão automática de versão por tags** — `release/version` (bash + PowerShell) agora sugerem `YY.M.(ultimo+1)` com base em tags locais `vYY.M.*`; ao virar o mês sem tags, sugerem `YY.M.1`.
+
+### Traduções
+
+- **Novo rótulo de configuração** — chave `settings.inAppAutoUpdate` adicionada em pt/en/es/ja/zh.
+
+### Teste manual (release)
+
+- **Modo padrão (toggle desligado)** — ao detectar update, o app apenas avisa e o botão abre a página de release no navegador.
+- **Modo in-app (toggle ligado)** — após detectar/baixar update, o app exibe prompt `Quit and Install`.
+- **Configurações** — cabeçalho mostra a versão atual em formato `vX.Y.Z`.
+
 ## [26.4.10] - 2026-04-08
 
 ### Corrigido

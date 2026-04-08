@@ -21,6 +21,7 @@ export type SettingTypes = {
   resetFocusToIdleEnabled: boolean;
   notificationType: NotificationTypes;
   openAtLogin: boolean;
+  enableInAppAutoUpdate: boolean;
   language: LanguageOption;
 };
 

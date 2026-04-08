@@ -2,9 +2,18 @@ import React, { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { restoreDefaultSettings } from "store";
 import { useAppDispatch } from "hooks/storeHooks";
+import styled from "styled-components/macro";
 
 import { Header } from "components";
 import { StyledHeaderButton } from "styles";
+import Json from "../../../package.json";
+
+const StyledSettingsVersion = styled.div`
+  margin-top: -0.2rem;
+  margin-bottom: 0.8rem;
+  font-size: 1.1rem;
+  color: var(--color-disabled-text);
+`;
 
 const SettingHeader: React.FC = () => {
   const { t } = useTranslation();
@@ -19,13 +28,18 @@ const SettingHeader: React.FC = () => {
   }, [dispatch]);
 
   return (
-    <Header heading={t("settings.title")}>
-      <StyledHeaderButton success={success} onClick={restoreSettings}>
-        {success
-          ? t("settings.restored")
-          : t("settings.restoreDefault")}
-      </StyledHeaderButton>
-    </Header>
+    <>
+      <Header heading={t("settings.title")}>
+        <StyledHeaderButton success={success} onClick={restoreSettings}>
+          {success
+            ? t("settings.restored")
+            : t("settings.restoreDefault")}
+        </StyledHeaderButton>
+      </Header>
+      {Json.version && (
+        <StyledSettingsVersion>v{Json.version}</StyledSettingsVersion>
+      )}
+    </>
   );
 };
 

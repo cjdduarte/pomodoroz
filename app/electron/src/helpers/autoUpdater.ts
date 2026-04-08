@@ -10,6 +10,7 @@ import fs from "fs";
 import path from "path";
 
 type AutoUpdateProps = {
+  enableInAppAutoUpdate?: boolean;
   onErrorUpdating?: (error: unknown) => void;
   onCheckingUpdates?: () => void;
   onUpdateAvailable?: (info: UpdateInfo) => void;
@@ -19,6 +20,7 @@ type AutoUpdateProps = {
 };
 
 export function activateAutoUpdate({
+  enableInAppAutoUpdate = false,
   onErrorUpdating,
   onCheckingUpdates,
   onUpdateAvailable,
@@ -29,6 +31,9 @@ export function activateAutoUpdate({
   const logger = ElectronLogger;
   logger.transports.file.level = "debug";
   autoUpdater.logger = logger;
+  // Default is notify-only; opt-in allows in-app download/install.
+  autoUpdater.autoDownload = enableInAppAutoUpdate;
+  autoUpdater.autoInstallOnAppQuit = enableInAppAutoUpdate;
 
   if (onErrorUpdating) autoUpdater.on("error", onErrorUpdating);
 

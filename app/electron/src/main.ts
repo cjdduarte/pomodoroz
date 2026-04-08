@@ -26,6 +26,7 @@ import {
   MINIMIZE_WINDOW,
   CLOSE_WINDOW,
   SET_UI_THEME,
+  SET_IN_APP_AUTO_UPDATE,
   SET_NATIVE_TITLEBAR,
   SHOW_WINDOW,
   RELEASE_NOTES_LINK,
@@ -33,6 +34,7 @@ import {
   SET_COMPACT_MODE,
   SET_OPEN_AT_LOGIN,
   UPDATE_AVAILABLE,
+  OPEN_RELEASE_PAGE,
   INSTALL_UPDATE,
   FULLSCREEN_BREAK_ENTERED,
   FULLSCREEN_BREAK_EXITED,
@@ -473,6 +475,8 @@ type SetTrayBehaviorPayload =
 type SetCompactModePayload =
   ToMainPayloadMap[typeof SET_COMPACT_MODE][0];
 type SetUiThemePayload = ToMainPayloadMap[typeof SET_UI_THEME][0];
+type SetInAppAutoUpdatePayload =
+  ToMainPayloadMap[typeof SET_IN_APP_AUTO_UPDATE][0];
 type SetNativeTitlebarPayload =
   ToMainPayloadMap[typeof SET_NATIVE_TITLEBAR][0];
 type MinimizeWindowPayload =
@@ -530,6 +534,11 @@ const isSetUiThemePayload = (
   value: unknown
 ): value is SetUiThemePayload =>
   hasBooleanProperty(value, "isDarkMode");
+
+const isSetInAppAutoUpdatePayload = (
+  value: unknown
+): value is SetInAppAutoUpdatePayload =>
+  hasBooleanProperty(value, "enableInAppAutoUpdate");
 
 const isSetNativeTitlebarPayload = (
   value: unknown
@@ -596,6 +605,17 @@ const syncOpenAtLoginFromStore = (): void => {
     typeof storedOpenAtLogin === "boolean" ? storedOpenAtLogin : false;
 
   applyOpenAtLoginSetting(desiredOpenAtLogin);
+};
+
+const isInAppAutoUpdateEnabled = (): boolean =>
+  store.safeGet("enableInAppAutoUpdate") === true;
+
+const applyInAppAutoUpdatePreference = (
+  enableInAppAutoUpdate: boolean
+): void => {
+  if (!appUpdater) return;
+  appUpdater.autoDownload = enableInAppAutoUpdate;
+  appUpdater.autoInstallOnAppQuit = enableInAppAutoUpdate;
 };
 
 const isSafeExternalUrl = (url: string): boolean => {
@@ -1002,7 +1022,9 @@ if (!onlySingleInstance) {
       },
     ]);
 
+    const enableInAppAutoUpdate = isInAppAutoUpdateEnabled();
     appUpdater = activateAutoUpdate({
+      enableInAppAutoUpdate,
       onErrorUpdating: (error) => {
         console.log("[Updater] Error while checking updates:", error);
       },
@@ -1011,7 +1033,7 @@ if (!onlySingleInstance) {
 
         notify({
           title: "NEW UPDATE IS AVAILABLE",
-          message: `App version ${info.version} ready to be downloaded.`,
+          message: `App version ${info.version} is available.`,
           actions: ["View Release Notes"],
           callback: (err, response) => {
             if (!err) {
@@ -1022,12 +1044,18 @@ if (!onlySingleInstance) {
           },
         });
       },
-      onUpdateDownloaded: (info) => {
+      onUpdateDownloaded: () => {
+        if (!isInAppAutoUpdateEnabled()) {
+          console.log(
+            "[Updater] Update downloaded, but in-app auto update is disabled. Skipping install prompt."
+          );
+          return;
+        }
+
         notify({
           title: "READY TO BE INSTALLED",
           message: "Update has been successfully downloaded.",
-          // Keep a single explicit action to preserve current update UX.
-          actions: ["Quit and Install" /*, "Install it Later"*/],
+          actions: ["Quit and Install"],
           callback: (err, response) => {
             if (!err && response === "quit and install") {
               appUpdater?.quitAndInstall();
@@ -1129,6 +1157,28 @@ ipcMain.on(SET_UI_THEME, (_event, payload: unknown) => {
   store.safeSet("isDarkMode", isDarkMode);
 });
 
+ipcMain.on(SET_IN_APP_AUTO_UPDATE, (_event, payload: unknown) => {
+  if (!isSetInAppAutoUpdatePayload(payload)) return;
+
+  const { enableInAppAutoUpdate } = payload;
+  const storedValue = isInAppAutoUpdateEnabled();
+
+  if (storedValue !== enableInAppAutoUpdate) {
+    store.safeSet("enableInAppAutoUpdate", enableInAppAutoUpdate);
+  }
+
+  applyInAppAutoUpdatePreference(enableInAppAutoUpdate);
+
+  if (enableInAppAutoUpdate && appUpdater) {
+    appUpdater.checkForUpdates().catch((error) => {
+      console.log(
+        "[Updater] Error while rechecking updates after enabling in-app auto update:",
+        error
+      );
+    });
+  }
+});
+
 ipcMain.on(SHOW_WINDOW, () => {
   if (!win) return;
 
@@ -1200,9 +1250,13 @@ ipcMain.on(TRAY_ICON_UPDATE, (_event, dataUrl: unknown) => {
   }
 });
 
-ipcMain.on(INSTALL_UPDATE, () => {
-  appUpdater?.quitAndInstall();
-});
+const openReleasePage = () => {
+  shell.openExternal(RELEASE_NOTES_LINK);
+};
+
+ipcMain.on(OPEN_RELEASE_PAGE, openReleasePage);
+// Deprecated compatibility alias: remove after one release cycle.
+ipcMain.on(INSTALL_UPDATE, openReleasePage);
 
 ipcMain.on(SET_OPEN_AT_LOGIN, (_event, payload: unknown) => {
   if (!isSetOpenAtLoginPayload(payload)) return;

@@ -12,9 +12,7 @@ import {
   StyledTaskForm,
 } from "../styles";
 import { getInvokeConnector } from "../contexts";
-import { INSTALL_UPDATE } from "@pomodoroz/shareables";
-import { useNotification } from "../hooks";
-import notificationIcon from "../assets/logos/notification-dark.png";
+import { OPEN_RELEASE_PAGE } from "@pomodoroz/shareables";
 import { sanitizeMarkdownLinkUri } from "utils";
 
 const UpdateWrapper = styled.div`
@@ -48,7 +46,6 @@ const IgnoreVersion = styled.div`
 `;
 
 const Updater: React.FC = () => {
-  const settings = useAppSelector((state) => state.settings);
   const update = useAppSelector((state) => state.update);
 
   const dispatch = useAppDispatch();
@@ -77,18 +74,15 @@ const Updater: React.FC = () => {
           <StyledButtonPrimary
             onClick={() => {
               const invokeConnector = getInvokeConnector();
-              new window.Notification(
-                "Downloading & Installing Update",
-                {
-                  body: `This may take a moment to start depending on your internet speed.`,
-                }
-              );
-              invokeConnector?.send(INSTALL_UPDATE);
+              new window.Notification("Opening Release Page", {
+                body: "Your browser will open the latest release notes and installer.",
+              });
+              invokeConnector?.send(OPEN_RELEASE_PAGE);
               dispatch(setUpdateVersion(""));
               dispatch(setUpdateBody(""));
             }}
           >
-            Install Now
+            Open Release Page
           </StyledButtonPrimary>
           <StyledButtonNormal
             onClick={() => {

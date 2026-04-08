@@ -150,6 +150,7 @@ export const pt = {
     closeToTray: "Fechar para a bandeja",
     voiceAssistance: "Assistência por voz",
     openAtLogin: "Abrir ao iniciar sessão",
+    inAppAutoUpdate: "Auto update no app",
     notificationSound: "Som de notificação",
     notificationSoundDefault: "Som padrão do app",
     notificationSoundCustom: "Som personalizado",

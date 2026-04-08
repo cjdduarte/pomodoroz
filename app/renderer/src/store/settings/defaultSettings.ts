@@ -26,5 +26,6 @@ export const defaultSettings: Readonly<SettingTypes> = Object.freeze({
   resetFocusToIdleEnabled: false,
   useNativeTitlebar: detectOS() === "Windows" ? false : true,
   openAtLogin: false,
+  enableInAppAutoUpdate: false,
   language: "auto",
 });

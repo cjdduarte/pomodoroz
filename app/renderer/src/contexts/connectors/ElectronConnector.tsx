@@ -19,6 +19,7 @@ import {
   SET_NATIVE_TITLEBAR,
   SHOW_WINDOW,
   SET_UI_THEME,
+  SET_IN_APP_AUTO_UPDATE,
   TRAY_ICON_UPDATE,
   SET_OPEN_AT_LOGIN,
   UPDATE_AVAILABLE,
@@ -165,6 +166,12 @@ export const ElectronConnectorProvider = ({
       openAtLogin: settings.openAtLogin,
     });
   }, [sendToMain, settings.openAtLogin]);
+
+  useEffect(() => {
+    sendToMain(SET_IN_APP_AUTO_UPDATE, {
+      enableInAppAutoUpdate: settings.enableInAppAutoUpdate,
+    });
+  }, [sendToMain, settings.enableInAppAutoUpdate]);
 
   useEffect(() => {
     let cleanup = () => {};

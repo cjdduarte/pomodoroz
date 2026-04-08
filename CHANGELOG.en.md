@@ -6,6 +6,26 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.4.11] - 2026-04-08
+
+### Changed
+
+- **Configurable update policy in Settings** — new `In-app Auto Update` toggle; default mode is notify+redirect to release page, and enabling it restores in-app download/install behavior.
+- **Updater IPC contract refined** — added `SET_IN_APP_AUTO_UPDATE` and `OPEN_RELEASE_PAGE`; `INSTALL_UPDATE` remains as a compatibility alias for one transition cycle.
+- **Settings header now shows app version** — displays `vX.Y.Z` in a subtle way.
+- **Downloaded-update guard now logs explicitly** — when an update finishes downloading with in-app mode disabled, main logs the decision and intentionally skips the install prompt.
+- **Tag-based version suggestion** — `release/version` scripts (bash + PowerShell) now suggest `YY.M.(last+1)` from local `vYY.M.*` tags; when a month turns with no tags, they suggest `YY.M.1`.
+
+### Translations
+
+- **New settings label key** — `settings.inAppAutoUpdate` added in pt/en/es/ja/zh.
+
+### Manual test (release)
+
+- **Default mode (toggle off)** — when an update is detected, the app only notifies and the button opens the release page in the browser.
+- **In-app mode (toggle on)** — after update detection/download, the app shows the `Quit and Install` prompt.
+- **Settings** — header displays the current app version as `vX.Y.Z`.
+
 ## [26.4.10] - 2026-04-08
 
 ### Fixed

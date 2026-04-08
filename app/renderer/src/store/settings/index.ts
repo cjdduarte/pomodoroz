@@ -238,6 +238,13 @@ const settingsSlice = createSlice({
       state.openAtLogin = action.payload;
     },
 
+    setEnableInAppAutoUpdate(
+      state,
+      action: SettingsPayload<"enableInAppAutoUpdate">
+    ) {
+      state.enableInAppAutoUpdate = action.payload;
+    },
+
     setLanguage(state, action: SettingsPayload<"language">) {
       state.language = action.payload;
     },
@@ -267,6 +274,7 @@ export const {
   setMinimizeToTray,
   setNotificationSound,
   setNotificationType,
+  setEnableInAppAutoUpdate,
   setOpenAtLogin,
   setLanguage,
   setUseNativeTitlebar,

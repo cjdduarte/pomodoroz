@@ -146,6 +146,7 @@ export const zh = {
     closeToTray: "关闭到托盘",
     voiceAssistance: "语音辅助",
     openAtLogin: "开机自启",
+    inAppAutoUpdate: "应用内自动更新",
     notificationSound: "通知声音",
     notificationSoundDefault: "应用默认声音",
     notificationSoundCustom: "自定义声音",

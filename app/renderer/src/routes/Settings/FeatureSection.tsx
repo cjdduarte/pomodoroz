@@ -18,6 +18,7 @@ import {
   setEnableGridColorLoop,
   setShowGridRandomButton,
   setOpenAtLogin,
+  setEnableInAppAutoUpdate,
   setFollowSystemTheme,
 } from "store";
 import { Toggler, TogglerProps, Collapse, Radio } from "components";
@@ -197,6 +198,16 @@ const FeatureSection: React.FC = () => {
           display: "none",
         }),
       },
+    },
+    {
+      id: "in-app-auto-update",
+      label: t("settings.inAppAutoUpdate"),
+      checked: settings.enableInAppAutoUpdate,
+      onChange: useCallback(() => {
+        dispatch(
+          setEnableInAppAutoUpdate(!settings.enableInAppAutoUpdate)
+        );
+      }, [dispatch, settings.enableInAppAutoUpdate]),
     },
   ];
 
