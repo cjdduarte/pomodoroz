@@ -15,6 +15,8 @@
 - **Settings header now shows app version** — displays `vX.Y.Z` in a subtle way.
 - **Downloaded-update guard now logs explicitly** — when an update finishes downloading with in-app mode disabled, main logs the decision and intentionally skips the install prompt.
 - **Tag-based version suggestion** — `release/version` scripts (bash + PowerShell) now suggest `YY.M.(last+1)` from local `vYY.M.*` tags; when a month turns with no tags, they suggest `YY.M.1`.
+- **Tag sync in release flow** — `release.sh`/`release.ps1` now attempt `fetch --tags` automatically; if network/auth fails, they continue with a warning and use local tags.
+- **Release mode menu** — without parameters, `release.sh`/`release.ps1` now show an interactive menu to choose real release or simulation mode.
 
 ### Translations
 

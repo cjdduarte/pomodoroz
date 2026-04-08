@@ -18,6 +18,32 @@ function Fail {
     exit 1
 }
 
+function Select-ReleaseMode {
+    while ($true) {
+        Write-Host "Modo de execucao:"
+        Write-Host "  1) Publicar release (real)"
+        Write-Host "  2) Simular release (sem alterar nada)"
+        Write-Host "  3) Cancelar"
+        $modeOption = Read-Host "Opcao [1-3]"
+
+        switch ($modeOption) {
+            "1" {
+                return $false
+            }
+            "2" {
+                return $true
+            }
+            "3" {
+                Write-Host "Operacao cancelada."
+                exit 0
+            }
+            default {
+                Write-Host "Opcao invalida. Escolha 1, 2 ou 3." -ForegroundColor Yellow
+            }
+        }
+    }
+}
+
 function Show-Usage {
     @"
 Uso:
@@ -35,6 +61,10 @@ Fluxo:
 Sem -Version, sugere automaticamente usando:
   ano/mes atual (yy.m) + ultimo patch de tag local vyy.m.*
   exemplo: v26.4.10 -> sugestao 26.4.11; ao virar mes sem tag, 26.5.1
+
+Sem parametros em terminal interativo, abre menu de modo:
+  1) Publicar release
+  2) Simular release
 
 Opcoes:
   -DryRun        Mostra as acoes sem executar mudancas
@@ -125,6 +155,22 @@ function Get-SuggestedVersion {
     return "$currentMajor.$currentMinor.$($maxPatch + 1)"
 }
 
+function Refresh-LocalTags {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$RepoRoot
+    )
+
+    try {
+        & git -C $RepoRoot fetch --tags --quiet 2>$null
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "Aviso: nao foi possivel atualizar tags remotas; usando tags locais." -ForegroundColor Yellow
+        }
+    } catch {
+        Write-Host "Aviso: nao foi possivel atualizar tags remotas; usando tags locais." -ForegroundColor Yellow
+    }
+}
+
 function Ensure-Command {
     param([string]$Command)
     if (-not (Get-Command $Command -ErrorAction SilentlyContinue)) {
@@ -161,7 +207,13 @@ if ($Version -eq "-h" -or $Version -eq "--help") {
     exit 0
 }
 
+$showModeMenu = $PSBoundParameters.Count -eq 0
+if ($showModeMenu -and [Environment]::UserInteractive) {
+    $DryRun = Select-ReleaseMode
+}
+
 $ROOT = Split-Path -Parent $PSScriptRoot
+Refresh-LocalTags -RepoRoot $ROOT
 $SUGGESTED_VERSION = Get-SuggestedVersion -RepoRoot $ROOT
 $versionFromPrompt = $false
 

@@ -40,13 +40,32 @@ get_suggested_version() {
   fi
 }
 
-SUGGESTED_VERSION="$(get_suggested_version)"
+refresh_local_tags() {
+  if ! command -v git >/dev/null 2>&1; then
+    return
+  fi
+
+  if ! git -C "$APP_DIR" rev-parse --git-dir >/dev/null 2>&1; then
+    return
+  fi
+
+  if ! git -C "$APP_DIR" fetch --tags --quiet >/dev/null 2>&1; then
+    echo "Aviso: nao foi possivel atualizar tags remotas; usando tags locais." >&2
+  fi
+}
+
+SUGGESTED_VERSION=""
 
 DRY_RUN=0
 SKIP_VALIDATE=0
 NO_PUSH=0
 INPUT_VERSION=""
 VERSION_FROM_PROMPT=0
+HAS_ARGS=0
+
+if [[ $# -gt 0 ]]; then
+  HAS_ARGS=1
+fi
 
 step() {
   printf "\n==> %s\n" "$1"
@@ -68,6 +87,10 @@ Uso:
 Sem argumento, sugere automaticamente usando:
   ano/mes atual (yy.m) + ultimo patch de tag local vyy.m.*
   exemplo: v26.4.10 -> sugestao 26.4.11; ao virar mes sem tag, 26.5.1
+
+Sem argumentos em terminal interativo, abre menu de modo:
+  1) Publicar release
+  2) Simular release
 
 Fluxo:
   1) valida repo limpo e branch atual
@@ -112,6 +135,35 @@ run_cmd() {
   fi
 }
 
+select_release_mode() {
+  while true; do
+    cat <<'EOF'
+Modo de execucao:
+  1) Publicar release (real)
+  2) Simular release (sem alterar nada)
+  3) Cancelar
+EOF
+    read -r -p "Opcao [1-3]: " MODE_OPTION
+    case "$MODE_OPTION" in
+      1)
+        DRY_RUN=0
+        return
+        ;;
+      2)
+        DRY_RUN=1
+        return
+        ;;
+      3)
+        echo "Operacao cancelada."
+        exit 0
+        ;;
+      *)
+        echo "Opcao invalida. Escolha 1, 2 ou 3."
+        ;;
+    esac
+  done
+}
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --dry-run)
@@ -139,6 +191,13 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+if (( HAS_ARGS == 0 )) && [[ -t 0 ]]; then
+  select_release_mode
+fi
+
+refresh_local_tags
+SUGGESTED_VERSION="$(get_suggested_version)"
 
 if [[ -z "$INPUT_VERSION" ]]; then
   if [[ -t 0 ]]; then

@@ -15,6 +15,8 @@
 - **Versão visível em Ajustes** — cabeçalho de Configurações agora exibe `vX.Y.Z` de forma discreta.
 - **Guard de download com log explícito** — quando um update termina de baixar com o modo in-app desativado, o main registra log e ignora o prompt de instalação de forma transparente.
 - **Sugestão automática de versão por tags** — `release/version` (bash + PowerShell) agora sugerem `YY.M.(ultimo+1)` com base em tags locais `vYY.M.*`; ao virar o mês sem tags, sugerem `YY.M.1`.
+- **Sincronização de tags no release** — `release.sh`/`release.ps1` agora tentam `fetch --tags` automaticamente; em falha de rede/permissão, seguem com aviso e usam tags locais.
+- **Menu de execução no release** — sem parâmetros, `release.sh`/`release.ps1` agora mostram menu interativo com opções de publicar release real ou simular.
 
 ### Traduções
 
