@@ -139,5 +139,6 @@ Renderer persists state in `localStorage`. Electron uses `electron-store` for na
 - **Updater**: Keep release feed on this fork (`cjdduarte/pomodoroz`). Do not point updater to original Pomatez feed. Details in `docs/TECHNICAL_DECISIONS_2026.md` and `docs/DECISOES_TECNICAS_2026.pt-BR.md`.
 - **Documentation**: Log implemented changes in `CHANGELOG.md` and `CHANGELOG.en.md`. Track future work and technical decisions in `docs/TECHNICAL_DECISIONS_2026.md` and `docs/DECISOES_TECNICAS_2026.pt-BR.md`. Keep `AGENTS.md` for agent operational rules.
 - **Release Notes Source of Truth**: GitHub Release title/notes are generated from `CHANGELOG.md` section `## [x.y.z]`. Always update both `CHANGELOG.md` and `CHANGELOG.en.md` before tag/release.
+- **Changelog Fill Rule**: Never add new items to a published version. Keep the next version at the top as `A definir` (PT) / `TBD` (EN), set the date only on release day, and move subsequent work to the next version.
 - **Language**: Code in English. Logs/comments in Portuguese (PT-BR) where appropriate.
 - **Dependencies**: Explain options and wait for confirmation before adding new libraries.

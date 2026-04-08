@@ -56,6 +56,20 @@ Regra: este arquivo NAO replica cronologia de mudancas, tabelas de decisoes, roa
 4. Workflow de release sincroniza titulo/notas a partir do `CHANGELOG.md`; sem conteudo, cai em texto generico de fallback.
 5. Regra operacional: nao criar tag `v*` sem entrada valida no changelog da versao.
 
+### Procedimento operacional (anti-erro)
+
+1. Identificar se a versao ja foi publicada (tag `v*` existente e data real no changelog).
+2. NUNCA editar itens de versao ja publicada; qualquer ajuste novo entra na proxima versao.
+3. Durante desenvolvimento, manter a secao da proxima versao no topo:
+   - PT: `## [x.y.z] - A definir`
+   - EN: `## [x.y.z] - TBD`
+4. Registrar mudancas com bullets curtos por bloco (`### Adicionado`, `### Alterado`, `### Corrigido`).
+5. No dia da publicacao, trocar apenas a data (`A definir`/`TBD` -> `YYYY-MM-DD`) da versao que sera tagueada.
+6. Depois de publicar `vX.Y.Z`, novas mudancas devem abrir/usar `X.Y.(Z+1)` (ou versao alvo definida) com `A definir`/`TBD`.
+7. Antes da tag, validar que a mesma versao existe nos dois arquivos:
+   - `CHANGELOG.md`
+   - `CHANGELOG.en.md`
+
 Template minimo recomendado por versao:
 
 ```md
