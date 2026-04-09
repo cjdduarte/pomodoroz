@@ -78,7 +78,7 @@ export const zh = {
   grid: {
     title: "学习轮换",
     reset: "重置颜色",
-    resetConfirm: "点击以确认",
+    resetConfirm: "重置所有颜色？",
     random: "随机",
     randomDisabled: "没有可抽选的卡片",
     visited: "已访问任务",

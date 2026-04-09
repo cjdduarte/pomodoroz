@@ -81,7 +81,7 @@ export const en = {
   grid: {
     title: "Study Rotation",
     reset: "Reset colors",
-    resetConfirm: "Click to confirm",
+    resetConfirm: "Reset all colors?",
     random: "Draw",
     randomDisabled: "No eligible cards to draw",
     visited: "Visited tasks",

@@ -82,7 +82,7 @@ export const es = {
   grid: {
     title: "Rotación de Estudio",
     reset: "Restablecer colores",
-    resetConfirm: "Haz clic para confirmar",
+    resetConfirm: "¿Restablecer todos los colores?",
     random: "Sortear",
     randomDisabled: "No hay tarjetas elegibles para sorteo",
     visited: "Tareas visitadas",

@@ -81,7 +81,7 @@ export const pt = {
   grid: {
     title: "Rotação de Estudos",
     reset: "Resetar cores",
-    resetConfirm: "Clique para confirmar",
+    resetConfirm: "Resetar todas as cores?",
     random: "Sortear",
     randomDisabled: "Sem cartões elegíveis para sortear",
     visited: "Tarefas visitadas",

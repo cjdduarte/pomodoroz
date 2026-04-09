@@ -86,7 +86,6 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
   const enableGridColorLoop = useAppSelector(
     (state) => state.settings.enableGridColorLoop
   );
-  const [isResetArmed, setIsResetArmed] = useState(false);
   const [columnsMode, setColumnsMode] = useState<GridColumnsMode>(
     getInitialColumnsMode
   );
@@ -123,18 +122,6 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
   useEffect(() => {
     saveToStorage(GRID_GROUPED_STORAGE_KEY, grouped);
   }, [grouped]);
-
-  useEffect(() => {
-    if (!isResetArmed) {
-      return;
-    }
-
-    const timeout = window.setTimeout(() => {
-      setIsResetArmed(false);
-    }, 4500);
-
-    return () => window.clearTimeout(timeout);
-  }, [isResetArmed]);
 
   const gridItems = useMemo<GridItem[]>(() => {
     return tasks.flatMap((list): GridItem[] => {
@@ -235,13 +222,13 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
   );
 
   const handleReset = useCallback(() => {
-    if (!isResetArmed) {
-      setIsResetArmed(true);
+    const hasConfirmed = window.confirm(t("grid.resetConfirm"));
+    if (!hasConfirmed) {
       return;
     }
+
     dispatch(resetAllDayColors());
-    setIsResetArmed(false);
-  }, [dispatch, isResetArmed]);
+  }, [dispatch, t]);
 
   const randomWhiteCandidates = useMemo(() => {
     return gridItems.filter(
@@ -340,9 +327,7 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
   const selectHint = compact
     ? t("grid.selectHintCompact")
     : t("grid.selectHint");
-  const resetLabel = isResetArmed
-    ? t("grid.resetConfirm")
-    : t("grid.reset");
+  const resetLabel = t("grid.reset");
   const randomLabel = t("grid.random");
   const randomTooltip = canRandomDraw
     ? randomLabel

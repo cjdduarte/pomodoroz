@@ -81,7 +81,7 @@ export const ja = {
   grid: {
     title: "学習ローテーション",
     reset: "色をリセット",
-    resetConfirm: "クリックで確認",
+    resetConfirm: "すべての色をリセットしますか？",
     random: "抽選",
     randomDisabled: "抽選できるカードがありません",
     visited: "訪問済みタスク",
