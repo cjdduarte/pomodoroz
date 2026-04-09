@@ -1,0 +1,37 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "Pomodoroz",
+  "version": "26.4.15",
+  "identifier": "com.cjdduarte.pomodoroz",
+  "build": {
+    "frontendDist": "../app/renderer/build",
+    "devUrl": "http://localhost:3000",
+    "beforeDevCommand": "yarn workspace @pomodoroz/renderer run dev:renderer",
+    "beforeBuildCommand": "yarn workspace @pomodoroz/renderer run build"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Pomodoroz",
+        "width": 340,
+        "height": 470,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  }
+}
