@@ -10,6 +10,8 @@
 
 ### Corrigido
 
+- **Reset de cores no grid com ação no primeiro clique** — botão agora abre confirmação imediata e aplica o reset sem exigir segundo clique.
+- **Texto da confirmação de reset no grid ajustado** — mensagem de confirmação agora usa formato de pergunta no diálogo (`window.confirm`) em pt/en/es/ja/zh.
 - **Texto de apoio padronizado no PT-BR.**
 - **Drag visual entre listas estabilizado** — ao arrastar uma tarefa para outra lista, o card não “salta” de volta visualmente para a lista de origem antes do drop.
 - **Preview de arraste alinhado ao card real** — overlay de drag agora reaproveita o mesmo estilo do cartão da lista (largura, layout e ícones), melhorando a consistência visual durante o movimento.

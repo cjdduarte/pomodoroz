@@ -10,6 +10,8 @@
 
 ### Fixed
 
+- **Grid color reset now acts on first click** — button now shows immediate confirmation and applies reset without requiring a second click.
+- **Grid reset confirmation copy updated** — confirmation message now uses an interrogative dialog style (`window.confirm`) across pt/en/es/ja/zh.
 - **PT-BR support wording normalized.**
 - **Cross-list drag visual stabilized** — when dragging a task to another list, the card no longer visually snaps back to the source list before drop.
 - **Drag preview aligned with real card UI** — drag overlay now reuses the same card styling (width, layout, and icons), improving visual consistency while moving tasks.

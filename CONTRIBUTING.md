@@ -11,6 +11,7 @@ Please use conventional commit messages in your PRs (or PR titles for squash mer
 - `docs:` — Documentation changes
 - `lang:` — Language/i18n changes
 - Commit messages and PR titles must be in English.
+- For AI-assisted changes: after each finalized implementation, include a suggested ready-to-use commit message in English.
 
 ## Development Setup
 

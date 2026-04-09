@@ -32,6 +32,7 @@
 4. Never swap technology silently.
 5. Code in English. Comments/logs in Portuguese (PT-BR) where appropriate.
 6. Commit messages and PR titles must be in English (Conventional Commits).
+7. At the end of each finalized implementation, AI agents must suggest a ready-to-use commit message (Conventional Commits, English).
 
 ---
 

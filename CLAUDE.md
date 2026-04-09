@@ -144,4 +144,5 @@ Renderer persists state in `localStorage`. Electron uses `electron-store` for na
 - **Changelog Fill Rule**: Never add new items to a published version. Keep the next version at the top as `A definir` (PT) / `TBD` (EN), set the date only on release day, and move subsequent work to the next version.
 - **Language**: Code in English. Logs/comments in Portuguese (PT-BR) where appropriate.
 - **Commits**: Commit messages and PR titles must be in English (Conventional Commits).
+- **AI Finalization Output**: At the end of each finalized implementation, suggest a ready-to-use Conventional Commit message in English.
 - **Dependencies**: Explain options and wait for confirmation before adding new libraries.
