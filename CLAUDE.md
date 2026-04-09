@@ -143,4 +143,5 @@ Renderer persists state in `localStorage`. Electron uses `electron-store` for na
 - **Release Notes Source of Truth**: GitHub Release title/notes are generated from `CHANGELOG.md` section `## [x.y.z]`. Always update both changelogs before tag/release.
 - **Changelog Fill Rule**: Never add new items to a published version. Keep the next version at the top as `A definir` (PT) / `TBD` (EN), set the date only on release day, and move subsequent work to the next version.
 - **Language**: Code in English. Logs/comments in Portuguese (PT-BR) where appropriate.
+- **Commits**: Commit messages and PR titles must be in English (Conventional Commits).
 - **Dependencies**: Explain options and wait for confirmation before adding new libraries.

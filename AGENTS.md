@@ -31,6 +31,7 @@
 3. Before adding a new library: present options, impact, and wait for confirmation.
 4. Never swap technology silently.
 5. Code in English. Comments/logs in Portuguese (PT-BR) where appropriate.
+6. Commit messages and PR titles must be in English (Conventional Commits).
 
 ---
 

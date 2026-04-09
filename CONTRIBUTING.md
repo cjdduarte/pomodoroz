@@ -10,6 +10,7 @@ Please use conventional commit messages in your PRs (or PR titles for squash mer
 - `chore:` — Non-code changes (build, deps, CI)
 - `docs:` — Documentation changes
 - `lang:` — Language/i18n changes
+- Commit messages and PR titles must be in English.
 
 ## Development Setup
 
