@@ -94,7 +94,8 @@ O objetivo do Pomodoroz não é "corrigir flexibilidade", e sim adicionar recurs
 ### Evidências e histórico
 
 - Entregas implementadas: [CHANGELOG.md](CHANGELOG.md)
-- Melhorias candidatas (não implementadas): [docs/DECISOES_TECNICAS_2026.pt-BR.md#adaptive-focus-candidates](docs/DECISOES_TECNICAS_2026.pt-BR.md#adaptive-focus-candidates)
+- Melhorias candidatas (não implementadas): [docs/PRODUCT_BACKLOG.md](docs/PRODUCT_BACKLOG.md)
+- Plano de migração (Electron para Tauri): [docs/MIGRATION_ELECTRON_TO_TAURI.md](docs/MIGRATION_ELECTRON_TO_TAURI.md)
 
 ## ✨ Funcionalidades
 
@@ -176,7 +177,7 @@ O objetivo do Pomodoroz não é "corrigir flexibilidade", e sim adicionar recurs
 
 ## 🚧 Em desenvolvimento
 
-Melhorias pensadas a partir de feedback real de usuários que lidam com dificuldade de foco e TDAH. Veja detalhes em [docs/DECISOES_TECNICAS_2026.pt-BR.md](docs/DECISOES_TECNICAS_2026.pt-BR.md#adaptive-focus-candidates).
+Melhorias pensadas a partir de feedback real de usuários que lidam com dificuldade de foco e TDAH. Veja detalhes em [docs/PRODUCT_BACKLOG.md](docs/PRODUCT_BACKLOG.md).
 
 - **Presets de cadência** — Só começa (5/1), Sprint (10/3), Clássico (25/5), Flow (50/10).
 - **Estender sessão** — "+5 min" / "+10 min" quando estiver em hiperfoco, sem perder o ritmo.

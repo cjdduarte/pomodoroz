@@ -94,7 +94,8 @@ Pomodoroz is not about "fixing flexibility"; it focuses on adding workflow featu
 ### Evidence and history
 
 - Implemented deliveries: [CHANGELOG.en.md](CHANGELOG.en.md)
-- Candidate improvements (not implemented yet): [docs/TECHNICAL_DECISIONS_2026.md#adaptive-focus-candidates](docs/TECHNICAL_DECISIONS_2026.md#adaptive-focus-candidates)
+- Candidate improvements (not implemented yet): [docs/PRODUCT_BACKLOG.md](docs/PRODUCT_BACKLOG.md)
+- Migration plan (Electron to Tauri): [docs/MIGRATION_ELECTRON_TO_TAURI.md](docs/MIGRATION_ELECTRON_TO_TAURI.md)
 
 ## ✨ Features
 
@@ -176,7 +177,7 @@ Pomodoroz is not about "fixing flexibility"; it focuses on adding workflow featu
 
 ## 🚧 Coming Soon
 
-Improvements informed by real feedback from users who deal with focus difficulties and ADHD. See details at [docs/TECHNICAL_DECISIONS_2026.md](docs/TECHNICAL_DECISIONS_2026.md#adaptive-focus-candidates).
+Improvements informed by real feedback from users who deal with focus difficulties and ADHD. See details at [docs/PRODUCT_BACKLOG.md](docs/PRODUCT_BACKLOG.md).
 
 - **Cadence presets** — Just Start (5/1), Sprint (10/3), Classic (25/5), Flow (50/10).
 - **Extend session** — "+5 min" / "+10 min" when in hyperfocus, without breaking your flow.

@@ -1,110 +1,68 @@
-# Pomodoroz Desktop (Electron-only) - Agente Arquiteto
+# Pomodoroz — Agent Rules
 
-## Fontes Oficiais (sem duplicacao)
-
-- [CHANGELOG.md](CHANGELOG.md): historico do que JA foi implementado.
-- [docs/TECHNICAL_DECISIONS_2026.md](docs/TECHNICAL_DECISIONS_2026.md) / [docs/DECISOES_TECNICAS_2026.pt-BR.md](docs/DECISOES_TECNICAS_2026.pt-BR.md): decisoes tecnicas, stack alvo, roadmap e pendencias abertas.
-- [README.md](README.md) / [README.pt-BR.md](README.pt-BR.md): visao de produto, instalacao e uso.
-- [CLAUDE.md](CLAUDE.md): guia operacional para Claude Code.
-
-Regra: este arquivo NAO replica cronologia de mudancas, tabelas de decisoes, roadmap detalhado, nem backlog funcional. Essas informacoes ficam centralizadas nos documentos acima.
+> Operational rules for AI agents working on this codebase.
+> For project overview, stack, and commands, see `CLAUDE.md`.
+> For migration plan, see `docs/MIGRATION_ELECTRON_TO_TAURI.md`.
 
 ---
 
-## Escopo do Projeto
+## Scope
 
-- Plataforma principal: Electron (Node.js + Chromium + React/TypeScript).
-- Arquitetura: app desktop standalone, sem servidor e sem cloud.
-- Modelo de dados: local-first (dados locais).
-- Diretriz: evolucao incremental com foco em estabilidade, seguranca e previsibilidade.
-
----
-
-## Missao do Agente
-
-1. Preservar estabilidade funcional (timer, tasks, settings, tray e compact mode).
-2. Manter hardening de seguranca no Electron (preload/IPC/sandbox/CSP).
-3. Evoluir dependencias em lotes pequenos, testaveis e reversiveis.
-4. Manter build e smoke cross-platform (Windows, macOS e Linux).
-5. Registrar implementacoes no CHANGELOG e pendencias/decisoes no documento tecnico unico.
+- Platform: Electron desktop app (migrating to Tauri — see migration doc).
+- Architecture: standalone, no server, no cloud. All data is local.
+- Direction: incremental evolution with focus on stability, security, and predictability.
 
 ---
 
-## Regras Gerais
+## Mission
 
-1. Trabalhar em blocos pequenos, testaveis e reversiveis.
-2. Preservar UX e comportamento do timer/tasks/settings.
-3. Antes de adicionar biblioteca nova, apresentar opcoes, impacto e aguardar confirmacao.
-4. Nao trocar tecnologia silenciosamente.
-5. Codigo em ingles; comentarios/logs em pt-BR quando fizer sentido.
-
----
-
-## Politica de Documentacao
-
-- Implementado apos o fork: registrar em `CHANGELOG.md`.
-- Pendencias futuras, decisoes e plano tecnico: registrar em `docs/TECHNICAL_DECISIONS_2026.md`.
-- Nao criar specs/checklists soltos na raiz para temas que ja existem no documento tecnico unico.
-
-### Regra de ligacao CHANGELOG <-> Release (obrigatoria)
-
-1. Fonte oficial das notas da GitHub Release: secao da versao em `CHANGELOG.md` (`## [x.y.z]`).
-2. Antes de criar tag/release, a IA deve inserir/atualizar:
-   - `CHANGELOG.md` (pt)
-   - `CHANGELOG.en.md` (en)
-3. Scripts de release (`release.sh`/`release.ps1`) devem falhar se a versao nao existir nos 2 changelogs.
-4. Workflow de release sincroniza titulo/notas a partir do `CHANGELOG.md`; sem conteudo, cai em texto generico de fallback.
-5. Regra operacional: nao criar tag `v*` sem entrada valida no changelog da versao.
-
-### Procedimento operacional (anti-erro)
-
-1. Identificar se a versao ja foi publicada (tag `v*` existente e data real no changelog).
-2. NUNCA editar itens de versao ja publicada; qualquer ajuste novo entra na proxima versao.
-3. Durante desenvolvimento, manter a secao da proxima versao no topo:
-   - PT: `## [x.y.z] - A definir`
-   - EN: `## [x.y.z] - TBD`
-4. Registrar mudancas com bullets curtos por bloco (`### Adicionado`, `### Alterado`, `### Corrigido`).
-5. No dia da publicacao, trocar apenas a data (`A definir`/`TBD` -> `YYYY-MM-DD`) da versao que sera tagueada.
-6. Depois de publicar `vX.Y.Z`, novas mudancas devem abrir/usar `X.Y.(Z+1)` (ou versao alvo definida) com `A definir`/`TBD`.
-7. Antes da tag, validar que a mesma versao existe nos dois arquivos:
-   - `CHANGELOG.md`
-   - `CHANGELOG.en.md`
-
-Template minimo recomendado por versao:
-
-```md
-## [x.y.z] - YYYY-MM-DD
-
-### Changed
-
-- Item 1
-```
+1. Preserve functional stability (timer, tasks, settings, tray, compact mode).
+2. Maintain security hardening (preload/IPC/sandbox/CSP).
+3. Evolve dependencies in small, testable, reversible blocks.
+4. Keep cross-platform builds green (Windows, macOS, Linux).
+5. Log changes in CHANGELOG; track decisions in docs.
 
 ---
 
-## Fluxo de Scripts (baseline)
+## Rules
 
-- Fluxo principal: `yarn dev:app`, `yarn build:*`, `yarn lint`.
-- Wrappers recomendados:
-  - Unix: `./scripts/validar-tudo.sh` (menu), `./scripts/validar-tudo.sh --dev`, `./scripts/validar-tudo.sh --run-packed`
-  - PowerShell: `./scripts/validar-tudo.ps1` (menu), `./scripts/validar-tudo.ps1 -Dev`, `./scripts/validar-tudo.ps1 -RunPacked`
-- Scripts de instalacao local:
-
-```sh
-./scripts/install.sh
-./scripts/install.ps1
-./scripts/uninstall.sh
-./scripts/uninstall.ps1
-```
+1. Work in small, testable, reversible blocks.
+2. Preserve UX and behavior of timer/tasks/settings.
+3. Before adding a new library: present options, impact, and wait for confirmation.
+4. Never swap technology silently.
+5. Code in English. Comments/logs in Portuguese (PT-BR) where appropriate.
 
 ---
 
-## MCP (uso recomendado)
+## Documentation Policy
 
-| MCP                 | Quando usar                           |
-| ------------------- | ------------------------------------- |
-| context7            | Duvidas de API e documentacao oficial |
-| sequential-thinking | Planejamento de migracoes maiores     |
-| playwright          | Investigacao de comportamento de UI   |
+| What                              | Where                                          |
+| --------------------------------- | ---------------------------------------------- |
+| Implemented changes               | `CHANGELOG.md` (PT) and `CHANGELOG.en.md` (EN) |
+| Migration plan                    | `docs/MIGRATION_ELECTRON_TO_TAURI.md`          |
+| Release/update operations         | `docs/RELEASE_OPERATIONS.md`                   |
+| Product backlog (future features) | `docs/PRODUCT_BACKLOG.md`                      |
+| Agent operational rules           | This file (`AGENTS.md`)                        |
+| Claude Code guide                 | `CLAUDE.md`                                    |
 
-Regra: usar MCP como suporte de decisao, sem duplicar historico/roadmap neste arquivo.
+Do not create loose specs/checklists for topics already covered in the documents above.
+
+### Changelog Rules
+
+1. Source of truth for GitHub Release notes: `CHANGELOG.md` section `## [x.y.z]`.
+2. Before creating a tag/release, update both `CHANGELOG.md` and `CHANGELOG.en.md`.
+3. Never edit items of an already-published version; new changes go in the next version.
+4. Keep the next version at the top as `A definir` (PT) / `TBD` (EN); set date only on release day.
+5. Do not create tag `v*` without a valid entry in both changelogs.
+
+---
+
+## MCP (Recommended Usage)
+
+| MCP                 | When to use                              |
+| ------------------- | ---------------------------------------- |
+| context7            | API and official documentation questions |
+| sequential-thinking | Planning larger migrations               |
+| playwright          | UI behavior investigation                |
+
+Use MCP as decision support; do not duplicate history or roadmap in this file.

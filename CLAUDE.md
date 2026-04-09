@@ -4,23 +4,32 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Pomodoroz is a cross-platform Pomodoro desktop app (Electron-only), forked from [Pomatez](https://github.com/zidoro/pomatez). It is a standalone desktop app with no server or cloud — all data is local.
+Pomodoroz is a cross-platform Pomodoro desktop app, forked from [Pomatez](https://github.com/zidoro/pomatez). Standalone desktop app with no server or cloud — all data is local.
 
-Operational agent rules: `AGENTS.md`.
-Implemented changes tracked in: `CHANGELOG.md` and `CHANGELOG.en.md`.
-Technical decisions, roadmap, and pending items tracked in: `docs/TECHNICAL_DECISIONS_2026.md` and `docs/DECISOES_TECNICAS_2026.pt-BR.md`.
+**Current runtime: Electron.** Migrating to Tauri — see `docs/MIGRATION_ELECTRON_TO_TAURI.md`.
 
-## Repository Layout
+### Key Documents
+
+| Document                              | Purpose                                        |
+| ------------------------------------- | ---------------------------------------------- |
+| `AGENTS.md`                           | Agent operational rules                        |
+| `CHANGELOG.md` / `CHANGELOG.en.md`    | Implemented changes                            |
+| `docs/MIGRATION_ELECTRON_TO_TAURI.md` | Migration plan (Electron -> Tauri)             |
+| `docs/RELEASE_OPERATIONS.md`          | Release flow, auto-update, checklists          |
+| `docs/PRODUCT_BACKLOG.md`             | Future features (gamification, adaptive focus) |
+
+## Repository Layout (Current — Electron)
 
 ```text
-<repo-root>/                     # Git root AND monorepo root
-├── AGENTS.md                    # Agent operation rules (no roadmap/history duplication)
-├── CLAUDE.md                    # This file
+<repo-root>/
+├── AGENTS.md
+├── CLAUDE.md
 ├── package.json                 # Root workspace config (Lerna + Yarn Classic)
 ├── app/
 │   ├── electron/                # Electron main process (entry: src/main.ts)
 │   ├── renderer/                # React renderer (Vite dev + build)
 │   └── shareables/              # @pomodoroz/shareables (shared IPC channel constants)
+├── docs/                        # Technical docs (migration, release ops, backlog)
 └── scripts/                     # Helper scripts (validation, install, version sync)
 ```
 
@@ -33,7 +42,7 @@ Technical decisions, roadmap, and pending items tracked in: `docs/TECHNICAL_DECI
 - **React Router** `7.x` (HashRouter)
 - **Redux Toolkit** `2.x` — state management
 - **Styled Components** — CSS-in-JS
-- **@dnd-kit** — drag-and-drop (replaced `react-beautiful-dnd`)
+- **@dnd-kit** — drag-and-drop
 - **i18next** — internationalization (en, pt, es, ja, zh)
 - **ESLint 9** + `@typescript-eslint 8` (flat config)
 - **Lerna 9** + Nx — monorepo orchestration
@@ -83,13 +92,6 @@ yarn build:dir
 ./app/electron/dist/linux-unpacked/pomodoroz
 ```
 
-Local install/uninstall (AppImage + desktop launcher):
-
-```sh
-./scripts/install.sh
-./scripts/uninstall.sh
-```
-
 ## Architecture
 
 ### Monorepo
@@ -136,9 +138,9 @@ Renderer persists state in `localStorage`. Electron uses `electron-store` for na
 
 ## Key Policies
 
-- **Updater**: Keep release feed on this fork (`cjdduarte/pomodoroz`). Do not point updater to original Pomatez feed. Details in `docs/TECHNICAL_DECISIONS_2026.md` and `docs/DECISOES_TECNICAS_2026.pt-BR.md`.
-- **Documentation**: Log implemented changes in `CHANGELOG.md` and `CHANGELOG.en.md`. Track future work and technical decisions in `docs/TECHNICAL_DECISIONS_2026.md` and `docs/DECISOES_TECNICAS_2026.pt-BR.md`. Keep `AGENTS.md` for agent operational rules.
-- **Release Notes Source of Truth**: GitHub Release title/notes are generated from `CHANGELOG.md` section `## [x.y.z]`. Always update both `CHANGELOG.md` and `CHANGELOG.en.md` before tag/release.
+- **Updater**: Keep release feed on this fork (`cjdduarte/pomodoroz`). Do not point updater to original Pomatez feed.
+- **Documentation**: Log implemented changes in `CHANGELOG.md` and `CHANGELOG.en.md`. Track migration in `docs/MIGRATION_ELECTRON_TO_TAURI.md`. Track future features in `docs/PRODUCT_BACKLOG.md`.
+- **Release Notes Source of Truth**: GitHub Release title/notes are generated from `CHANGELOG.md` section `## [x.y.z]`. Always update both changelogs before tag/release.
 - **Changelog Fill Rule**: Never add new items to a published version. Keep the next version at the top as `A definir` (PT) / `TBD` (EN), set the date only on release day, and move subsequent work to the next version.
 - **Language**: Code in English. Logs/comments in Portuguese (PT-BR) where appropriate.
 - **Dependencies**: Explain options and wait for confirmation before adding new libraries.
