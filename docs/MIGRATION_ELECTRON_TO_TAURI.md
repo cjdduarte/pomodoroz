@@ -137,18 +137,21 @@ pomodoroz/
 
 - Goal: get Tauri running alongside the existing renderer without breaking Electron.
 - Scope:
-  - `pnpm init` at root, install dependencies
-  - `pnpm create tauri-app` scaffold into `src-tauri/`
-  - Configure `vite.config.ts` with `@tauri-apps/vite-plugin`
+  - Scaffold `src-tauri/` (Cargo.toml, tauri.conf.json, src/main.rs)
+  - Add `@tauri-apps/cli` and `@tauri-apps/api` as devDependencies via Yarn
+  - Add `"tauri": "tauri"` script to root `package.json` (uses local bin from `@tauri-apps/cli`)
+  - Configure the existing renderer Vite config (`app/renderer/vite.config.ts`) with `@tauri-apps/vite-plugin` — no folder restructuring yet
   - Verify the renderer loads inside a Tauri window (no native features yet)
 - Validation:
-  - `pnpm dev` opens a Tauri window with the React UI
-  - Electron dev flow still works in parallel (not broken yet)
+  - `yarn tauri dev` opens a Tauri window with the React UI
+  - `yarn dev:app` (Electron) still works in parallel (not broken)
 - Exit criteria:
   - Tauri window renders the existing React app
-  - No Electron code removed yet
+  - No Electron code removed yet (including `app/shareables/` — IPC contracts stay until Phase 1)
+  - Package manager remains Yarn (pnpm migration is Phase 3a)
+  - Existing scripts (`validar-tudo.sh`, `release.sh`, etc.) still work unchanged
 - Rollback:
-  - Delete `src-tauri/` and `pnpm-lock.yaml`
+  - Delete `src-tauri/`, remove Tauri devDependencies and `"tauri"` script from package.json, revert vite.config.ts changes
 
 ### Phase 1 — Connector Swap (Electron IPC to Tauri Commands)
 
