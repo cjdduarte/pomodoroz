@@ -20,8 +20,14 @@ type SpecialFieldProps = {
   duration?: number;
 };
 
+type SpecialFieldValues = {
+  fromTime: string;
+  toTime: string;
+  duration: number;
+};
+
 type Props = {
-  onFieldSubmit?: (values: SpecialFieldProps) => void;
+  onFieldSubmit?: (values: SpecialFieldValues) => void;
 } & React.HTMLProps<HTMLInputElement> &
   SpecialFieldProps;
 
@@ -35,10 +41,10 @@ const SpecialField: React.FC<Props> = ({
   const { t } = useTranslation();
   const [showSetter, setShowSetter] = useState(false);
 
-  const [values, setValues] = useState({
-    fromTime,
-    toTime,
-    duration,
+  const [values, setValues] = useState<SpecialFieldValues>({
+    fromTime: fromTime ?? "",
+    toTime: toTime ?? "",
+    duration: duration ?? 0,
   });
 
   const [success, setSuccess] = useState(false);
@@ -105,7 +111,7 @@ const SpecialField: React.FC<Props> = ({
   );
 
   const onClear = useCallback(
-    (e) => {
+    (e: React.MouseEvent<HTMLButtonElement>) => {
       e.stopPropagation();
       const newValues = {
         fromTime: "",

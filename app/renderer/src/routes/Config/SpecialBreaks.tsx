@@ -7,6 +7,7 @@ import {
   setThirdSpecialBreak,
   setFourthSpecialBreak,
 } from "store";
+import type { SpecialBreakTypes } from "store/config/types";
 import {
   StyledConfigSpecialBreaks,
   StyledSpecialBreakHeading,
@@ -21,28 +22,28 @@ const SpecialBreaks: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const setFirstSpecialBreakCallback = useCallback(
-    (values) => {
+    (values: SpecialBreakTypes) => {
       dispatch(setFirstSpecialBreak(values));
     },
     [dispatch]
   );
 
   const setSecondSpecialBreakCallback = useCallback(
-    (values) => {
+    (values: SpecialBreakTypes) => {
       dispatch(setSecondSpecialBreak(values));
     },
     [dispatch]
   );
 
   const setThirdSpecialBreakCallback = useCallback(
-    (values) => {
+    (values: SpecialBreakTypes) => {
       dispatch(setThirdSpecialBreak(values));
     },
     [dispatch]
   );
 
   const setFourthSpecialBreakCallback = useCallback(
-    (values) => {
+    (values: SpecialBreakTypes) => {
       dispatch(setFourthSpecialBreak(values));
     },
     [dispatch]

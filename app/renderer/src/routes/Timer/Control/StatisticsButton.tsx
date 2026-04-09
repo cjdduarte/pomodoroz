@@ -16,7 +16,7 @@ const StatisticsButton: React.FC<Props> = ({
   const buttonClickAction = useRippleEffect();
 
   const onStatisticsAction = useCallback(
-    (e) =>
+    (e: React.MouseEvent<HTMLButtonElement>) =>
       buttonClickAction(e, buttonRef, () => {
         if (onClick) {
           onClick(e);

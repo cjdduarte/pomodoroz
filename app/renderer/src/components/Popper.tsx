@@ -14,7 +14,7 @@ type Props = {
   children: ({
     targetRef,
   }: {
-    targetRef: React.RefObject<HTMLElement>;
+    targetRef: React.RefObject<HTMLElement | null>;
   }) => React.ReactNode;
 };
 

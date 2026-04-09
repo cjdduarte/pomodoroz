@@ -16,6 +16,8 @@
 - **Ícones de lista diferenciados no topo** — botão de arrastar lista agora usa ícone de grip, reduzindo ambiguidade visual com o botão de ações (`...`).
 - **Tipagem SVG ajustada para TypeScript 6** — módulo `*.svg` agora declara `ReactComponent` nomeado em `src/typings.d.ts`, eliminando o `TS2614` no índice de ícones.
 - **Hook `useTargetOutside` compatível com refs React 19/TS6** — `ref` agora aceita `RefObject<T | null>`, removendo `TS2322` em `TaskHeader` e outros usos com `useRef(..., null)`.
+- **Typecheck do renderer integrado no validar-tudo** — `scripts/validar-tudo.sh` e `scripts/validar-tudo.ps1` agora executam `yarn workspace @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json` no fluxo completo e no `quick-dev`.
+- **Lote TS6 aplicado no renderer** — corrigidos tipos de eventos (`implicit any`), refs de botões no ripple effect, tipagem de `wakeLock`, tipagem de `children` em `Dimmer`, compatibilidade de refs em `Popper` e widening de `trackedTaskActionTypes` no reducer de tasks.
 
 ## [26.4.13] - 2026-04-08
 

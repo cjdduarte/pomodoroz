@@ -422,7 +422,7 @@ export type TasksState = {
 export const undoTasks = createAction("tasks/undo");
 export const redoTasks = createAction("tasks/redo");
 
-const trackedTaskActionTypes = new Set(
+const trackedTaskActionTypes: ReadonlySet<string> = new Set(
   Object.values(tasksSlice.actions).map((action) => action.type)
 );
 

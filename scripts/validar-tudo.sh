@@ -34,7 +34,8 @@ Fluxo padrao:
   2) yarn install (sincroniza lockfile)
   3) yarn workspace @pomodoroz/shareables run build
   4) yarn lint
-  5) yarn build:dir
+  5) yarn workspace @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json
+  6) yarn build:dir
 
 Opcoes:
   --skip-install   Nao roda yarn install
@@ -44,7 +45,7 @@ Opcoes:
   --installers-full Perfil completo (targets padrao do projeto)
   --installers-slim Perfil enxuto (default)
   --install-local  Executa ./scripts/install.sh
-  --quick-dev      Fluxo rapido: yarn lint + yarn dev:app
+  --quick-dev      Fluxo rapido: yarn lint + typecheck renderer + yarn dev:app
   -h, --help       Mostra esta ajuda
 EOF
 }
@@ -53,7 +54,7 @@ show_menu() {
   cat <<'EOF'
 Menu de validacao:
 Escada de execucao (simples -> completo):
-- 1) Quick run (lint + dev:app).
+- 1) Quick run (lint + typecheck renderer + dev:app).
 - 2) Preflight sem install.
 - 3) Preflight completo (com install).
 - 4) Preflight completo + Quick run (lint + dev:app).
@@ -215,6 +216,11 @@ if (( RUN_QUICK_DEV == 1 )); then
   ( cd "$APP_DIR" && yarn workspace @pomodoroz/shareables run build )
   step "Quick run: lint"
   ( cd "$APP_DIR" && yarn lint )
+  step "Quick run: typecheck renderer"
+  (
+    cd "$APP_DIR" &&
+      yarn workspace @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json
+  )
   step "Quick run: dev:app"
   exec bash -lc "cd \"$APP_DIR\" && yarn dev:app"
 fi
@@ -224,6 +230,12 @@ step "Preparando @pomodoroz/shareables (tipos para dependencias internas)"
 
 step "Lint completo (ESLint renderer + TypeScript workspaces)"
 ( cd "$APP_DIR" && yarn lint )
+
+step "Typecheck do renderer (TypeScript)"
+(
+  cd "$APP_DIR" &&
+    yarn workspace @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json
+)
 
 if (( RUN_INSTALLERS == 1 )); then
   case "$(uname -s)" in

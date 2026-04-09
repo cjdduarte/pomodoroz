@@ -16,6 +16,8 @@
 - **Top list icons visually separated** — list drag button now uses a grip icon, reducing visual ambiguity with the actions menu (`...`) button.
 - **SVG typing aligned for TypeScript 6** — `*.svg` module now declares named `ReactComponent` in `src/typings.d.ts`, removing `TS2614` in the icons index.
 - **`useTargetOutside` hook aligned with React refs in TS6** — `ref` now accepts `RefObject<T | null>`, removing `TS2322` in `TaskHeader` and other `useRef(..., null)` call sites.
+- **Renderer typecheck added to validation wrappers** — `scripts/validar-tudo.sh` and `scripts/validar-tudo.ps1` now run `yarn workspace @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json` in both full and `quick-dev` flows.
+- **Renderer TS6 typing cleanup batch** — fixed event handler typings (`implicit any`), button ref compatibility in ripple effect, `wakeLock` typing, `children` typing in `Dimmer`, ref compatibility in `Popper`, and widened `trackedTaskActionTypes` in tasks history reducer.
 
 ## [26.4.13] - 2026-04-08
 

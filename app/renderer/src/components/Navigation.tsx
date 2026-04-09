@@ -27,7 +27,7 @@ const Navigation: React.FC<Props> = ({ timerType }) => {
   return (
     <StyledNav useNativeTitlebar={settings.useNativeTitlebar}>
       <StyledNavList>
-        {routes(hasUpdateNotification).map(
+        {routes(Boolean(hasUpdateNotification)).map(
           ({ name, icon, exact, path, notify }) => {
             return (
               <StyledNavListItem key={path}>

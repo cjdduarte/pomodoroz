@@ -1,8 +1,8 @@
 export const useRippleEffect =
   () =>
   (
-    e: React.MouseEvent<HTMLElement>,
-    ref: React.RefObject<HTMLButtonElement>,
+    e: React.MouseEvent<HTMLButtonElement>,
+    ref: React.RefObject<HTMLButtonElement | null>,
     fnCallback: () => void
   ) => {
     e.preventDefault();

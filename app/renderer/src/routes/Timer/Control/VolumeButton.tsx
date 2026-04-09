@@ -13,7 +13,7 @@ const VolumeButton: React.FC<Props> = ({ soundOn, onClick }) => {
   const buttonClickAction = useRippleEffect();
 
   const onVolumeAction = useCallback(
-    (e) =>
+    (e: React.MouseEvent<HTMLButtonElement>) =>
       buttonClickAction(e, buttonRef, () => {
         if (onClick) {
           onClick(e);

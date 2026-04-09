@@ -11,7 +11,7 @@ const ResetButton: React.FC<Props> = ({ onClick, className }) => {
   const buttonClickAction = useRippleEffect();
 
   const onResetAction = useCallback(
-    (e) =>
+    (e: React.MouseEvent<HTMLButtonElement>) =>
       buttonClickAction(e, buttonRef, () => {
         if (onClick) {
           onClick(e);

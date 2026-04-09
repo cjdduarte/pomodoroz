@@ -99,12 +99,13 @@ const TaskDetails = ({ listId, cardId, onExit, ref }: Props) => {
   }, [cardId, dispatch, listId, onExit]);
 
   const showPreviewCallback = useCallback(
-    (e) => setShowPreview(e.currentTarget.checked),
+    (e: React.ChangeEvent<HTMLInputElement>) =>
+      setShowPreview(e.currentTarget.checked),
     []
   );
 
   const setTaskCardDoneCallback = useCallback(
-    (e) => {
+    (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.currentTarget.checked) {
         dispatch(setTaskCardDone({ listId, cardId: card?._id }));
       } else {
@@ -125,7 +126,8 @@ const TaskDetails = ({ listId, cardId, onExit, ref }: Props) => {
   );
 
   const setDescriptionCallback = useCallback(
-    (e) => setDescription(e.target.value),
+    (e: React.ChangeEvent<HTMLTextAreaElement>) =>
+      setDescription(e.target.value),
     []
   );
 

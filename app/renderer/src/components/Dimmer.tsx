@@ -4,6 +4,7 @@ import { StyledDimmer } from "styles";
 
 type Props = {
   visible?: boolean;
+  children?: React.ReactNode;
 };
 
 export const Dimmer: React.FC<Props> = ({ visible, children }) => {

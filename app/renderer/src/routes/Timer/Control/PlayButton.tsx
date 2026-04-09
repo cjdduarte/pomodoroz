@@ -19,7 +19,7 @@ const PlayButton: React.FC<Props> = ({
   const buttonClickAction = useRippleEffect();
 
   const onPlayAction = useCallback(
-    (e) =>
+    (e: React.MouseEvent<HTMLButtonElement>) =>
       buttonClickAction(e, buttonRef, () => {
         if (onClick) {
           onClick(e);

@@ -56,7 +56,8 @@ Fluxo padrao:
   2) yarn install (sincroniza lockfile)
   3) yarn workspace @pomodoroz/shareables run build
   4) yarn lint
-  5) yarn build:dir
+  5) yarn workspace @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json
+  6) yarn build:dir
 
 Opcoes:
   -SkipInstall   Nao roda yarn install
@@ -65,7 +66,7 @@ Opcoes:
   -BuildInstallers  Apos validar, gera instaladores da plataforma atual
   -InstallersProfile  Perfil para -BuildInstallers: slim (default) ou full
   -InstallLocal  Executa ./scripts/install.ps1
-  -QuickDev      Fluxo rapido: yarn lint + yarn dev:app
+  -QuickDev      Fluxo rapido: yarn lint + typecheck renderer + yarn dev:app
   -Help
 "@
 }
@@ -73,7 +74,7 @@ Opcoes:
 function Show-ModeMenu {
     Write-Host "Menu de validacao:"
     Write-Host "Escada de execucao (simples -> completo):"
-    Write-Host "- 1) Quick run (lint + dev:app)."
+    Write-Host "- 1) Quick run (lint + typecheck renderer + dev:app)."
     Write-Host "- 2) Preflight sem install."
     Write-Host "- 3) Preflight completo (com install)."
     Write-Host "- 4) Preflight completo + Quick run (lint + dev:app)."
@@ -221,6 +222,11 @@ if ($QuickDev) {
     Invoke-Yarn lint
     Pop-Location
 
+    Step "Quick run: typecheck renderer"
+    Push-Location $APP_DIR
+    Invoke-Yarn workspace @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json
+    Pop-Location
+
     Step "Quick run: dev:app"
     Push-Location $APP_DIR
     Invoke-Yarn dev:app
@@ -236,6 +242,11 @@ Pop-Location
 Step "Lint completo (ESLint renderer + TypeScript workspaces)"
 Push-Location $APP_DIR
 Invoke-Yarn lint
+Pop-Location
+
+Step "Typecheck do renderer (TypeScript)"
+Push-Location $APP_DIR
+Invoke-Yarn workspace @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json
 Pop-Location
 
 if ($BuildInstallers) {

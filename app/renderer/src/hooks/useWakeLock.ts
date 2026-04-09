@@ -1,25 +1,14 @@
 import { useCallback, useEffect, useRef } from "react";
 
-type WakeLockSentinelLike = {
-  released: boolean;
-  release: () => Promise<void>;
-};
-
-type WakeLockLike = {
-  request: (type: "screen") => Promise<WakeLockSentinelLike>;
-};
-
-declare global {
-  interface Navigator {
-    wakeLock?: WakeLockLike;
-  }
-}
-
 const useWakeLock = () => {
-  const sentinelRef = useRef<WakeLockSentinelLike | null>(null);
+  const sentinelRef = useRef<WakeLockSentinel | null>(null);
 
   const preventSleeping = useCallback(async () => {
-    if (!navigator.wakeLock) {
+    const wakeLockApi = (
+      navigator as Navigator & { wakeLock?: WakeLock }
+    ).wakeLock;
+
+    if (!wakeLockApi) {
       return;
     }
 
@@ -28,7 +17,7 @@ const useWakeLock = () => {
     }
 
     try {
-      sentinelRef.current = await navigator.wakeLock.request("screen");
+      sentinelRef.current = await wakeLockApi.request("screen");
     } catch (_) {
       sentinelRef.current = null;
     }

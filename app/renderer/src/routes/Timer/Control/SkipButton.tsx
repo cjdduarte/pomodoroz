@@ -11,7 +11,7 @@ const SkipButton: React.FC<Props> = ({ onClick }) => {
   const buttonClickAction = useRippleEffect();
 
   const onSkipAction = useCallback(
-    (e) =>
+    (e: React.MouseEvent<HTMLButtonElement>) =>
       buttonClickAction(e, buttonRef, () => {
         if (onClick) {
           onClick(e);

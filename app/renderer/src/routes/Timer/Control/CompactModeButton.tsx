@@ -15,7 +15,7 @@ const CompactModeButton: React.FC<Props> = ({ onClick, flipped }) => {
   const buttonClickAction = useRippleEffect();
 
   const onClickAction = useCallback(
-    (e) =>
+    (e: React.MouseEvent<HTMLButtonElement>) =>
       buttonClickAction(e, buttonRef, () => {
         if (onClick) {
           onClick(e);
