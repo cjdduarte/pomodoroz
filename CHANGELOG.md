@@ -6,12 +6,17 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
-## [26.4.14] - 2026-04-09
+## [26.4.15] - 2026-04-09
 
 ### Corrigido
 
 - **Reset de cores no grid com ação no primeiro clique** — botão agora abre confirmação imediata e aplica o reset sem exigir segundo clique.
 - **Texto da confirmação de reset no grid ajustado** — mensagem de confirmação agora usa formato de pergunta no diálogo (`window.confirm`) em pt/en/es/ja/zh.
+
+## [26.4.14] - 2026-04-09
+
+### Corrigido
+
 - **Texto de apoio padronizado no PT-BR.**
 - **Drag visual entre listas estabilizado** — ao arrastar uma tarefa para outra lista, o card não “salta” de volta visualmente para a lista de origem antes do drop.
 - **Preview de arraste alinhado ao card real** — overlay de drag agora reaproveita o mesmo estilo do cartão da lista (largura, layout e ícones), melhorando a consistência visual durante o movimento.
@@ -20,10 +25,6 @@
 - **Hook `useTargetOutside` compatível com refs React 19/TS6** — `ref` agora aceita `RefObject<T | null>`, removendo `TS2322` em `TaskHeader` e outros usos com `useRef(..., null)`.
 - **Typecheck do renderer integrado no validar-tudo** — `scripts/validar-tudo.sh` e `scripts/validar-tudo.ps1` agora executam `yarn workspace @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json` no fluxo completo e no `quick-dev`.
 - **Lote TS6 aplicado no renderer** — corrigidos tipos de eventos (`implicit any`), refs de botões no ripple effect, tipagem de `wakeLock`, tipagem de `children` em `Dimmer`, compatibilidade de refs em `Popper` e widening de `trackedTaskActionTypes` no reducer de tasks.
-
-### Documentação
-
-- **Regra de saída final da IA formalizada** — `AGENTS.md`, `CLAUDE.md` e `CONTRIBUTING.md` agora exigem sugestão de mensagem de commit pronta (Conventional Commits, em inglês) ao fim de cada implementação finalizada.
 
 ## [26.4.13] - 2026-04-08
 

@@ -6,12 +6,17 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
-## [26.4.14] - 2026-04-09
+## [26.4.15] - 2026-04-09
 
 ### Fixed
 
 - **Grid color reset now acts on first click** — button now shows immediate confirmation and applies reset without requiring a second click.
 - **Grid reset confirmation copy updated** — confirmation message now uses an interrogative dialog style (`window.confirm`) across pt/en/es/ja/zh.
+
+## [26.4.14] - 2026-04-09
+
+### Fixed
+
 - **PT-BR support wording normalized.**
 - **Cross-list drag visual stabilized** — when dragging a task to another list, the card no longer visually snaps back to the source list before drop.
 - **Drag preview aligned with real card UI** — drag overlay now reuses the same card styling (width, layout, and icons), improving visual consistency while moving tasks.
@@ -20,10 +25,6 @@
 - **`useTargetOutside` hook aligned with React refs in TS6** — `ref` now accepts `RefObject<T | null>`, removing `TS2322` in `TaskHeader` and other `useRef(..., null)` call sites.
 - **Renderer typecheck added to validation wrappers** — `scripts/validar-tudo.sh` and `scripts/validar-tudo.ps1` now run `yarn workspace @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json` in both full and `quick-dev` flows.
 - **Renderer TS6 typing cleanup batch** — fixed event handler typings (`implicit any`), button ref compatibility in ripple effect, `wakeLock` typing, `children` typing in `Dimmer`, ref compatibility in `Popper`, and widened `trackedTaskActionTypes` in tasks history reducer.
-
-### Documentation
-
-- **AI final-output rule formalized** — `AGENTS.md`, `CLAUDE.md`, and `CONTRIBUTING.md` now require a ready-to-use commit message suggestion (Conventional Commits, English) at the end of each finalized implementation.
 
 ## [26.4.13] - 2026-04-08
 
