@@ -20,34 +20,33 @@ become Tauri Rust commands + plugins. Everything else can be ported incrementall
 
 ### Portability Summary
 
-| Layer                               | Files | Lines (approx) | Portability                              |
-| ----------------------------------- | ----- | -------------- | ---------------------------------------- |
-| Redux slices (7)                    | 7     | ~980           | 100% — runtime-agnostic                  |
-| React components (64)               | 64    | ~4000+         | ~95% — only 10 files touch Electron IPC  |
-| i18n (5 languages, 200+ keys)       | 10    | ~1200          | 100% — i18next works anywhere            |
-| Styled Components (163 definitions) | 39    | ~2000+         | 100% — CSS-in-JS is framework-agnostic   |
-| Custom hooks (11)                   | 11    | ~500+          | ~90% — few touch IPC                     |
-| Electron main process               | 5+    | ~2500          | 0% — must be rewritten as Tauri commands |
-| Shareables (IPC contracts)          | 1     | ~199           | Replace with Tauri command/event types   |
+| Layer                               | Files | Lines (approx) | Portability                                                  |
+| ----------------------------------- | ----- | -------------- | ------------------------------------------------------------ |
+| Redux slices (7)                    | 7     | ~980           | 100% — runtime-agnostic                                      |
+| React components (64)               | 64    | ~4000+         | ~95% — only a small compatibility layer touches Electron IPC |
+| i18n (5 languages, 200+ keys)       | 10    | ~1200          | 100% — i18next works anywhere                                |
+| Styled Components (163 definitions) | 39    | ~2000+         | 100% — CSS-in-JS is framework-agnostic                       |
+| Custom hooks (11)                   | 11    | ~500+          | ~90% — few touch IPC                                         |
+| Electron main process               | 5+    | ~2500          | 0% — must be rewritten as Tauri commands                     |
+| Shareables (IPC contracts)          | 1     | ~199           | Replace with Tauri command/event types                       |
 
-### Renderer Files With Direct Electron Coupling (10 of 176)
+### Renderer Files With Electron Coupling (Phase 1, Compatibility Layer)
 
-These are the only renderer files that reference `window.electron` or Electron APIs:
+At this stage, Electron-specific references are intentionally limited to compatibility
+modules while dual-runtime support is still active:
 
-1. `contexts/connectors/ElectronConnector.tsx` — IPC send/receive (connector impl)
-2. `contexts/ConnectorContext.tsx` — `isElectron()` detection
-3. `contexts/InvokeConnector.tsx` — type definitions
-4. `contexts/CounterContext.tsx` — direct `window.electron.receive()` (2 places)
-5. `routes/Settings/TaskTransferSection.tsx` — direct `window.electron.send/receive()` (4 places)
-6. `routes/Timer/Control/Control.tsx` — direct `window.electron.invoke()`
-7. `components/Layout.tsx` — uses `getInvokeConnector()`
-8. `components/Updater.tsx` — uses `getInvokeConnector()` + `window.Notification`
-9. `extensions/window.extension.ts` — type definitions for `window.electron`
-10. (style/theme files with connector integration)
+1. `contexts/connectors/ElectronConnector.tsx` — Electron provider implementation
+2. `contexts/connectors/ElectronInvokeConnector.ts` — Electron IPC adapter
+3. `contexts/ConnectorContext.tsx` — runtime detection (`electron` / `tauri` / browser)
+4. `contexts/InvokeConnector.tsx` — shared connector contract (still typed with current IPC map)
+5. `extensions/window.extension.ts` — global type definitions for `window.electron`
 
-The project already uses a **connector context pattern** (`ConnectorContext` / `ElectronConnector`).
-Most Electron calls are routed through this abstraction. The migration path is: create a
-`TauriConnector` that implements the same interface using `@tauri-apps/api`.
+Direct native calls from feature modules (`CounterContext`, `TaskTransferSection`,
+`Control`, `CompactTaskDisplay`) have already been migrated to the connector API.
+
+The project uses a **connector context pattern** (`ConnectorContext` + runtime-specific
+providers). Migration path: keep Electron connector for compatibility while expanding
+`TauriConnector` + Rust commands until Electron can be removed in Phase 3b.
 
 ---
 
@@ -133,6 +132,50 @@ pomodoroz/
 
 ## 4. Migration Phases
 
+### 4.0 Execution Tracker (Where We Are)
+
+Current status is tracked here (not only in phase descriptions) so we can see exactly where work stopped and what is still pending before moving to the next phase.
+
+| Phase                             | Status                | Last update | Gate to advance                                                      |
+| --------------------------------- | --------------------- | ----------- | -------------------------------------------------------------------- |
+| 0 — Tauri Scaffold + Dual Runtime | Completed             | 2026-04-09  | Closed after Tauri + Electron dev validation and script verification |
+| 1 — Connector Swap                | In progress (current) | 2026-04-09  | Run final parity validation for migrated flows and close Phase 1     |
+| 2 — Native Features               | Not started           | -           | Start only after Phase 1 exit criteria are complete                  |
+| 3a — Yarn to pnpm                 | Not started           | -           | Start only after Phase 2 exit criteria are complete                  |
+| 3b — Flatten Structure            | Not started           | -           | Start only after Phase 3a exit criteria are complete                 |
+| 4 — CI for Tauri                  | Not started           | -           | Start only after Phase 3b exit criteria are complete                 |
+
+Phase 0 completion checklist (execution status):
+
+- [x] `src-tauri/` scaffold created and version/identifier aligned with project
+- [x] `@tauri-apps/cli` and `@tauri-apps/api` added, plus root `"tauri"` script
+- [x] Tauri dev flow validated (`yarn tauri dev` opened and ran the app)
+- [x] No Electron code removed yet
+- [x] Package manager still Yarn (pnpm remains Phase 3a)
+- [x] Revalidate `yarn dev:app` after Tauri scaffold (Electron path still green)
+- [x] Run/confirm script checklist impact for current phase (`scripts/` validation rule)
+
+Rule to move forward: only start Phase 1 after all Phase 0 checklist items above are checked.
+Current state: gate satisfied, Phase 1 can proceed.
+
+Phase 1 progress checklist (execution status):
+
+- [x] Remove direct `window.electron` calls from renderer modules (all calls routed through connector API)
+- [x] Create and wire `TauriConnector` as runtime-native implementation
+- [x] Implement Rust command/event bridge in `src-tauri/src/commands/` for migrated channels
+- [x] Replace remaining renderer dependency on Electron IPC contract package (`@pomodoroz/shareables`) with local runtime command/event types
+- [ ] Validate feature parity for migrated flows (timer reset confirmation, fullscreen events, task import/export; reset confirmation currently uses prompt fallback on Tauri)
+  - [x] Runtime smoke validation completed (`yarn tauri dev --no-watch` booted successfully after connector decoupling)
+  - [ ] Manual functional validation pending (reset decision flow, fullscreen enter/exit events, import/export result messaging)
+
+Phase 1 manual validation matrix (to close the last checklist item):
+
+| Flow                         | How to validate                                                                               | Expected result                                                                                                     |
+| ---------------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Reset focus -> idle decision | Start focus timer with elapsed seconds, click reset, test `yes`, `no`, and `cancel` decisions | `yes` reclassifies elapsed focus as idle; `no` resets without reclassification; `cancel` keeps timer running        |
+| Fullscreen break events      | Enable fullscreen break, trigger break start/end transitions                                  | Window enters fullscreen on break and exits fullscreen when break ends; timer/navigation state remains consistent   |
+| Task export/import           | Export tasks from Settings, then import valid file and malformed file                         | Export success message shown; valid import enters pending merge/replace flow; malformed file shows validation error |
+
 ### Phase 0 — Tauri Scaffold + Dual Runtime
 
 - Goal: get Tauri running alongside the existing renderer without breaking Electron.
@@ -140,7 +183,7 @@ pomodoroz/
   - Scaffold `src-tauri/` (Cargo.toml, tauri.conf.json, src/main.rs)
   - Add `@tauri-apps/cli` and `@tauri-apps/api` as devDependencies via Yarn
   - Add `"tauri": "tauri"` script to root `package.json` (uses local bin from `@tauri-apps/cli`)
-  - Configure the existing renderer Vite config (`app/renderer/vite.config.ts`) with `@tauri-apps/vite-plugin` — no folder restructuring yet
+  - Keep the existing renderer Vite config (`app/renderer/vite.config.ts`) and wire Tauri via `src-tauri/tauri.conf.json` (`devUrl` + `beforeDevCommand`) — no folder restructuring yet
   - Verify the renderer loads inside a Tauri window (no native features yet)
 - Validation:
   - `yarn tauri dev` opens a Tauri window with the React UI
@@ -160,7 +203,7 @@ pomodoroz/
   - Create `TauriConnector.tsx` implementing the same interface as `ElectronConnector.tsx`
   - Replace `ConnectorContext` detection to use Tauri when available
   - Implement Rust commands in `src-tauri/src/commands/` for each IPC channel
-  - Fix the 10 renderer files that bypass the connector (direct `window.electron` calls)
+  - Remove feature-level direct native calls so renderer modules use connector APIs only
   - Replace `@pomodoroz/shareables` IPC constants with Tauri command/event types
 - Validation:
   - Timer works (start/pause/skip/reset)
@@ -168,7 +211,7 @@ pomodoroz/
   - Tasks CRUD works
 - Exit criteria:
   - All renderer-to-native communication goes through Tauri
-  - No remaining references to `window.electron`
+  - No remaining `window.electron` usage outside Electron compatibility modules
 - Rollback:
   - Revert connector changes; `ElectronConnector` is still in git history
 

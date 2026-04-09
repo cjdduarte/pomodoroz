@@ -6,6 +6,31 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.4.16] - TBD
+
+### Added
+
+- **Initial Tauri runtime scaffold (v2)** — new `src-tauri/` directory with `Cargo.toml`, `build.rs`, `src/main.rs`, `src/lib.rs`, capabilities, and default icons to bootstrap a dual-runtime flow.
+- **Tauri tooling in the current monorepo** — added `@tauri-apps/cli` and `@tauri-apps/api` dependencies at the root project plus a new `yarn tauri` script.
+
+### Changed
+
+- **Tauri config aligned with current renderer workspace** — `src-tauri/tauri.conf.json` now targets `../app/renderer/build`, uses `devUrl` `http://localhost:3000`, and runs renderer workspace commands in `beforeDevCommand`/`beforeBuildCommand`.
+- **Initial Tauri app metadata adjusted** — identifier set to `com.cjdduarte.pomodoroz`, scaffold version set to `26.4.15`, and initial window size set to `340x470` to better match current Electron behavior.
+- **Renderer native calls centralized behind connector APIs** — direct `window.electron` usage was removed from `CounterContext`, `Control`, and `TaskTransferSection`; these flows now use the typed `InvokeConnector` contract.
+- **Connector contract expanded for Phase 1** — `InvokeConnector` now includes `send`, `receive`, and `invoke`, preserving Electron behavior while preparing the Tauri swap.
+- **`TauriConnector` runtime path enabled** — `ConnectorContext` now selects provider by runtime (`electron`/`tauri`), with a dedicated `TauriInvokeConnector` for window/fullscreen/compact mode and task import/export flow under Tauri.
+- **Tauri capability permissions aligned** — `src-tauri/capabilities/default.json` now includes explicit window permissions required by the connector (`show`, `hide`, `close`, `minimize`, `set_focus`, `set_always_on_top`, `set_fullscreen`, `set_size`, `set_theme`, `set_decorations`).
+- **Compact mode detached from direct Electron usage** — `CompactTaskDisplay` now uses `getInvokeConnector()` for `COMPACT_EXPAND`/`COMPACT_COLLAPSE`.
+- **Rust command bridge started in `src-tauri`** — added native commands in `src-tauri/src/commands/window_bridge.rs` (always-on-top, fullscreen break, compact mode, theme, titlebar, show/minimize/close), and `TauriInvokeConnector` now calls these channels via `invoke()`.
+- **Renderer decoupled from `@pomodoroz/shareables`** — frontend IPC contract moved to `app/renderer/src/ipc/index.ts`, renderer imports now use `ipc`, and the package dependency was removed from `@pomodoroz/renderer`.
+
+### Documentation
+
+- **Tauri migration plan (Phase 0) refined** — scope updated for a Yarn-based dual runtime, `tauri` script in root `package.json`, and integration via `src-tauri/tauri.conf.json` with the current renderer workspace, without premature folder restructuring.
+- **Commit/PR language policy formalized** — `AGENTS.md`, `CLAUDE.md`, and `CONTRIBUTING.md` now explicitly require commit messages and PR titles in English (Conventional Commits).
+- **Milestone-based execution tracking added to migration plan** — `docs/MIGRATION_ELECTRON_TO_TAURI.md` now includes an explicit phase tracker (status, advancement gate, and execution checklists for phases 0 and 1).
+
 ## [26.4.15] - 2026-04-09
 
 ### Fixed
