@@ -7,7 +7,7 @@ import type {
   FromMainPayloadMap,
   InvokeMainPayloadMap,
   InvokeMainResponseMap,
-} from "@pomodoroz/shareables";
+} from "ipc";
 
 declare global {
   interface Window {

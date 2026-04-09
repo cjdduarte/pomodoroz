@@ -27,7 +27,7 @@ import { TimerStatus } from "store/timer/types";
 import { useAppDispatch, useAppSelector } from "hooks/storeHooks";
 import { isFreshInstallProfile, setEnableInAppAutoUpdate } from "store";
 import { getFromStorage, saveToStorage } from "utils";
-import { SET_IN_APP_AUTO_UPDATE } from "@pomodoroz/shareables";
+import { SET_IN_APP_AUTO_UPDATE } from "ipc";
 
 const AUTO_UPDATE_POLICY_PROMPT_SEEN_KEY =
   "auto-update-policy-prompt-seen";

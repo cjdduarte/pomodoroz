@@ -2,8 +2,9 @@ import WarningBell from "assets/audios/warning-bell.wav";
 import {
   CONFIRM_RESET_FOCUS_TO_IDLE,
   type ResetFocusToIdleDialogResult,
-} from "@pomodoroz/shareables";
+} from "ipc";
 import { SVG } from "components";
+import { getInvokeConnector } from "contexts";
 import React, {
   useCallback,
   useEffect,
@@ -113,8 +114,9 @@ const Control: React.FC<Props> = ({
       let decision: ResetFocusToIdleDialogResult = "no";
 
       try {
-        if (window.electron?.invoke) {
-          decision = await window.electron.invoke(
+        const invokeConnector = getInvokeConnector();
+        if (invokeConnector) {
+          decision = await invokeConnector.invoke(
             CONFIRM_RESET_FOCUS_TO_IDLE
           );
         }

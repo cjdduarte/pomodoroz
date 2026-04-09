@@ -31,7 +31,6 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@emotion/is-prop-valid": "^1.4.0",
-    "@pomodoroz/shareables": "*",
     "@reduxjs/toolkit": "^2.11.2",
     "@types/node": "25.5.2",
     "@types/react": "^19.0.0",

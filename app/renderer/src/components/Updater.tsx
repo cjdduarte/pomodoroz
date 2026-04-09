@@ -13,7 +13,7 @@ import {
   StyledTaskForm,
 } from "../styles";
 import { getInvokeConnector } from "../contexts";
-import { OPEN_RELEASE_PAGE } from "@pomodoroz/shareables";
+import { OPEN_RELEASE_PAGE } from "ipc";
 import { sanitizeMarkdownLinkUri } from "utils";
 
 const UpdateWrapper = styled.div`

@@ -33,10 +33,8 @@ import specialBreakStartedWav from "assets/audios/special-break-started.wav";
 import thirtySecondsLeftWav from "assets/audios/thirty-seconds-left.wav";
 import { useAppDispatch, useAppSelector } from "hooks/storeHooks";
 import { TimerStatus } from "store/timer/types";
-import {
-  FULLSCREEN_BREAK_ENTERED,
-  FULLSCREEN_BREAK_EXITED,
-} from "@pomodoroz/shareables";
+import { FULLSCREEN_BREAK_ENTERED, FULLSCREEN_BREAK_EXITED } from "ipc";
+import { getRuntimeInvokeConnector } from "./connectors/runtimeInvokeConnector";
 
 type CounterProps = {
   count: number;
@@ -855,16 +853,17 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
   ]);
 
   useEffect(() => {
-    if (!window.electron?.receive) return;
+    const invokeConnector = getRuntimeInvokeConnector();
+    if (!invokeConnector) return;
 
-    const cleanupEntered = window.electron.receive(
+    const cleanupEntered = invokeConnector.receive(
       FULLSCREEN_BREAK_ENTERED,
       () => {
         setShouldFullscreen(true);
       }
     );
 
-    const cleanupExited = window.electron.receive(
+    const cleanupExited = invokeConnector.receive(
       FULLSCREEN_BREAK_EXITED,
       () => {
         setShouldRequestFullscreen(false);

@@ -10,27 +10,29 @@ import { ConnectorContext } from "../ConnectorContext";
 import { useAppSelector, useAppDispatch } from "hooks/storeHooks";
 import { CounterContext } from "../CounterContext";
 import {
-  SET_ALWAYS_ON_TOP,
   CLOSE_WINDOW,
+  MINIMIZE_WINDOW,
+  OPEN_RELEASE_PAGE,
+  SET_ALWAYS_ON_TOP,
   SET_COMPACT_MODE,
   SET_FULLSCREEN_BREAK,
-  SET_TRAY_BEHAVIOR,
-  MINIMIZE_WINDOW,
-  SET_NATIVE_TITLEBAR,
-  SHOW_WINDOW,
-  SET_UI_THEME,
   SET_IN_APP_AUTO_UPDATE,
-  TRAY_ICON_UPDATE,
+  SET_NATIVE_TITLEBAR,
   SET_OPEN_AT_LOGIN,
+  SET_TRAY_BEHAVIOR,
+  SET_UI_THEME,
+  SHOW_WINDOW,
+  TRAY_ICON_UPDATE,
   UPDATE_AVAILABLE,
-  type UpdateAvailablePayload,
   type ToMainChannel,
   type ToMainPayloadMap,
+  type UpdateAvailablePayload,
 } from "ipc";
 import { useTrayIconUpdates } from "hooks/useTrayIconUpdates";
 import { setUpdateBody, setUpdateVersion } from "store/update";
 import { getFromStorage } from "utils";
 import { isFreshInstallProfile } from "store";
+import { TauriInvokeConnector } from "./TauriInvokeConnector";
 
 const AUTO_UPDATE_POLICY_PROMPT_SEEN_KEY =
   "auto-update-policy-prompt-seen";
@@ -38,21 +40,18 @@ const AUTO_UPDATE_POLICY_PROMPT_PENDING_KEY =
   "auto-update-policy-prompt-pending-choice";
 
 const IPC_ERROR_MESSAGE =
-  "Falha ao comunicar com o processo nativo. Reinicie o app.";
+  "Falha ao comunicar com o runtime nativo (Tauri). Reinicie o app.";
 
-export const ElectronConnectorProvider = ({
+export const TauriConnectorProvider = ({
   children,
 }: PropsWithChildren) => {
-  const { electron } = window;
   const dispatch = useAppDispatch();
-
   const timer = useAppSelector((state) => state.timer);
   const settings = useAppSelector((state) => state.settings);
   const ignoreUpdateRef = useRef(settings.ignoreUpdate);
   const [connectorError, setConnectorError] = useState<string | null>(
     null
   );
-
   const { shouldRequestFullscreen } = useContext(CounterContext);
 
   const clearConnectorError = useCallback(() => {
@@ -60,7 +59,7 @@ export const ElectronConnectorProvider = ({
   }, []);
 
   const setConnectorIpcError = useCallback((error: unknown) => {
-    console.error("[IPC] Native communication error.", error);
+    console.error("[TAURI IPC] Native communication error.", error);
     setConnectorError(IPC_ERROR_MESSAGE);
   }, []);
 
@@ -70,13 +69,13 @@ export const ElectronConnectorProvider = ({
       ...payload: ToMainPayloadMap[C]
     ) => {
       try {
-        electron.send(channel, ...payload);
+        TauriInvokeConnector.send(channel, ...payload);
         clearConnectorError();
       } catch (error) {
         setConnectorIpcError(error);
       }
     },
-    [clearConnectorError, electron, setConnectorIpcError]
+    [clearConnectorError, setConnectorIpcError]
   );
 
   useEffect(() => {
@@ -95,7 +94,9 @@ export const ElectronConnectorProvider = ({
     });
   }, [sendToMain, settings.closeToTray]);
 
-  const openExternalCallback = useCallback(() => undefined, []);
+  const openExternalCallback = useCallback(() => {
+    sendToMain(OPEN_RELEASE_PAGE);
+  }, [sendToMain]);
 
   useEffect(() => {
     if (!settings.enableFullscreenBreak) {
@@ -105,8 +106,6 @@ export const ElectronConnectorProvider = ({
 
   useEffect(() => {
     if (!shouldRequestFullscreen) return;
-
-    // Ensure tray-hidden windows are visible before fullscreen is requested.
     sendToMain(SHOW_WINDOW);
   }, [sendToMain, shouldRequestFullscreen]);
 
@@ -174,29 +173,24 @@ export const ElectronConnectorProvider = ({
   }, [sendToMain, settings.enableInAppAutoUpdate]);
 
   useEffect(() => {
-    let cleanup = () => {};
-    try {
-      cleanup = electron.receive(
-        UPDATE_AVAILABLE,
-        (payload: UpdateAvailablePayload) => {
-          const version = payload.version;
-          const updateBody = payload.updateBody;
+    const cleanup = TauriInvokeConnector.receive(
+      UPDATE_AVAILABLE,
+      (payload: UpdateAvailablePayload) => {
+        const version = payload.version;
+        const updateBody = payload.updateBody;
 
-          if (!version || version === ignoreUpdateRef.current) {
-            return;
-          }
-
-          dispatch(setUpdateVersion(version));
-          dispatch(setUpdateBody(updateBody));
+        if (!version || version === ignoreUpdateRef.current) {
+          return;
         }
-      );
-      clearConnectorError();
-    } catch (error) {
-      setConnectorIpcError(error);
-    }
 
+        dispatch(setUpdateVersion(version));
+        dispatch(setUpdateBody(updateBody));
+      }
+    );
+
+    clearConnectorError();
     return cleanup;
-  }, [clearConnectorError, dispatch, electron, setConnectorIpcError]);
+  }, [clearConnectorError, dispatch]);
 
   useTrayIconUpdates((dataUrl) => {
     sendToMain(TRAY_ICON_UPDATE, dataUrl);

@@ -6,6 +6,7 @@ import React, {
 } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components/macro";
+import { getInvokeConnector } from "contexts";
 import { useAppDispatch, useAppSelector } from "hooks/storeHooks";
 import {
   appendTaskLists,
@@ -17,7 +18,7 @@ import {
   IMPORT_TASKS_DIALOG,
   TASKS_EXPORT_RESULT,
   TASKS_IMPORT_RESULT,
-} from "@pomodoroz/shareables";
+} from "ipc";
 import {
   StyledButtonDanger,
   StyledButtonPrimary,
@@ -126,10 +127,11 @@ const TaskTransferSection: React.FC = () => {
   const [notice, setNotice] = useState<Notice | null>(null);
   const [pendingImport, setPendingImport] =
     useState<PendingImport | null>(null);
+  const invokeConnector = getInvokeConnector();
 
   const hasNativeIpc =
-    typeof window.electron?.send === "function" &&
-    typeof window.electron?.receive === "function";
+    typeof invokeConnector?.send === "function" &&
+    typeof invokeConnector?.receive === "function";
 
   const pendingSummary = useMemo(() => {
     if (!pendingImport) return "";
@@ -158,11 +160,11 @@ const TaskTransferSection: React.FC = () => {
     setPendingImport(null);
     setNotice(null);
     setIsExporting(true);
-    window.electron.send(EXPORT_TASKS_DIALOG, {
+    invokeConnector?.send(EXPORT_TASKS_DIALOG, {
       suggestedFileName: createSuggestedFileName(),
       content,
     });
-  }, [hasNativeIpc, t, taskLists]);
+  }, [hasNativeIpc, invokeConnector, t, taskLists]);
 
   const onImport = useCallback(() => {
     if (!hasNativeIpc) {
@@ -176,8 +178,8 @@ const TaskTransferSection: React.FC = () => {
     setNotice(null);
     setPendingImport(null);
     setIsImporting(true);
-    window.electron.send(IMPORT_TASKS_DIALOG);
-  }, [hasNativeIpc, t]);
+    invokeConnector?.send(IMPORT_TASKS_DIALOG);
+  }, [hasNativeIpc, invokeConnector, t]);
 
   const applyImport = useCallback(
     (mode: "merge" | "replace") => {
@@ -215,9 +217,8 @@ const TaskTransferSection: React.FC = () => {
       return;
     }
 
-    const cleanupExport = window.electron.receive(
-      TASKS_EXPORT_RESULT,
-      (payload) => {
+    const cleanupExport =
+      invokeConnector?.receive(TASKS_EXPORT_RESULT, (payload) => {
         setIsExporting(false);
 
         if (payload.canceled) {
@@ -245,12 +246,10 @@ const TaskTransferSection: React.FC = () => {
               })
             : t("settings.taskTransfer.exportSuccess"),
         });
-      }
-    );
+      }) ?? (() => undefined);
 
-    const cleanupImport = window.electron.receive(
-      TASKS_IMPORT_RESULT,
-      (payload) => {
+    const cleanupImport =
+      invokeConnector?.receive(TASKS_IMPORT_RESULT, (payload) => {
         setIsImporting(false);
 
         if (payload.canceled) {
@@ -295,14 +294,13 @@ const TaskTransferSection: React.FC = () => {
           tone: "info",
           message: t("settings.taskTransfer.importReady"),
         });
-      }
-    );
+      }) ?? (() => undefined);
 
     return () => {
       cleanupExport();
       cleanupImport();
     };
-  }, [hasNativeIpc, t]);
+  }, [hasNativeIpc, invokeConnector, t]);
 
   return (
     <SettingSection heading={t("settings.taskTransfer.heading")}>

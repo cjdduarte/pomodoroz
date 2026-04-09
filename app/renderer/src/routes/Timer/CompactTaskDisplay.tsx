@@ -24,10 +24,8 @@ import type { TaskSelection } from "store";
 import type { TaskList, Task } from "store/tasks/types";
 import { resolveActiveTaskSelection } from "utils";
 import TaskListGrid from "routes/Tasks/TaskListGrid";
-import {
-  COMPACT_COLLAPSE,
-  COMPACT_EXPAND,
-} from "@pomodoroz/shareables";
+import { COMPACT_COLLAPSE, COMPACT_EXPAND } from "ipc";
+import { getInvokeConnector } from "contexts";
 
 type TimerLocationState = {
   selectedTask?: TaskSelection;
@@ -411,7 +409,6 @@ const StyledPromptButton = styled.button`
 const CompactTaskDisplay: React.FC = () => {
   const { t } = useTranslation();
   const location = useLocation();
-  const { electron } = window;
   const tasks = useAppSelector((state) => state.tasks.present);
   const timer = useAppSelector((state) => state.timer);
   const compactMode = useAppSelector(
@@ -479,12 +476,13 @@ const CompactTaskDisplay: React.FC = () => {
 
   const sendCompactResizeEvent = useCallback(
     (channel: typeof COMPACT_EXPAND | typeof COMPACT_COLLAPSE) => {
-      if (typeof electron?.send !== "function") {
+      const invokeConnector = getInvokeConnector();
+      if (!invokeConnector) {
         return;
       }
 
       try {
-        electron.send(channel);
+        invokeConnector.send(channel);
       } catch (error) {
         console.error(
           "[CompactGrid] Failed to send resize event.",
@@ -492,7 +490,7 @@ const CompactTaskDisplay: React.FC = () => {
         );
       }
     },
-    [electron]
+    []
   );
 
   const collapseCompactGrid = useCallback(() => {

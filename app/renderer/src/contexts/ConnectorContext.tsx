@@ -1,9 +1,10 @@
 import React, { type PropsWithChildren } from "react";
-import isElectron from "is-electron";
+import { ElectronConnectorProvider } from "./connectors/ElectronConnector";
+import { TauriConnectorProvider } from "./connectors/TauriConnector";
 import {
-  ElectronConnectorProvider,
-  ElectronInvokeConnector,
-} from "./connectors/ElectronConnector";
+  getRuntimeInvokeConnector,
+  getRuntimeKind,
+} from "./connectors/runtimeInvokeConnector";
 
 export type ConnectorProps = {
   onMinimizeCallback?: () => void;
@@ -16,10 +17,7 @@ export type ConnectorProps = {
 export const ConnectorContext = React.createContext<ConnectorProps>({});
 
 export function getInvokeConnector() {
-  if (isElectron()) {
-    return ElectronInvokeConnector;
-  }
-  return undefined;
+  return getRuntimeInvokeConnector();
 }
 
 type ConnectorProviderComponent =
@@ -29,8 +27,12 @@ export const ConnectorProvider = ({ children }: PropsWithChildren) => {
   let Connector: ConnectorProviderComponent = ({ children }) => (
     <>{children}</>
   );
-  if (isElectron()) {
+
+  const runtime = getRuntimeKind();
+  if (runtime === "electron") {
     Connector = ElectronConnectorProvider;
+  } else if (runtime === "tauri") {
+    Connector = TauriConnectorProvider;
   }
 
   return <Connector>{children}</Connector>;

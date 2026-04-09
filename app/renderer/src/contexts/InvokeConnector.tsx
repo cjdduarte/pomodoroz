@@ -1,7 +1,12 @@
 import type {
+  FromMainChannel,
+  FromMainPayloadMap,
+  InvokeMainChannel,
+  InvokeMainPayloadMap,
+  InvokeMainResponseMap,
   ToMainChannel,
   ToMainPayloadMap,
-} from "@pomodoroz/shareables";
+} from "ipc";
 
 /**
  * Explicitly for calling invokes from the trigger rather than a setting change.
@@ -11,4 +16,12 @@ export type InvokeConnector = {
     event: C,
     ...payload: ToMainPayloadMap[C]
   ) => void;
+  receive: <C extends FromMainChannel>(
+    event: C,
+    response: (...payload: FromMainPayloadMap[C]) => void
+  ) => () => void;
+  invoke: <C extends InvokeMainChannel>(
+    event: C,
+    ...payload: InvokeMainPayloadMap[C]
+  ) => Promise<InvokeMainResponseMap[C]>;
 };
