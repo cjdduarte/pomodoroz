@@ -55,6 +55,12 @@ This project uses Husky + lint-staged for pre-commit checks.
 Hooks are installed automatically when you run `yarn install`.
 To run the same checks manually: `yarn lint-staged`.
 
+### Generated Files (Tauri)
+
+- Never commit Rust build outputs from `src-tauri/target/`.
+- Never commit generated ACL schemas from `src-tauri/gen/schemas/`.
+- Before committing, run `git status --short` and confirm only source/docs files are staged.
+
 ## CI / Release
 
 - There is no CI pipeline on regular pushes/PRs yet (planned in migration Phase 4).
