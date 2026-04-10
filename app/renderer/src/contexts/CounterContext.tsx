@@ -884,6 +884,28 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
     setShouldFullscreen(false);
   }, [shouldRequestFullscreen]);
 
+  useEffect(() => {
+    if (!settings.enableFullscreenBreak || !shouldFullscreen) {
+      return;
+    }
+
+    const dismissFullscreenOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" && event.code !== "Escape") {
+        return;
+      }
+
+      setShouldRequestFullscreen(false);
+      setShouldFullscreen(false);
+      setFullscreenDismissed(true);
+    };
+
+    window.addEventListener("keydown", dismissFullscreenOnEscape);
+
+    return () => {
+      window.removeEventListener("keydown", dismissFullscreenOnEscape);
+    };
+  }, [settings.enableFullscreenBreak, shouldFullscreen]);
+
   const shouldPromptFocusToIdleReset =
     settings.resetFocusToIdleEnabled &&
     timer.timerType === TimerStatus.STAY_FOCUS &&

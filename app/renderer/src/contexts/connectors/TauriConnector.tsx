@@ -10,16 +10,20 @@ import { ConnectorContext } from "../ConnectorContext";
 import { useAppSelector, useAppDispatch } from "hooks/storeHooks";
 import { CounterContext } from "../CounterContext";
 import {
+  detectSystemLanguage,
+  normalizeLanguageCode,
+} from "i18n/languages";
+import type { LanguageCode } from "store/settings/types";
+import {
   CLOSE_WINDOW,
   MINIMIZE_WINDOW,
   OPEN_RELEASE_PAGE,
   SET_ALWAYS_ON_TOP,
   SET_COMPACT_MODE,
   SET_FULLSCREEN_BREAK,
-  SET_IN_APP_AUTO_UPDATE,
   SET_NATIVE_TITLEBAR,
-  SET_OPEN_AT_LOGIN,
   SET_TRAY_BEHAVIOR,
+  SET_TRAY_COPY,
   SET_UI_THEME,
   SHOW_WINDOW,
   TRAY_ICON_UPDATE,
@@ -28,19 +32,56 @@ import {
   type ToMainPayloadMap,
   type UpdateAvailablePayload,
 } from "ipc";
+import { listen } from "@tauri-apps/api/event";
 import { useTrayIconUpdates } from "hooks/useTrayIconUpdates";
 import { setUpdateBody, setUpdateVersion } from "store/update";
-import { getFromStorage } from "utils";
-import { isFreshInstallProfile } from "store";
 import { TauriInvokeConnector } from "./TauriInvokeConnector";
 
-const AUTO_UPDATE_POLICY_PROMPT_SEEN_KEY =
-  "auto-update-policy-prompt-seen";
-const AUTO_UPDATE_POLICY_PROMPT_PENDING_KEY =
-  "auto-update-policy-prompt-pending-choice";
+const WINDOW_RESTORED_EVENT = "pomodoroz://window-restored";
 
 const IPC_ERROR_MESSAGE =
   "Falha ao comunicar com o runtime nativo (Tauri). Reinicie o app.";
+
+type TrayCopy = {
+  restoreLabel: string;
+  quitLabel: string;
+  tooltip: string;
+};
+
+const TRAY_COPY_BY_LANGUAGE: Record<LanguageCode, TrayCopy> = {
+  en: {
+    restoreLabel: "Restore Pomodoroz",
+    quitLabel: "Quit",
+    tooltip: "Pomodoroz",
+  },
+  es: {
+    restoreLabel: "Restaurar Pomodoroz",
+    quitLabel: "Salir",
+    tooltip: "Pomodoroz",
+  },
+  zh: {
+    restoreLabel: "还原 Pomodoroz",
+    quitLabel: "退出",
+    tooltip: "Pomodoroz",
+  },
+  ja: {
+    restoreLabel: "Pomodoroz を復元",
+    quitLabel: "終了",
+    tooltip: "Pomodoroz",
+  },
+  pt: {
+    restoreLabel: "Restaurar Pomodoroz",
+    quitLabel: "Sair",
+    tooltip: "Pomodoroz",
+  },
+};
+
+const resolveTrayLanguage = (language: string): LanguageCode => {
+  if (language === "auto") {
+    return detectSystemLanguage();
+  }
+  return normalizeLanguageCode(language);
+};
 
 export const TauriConnectorProvider = ({
   children,
@@ -99,6 +140,18 @@ export const TauriConnectorProvider = ({
   }, [sendToMain]);
 
   useEffect(() => {
+    sendToMain(SET_TRAY_BEHAVIOR, {
+      minimizeToTray: settings.minimizeToTray,
+      closeToTray: settings.closeToTray,
+    });
+  }, [sendToMain, settings.closeToTray, settings.minimizeToTray]);
+
+  useEffect(() => {
+    const language = resolveTrayLanguage(settings.language);
+    sendToMain(SET_TRAY_COPY, TRAY_COPY_BY_LANGUAGE[language]);
+  }, [sendToMain, settings.language]);
+
+  useEffect(() => {
     if (!settings.enableFullscreenBreak) {
       sendToMain(SHOW_WINDOW);
     }
@@ -123,13 +176,6 @@ export const TauriConnectorProvider = ({
   }, [sendToMain, settings.alwaysOnTop, shouldRequestFullscreen]);
 
   useEffect(() => {
-    sendToMain(SET_TRAY_BEHAVIOR, {
-      minimizeToTray: settings.minimizeToTray,
-      closeToTray: settings.closeToTray,
-    });
-  }, [sendToMain, settings.closeToTray, settings.minimizeToTray]);
-
-  useEffect(() => {
     sendToMain(SET_COMPACT_MODE, {
       compactMode: settings.compactMode,
     });
@@ -148,29 +194,58 @@ export const TauriConnectorProvider = ({
   }, [sendToMain, settings.useNativeTitlebar]);
 
   useEffect(() => {
-    sendToMain(SET_OPEN_AT_LOGIN, {
-      openAtLogin: settings.openAtLogin,
-    });
-  }, [sendToMain, settings.openAtLogin]);
+    // Workaround do Linux/webkit2gtk:
+    // quando o Rust restaura da bandeja, o toggle de resizable
+    // usado para recuperar input grab pode deixar `:hover` preso.
+    // Suprimimos hover no `<html>` até o próximo mousemove real.
+    let unlisten: (() => void) | null = null;
+    let clearTimer: number | null = null;
+    let disposed = false;
 
-  useEffect(() => {
-    const hasSeenPrompt =
-      getFromStorage<boolean>(AUTO_UPDATE_POLICY_PROMPT_SEEN_KEY) ===
-      true;
-    const hasPendingChoice =
-      getFromStorage<boolean>(AUTO_UPDATE_POLICY_PROMPT_PENDING_KEY) ===
-      true;
-    const shouldDeferPolicySync =
-      hasPendingChoice || (isFreshInstallProfile && !hasSeenPrompt);
+    const clearSuppression = () => {
+      document.documentElement.removeAttribute("data-suppress-hover");
+      window.removeEventListener("mousemove", clearSuppression, true);
+      if (clearTimer !== null) {
+        window.clearTimeout(clearTimer);
+        clearTimer = null;
+      }
+    };
 
-    if (shouldDeferPolicySync) {
-      return;
-    }
+    void listen(WINDOW_RESTORED_EVENT, () => {
+      document.documentElement.setAttribute(
+        "data-suppress-hover",
+        "true"
+      );
+      window.addEventListener("mousemove", clearSuppression, true);
+      if (clearTimer !== null) {
+        window.clearTimeout(clearTimer);
+      }
+      // Fallback: se o cursor ficar parado fora da janela e não
+      // vier mousemove, limpamos o estado após 2s.
+      clearTimer = window.setTimeout(clearSuppression, 2000);
+    })
+      .then((cleanup) => {
+        if (disposed) {
+          cleanup();
+          return;
+        }
+        unlisten = cleanup;
+      })
+      .catch((error: unknown) => {
+        console.error(
+          "[TAURI IPC] Failed to subscribe to window-restored.",
+          error
+        );
+      });
 
-    sendToMain(SET_IN_APP_AUTO_UPDATE, {
-      enableInAppAutoUpdate: settings.enableInAppAutoUpdate,
-    });
-  }, [sendToMain, settings.enableInAppAutoUpdate]);
+    return () => {
+      disposed = true;
+      clearSuppression();
+      if (unlisten) {
+        unlisten();
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const cleanup = TauriInvokeConnector.receive(

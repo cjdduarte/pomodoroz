@@ -12,6 +12,17 @@ const TitlebarButton = css`
 
   -webkit-app-region: no-drag;
 
+  /*
+   * Workaround Linux/Tauri:
+   * após restaurar da bandeja, o toggle de resizable (usado para
+   * recuperar input grab no webkit2gtk) pode gerar hover preso.
+   * O TauriConnectorProvider aplica data-suppress-hover="true" no
+   * html por um curto período até o próximo mousemove real.
+   */
+  html[data-suppress-hover="true"] &:hover {
+    background-color: transparent;
+  }
+
   &:hover {
     background-color: var(--color-titlebar-hover);
   }
@@ -93,6 +104,13 @@ export const StyledMinimizeButton = styled.button`
 
 export const StyledCloseButton = styled.button`
   ${TitlebarButton};
+
+  html[data-suppress-hover="true"] &:hover {
+    &::before,
+    &::after {
+      background-color: var(--color-body-text);
+    }
+  }
 
   &:hover {
     &::before,

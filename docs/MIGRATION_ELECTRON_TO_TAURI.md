@@ -136,14 +136,14 @@ pomodoroz/
 
 Current status is tracked here (not only in phase descriptions) so we can see exactly where work stopped and what is still pending before moving to the next phase.
 
-| Phase                             | Status                | Last update | Gate to advance                                                      |
-| --------------------------------- | --------------------- | ----------- | -------------------------------------------------------------------- |
-| 0 — Tauri Scaffold + Dual Runtime | Completed             | 2026-04-09  | Closed after Tauri + Electron dev validation and script verification |
-| 1 — Connector Swap                | In progress (current) | 2026-04-09  | Run final parity validation for migrated flows and close Phase 1     |
-| 2 — Native Features               | Not started           | -           | Start only after Phase 1 exit criteria are complete                  |
-| 3a — Yarn to pnpm                 | Not started           | -           | Start only after Phase 2 exit criteria are complete                  |
-| 3b — Flatten Structure            | Not started           | -           | Start only after Phase 3a exit criteria are complete                 |
-| 4 — CI for Tauri                  | Not started           | -           | Start only after Phase 3b exit criteria are complete                 |
+| Phase                             | Status                   | Last update | Gate to advance                                                      |
+| --------------------------------- | ------------------------ | ----------- | -------------------------------------------------------------------- |
+| 0 — Tauri Scaffold + Dual Runtime | Completed                | 2026-04-09  | Closed after Tauri + Electron dev validation and script verification |
+| 1 — Connector Swap                | Completed                | 2026-04-10  | Closed after runtime + manual parity validation                      |
+| 2 — Native Features               | In progress (2a current) | 2026-04-10  | Complete tray/system menu parity and continue sub-phases             |
+| 3a — Yarn to pnpm                 | Not started              | -           | Start only after Phase 2 exit criteria are complete                  |
+| 3b — Flatten Structure            | Not started              | -           | Start only after Phase 3a exit criteria are complete                 |
+| 4 — CI for Tauri                  | Not started              | -           | Start only after Phase 3b exit criteria are complete                 |
 
 Phase 0 completion checklist (execution status):
 
@@ -156,7 +156,8 @@ Phase 0 completion checklist (execution status):
 - [x] Run/confirm script checklist impact for current phase (`scripts/` validation rule)
 
 Rule to move forward: only start Phase 1 after all Phase 0 checklist items above are checked.
-Current state: gate satisfied, Phase 1 can proceed.
+Current state: Phase 1 closed and Phase 2a is now active.
+Current guardrail in Tauri runtime: settings toggles that still depend on future native sub-phases (`openAtLogin` -> 2g, `inAppAutoUpdate` -> 2f) stay disabled to avoid false-positive UX.
 
 Phase 1 progress checklist (execution status):
 
@@ -164,9 +165,9 @@ Phase 1 progress checklist (execution status):
 - [x] Create and wire `TauriConnector` as runtime-native implementation
 - [x] Implement Rust command/event bridge in `src-tauri/src/commands/` for migrated channels
 - [x] Replace remaining renderer dependency on Electron IPC contract package (`@pomodoroz/shareables`) with local runtime command/event types
-- [ ] Validate feature parity for migrated flows (timer reset confirmation, fullscreen events, task import/export; reset confirmation currently uses prompt fallback on Tauri)
+- [x] Validate feature parity for migrated flows (timer reset confirmation, fullscreen events, task import/export; reset confirmation currently uses two-step confirm fallback on Tauri)
   - [x] Runtime smoke validation completed (`yarn tauri dev --no-watch` booted successfully after connector decoupling)
-  - [ ] Manual functional validation pending (reset decision flow, fullscreen enter/exit events, import/export result messaging)
+  - [x] Manual functional validation completed (`cancelar/não/sim` reset decision, fullscreen + `Esc`, window actions, and import/export fallback messaging)
 
 Phase 1 manual validation matrix (to close the last checklist item):
 

@@ -24,6 +24,18 @@
 - **Compact mode sem acoplamento direto ao Electron** — `CompactTaskDisplay` agora usa `getInvokeConnector()` para `COMPACT_EXPAND`/`COMPACT_COLLAPSE`.
 - **Bridge de comandos Rust iniciado no `src-tauri`** — adicionados comandos nativos em `src-tauri/src/commands/window_bridge.rs` (always-on-top, fullscreen break, compact mode, theme, titlebar, show/minimize/close) e `TauriInvokeConnector` passou a usar `invoke()` nesses canais.
 - **Renderer desacoplado de `@pomodoroz/shareables`** — o contrato IPC do frontend foi movido para `app/renderer/src/ipc/index.ts`, todos os imports do renderer passaram a usar `ipc`, e a dependência do pacote foi removida de `@pomodoroz/renderer`.
+- **Fluxo de confirmação de reset no Tauri ajustado para PT/UX legível** — `TauriInvokeConnector` trocou o `window.prompt` por duas confirmações (`window.confirm`), preservando decisões `cancelar/não/sim` sem campo de texto.
+- **Saída de fullscreen break via `Esc` restaurada no Tauri** — `CounterContext` agora encerra fullscreen por teclado durante pausa, com o mesmo comportamento esperado da experiência anterior.
+- **Tray inicial habilitado no runtime Tauri (Fase 2a)** — `src-tauri/src/lib.rs` agora cria ícone de bandeja com menu (`Restore`/`Quit`) e clique no ícone para restaurar a janela.
+- **Fechar/minimizar para bandeja reativado com fallback seguro** — `window_bridge` só oculta janela quando o tray está disponível; sem tray, mantém minimizar/fechar padrão para evitar “sumir” app.
+- **Botão `X` da barra nativa agora respeita `Fechar para a bandeja` no Tauri** — o backend Rust passou a interceptar `CloseRequested` da janela principal com estado `set_tray_behavior`, evitando inconsistência após restaurar da bandeja.
+- **Decisão de fechar/ocultar centralizada no fluxo nativo de fechamento** — `close_window` passou a delegar para `window.close()` e o handler `CloseRequested` (com `TrayBehaviorState`) virou a única fonte de decisão de hide/exit.
+- **Fechar por `X` customizado voltou a respeitar `Fechar para a bandeja`** — o botão da barra customizada agora entra no mesmo fluxo nativo (`CloseRequested`), mantendo comportamento consistente com o fechamento da janela.
+- **Ícone dinâmico de tray voltou a funcionar no Tauri** — `TRAY_ICON_UPDATE` agora converte `dataUrl` no renderer e atualiza o ícone nativo via comando Rust `set_tray_icon`, removendo no-op e desperdício de ciclo.
+- **Menu de bandeja sincronizado com idioma do app no Tauri** — labels do tray (`Restaurar`/`Sair` etc.) agora são atualizados pelo renderer via `SET_TRAY_COPY`, evitando menu fixo em inglês quando a interface está em português.
+- **`SET_TRAY_BEHAVIOR` reativado no path Tauri** — o renderer voltou a sincronizar `closeToTray` para o backend nativo, mantendo uma única fonte de verdade para decisão de fechar x ocultar.
+- **Toggles ainda não suportados no backend Tauri ficaram bloqueados em Ajustes** — `Open at login` e `In-app auto update` agora ficam `disabled` no runtime Tauri até as fases nativas correspondentes.
+- **Conjunto Tauri pinado para reduzir drift de ecossistema** — `@tauri-apps/api`, `@tauri-apps/cli`, `tauri`, `tauri-build` e `tauri-plugin-log` agora usam versões fixas no projeto.
 
 ### Documentação
 

@@ -33,10 +33,13 @@ import {
   SET_COMPACT_MODE,
   SET_FULLSCREEN_BREAK,
   SET_NATIVE_TITLEBAR,
+  SET_TRAY_BEHAVIOR,
+  SET_TRAY_COPY,
   SET_UI_THEME,
   SHOW_WINDOW,
   TASKS_EXPORT_RESULT,
   TASKS_IMPORT_RESULT,
+  TRAY_ICON_UPDATE,
 } from "ipc";
 import type { InvokeConnector } from "../InvokeConnector";
 
@@ -69,50 +72,64 @@ const buildErrorMessage = (error: unknown): string =>
 const toInvokeArgs = (payload: unknown): Record<string, unknown> =>
   (payload ?? {}) as Record<string, unknown>;
 
-type ResetPromptCopy = {
-  title: string;
-  message: string;
-  hint: string;
-  yesTokens: string[];
-  noTokens: string[];
+const dataUrlToPngBytes = (dataUrl: string): number[] => {
+  const separatorIndex = dataUrl.indexOf(",");
+  if (separatorIndex < 0) {
+    throw new Error("Invalid tray icon payload.");
+  }
+
+  const base64 = dataUrl.slice(separatorIndex + 1).replace(/\s/g, "");
+  const binary = window.atob(base64);
+  const bytes: number[] = new Array(binary.length);
+
+  for (let index = 0; index < binary.length; index += 1) {
+    bytes[index] = binary.charCodeAt(index);
+  }
+
+  return bytes;
 };
 
-const RESET_PROMPT_COPY: Record<LanguageCode, ResetPromptCopy> = {
+type ResetDialogCopy = {
+  resetTitle: string;
+  resetMessage: string;
+  reclassifyTitle: string;
+  reclassifyMessage: string;
+};
+
+const RESET_DIALOG_COPY: Record<LanguageCode, ResetDialogCopy> = {
   en: {
-    title: "Allocate elapsed focus time to Idle?",
-    message: "Move the elapsed time of the current task to Idle?",
-    hint: "Type: yes / no (or press Cancel)",
-    yesTokens: ["y", "yes"],
-    noTokens: ["n", "no"],
+    resetTitle: "Reset current timer?",
+    resetMessage: "Do you want to reset now?",
+    reclassifyTitle: "Allocate elapsed focus time to Idle?",
+    reclassifyMessage:
+      "Move the elapsed time of the current task to Idle?",
   },
   es: {
-    title: "¿Asignar el tiempo transcurrido a Ocioso?",
-    message:
+    resetTitle: "¿Restablecer el temporizador actual?",
+    resetMessage: "¿Quieres restablecerlo ahora?",
+    reclassifyTitle: "¿Asignar el tiempo transcurrido a Ocioso?",
+    reclassifyMessage:
       "¿Mover a Ocioso el tiempo transcurrido de la tarea actual?",
-    hint: "Escribe: si / no (o Cancelar)",
-    yesTokens: ["s", "si", "sí", "y", "yes"],
-    noTokens: ["n", "no"],
   },
   zh: {
-    title: "将已过专注时间分配为空闲？",
-    message: "是否将当前任务的已过时间转为空闲时间？",
-    hint: "输入: 是 / 否（或取消）",
-    yesTokens: ["是", "y", "yes"],
-    noTokens: ["否", "n", "no"],
+    resetTitle: "重置当前计时器？",
+    resetMessage: "是否立即重置？",
+    reclassifyTitle: "将已过专注时间分配为空闲？",
+    reclassifyMessage: "是否将当前任务的已过时间转为空闲时间？",
   },
   ja: {
-    title: "経過した集中時間をアイドルに振り替えますか？",
-    message: "現在のタスクの経過時間をアイドル時間へ移動しますか？",
-    hint: "入力: はい / いいえ（またはキャンセル）",
-    yesTokens: ["はい", "y", "yes"],
-    noTokens: ["いいえ", "n", "no"],
+    resetTitle: "現在のタイマーをリセットしますか？",
+    resetMessage: "今すぐリセットしますか？",
+    reclassifyTitle: "経過した集中時間をアイドルに振り替えますか？",
+    reclassifyMessage:
+      "現在のタスクの経過時間をアイドル時間へ移動しますか？",
   },
   pt: {
-    title: "Alocar tempo decorrido em Ocioso?",
-    message: "Mover o tempo decorrido desta tarefa atual para Ocioso?",
-    hint: "Digite: sim / nao (ou Cancelar)",
-    yesTokens: ["s", "sim", "y", "yes"],
-    noTokens: ["n", "nao", "não", "no"],
+    resetTitle: "Resetar o timer atual?",
+    resetMessage: "Deseja resetar agora?",
+    reclassifyTitle: "Alocar tempo decorrido em Ocioso?",
+    reclassifyMessage:
+      "Mover o tempo decorrido desta tarefa atual para Ocioso?",
   },
 };
 
@@ -130,24 +147,21 @@ const resolvePreferredLanguage = (): LanguageCode => {
 
 const askResetFocusToIdle = (): ResetFocusToIdleDialogResult => {
   const language = resolvePreferredLanguage();
-  const copy = RESET_PROMPT_COPY[language];
-  const answer = window.prompt(
-    `${copy.title}\n\n${copy.message}\n${copy.hint}`,
-    ""
+  const copy = RESET_DIALOG_COPY[language];
+  const shouldResetNow = window.confirm(
+    `${copy.resetTitle}\n\n${copy.resetMessage}`
   );
 
-  if (answer === null) {
+  if (!shouldResetNow) {
     return "cancel";
   }
 
-  const normalized = answer.trim().toLowerCase();
-  if (copy.yesTokens.includes(normalized)) {
+  const shouldReclassify = window.confirm(
+    `${copy.reclassifyTitle}\n\n${copy.reclassifyMessage}`
+  );
+  if (shouldReclassify) {
     return "yes";
   }
-  if (copy.noTokens.includes(normalized) || normalized === "") {
-    return "no";
-  }
-
   return "no";
 };
 
@@ -308,6 +322,16 @@ const sendToTauri = async <C extends ToMainChannel>(
       return;
     }
 
+    case SET_TRAY_BEHAVIOR: {
+      await invoke("set_tray_behavior", toInvokeArgs(payload[0]));
+      return;
+    }
+
+    case SET_TRAY_COPY: {
+      await invoke("set_tray_copy", toInvokeArgs(payload[0]));
+      return;
+    }
+
     case SHOW_WINDOW: {
       await invoke("show_window");
       return;
@@ -319,7 +343,10 @@ const sendToTauri = async <C extends ToMainChannel>(
     }
 
     case CLOSE_WINDOW: {
-      await invoke("close_window", toInvokeArgs(payload[0]));
+      // `closeToTray` is handled entirely on the Rust side via
+      // `TrayBehaviorState` + `CloseRequested` event. The renderer
+      // just asks for a close — the event handler decides the outcome.
+      await invoke("close_window");
       return;
     }
 
@@ -336,6 +363,14 @@ const sendToTauri = async <C extends ToMainChannel>(
 
     case IMPORT_TASKS_DIALOG: {
       await importTasksFallback();
+      return;
+    }
+
+    case TRAY_ICON_UPDATE: {
+      const dataUrl = payload[0] as string;
+      await invoke("set_tray_icon", {
+        pngBytes: dataUrlToPngBytes(dataUrl),
+      });
       return;
     }
 

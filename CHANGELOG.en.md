@@ -24,6 +24,18 @@
 - **Compact mode detached from direct Electron usage** — `CompactTaskDisplay` now uses `getInvokeConnector()` for `COMPACT_EXPAND`/`COMPACT_COLLAPSE`.
 - **Rust command bridge started in `src-tauri`** — added native commands in `src-tauri/src/commands/window_bridge.rs` (always-on-top, fullscreen break, compact mode, theme, titlebar, show/minimize/close), and `TauriInvokeConnector` now calls these channels via `invoke()`.
 - **Renderer decoupled from `@pomodoroz/shareables`** — frontend IPC contract moved to `app/renderer/src/ipc/index.ts`, renderer imports now use `ipc`, and the package dependency was removed from `@pomodoroz/renderer`.
+- **Tauri reset confirmation flow refined for clarity** — `TauriInvokeConnector` replaced `window.prompt` with a two-step `window.confirm` flow, preserving `cancel/no/yes` decisions without a text input field.
+- **Fullscreen break exit via `Esc` restored on Tauri** — `CounterContext` now exits fullscreen by keyboard during break, matching expected behavior from the previous experience.
+- **Initial tray support enabled in Tauri runtime (Phase 2a)** — `src-tauri/src/lib.rs` now creates a tray icon with menu actions (`Restore`/`Quit`) and left-click restore behavior.
+- **Close/minimize-to-tray behavior re-enabled with safe fallback** — `window_bridge` now hides the window only when tray is available; otherwise it performs normal minimize/close to avoid hidden-window dead ends.
+- **Native titlebar `X` now honors `Close to tray` on Tauri** — Rust backend now intercepts main-window `CloseRequested` using `set_tray_behavior` state, avoiding inconsistent close behavior after tray restore.
+- **Hide-vs-exit decision now centralized in the native close flow** — `close_window` now delegates to `window.close()`, and `CloseRequested` (backed by `TrayBehaviorState`) is the single decision point for hide vs exit.
+- **Custom titlebar `X` now honors `Close to tray` consistently** — the React titlebar now routes through the same native `CloseRequested` path used by normal window close.
+- **Dynamic tray icon now works on Tauri** — `TRAY_ICON_UPDATE` now converts renderer `dataUrl` into bytes and updates the native tray icon through the Rust `set_tray_icon` command, removing no-op overhead.
+- **Tray menu now syncs with app language on Tauri** — tray labels (`Restore`/`Quit`, etc.) are now updated from renderer via `SET_TRAY_COPY`, avoiding English-only tray text when UI is Portuguese.
+- **`SET_TRAY_BEHAVIOR` re-enabled on Tauri path** — renderer now syncs `closeToTray` to native state so hide-vs-exit behavior has a single source of truth.
+- **Unsupported backend toggles are now disabled in Tauri Settings** — `Open at login` and `In-app auto update` are now disabled on Tauri runtime until their native phases are implemented.
+- **Tauri stack versions pinned to reduce ecosystem drift** — `@tauri-apps/api`, `@tauri-apps/cli`, `tauri`, `tauri-build`, and `tauri-plugin-log` now use fixed versions in the project.
 
 ### Documentation
 
