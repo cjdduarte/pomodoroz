@@ -1,6 +1,8 @@
 mod commands;
 mod constants;
 
+#[cfg(target_os = "linux")]
+use std::path::{Path, PathBuf};
 use commands::window_bridge::{
   close_window, compact_collapse, compact_expand, minimize_window,
   set_always_on_top, set_compact_mode, set_fullscreen_break,
@@ -23,6 +25,70 @@ struct TrayCopy {
   restore_label: &'static str,
   quit_label: &'static str,
   tooltip: &'static str,
+}
+
+#[cfg(target_os = "linux")]
+fn resolve_linux_tray_base_dir() -> PathBuf {
+  std::env::var_os("XDG_RUNTIME_DIR")
+    .map(PathBuf::from)
+    .unwrap_or_else(std::env::temp_dir)
+    .join("pomodoroz-tray")
+}
+
+#[cfg(target_os = "linux")]
+fn parse_linux_session_pid(dir_name: &str) -> Option<u32> {
+  let suffix = dir_name.strip_prefix("session-")?;
+  let pid_segment = suffix.split('-').next()?;
+  pid_segment.parse::<u32>().ok()
+}
+
+#[cfg(target_os = "linux")]
+fn is_linux_pid_alive(pid: u32) -> bool {
+  Path::new(&format!("/proc/{pid}")).exists()
+}
+
+#[cfg(target_os = "linux")]
+fn cleanup_orphan_linux_tray_sessions(base_dir: &Path) {
+  let Ok(entries) = std::fs::read_dir(base_dir) else {
+    return;
+  };
+
+  for entry in entries.flatten() {
+    let path = entry.path();
+    if !path.is_dir() {
+      continue;
+    }
+
+    let file_name = entry.file_name();
+    let Some(name) = file_name.to_str() else {
+      continue;
+    };
+    let Some(pid) = parse_linux_session_pid(name) else {
+      continue;
+    };
+
+    if !is_linux_pid_alive(pid) {
+      let _ = std::fs::remove_dir_all(path);
+    }
+  }
+}
+
+#[cfg(target_os = "linux")]
+fn resolve_linux_tray_temp_dir() -> PathBuf {
+  let base_dir = resolve_linux_tray_base_dir();
+  cleanup_orphan_linux_tray_sessions(&base_dir);
+  let session_nonce = std::time::SystemTime::now()
+    .duration_since(std::time::UNIX_EPOCH)
+    .map(|duration| duration.as_millis())
+    .unwrap_or_default();
+
+  // Diretório por processo/sessão evita colisão de path com runs
+  // anteriores do `yarn tauri dev` no cache do status notifier.
+  base_dir.join(format!(
+    "session-{}-{}",
+    std::process::id(),
+    session_nonce
+  ))
 }
 
 fn resolve_tray_copy() -> TrayCopy {
@@ -111,6 +177,11 @@ fn setup_tray<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<()> {
         show_main_window(tray.app_handle());
       }
     });
+
+  #[cfg(target_os = "linux")]
+  {
+    tray_builder = tray_builder.temp_dir_path(resolve_linux_tray_temp_dir());
+  }
 
   if let Some(icon) = app.default_window_icon().cloned() {
     tray_builder = tray_builder.icon(icon);
