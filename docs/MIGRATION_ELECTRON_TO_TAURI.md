@@ -232,6 +232,19 @@ Migrate Electron main process features to Tauri plugins, one at a time:
 | 2h        | File dialogs (task import/export) | `tauri-plugin-dialog`          | Low        |
 | 2i        | Custom notification sound         | Rust audio playback            | Medium     |
 
+Phase 2a current validation snapshot (2026-04-10):
+
+- [x] Item 1 validated: tray/menu parity (`Restore`/`Quit`, tray click restore, localized copy).
+- [x] Item 2 validated (functional): close/minimize tray flows work as implemented (`closeToTray` and `minimizeToTray`) with current Tauri bridge.
+- [!] Known UX caveat (to revisit): when `useNativeTitlebar = true`, OS-native minimize controls may bypass custom renderer callbacks, so `minimizeToTray` toggle can feel inconsistent versus custom titlebar behavior.
+
+Linux tray icon dev-session note (record for future revisit):
+
+- Root context: `tray-icon` (via Tauri Linux stack) writes tray PNGs to runtime temp paths and uses file paths with appindicator/status notifier.
+- Observed symptom: in repeated `yarn tauri dev` cycles, tray icon could appear stale/“random” at startup in some sessions.
+- Mitigation applied: app-specific Linux tray `temp_dir_path` is now session-isolated (`pid + timestamp`) and startup performs defensive cleanup of orphan `session-*` folders based on `/proc/<pid>` existence.
+- Residual note: if compositor-side cache behavior still appears, revisit in Phase 2a polish and re-evaluate with packaged builds (not only dev loop).
+
 - Validation per sub-phase:
   - Feature works identically to Electron version
   - No regression in previously migrated features
