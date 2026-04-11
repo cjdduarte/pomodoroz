@@ -1,5 +1,6 @@
 import { NotificationSoundTypes } from "store/settings/types";
 import { getNotificationSoundSource } from "store/settings/notificationSound";
+import { showDesktopNotification } from "utils";
 
 type OptionProps = {
   mute?: boolean;
@@ -48,6 +49,6 @@ export const useNotification = (
     }
 
     if (!notify) return;
-    return new window.Notification(title, defaultOptions);
+    void showDesktopNotification(title, defaultOptions);
   };
 };

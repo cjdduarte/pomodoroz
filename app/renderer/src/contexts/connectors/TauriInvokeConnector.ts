@@ -5,7 +5,7 @@ import {
   normalizeLanguageCode,
 } from "i18n/languages";
 import type { LanguageCode } from "store/settings/types";
-import { getFromStorage } from "utils";
+import { getFromStorage, openExternalUrl } from "utils";
 import type {
   ExportTasksDialogPayload,
   FromMainChannel,
@@ -351,7 +351,7 @@ const sendToTauri = async <C extends ToMainChannel>(
     }
 
     case OPEN_RELEASE_PAGE: {
-      window.open(RELEASE_NOTES_LINK, "_blank", "noopener,noreferrer");
+      await openExternalUrl(RELEASE_NOTES_LINK);
       return;
     }
 

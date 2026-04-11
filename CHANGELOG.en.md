@@ -37,6 +37,9 @@
 - **Unsupported backend toggles are now disabled in Tauri Settings** — `Open at login` and `In-app auto update` are now disabled on Tauri runtime until their native phases are implemented.
 - **Tauri stack versions pinned to reduce ecosystem drift** — `@tauri-apps/api`, `@tauri-apps/cli`, `tauri`, `tauri-build`, and `tauri-plugin-log` now use fixed versions in the project.
 - **Linux tray icon cache collisions mitigated across dev sessions** — `setup_tray` now uses an app-specific per-session (`pid+timestamp`) `temp_dir_path` under runtime temp storage and performs defensive cleanup of orphan session folders, reducing stale icon-path reuse between `yarn tauri dev` runs.
+- **Renderer desktop notifications migrated to a cross-runtime wrapper** — `useNotification` and `Updater` now call `showDesktopNotification`, which uses `tauri-plugin-notification` on Tauri and keeps browser notification fallback outside Tauri.
+- **Tauri notification capability enabled in app permissions** — `src-tauri/capabilities/default.json` now includes `notification:default`, unblocking `isPermissionGranted`/`requestPermission`/`notify` on native runtime.
+- **External link opening on Tauri fixed through native opener path** — support/help links and release-note opening no longer rely on `window.open`/`target=\"_blank\"`; they now use `plugin-opener` (`@tauri-apps/plugin-opener` + `tauri-plugin-opener`).
 
 ### Documentation
 

@@ -32,6 +32,8 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@emotion/is-prop-valid": "^1.4.0",
     "@reduxjs/toolkit": "^2.11.2",
+    "@tauri-apps/plugin-notification": "2.3.3",
+    "@tauri-apps/plugin-opener": "2.5.3",
     "@types/node": "25.5.2",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",

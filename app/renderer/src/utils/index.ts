@@ -8,5 +8,7 @@ export * from "./detectOS";
 export * from "./encodeSvg";
 export * from "./isEqualToOne";
 export * from "./sanitizeMarkdownLinkUri";
+export * from "./openExternalUrl";
 export * from "./tasksTransfer";
 export * from "./activeTaskSelection";
+export * from "./desktopNotification";

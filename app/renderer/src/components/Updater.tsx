@@ -14,7 +14,11 @@ import {
 } from "../styles";
 import { getInvokeConnector } from "../contexts";
 import { OPEN_RELEASE_PAGE } from "ipc";
-import { sanitizeMarkdownLinkUri } from "utils";
+import {
+  openExternalUrl,
+  sanitizeMarkdownLinkUri,
+  showDesktopNotification,
+} from "utils";
 
 const UpdateWrapper = styled.div`
   display: flex;
@@ -127,8 +131,20 @@ const Updater: React.FC = () => {
         <ReactMarkdown
           urlTransform={sanitizeMarkdownLinkUri}
           components={{
-            a: ({ ...props }) => (
-              <a {...props} target="_blank" rel="noopener noreferrer" />
+            a: ({ href, ...props }) => (
+              <a
+                {...props}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(event) => {
+                  if (!href) {
+                    return;
+                  }
+                  event.preventDefault();
+                  void openExternalUrl(href);
+                }}
+              />
             ),
           }}
         >
@@ -141,7 +157,7 @@ const Updater: React.FC = () => {
           <StyledButtonPrimary
             onClick={() => {
               const invokeConnector = getInvokeConnector();
-              new window.Notification(
+              void showDesktopNotification(
                 t("updater.openingReleaseTitle"),
                 {
                   body: t("updater.openingReleaseBody"),

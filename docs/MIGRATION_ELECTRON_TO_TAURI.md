@@ -140,7 +140,7 @@ Current status is tracked here (not only in phase descriptions) so we can see ex
 | --------------------------------- | ------------------------ | ----------- | -------------------------------------------------------------------- |
 | 0 — Tauri Scaffold + Dual Runtime | Completed                | 2026-04-09  | Closed after Tauri + Electron dev validation and script verification |
 | 1 — Connector Swap                | Completed                | 2026-04-10  | Closed after runtime + manual parity validation                      |
-| 2 — Native Features               | In progress (2a current) | 2026-04-10  | Complete tray/system menu parity and continue sub-phases             |
+| 2 — Native Features               | In progress (2b current) | 2026-04-10  | Validate notification parity and continue sub-phases                 |
 | 3a — Yarn to pnpm                 | Not started              | -           | Start only after Phase 2 exit criteria are complete                  |
 | 3b — Flatten Structure            | Not started              | -           | Start only after Phase 3a exit criteria are complete                 |
 | 4 — CI for Tauri                  | Not started              | -           | Start only after Phase 3b exit criteria are complete                 |
@@ -156,7 +156,7 @@ Phase 0 completion checklist (execution status):
 - [x] Run/confirm script checklist impact for current phase (`scripts/` validation rule)
 
 Rule to move forward: only start Phase 1 after all Phase 0 checklist items above are checked.
-Current state: Phase 1 closed and Phase 2a is now active.
+Current state: Phase 1 closed, Phase 2a validated, and Phase 2b is now active.
 Current guardrail in Tauri runtime: settings toggles that still depend on future native sub-phases (`openAtLogin` -> 2g, `inAppAutoUpdate` -> 2f) stay disabled to avoid false-positive UX.
 
 Phase 1 progress checklist (execution status):
@@ -244,6 +244,15 @@ Linux tray icon dev-session note (record for future revisit):
 - Observed symptom: in repeated `yarn tauri dev` cycles, tray icon could appear stale/“random” at startup in some sessions.
 - Mitigation applied: app-specific Linux tray `temp_dir_path` is now session-isolated (`pid + timestamp`) and startup performs defensive cleanup of orphan `session-*` folders based on `/proc/<pid>` existence.
 - Residual note: if compositor-side cache behavior still appears, revisit in Phase 2a polish and re-evaluate with packaged builds (not only dev loop).
+
+Phase 2b kickoff snapshot (2026-04-10):
+
+- [x] Tauri notification plugin dependencies wired (`tauri-plugin-notification` in Rust and `@tauri-apps/plugin-notification` in renderer).
+- [x] Tauri capabilities updated for desktop notifications (`notification:default`) to unblock permission/dispatch on the `main` window.
+- [x] Desktop notification wrapper introduced in renderer (`showDesktopNotification`) with runtime-aware path (`tauri` vs browser/Electron fallback).
+- [x] Direct renderer notification calls migrated to wrapper (`useNotification`, `Updater`).
+- [x] External URL opening on Tauri migrated from `window.open`/`target="_blank"` to native opener plugin path (`@tauri-apps/plugin-opener` + `tauri-plugin-opener`), fixing Settings support/help links and release-page actions.
+- [ ] Manual parity validation pending (notification permission prompt + notification delivery in active timer/update flows).
 
 - Validation per sub-phase:
   - Feature works identically to Electron version

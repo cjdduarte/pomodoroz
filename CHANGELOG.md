@@ -37,6 +37,9 @@
 - **Toggles ainda não suportados no backend Tauri ficaram bloqueados em Ajustes** — `Open at login` e `In-app auto update` agora ficam `disabled` no runtime Tauri até as fases nativas correspondentes.
 - **Conjunto Tauri pinado para reduzir drift de ecossistema** — `@tauri-apps/api`, `@tauri-apps/cli`, `tauri`, `tauri-build` e `tauri-plugin-log` agora usam versões fixas no projeto.
 - **Ícone de tray no Linux isolado por sessão para evitar “ícone aleatório” entre execuções dev** — `setup_tray` agora usa `temp_dir_path` próprio (`$XDG_RUNTIME_DIR`/`pomodoroz-tray` por processo+timestamp) e faz limpeza defensiva de sessões órfãs, reduzindo reutilização de caminhos antigos no status notifier.
+- **Notificações desktop no renderer migradas para wrapper cross-runtime** — `useNotification` e `Updater` agora usam `showDesktopNotification`, que integra `tauri-plugin-notification` no runtime Tauri e preserva fallback de notificação web fora do Tauri.
+- **Permissão de notificação no Tauri habilitada via capability** — `src-tauri/capabilities/default.json` agora inclui `notification:default`, liberando `isPermissionGranted`/`requestPermission`/`notify` no runtime nativo.
+- **Abertura de links externos no Tauri corrigida para caminho nativo** — links de suporte/ajuda e abertura de release notes deixaram de depender de `window.open`/`target="_blank"` e passaram a usar `plugin-opener` (`@tauri-apps/plugin-opener` + `tauri-plugin-opener`).
 
 ### Documentação
 

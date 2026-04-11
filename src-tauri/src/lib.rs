@@ -240,6 +240,10 @@ pub fn run() {
             .build(),
         )?;
       }
+
+      app_handle.plugin(tauri_plugin_notification::init())?;
+      app_handle.plugin(tauri_plugin_opener::init())?;
+
       Ok(())
     })
     .run(tauri::generate_context!())
