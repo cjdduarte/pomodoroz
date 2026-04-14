@@ -41,6 +41,7 @@
 - **Permissão de notificação no Tauri habilitada via capability** — `src-tauri/capabilities/default.json` agora inclui `notification:default`, liberando `isPermissionGranted`/`requestPermission`/`notify` no runtime nativo.
 - **Abertura de links externos no Tauri corrigida para caminho nativo** — links de suporte/ajuda e abertura de release notes deixaram de depender de `window.open`/`target="_blank"` e passaram a usar `plugin-opener` (`@tauri-apps/plugin-opener` + `tauri-plugin-opener`).
 - **Solicitação de permissão de notificação ajustada para gesto do usuário** — o pedido de permissão saiu do fluxo assíncrono do timer e passou para a interação em Ajustes (tipo de notificação), evitando bloqueio do WebKit/Tauri (`Notification prompting can only be done from a user gesture`).
+- **Atalhos globais iniciais migrados para Tauri (Fase 2c kickoff)** — backend Rust agora registra `Alt+Shift+H` (ocultar app; fallback para minimizar sem tray) e `Alt+Shift+S` (restaurar/focar janela), alinhando paridade com o comportamento do Electron.
 
 ### Documentação
 

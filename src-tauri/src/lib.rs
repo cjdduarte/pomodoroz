@@ -191,6 +191,55 @@ fn setup_tray<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<()> {
   Ok(())
 }
 
+fn setup_global_shortcuts<R: Runtime>(
+  app: &AppHandle<R>
+) -> tauri::Result<()> {
+  use tauri_plugin_global_shortcut::{
+    Code, Modifiers, ShortcutState,
+  };
+
+  let builder = match tauri_plugin_global_shortcut::Builder::new()
+    .with_shortcuts(["alt+shift+h", "alt+shift+s"])
+  {
+    Ok(builder) => builder,
+    Err(error) => {
+      log::warn!(
+        "[TAURI] Failed to prepare global shortcuts: {error}"
+      );
+      return Ok(());
+    }
+  };
+
+  app.plugin(
+    builder
+      .with_handler(|app, shortcut, event| {
+        if event.state != ShortcutState::Pressed {
+          return;
+        }
+
+        let shortcut_modifiers = Modifiers::ALT | Modifiers::SHIFT;
+
+        if shortcut.matches(shortcut_modifiers, Code::KeyH) {
+          if let Some(window) = app.get_webview_window(MAIN_WINDOW_LABEL) {
+            if app.tray_by_id(MAIN_TRAY_ID).is_some() {
+              let _ = window.hide();
+            } else {
+              let _ = window.minimize();
+            }
+          }
+          return;
+        }
+
+        if shortcut.matches(shortcut_modifiers, Code::KeyS) {
+          show_main_window(app);
+        }
+      })
+      .build(),
+  )?;
+
+  Ok(())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
   tauri::Builder::default()
@@ -231,6 +280,11 @@ pub fn run() {
       let app_handle = app.handle();
       if let Err(error) = setup_tray(&app_handle) {
         log::warn!("[TAURI] Failed to initialize tray icon: {error}");
+      }
+      if let Err(error) = setup_global_shortcuts(&app_handle) {
+        log::warn!(
+          "[TAURI] Failed to initialize global shortcuts: {error}"
+        );
       }
 
       if cfg!(debug_assertions) {
