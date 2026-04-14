@@ -192,7 +192,6 @@ const FeatureSection: React.FC = () => {
       id: "open-at-login",
       label: t("settings.openAtLogin"),
       checked: settings.openAtLogin,
-      disabled: isTauriRuntime,
       onChange: useCallback(() => {
         dispatch(setOpenAtLogin(!settings.openAtLogin));
       }, [dispatch, settings.openAtLogin]),

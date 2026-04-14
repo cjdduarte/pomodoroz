@@ -34,7 +34,8 @@
 - **Dynamic tray icon now works on Tauri** — `TRAY_ICON_UPDATE` now converts renderer `dataUrl` into bytes and updates the native tray icon through the Rust `set_tray_icon` command, removing no-op overhead.
 - **Tray menu now syncs with app language on Tauri** — tray labels (`Restore`/`Quit`, etc.) are now updated from renderer via `SET_TRAY_COPY`, avoiding English-only tray text when UI is Portuguese.
 - **`SET_TRAY_BEHAVIOR` re-enabled on Tauri path** — renderer now syncs `closeToTray` to native state so hide-vs-exit behavior has a single source of truth.
-- **Unsupported backend toggles are now disabled in Tauri Settings** — `Open at login` and `In-app auto update` are now disabled on Tauri runtime until their native phases are implemented.
+- **`Open at login` re-enabled on Tauri runtime (Phase 2g kickoff)** — initial `tauri-plugin-autostart` wiring now connects the Settings toggle to native backend behavior through `SET_OPEN_AT_LOGIN` in `TauriConnector`.
+- **Updater guardrail kept on Tauri after 2f defer decision** — only `In-app auto update` remains disabled in Settings until final release-hardening implementation.
 - **Tauri stack versions pinned to reduce ecosystem drift** — `@tauri-apps/api`, `@tauri-apps/cli`, `tauri`, `tauri-build`, and `tauri-plugin-log` now use fixed versions in the project.
 - **Linux tray icon cache collisions mitigated across dev sessions** — `setup_tray` now uses an app-specific per-session (`pid+timestamp`) `temp_dir_path` under runtime temp storage and performs defensive cleanup of orphan session folders, reducing stale icon-path reuse between `yarn tauri dev` runs.
 - **Renderer desktop notifications migrated to a cross-runtime wrapper** — `useNotification` and `Updater` now call `showDesktopNotification`, which uses `tauri-plugin-notification` on Tauri and keeps browser notification fallback outside Tauri.

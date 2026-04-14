@@ -34,7 +34,8 @@
 - **Ícone dinâmico de tray voltou a funcionar no Tauri** — `TRAY_ICON_UPDATE` agora converte `dataUrl` no renderer e atualiza o ícone nativo via comando Rust `set_tray_icon`, removendo no-op e desperdício de ciclo.
 - **Menu de bandeja sincronizado com idioma do app no Tauri** — labels do tray (`Restaurar`/`Sair` etc.) agora são atualizados pelo renderer via `SET_TRAY_COPY`, evitando menu fixo em inglês quando a interface está em português.
 - **`SET_TRAY_BEHAVIOR` reativado no path Tauri** — o renderer voltou a sincronizar `closeToTray` para o backend nativo, mantendo uma única fonte de verdade para decisão de fechar x ocultar.
-- **Toggles ainda não suportados no backend Tauri ficaram bloqueados em Ajustes** — `Open at login` e `In-app auto update` agora ficam `disabled` no runtime Tauri até as fases nativas correspondentes.
+- **`Open at login` reativado no runtime Tauri (Fase 2g kickoff)** — integração inicial com `tauri-plugin-autostart` conecta o toggle de Ajustes ao backend nativo via `SET_OPEN_AT_LOGIN` no `TauriConnector`.
+- **Guardrail de update mantido no Tauri após defer da 2f** — somente `In-app auto update` permanece `disabled` em Ajustes até a etapa final de hardening de release.
 - **Conjunto Tauri pinado para reduzir drift de ecossistema** — `@tauri-apps/api`, `@tauri-apps/cli`, `tauri`, `tauri-build` e `tauri-plugin-log` agora usam versões fixas no projeto.
 - **Ícone de tray no Linux isolado por sessão para evitar “ícone aleatório” entre execuções dev** — `setup_tray` agora usa `temp_dir_path` próprio (`$XDG_RUNTIME_DIR`/`pomodoroz-tray` por processo+timestamp) e faz limpeza defensiva de sessões órfãs, reduzindo reutilização de caminhos antigos no status notifier.
 - **Notificações desktop no renderer migradas para wrapper cross-runtime** — `useNotification` e `Updater` agora usam `showDesktopNotification`, que integra `tauri-plugin-notification` no runtime Tauri e preserva fallback de notificação web fora do Tauri.

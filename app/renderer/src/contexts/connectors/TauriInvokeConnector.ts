@@ -1,6 +1,10 @@
 import { invoke } from "@tauri-apps/api/core";
 import { emit, listen } from "@tauri-apps/api/event";
 import {
+  disable as disableAutostart,
+  enable as enableAutostart,
+} from "@tauri-apps/plugin-autostart";
+import {
   detectSystemLanguage,
   normalizeLanguageCode,
 } from "i18n/languages";
@@ -33,6 +37,7 @@ import {
   SET_COMPACT_MODE,
   SET_FULLSCREEN_BREAK,
   SET_NATIVE_TITLEBAR,
+  SET_OPEN_AT_LOGIN,
   SET_TRAY_BEHAVIOR,
   SET_TRAY_COPY,
   SET_UI_THEME,
@@ -319,6 +324,16 @@ const sendToTauri = async <C extends ToMainChannel>(
 
     case SET_NATIVE_TITLEBAR: {
       await invoke("set_native_titlebar", toInvokeArgs(payload[0]));
+      return;
+    }
+
+    case SET_OPEN_AT_LOGIN: {
+      const data = payload[0] as { openAtLogin: boolean };
+      if (data.openAtLogin) {
+        await enableAutostart();
+      } else {
+        await disableAutostart();
+      }
       return;
     }
 

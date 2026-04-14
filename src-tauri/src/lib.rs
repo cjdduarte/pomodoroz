@@ -287,6 +287,10 @@ pub fn run() {
         );
       }
 
+      app_handle.plugin(
+        tauri_plugin_autostart::Builder::new().build(),
+      )?;
+
       if cfg!(debug_assertions) {
         app_handle.plugin(
           tauri_plugin_log::Builder::default()

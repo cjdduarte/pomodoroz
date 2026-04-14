@@ -293,7 +293,8 @@ Phase 2f kickoff snapshot (2026-04-14):
 Phase 2g kickoff snapshot (2026-04-14):
 
 - [x] Scope activated after 2e sign-off and 2f defer decision.
-- [ ] Wire `tauri-plugin-autostart` integration path (Rust + renderer wrapper) for `openAtLogin`.
+- [x] `tauri-plugin-autostart` integration path wired (Rust plugin registration + renderer wrapper channel `SET_OPEN_AT_LOGIN` on Tauri runtime).
+- [x] Settings toggle `openAtLogin` re-enabled for Tauri runtime (kept hidden on Linux as before); `inAppAutoUpdate` remains disabled due 2f defer decision.
 - [ ] Validate manual parity path for open-at-login behavior (enable/disable persistence + startup behavior) without regressions in timer/tray/notification flows.
 
 - Validation per sub-phase:

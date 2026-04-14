@@ -22,6 +22,7 @@ import {
   SET_COMPACT_MODE,
   SET_FULLSCREEN_BREAK,
   SET_NATIVE_TITLEBAR,
+  SET_OPEN_AT_LOGIN,
   SET_TRAY_BEHAVIOR,
   SET_TRAY_COPY,
   SET_UI_THEME,
@@ -192,6 +193,12 @@ export const TauriConnectorProvider = ({
       useNativeTitlebar: settings.useNativeTitlebar,
     });
   }, [sendToMain, settings.useNativeTitlebar]);
+
+  useEffect(() => {
+    sendToMain(SET_OPEN_AT_LOGIN, {
+      openAtLogin: settings.openAtLogin,
+    });
+  }, [sendToMain, settings.openAtLogin]);
 
   useEffect(() => {
     // Workaround do Linux/webkit2gtk:
