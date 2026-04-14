@@ -26,7 +26,7 @@ import { ThemeContext } from "contexts";
 import { getRuntimeKind } from "contexts/connectors/runtimeInvokeConnector";
 
 import SettingSection from "./SettingSection";
-import { detectOS } from "utils";
+import { detectOS, requestDesktopNotificationPermission } from "utils";
 import { NotificationTypes } from "store/settings/types";
 
 const FeatureSection: React.FC = () => {
@@ -217,9 +217,21 @@ const FeatureSection: React.FC = () => {
 
   const onChangeNotificationProps = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      dispatch(
-        setNotificationType(e.target.value as NotificationTypes)
-      );
+      const nextNotificationType = e.target.value as NotificationTypes;
+
+      dispatch(setNotificationType(nextNotificationType));
+
+      if (nextNotificationType !== NotificationTypes.NONE) {
+        void requestDesktopNotificationPermission().then(
+          (permission) => {
+            if (permission === "denied") {
+              console.warn(
+                "[Notification] Permissão negada. Ajuste nas configurações do sistema para exibir avisos."
+              );
+            }
+          }
+        );
+      }
     },
     [dispatch]
   );

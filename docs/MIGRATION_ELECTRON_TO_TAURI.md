@@ -250,6 +250,7 @@ Phase 2b kickoff snapshot (2026-04-10):
 - [x] Tauri notification plugin dependencies wired (`tauri-plugin-notification` in Rust and `@tauri-apps/plugin-notification` in renderer).
 - [x] Tauri capabilities updated for desktop notifications (`notification:default`) to unblock permission/dispatch on the `main` window.
 - [x] Desktop notification wrapper introduced in renderer (`showDesktopNotification`) with runtime-aware path (`tauri` vs browser/Electron fallback).
+- [x] Notification permission request moved to user-gesture path (Settings notification type selection), avoiding WebKit/Tauri prompt rejection in background timer events.
 - [x] Direct renderer notification calls migrated to wrapper (`useNotification`, `Updater`).
 - [x] External URL opening on Tauri migrated from `window.open`/`target="_blank"` to native opener plugin path (`@tauri-apps/plugin-opener` + `tauri-plugin-opener`), fixing Settings support/help links and release-page actions.
 - [ ] Manual parity validation pending (notification permission prompt + notification delivery in active timer/update flows).

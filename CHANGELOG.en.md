@@ -40,6 +40,7 @@
 - **Renderer desktop notifications migrated to a cross-runtime wrapper** — `useNotification` and `Updater` now call `showDesktopNotification`, which uses `tauri-plugin-notification` on Tauri and keeps browser notification fallback outside Tauri.
 - **Tauri notification capability enabled in app permissions** — `src-tauri/capabilities/default.json` now includes `notification:default`, unblocking `isPermissionGranted`/`requestPermission`/`notify` on native runtime.
 - **External link opening on Tauri fixed through native opener path** — support/help links and release-note opening no longer rely on `window.open`/`target=\"_blank\"`; they now use `plugin-opener` (`@tauri-apps/plugin-opener` + `tauri-plugin-opener`).
+- **Notification permission request moved to user-gesture flow** — permission prompting was moved out of async timer events into Settings interaction (notification type selection), avoiding WebKit/Tauri prompt rejection (`Notification prompting can only be done from a user gesture`).
 
 ### Documentation
 
