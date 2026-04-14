@@ -49,6 +49,7 @@
 - **Política de idioma para commits/PRs formalizada** — `AGENTS.md`, `CLAUDE.md` e `CONTRIBUTING.md` agora explicitam que mensagens de commit e títulos de PR devem ser em inglês (Conventional Commits).
 - **Rastreio de execução por marcos adicionado ao plano** — `docs/MIGRATION_ELECTRON_TO_TAURI.md` agora tem tracker explícito por fase (status, gate de avanço e checklists de execução para fases 0 e 1).
 - **Tracker da migração avançado para 2c após fechamento manual da 2b** — `docs/MIGRATION_ELECTRON_TO_TAURI.md` agora registra a validação de notificações (permissão por gesto do usuário + entrega de aviso) como concluída.
+- **Tracker avançado para 2d após validação manual da 2c no Linux** — `docs/MIGRATION_ELECTRON_TO_TAURI.md` agora marca os atalhos globais `Alt+Shift+H/S` como validados no runtime dev Linux e abre o snapshot operacional da 2d.
 
 ## [26.4.15] - 2026-04-09
 

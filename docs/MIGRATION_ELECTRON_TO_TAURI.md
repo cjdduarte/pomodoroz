@@ -140,7 +140,7 @@ Current status is tracked here (not only in phase descriptions) so we can see ex
 | --------------------------------- | ------------------------ | ----------- | -------------------------------------------------------------------- |
 | 0 — Tauri Scaffold + Dual Runtime | Completed                | 2026-04-09  | Closed after Tauri + Electron dev validation and script verification |
 | 1 — Connector Swap                | Completed                | 2026-04-10  | Closed after runtime + manual parity validation                      |
-| 2 — Native Features               | In progress (2c current) | 2026-04-14  | Start global shortcuts migration after notification parity closure   |
+| 2 — Native Features               | In progress (2f current) | 2026-04-14  | Start auto-update migration scope and validate 2f integration path   |
 | 3a — Yarn to pnpm                 | Not started              | -           | Start only after Phase 2 exit criteria are complete                  |
 | 3b — Flatten Structure            | Not started              | -           | Start only after Phase 3a exit criteria are complete                 |
 | 4 — CI for Tauri                  | Not started              | -           | Start only after Phase 3b exit criteria are complete                 |
@@ -156,7 +156,7 @@ Phase 0 completion checklist (execution status):
 - [x] Run/confirm script checklist impact for current phase (`scripts/` validation rule)
 
 Rule to move forward: only start Phase 1 after all Phase 0 checklist items above are checked.
-Current state: Phase 1 closed, Phase 2a and 2b validated, and Phase 2c is now active.
+Current state: Phase 1 closed, Phase 2a/2b/2c/2d/2e validated (Linux dev runtime), and Phase 2f is now active.
 Current guardrail in Tauri runtime: settings toggles that still depend on future native sub-phases (`openAtLogin` -> 2g, `inAppAutoUpdate` -> 2f) stay disabled to avoid false-positive UX.
 
 Phase 1 progress checklist (execution status):
@@ -268,7 +268,27 @@ Phase 2c kickoff snapshot (2026-04-14):
 - [x] Global shortcuts registered on Tauri startup with native handlers for parity with Electron:
   - `Alt+Shift+H` -> hide main window (fallback to minimize when tray is unavailable)
   - `Alt+Shift+S` -> restore/focus main window
-- [ ] Manual parity validation pending on target desktop environments (Linux/Windows/macOS).
+- [x] Manual parity validation completed on Linux dev runtime (`Alt+Shift+H` hide/minimize path, `Alt+Shift+S` restore/focus path).
+- [ ] Cross-platform parity validation pending (Windows/macOS).
+
+Phase 2d validation snapshot (2026-04-14):
+
+- [x] Native window command bridge for `alwaysOnTop` + show/minimize/close is active in Rust (`window_bridge` + connector routing).
+- [x] `CloseRequested` interception with tray-aware behavior is active for native titlebar/window close parity.
+- [x] Baseline manual checks already exercised during earlier phases (show/minimize/close flows and fullscreen break exit via `Esc`).
+- [x] Consolidated manual parity pass completed (window actions + fullscreen transitions in current branch head).
+- [x] `alwaysOnTop` behavior documented with Linux/Wayland caveat; treated as non-blocking for 2d sign-off (same practical limitation already observed in previous Electron runtime on current dev environment).
+
+Phase 2e kickoff snapshot (2026-04-14):
+
+- [x] Baseline fullscreen break enter/exit plumbing already active in native window bridge.
+- [x] Consolidated parity pass completed for 2e sign-off (fullscreen break lifecycle + `Esc` behavior + no regression in timer flow).
+
+Phase 2f kickoff snapshot (2026-04-14):
+
+- [x] Settings guardrail remains active in Tauri runtime (`inAppAutoUpdate` toggle disabled until native updater path is fully wired), preventing false-positive UX.
+- [ ] Wire `tauri-plugin-updater` integration path (Rust + renderer wrappers), preserving current updater UI/flow contracts.
+- [ ] Validate manual parity path for update check, release-page fallback, and no-regression in existing timer/tray/notification features.
 
 - Validation per sub-phase:
   - Feature works identically to Electron version
