@@ -10,16 +10,19 @@ use commands::window_bridge::{
   set_tray_icon, set_ui_theme, show_window, TrayBehaviorState,
 };
 use constants::{
-  MAIN_TRAY_ID, MAIN_WINDOW_LABEL, TRAY_MENU_QUIT_ID,
-  TRAY_MENU_RESTORE_ID, WINDOW_RESTORED_EVENT,
+  MAIN_TRAY_ID, MAIN_WINDOW_LABEL, TRAY_MENU_QUIT_ID, TRAY_MENU_RESTORE_ID,
 };
+#[cfg(target_os = "linux")]
+use constants::WINDOW_RESTORED_EVENT;
 use tauri::{
   menu::{MenuBuilder, MenuItemBuilder},
   tray::{
     MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent,
   },
-  AppHandle, Emitter, Manager, Runtime, WindowEvent,
+  AppHandle, Manager, Runtime, WindowEvent,
 };
+#[cfg(target_os = "linux")]
+use tauri::Emitter;
 
 struct TrayCopy {
   restore_label: &'static str,
