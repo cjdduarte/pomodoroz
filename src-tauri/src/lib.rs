@@ -290,6 +290,12 @@ pub fn run() {
         );
       }
 
+      app_handle.plugin(tauri_plugin_single_instance::init(
+        |app, _args, _cwd| {
+          show_main_window(app);
+        },
+      ))?;
+
       app_handle.plugin(
         tauri_plugin_autostart::Builder::new().build(),
       )?;

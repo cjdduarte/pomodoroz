@@ -35,6 +35,8 @@
 - **Tray menu now syncs with app language on Tauri** — tray labels (`Restore`/`Quit`, etc.) are now updated from renderer via `SET_TRAY_COPY`, avoiding English-only tray text when UI is Portuguese.
 - **`SET_TRAY_BEHAVIOR` re-enabled on Tauri path** — renderer now syncs `closeToTray` to native state so hide-vs-exit behavior has a single source of truth.
 - **`Open at login` re-enabled on Tauri runtime (Phase 2g kickoff)** — initial `tauri-plugin-autostart` wiring now connects the Settings toggle to native backend behavior through `SET_OPEN_AT_LOGIN` in `TauriConnector`.
+- **Single-instance behavior restored on Tauri runtime (Electron parity)** — `tauri-plugin-single-instance` is now wired so repeated launcher/start-menu opens focus/restore the existing window instead of spawning duplicate app instances.
+- **NSIS Start Menu shortcut path made explicit** — `src-tauri/tauri.conf.json` now sets `bundle.windows.nsis.startMenuFolder = \"Pomodoroz\"` for more predictable Start Menu discoverability on Windows.
 - **Updater guardrail kept on Tauri after 2f defer decision** — only `In-app auto update` remains disabled in Settings until final release-hardening implementation.
 - **Tauri stack versions pinned to reduce ecosystem drift** — `@tauri-apps/api`, `@tauri-apps/cli`, `tauri`, `tauri-build`, and `tauri-plugin-log` now use fixed versions in the project.
 - **Linux tray icon cache collisions mitigated across dev sessions** — `setup_tray` now uses an app-specific per-session (`pid+timestamp`) `temp_dir_path` under runtime temp storage and performs defensive cleanup of orphan session folders, reducing stale icon-path reuse between `yarn tauri dev` runs.

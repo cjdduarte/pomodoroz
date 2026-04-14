@@ -35,6 +35,8 @@
 - **Menu de bandeja sincronizado com idioma do app no Tauri** — labels do tray (`Restaurar`/`Sair` etc.) agora são atualizados pelo renderer via `SET_TRAY_COPY`, evitando menu fixo em inglês quando a interface está em português.
 - **`SET_TRAY_BEHAVIOR` reativado no path Tauri** — o renderer voltou a sincronizar `closeToTray` para o backend nativo, mantendo uma única fonte de verdade para decisão de fechar x ocultar.
 - **`Open at login` reativado no runtime Tauri (Fase 2g kickoff)** — integração inicial com `tauri-plugin-autostart` conecta o toggle de Ajustes ao backend nativo via `SET_OPEN_AT_LOGIN` no `TauriConnector`.
+- **Instância única restaurada no runtime Tauri (paridade com Electron)** — `tauri-plugin-single-instance` foi integrado para focar/restaurar a janela existente ao abrir o app novamente, evitando múltiplas instâncias em duplo clique no atalho/menu.
+- **Atalho do Menu Iniciar explicitado no NSIS** — `src-tauri/tauri.conf.json` agora define `bundle.windows.nsis.startMenuFolder = \"Pomodoroz\"` para melhorar previsibilidade da entrada no Windows Start Menu.
 - **Guardrail de update mantido no Tauri após defer da 2f** — somente `In-app auto update` permanece `disabled` em Ajustes até a etapa final de hardening de release.
 - **Conjunto Tauri pinado para reduzir drift de ecossistema** — `@tauri-apps/api`, `@tauri-apps/cli`, `tauri`, `tauri-build` e `tauri-plugin-log` agora usam versões fixas no projeto.
 - **Ícone de tray no Linux isolado por sessão para evitar “ícone aleatório” entre execuções dev** — `setup_tray` agora usa `temp_dir_path` próprio (`$XDG_RUNTIME_DIR`/`pomodoroz-tray` por processo+timestamp) e faz limpeza defensiva de sessões órfãs, reduzindo reutilização de caminhos antigos no status notifier.
