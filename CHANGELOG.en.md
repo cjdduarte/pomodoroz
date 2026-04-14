@@ -47,6 +47,7 @@
 - **Tauri migration plan (Phase 0) refined** — scope updated for a Yarn-based dual runtime, `tauri` script in root `package.json`, and integration via `src-tauri/tauri.conf.json` with the current renderer workspace, without premature folder restructuring.
 - **Commit/PR language policy formalized** — `AGENTS.md`, `CLAUDE.md`, and `CONTRIBUTING.md` now explicitly require commit messages and PR titles in English (Conventional Commits).
 - **Milestone-based execution tracking added to migration plan** — `docs/MIGRATION_ELECTRON_TO_TAURI.md` now includes an explicit phase tracker (status, advancement gate, and execution checklists for phases 0 and 1).
+- **Migration tracker advanced to 2c after manual 2b closure** — `docs/MIGRATION_ELECTRON_TO_TAURI.md` now records notification parity validation (user-gesture permission prompt + notification delivery) as completed.
 
 ## [26.4.15] - 2026-04-09
 

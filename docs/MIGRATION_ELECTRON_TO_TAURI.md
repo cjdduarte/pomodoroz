@@ -140,7 +140,7 @@ Current status is tracked here (not only in phase descriptions) so we can see ex
 | --------------------------------- | ------------------------ | ----------- | -------------------------------------------------------------------- |
 | 0 — Tauri Scaffold + Dual Runtime | Completed                | 2026-04-09  | Closed after Tauri + Electron dev validation and script verification |
 | 1 — Connector Swap                | Completed                | 2026-04-10  | Closed after runtime + manual parity validation                      |
-| 2 — Native Features               | In progress (2b current) | 2026-04-10  | Validate notification parity and continue sub-phases                 |
+| 2 — Native Features               | In progress (2c current) | 2026-04-14  | Start global shortcuts migration after notification parity closure   |
 | 3a — Yarn to pnpm                 | Not started              | -           | Start only after Phase 2 exit criteria are complete                  |
 | 3b — Flatten Structure            | Not started              | -           | Start only after Phase 3a exit criteria are complete                 |
 | 4 — CI for Tauri                  | Not started              | -           | Start only after Phase 3b exit criteria are complete                 |
@@ -156,7 +156,7 @@ Phase 0 completion checklist (execution status):
 - [x] Run/confirm script checklist impact for current phase (`scripts/` validation rule)
 
 Rule to move forward: only start Phase 1 after all Phase 0 checklist items above are checked.
-Current state: Phase 1 closed, Phase 2a validated, and Phase 2b is now active.
+Current state: Phase 1 closed, Phase 2a and 2b validated, and Phase 2c is now active.
 Current guardrail in Tauri runtime: settings toggles that still depend on future native sub-phases (`openAtLogin` -> 2g, `inAppAutoUpdate` -> 2f) stay disabled to avoid false-positive UX.
 
 Phase 1 progress checklist (execution status):
@@ -253,7 +253,7 @@ Phase 2b kickoff snapshot (2026-04-10):
 - [x] Notification permission request moved to user-gesture path (Settings notification type selection), avoiding WebKit/Tauri prompt rejection in background timer events.
 - [x] Direct renderer notification calls migrated to wrapper (`useNotification`, `Updater`).
 - [x] External URL opening on Tauri migrated from `window.open`/`target="_blank"` to native opener plugin path (`@tauri-apps/plugin-opener` + `tauri-plugin-opener`), fixing Settings support/help links and release-page actions.
-- [ ] Manual parity validation pending (notification permission prompt + notification delivery in active timer/update flows).
+- [x] Manual parity validation completed on Linux dev runtime (permission prompt via Settings user gesture, timer/update notification delivery, and external links opening through native opener path).
 
 Phase 2b lessons learned (Linux/WebKit runtime):
 

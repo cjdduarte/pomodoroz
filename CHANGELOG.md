@@ -47,6 +47,7 @@
 - **Plano de migração para Tauri (Fase 0) refinado** — escopo atualizado para dual runtime com Yarn, script `tauri` no `package.json` raiz e integração via `src-tauri/tauri.conf.json` com o renderer atual, sem reestruturação prematura.
 - **Política de idioma para commits/PRs formalizada** — `AGENTS.md`, `CLAUDE.md` e `CONTRIBUTING.md` agora explicitam que mensagens de commit e títulos de PR devem ser em inglês (Conventional Commits).
 - **Rastreio de execução por marcos adicionado ao plano** — `docs/MIGRATION_ELECTRON_TO_TAURI.md` agora tem tracker explícito por fase (status, gate de avanço e checklists de execução para fases 0 e 1).
+- **Tracker da migração avançado para 2c após fechamento manual da 2b** — `docs/MIGRATION_ELECTRON_TO_TAURI.md` agora registra a validação de notificações (permissão por gesto do usuário + entrega de aviso) como concluída.
 
 ## [26.4.15] - 2026-04-09
 
