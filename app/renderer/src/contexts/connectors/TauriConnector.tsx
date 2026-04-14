@@ -14,6 +14,7 @@ import {
   normalizeLanguageCode,
 } from "i18n/languages";
 import type { LanguageCode } from "store/settings/types";
+import { detectOS } from "utils";
 import {
   CLOSE_WINDOW,
   MINIMIZE_WINDOW,
@@ -29,6 +30,7 @@ import {
   SHOW_WINDOW,
   TRAY_ICON_UPDATE,
   UPDATE_AVAILABLE,
+  WINDOW_RESTORED_EVENT,
   type ToMainChannel,
   type ToMainPayloadMap,
   type UpdateAvailablePayload,
@@ -37,8 +39,6 @@ import { listen } from "@tauri-apps/api/event";
 import { useTrayIconUpdates } from "hooks/useTrayIconUpdates";
 import { setUpdateBody, setUpdateVersion } from "store/update";
 import { TauriInvokeConnector } from "./TauriInvokeConnector";
-
-const WINDOW_RESTORED_EVENT = "pomodoroz://window-restored";
 
 const IPC_ERROR_MESSAGE =
   "Falha ao comunicar com o runtime nativo (Tauri). Reinicie o app.";
@@ -201,6 +201,10 @@ export const TauriConnectorProvider = ({
   }, [sendToMain, settings.openAtLogin]);
 
   useEffect(() => {
+    if (detectOS() !== "Linux") {
+      return undefined;
+    }
+
     // Workaround do Linux/webkit2gtk:
     // quando o Rust restaura da bandeja, o toggle de resizable
     // usado para recuperar input grab pode deixar `:hover` preso.

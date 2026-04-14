@@ -24,6 +24,7 @@ export const TASKS_EXPORT_RESULT = "TASKS_EXPORT_RESULT";
 export const TASKS_IMPORT_RESULT = "TASKS_IMPORT_RESULT";
 export const CONFIRM_RESET_FOCUS_TO_IDLE =
   "CONFIRM_RESET_FOCUS_TO_IDLE";
+export const WINDOW_RESTORED_EVENT = "pomodoroz://window-restored";
 
 export const TO_MAIN = [
   SET_ALWAYS_ON_TOP,

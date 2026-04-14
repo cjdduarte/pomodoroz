@@ -262,7 +262,7 @@ Phase 2b lessons learned (Linux/WebKit runtime):
 - WebKit DevTools console on this stack does not support top-level `await`; use async IIFE snippets for manual diagnostics.
 - `VM ... NeedDebuggerBreak trap` observed while DevTools/Inspector is attached is a debug/runtime-inspector signal and, by itself, is not treated as a functional app error.
 
-Phase 2c kickoff snapshot (2026-04-14):
+Phase 2c validation snapshot (2026-04-14):
 
 - [x] `tauri-plugin-global-shortcut` dependency wired in Rust backend.
 - [x] Global shortcuts registered on Tauri startup with native handlers for parity with Electron:
