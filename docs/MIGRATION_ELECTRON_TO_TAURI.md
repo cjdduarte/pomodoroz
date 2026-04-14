@@ -255,6 +255,13 @@ Phase 2b kickoff snapshot (2026-04-10):
 - [x] External URL opening on Tauri migrated from `window.open`/`target="_blank"` to native opener plugin path (`@tauri-apps/plugin-opener` + `tauri-plugin-opener`), fixing Settings support/help links and release-page actions.
 - [ ] Manual parity validation pending (notification permission prompt + notification delivery in active timer/update flows).
 
+Phase 2b lessons learned (Linux/WebKit runtime):
+
+- Notification permission prompt must be triggered by a user gesture (Settings interaction). Background/timer-triggered permission prompts are rejected by WebKit.
+- In Tauri dev on Linux, prefer native notification IPC path (`plugin:notification|notify`) for deterministic behavior instead of relying only on web `window.Notification` semantics inside the WebView.
+- WebKit DevTools console on this stack does not support top-level `await`; use async IIFE snippets for manual diagnostics.
+- `VM ... NeedDebuggerBreak trap` observed while DevTools/Inspector is attached is a debug/runtime-inspector signal and, by itself, is not treated as a functional app error.
+
 - Validation per sub-phase:
   - Feature works identically to Electron version
   - No regression in previously migrated features
