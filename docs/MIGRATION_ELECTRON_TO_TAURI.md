@@ -136,14 +136,14 @@ pomodoroz/
 
 Current status is tracked here (not only in phase descriptions) so we can see exactly where work stopped and what is still pending before moving to the next phase.
 
-| Phase                             | Status                   | Last update | Gate to advance                                                      |
-| --------------------------------- | ------------------------ | ----------- | -------------------------------------------------------------------- |
-| 0 — Tauri Scaffold + Dual Runtime | Completed                | 2026-04-09  | Closed after Tauri + Electron dev validation and script verification |
-| 1 — Connector Swap                | Completed                | 2026-04-10  | Closed after runtime + manual parity validation                      |
-| 2 — Native Features               | In progress (2f current) | 2026-04-14  | Start auto-update migration scope and validate 2f integration path   |
-| 3a — Yarn to pnpm                 | Not started              | -           | Start only after Phase 2 exit criteria are complete                  |
-| 3b — Flatten Structure            | Not started              | -           | Start only after Phase 3a exit criteria are complete                 |
-| 4 — CI for Tauri                  | Not started              | -           | Start only after Phase 3b exit criteria are complete                 |
+| Phase                             | Status                   | Last update | Gate to advance                                                                                    |
+| --------------------------------- | ------------------------ | ----------- | -------------------------------------------------------------------------------------------------- |
+| 0 — Tauri Scaffold + Dual Runtime | Completed                | 2026-04-09  | Closed after Tauri + Electron dev validation and script verification                               |
+| 1 — Connector Swap                | Completed                | 2026-04-10  | Closed after runtime + manual parity validation                                                    |
+| 2 — Native Features               | In progress (2g current) | 2026-04-14  | Implement open-at-login parity while keeping updater/release migration deferred to final hardening |
+| 3a — Yarn to pnpm                 | Not started              | -           | Start only after Phase 2 exit criteria are complete                                                |
+| 3b — Flatten Structure            | Not started              | -           | Start only after Phase 3a exit criteria are complete                                               |
+| 4 — CI for Tauri                  | Not started              | -           | Start only after Phase 3b exit criteria are complete                                               |
 
 Phase 0 completion checklist (execution status):
 
@@ -156,8 +156,8 @@ Phase 0 completion checklist (execution status):
 - [x] Run/confirm script checklist impact for current phase (`scripts/` validation rule)
 
 Rule to move forward: only start Phase 1 after all Phase 0 checklist items above are checked.
-Current state: Phase 1 closed, Phase 2a/2b/2c/2d/2e validated (Linux dev runtime), and Phase 2f is now active.
-Current guardrail in Tauri runtime: settings toggles that still depend on future native sub-phases (`openAtLogin` -> 2g, `inAppAutoUpdate` -> 2f) stay disabled to avoid false-positive UX.
+Current state: Phase 1 closed, Phase 2a/2b/2c/2d/2e validated (Linux dev runtime), Phase 2f is deferred by decision, and Phase 2g is now active.
+Current guardrail in Tauri runtime: `inAppAutoUpdate` (2f, deferred) remains disabled to avoid false-positive UX until final release hardening.
 
 Phase 1 progress checklist (execution status):
 
@@ -286,9 +286,15 @@ Phase 2e kickoff snapshot (2026-04-14):
 
 Phase 2f kickoff snapshot (2026-04-14):
 
-- [x] Settings guardrail remains active in Tauri runtime (`inAppAutoUpdate` toggle disabled until native updater path is fully wired), preventing false-positive UX.
-- [ ] Wire `tauri-plugin-updater` integration path (Rust + renderer wrappers), preserving current updater UI/flow contracts.
-- [ ] Validate manual parity path for update check, release-page fallback, and no-regression in existing timer/tray/notification features.
+- [x] Decision recorded: defer updater migration (`tauri-plugin-updater` + release pipeline changes) to final release hardening, avoiding intermediate beta/release churn during core migration.
+- [x] Settings guardrail remains active in Tauri runtime (`inAppAutoUpdate` toggle disabled) while 2f is deferred.
+- [ ] Execute 2f integration at final hardening checkpoint (after remaining native sub-phases are closed).
+
+Phase 2g kickoff snapshot (2026-04-14):
+
+- [x] Scope activated after 2e sign-off and 2f defer decision.
+- [ ] Wire `tauri-plugin-autostart` integration path (Rust + renderer wrapper) for `openAtLogin`.
+- [ ] Validate manual parity path for open-at-login behavior (enable/disable persistence + startup behavior) without regressions in timer/tray/notification flows.
 
 - Validation per sub-phase:
   - Feature works identically to Electron version
