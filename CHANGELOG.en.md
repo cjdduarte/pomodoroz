@@ -54,6 +54,8 @@
 - **Local install scripts migrated to `pnpm` with no fallback** — `scripts/install.sh` and `scripts/install.ps1` now require `pnpm` and run pre-check/build/AppImage steps through `pnpm` (`pnpm --filter ... run ...`, `pnpm build:dir`, `pnpm exec electron-builder`).
 - **`validar-tudo` wrappers migrated to `pnpm` with no fallback** — `.sh`/`.ps1` scripts now validate `pnpm`, run lint/typecheck/build through `pnpm`, and execute packaged/installer flows via `pnpm exec electron-builder`.
 - **`check-updates.sh` JS/TS table alignment fixed** — `pnpm outdated` JSON parsing now keeps columns aligned when `workspace` is empty, so package names are shown correctly again.
+- **Root/workspace `package.json` scripts migrated to `pnpm`** — build/lint/start/release commands in `package.json`, `app/electron/package.json`, `app/renderer/package.json`, and `app/shareables/package.json` no longer call `yarn`, removing implicit fallback in prebuild/build flows.
+- **`lerna` aligned to `pnpm`** — `lerna.json` now sets `npmClient: \"pnpm\"`, preventing `lerna run` pipelines from invoking workspace scripts through `yarn run`.
 
 ### Documentation
 

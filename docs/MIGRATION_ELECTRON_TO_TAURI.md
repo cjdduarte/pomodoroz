@@ -334,7 +334,8 @@ Phase 2i kickoff snapshot (2026-04-15):
   - [x] `version.sh/.ps1`, `release.sh/.ps1`, and `check-updates.sh/.ps1` migrated to `pnpm` without Yarn fallback.
   - [x] `install.sh/.ps1` migrated to `pnpm` without Yarn fallback.
   - [x] `validar-tudo.sh/.ps1` migrated to `pnpm` without Yarn fallback.
-  - [ ] Root scripts/workspace commands and lockfile transition (`pnpm-lock.yaml`, `yarn.lock` removal) still pending.
+  - [x] Root/workspace `package.json` scripts migrated from `yarn` to `pnpm`.
+  - [ ] Lockfile transition (`pnpm-lock.yaml` canonical + `yarn.lock` removal) still pending.
   - [ ] GitHub Actions workflow migration (`yarn` -> `pnpm`) still pending.
 - Validation:
   - `pnpm install` succeeds
