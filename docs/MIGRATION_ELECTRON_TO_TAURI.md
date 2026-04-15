@@ -411,15 +411,15 @@ Phase 2i kickoff snapshot (2026-04-15):
 Every migration phase that changes the build flow, package manager, or folder structure
 **must** verify and update the helper scripts accordingly:
 
-| Script                      | Purpose                        | Phases that affect it             |
-| --------------------------- | ------------------------------ | --------------------------------- |
-| `validar-tudo.sh` / `.ps1`  | Dev validation wrapper         | 1, 3a, 3b (paths, commands)       |
-| `install.sh` / `.ps1`       | Local AppImage/desktop install | 3b (artifact paths)               |
-| `uninstall.sh` / `.ps1`     | Local uninstall                | 3b (artifact paths)               |
-| `release.sh` / `.ps1`       | Release flow (tag, publish)    | 3a, 3b, 4 (pkg manager, CI)       |
-| `version.sh` / `.ps1`       | Version bump helper            | 3b (package.json location)        |
-| `version-sync.mjs`          | Sync version across workspaces | 3b (may be removed with monorepo) |
-| `check-updates.sh` / `.ps1` | Dependency update checker      | 3a (pkg manager commands)         |
+| Script                      | Purpose                        | Phases that affect it                        |
+| --------------------------- | ------------------------------ | -------------------------------------------- |
+| `validar-tudo.sh` / `.ps1`  | Dev validation wrapper         | 1, 3a, 3b (paths, commands)                  |
+| `install.sh` / `.ps1`       | Local AppImage/desktop install | 3b (artifact paths)                          |
+| `uninstall.sh` / `.ps1`     | Local uninstall                | 3b (artifact paths)                          |
+| `release.sh` / `.ps1`       | Release flow (tag, publish)    | 3a, 3b, 4 (pkg manager, CI)                  |
+| `version.sh` / `.ps1`       | Version bump helper            | 3a, 3b (pkg manager + package.json location) |
+| `version-sync.mjs`          | Sync version across workspaces | 3b (may be removed with monorepo)            |
+| `check-updates.sh` / `.ps1` | Dependency update checker      | 3a (pkg manager commands)                    |
 
 Rule: no phase is complete until all scripts in `scripts/` pass or are updated.
 Include script validation as part of the phase's exit criteria.
