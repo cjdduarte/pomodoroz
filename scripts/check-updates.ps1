@@ -110,6 +110,54 @@ function Is-MajorUpdate {
     return $currentMajor -ne $latestMajor
 }
 
+function Get-SemverTuple {
+    param([string]$VersionText)
+
+    if ([string]::IsNullOrWhiteSpace($VersionText)) {
+        return @(0, 0, 0)
+    }
+
+    $clean = ($VersionText -replace '^[^\d]*', '' -replace '[^\d.].*$', '').Trim()
+    if ([string]::IsNullOrWhiteSpace($clean)) {
+        return @(0, 0, 0)
+    }
+
+    $parts = $clean.Split('.')
+    $result = @(0, 0, 0)
+
+    for ($i = 0; $i -lt 3; $i++) {
+        if ($i -lt $parts.Length) {
+            $parsed = 0
+            if ([int]::TryParse($parts[$i], [ref]$parsed)) {
+                $result[$i] = $parsed
+            }
+        }
+    }
+
+    return $result
+}
+
+function Compare-Semver {
+    param(
+        [string]$Left,
+        [string]$Right
+    )
+
+    $leftTuple = Get-SemverTuple -VersionText $Left
+    $rightTuple = Get-SemverTuple -VersionText $Right
+
+    for ($i = 0; $i -lt 3; $i++) {
+        if ($leftTuple[$i] -lt $rightTuple[$i]) {
+            return -1
+        }
+        if ($leftTuple[$i] -gt $rightTuple[$i]) {
+            return 1
+        }
+    }
+
+    return 0
+}
+
 function Normalize-WorkspaceName {
     param([string]$WorkspaceName)
 
@@ -223,6 +271,22 @@ function Check-DevEnvironment {
     if (Check-Command "pnpm") {
         $pnpmVersion = pnpm --version
         Write-Host "  pnpm: $pnpmVersion ✓" -ForegroundColor Green
+
+        if (Check-Command "npm") {
+            $pnpmLatest = ""
+            try {
+                $pnpmLatest = (& npm view pnpm version --fetch-retries=0 --fetch-timeout=3000 2>$null | Select-Object -First 1).Trim()
+            } catch {
+                $pnpmLatest = ""
+            }
+
+            if (-not [string]::IsNullOrWhiteSpace($pnpmLatest)) {
+                if ((Compare-Semver -Left $pnpmVersion -Right $pnpmLatest) -lt 0) {
+                    Write-Host "    Update available: $pnpmVersion -> $pnpmLatest" -ForegroundColor Yellow
+                    Write-Host "    To update: corepack use pnpm@$pnpmLatest" -ForegroundColor Gray
+                }
+            }
+        }
     } else {
         Write-Host "  pnpm: ❌ nao encontrado" -ForegroundColor Red
     }

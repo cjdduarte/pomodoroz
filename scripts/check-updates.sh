@@ -63,6 +63,14 @@ require_cmd() {
   fi
 }
 
+version_gt() {
+  local left="$1"
+  local right="$2"
+  local max_version
+  max_version="$(printf "%s\n%s\n" "$left" "$right" | sort -V | tail -n 1)"
+  [ "$max_version" = "$left" ] && [ "$left" != "$right" ]
+}
+
 die() {
   echo "ERRO: $1" >&2
   exit 1
@@ -353,9 +361,26 @@ check_dev_environment() {
   fi
 
   if command -v pnpm >/dev/null 2>&1; then
-    local pnpm_version
+    local pnpm_version pnpm_latest
+    local lookup_status
     pnpm_version="$(pnpm --version)"
     echo "  pnpm: ${pnpm_version} ✓"
+
+    if command -v npm >/dev/null 2>&1; then
+      set +e
+      pnpm_latest="$(
+        npm view pnpm version --fetch-retries=0 --fetch-timeout=3000 2>/dev/null \
+          | head -n 1 \
+          | tr -d '[:space:]'
+      )"
+      lookup_status=$?
+      set -e
+
+      if [ "$lookup_status" -eq 0 ] && [ -n "$pnpm_latest" ] && version_gt "$pnpm_latest" "$pnpm_version"; then
+        echo "    Update available: ${pnpm_version} -> ${pnpm_latest}"
+        echo "    To update: corepack use pnpm@${pnpm_latest}"
+      fi
+    fi
   else
     echo "  pnpm: ❌ nao encontrado"
   fi
