@@ -154,8 +154,8 @@ export const ja = {
     autoUpdatePromptTitle: "自動アップデート",
     autoUpdatePromptBody:
       "新しいバージョンを自動でダウンロードしてインストールしますか？この設定は後で設定画面から変更できます。",
-    autoUpdatePromptEnable: "はい、自動更新する",
-    autoUpdatePromptNotifyOnly: "いいえ、通知のみ",
+    autoUpdatePromptEnable: "自動更新する",
+    autoUpdatePromptNotifyOnly: "通知のみ",
     notificationSound: "通知サウンド",
     notificationSoundDefault: "アプリ既定サウンド",
     notificationSoundCustom: "カスタムサウンド",

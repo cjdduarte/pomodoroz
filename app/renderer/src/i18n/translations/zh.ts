@@ -151,8 +151,8 @@ export const zh = {
     autoUpdatePromptTitle: "自动更新",
     autoUpdatePromptBody:
       "你希望应用自动下载并安装新版本吗？你之后可以在“设置”里修改。",
-    autoUpdatePromptEnable: "是，自动更新",
-    autoUpdatePromptNotifyOnly: "否，仅通知",
+    autoUpdatePromptEnable: "自动更新",
+    autoUpdatePromptNotifyOnly: "仅通知",
     notificationSound: "通知声音",
     notificationSoundDefault: "应用默认声音",
     notificationSoundCustom: "自定义声音",

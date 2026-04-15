@@ -140,7 +140,7 @@ Current status is tracked here (not only in phase descriptions) so we can see ex
 | --------------------------------- | ----------- | ----------- | --------------------------------------------------------------------------------------------------------- |
 | 0 — Tauri Scaffold + Dual Runtime | Completed   | 2026-04-09  | Closed after Tauri + Electron dev validation and script verification                                      |
 | 1 — Connector Swap                | Completed   | 2026-04-10  | Closed after runtime + manual parity validation                                                           |
-| 2 — Native Features               | In progress | 2026-04-15  | 2i validated; pending cross-platform parity follow-up (2c) and final hardening checkpoint for deferred 2f |
+| 2 — Native Features               | In progress | 2026-04-15  | 2c/2g/2h/2i validated in available environments; final hardening checkpoint still pending for deferred 2f |
 | 3a — Yarn to pnpm                 | Not started | -           | Start only after Phase 2 exit criteria are complete                                                       |
 | 3b — Flatten Structure            | Not started | -           | Start only after Phase 3a exit criteria are complete                                                      |
 | 4 — CI for Tauri                  | Not started | -           | Start only after Phase 3b exit criteria are complete                                                      |
@@ -269,7 +269,8 @@ Phase 2c validation snapshot (2026-04-14):
   - `Alt+Shift+H` -> hide main window (fallback to minimize when tray is unavailable)
   - `Alt+Shift+S` -> restore/focus main window
 - [x] Manual parity validation completed on Linux dev runtime (`Alt+Shift+H` hide/minimize path, `Alt+Shift+S` restore/focus path).
-- [ ] Cross-platform parity validation pending (Windows/macOS).
+- [x] Windows parity validation completed (`Alt+Shift+H` hide/minimize path, `Alt+Shift+S` restore/focus path).
+- [x] Current phase sign-off accepted without macOS run due unavailable environment; keep macOS validation as future follow-up when environment is available.
 
 Phase 2d validation snapshot (2026-04-14):
 

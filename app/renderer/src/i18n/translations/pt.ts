@@ -154,8 +154,8 @@ export const pt = {
     autoUpdatePromptTitle: "Atualizações automáticas",
     autoUpdatePromptBody:
       "Deseja que o app baixe e instale novas versões automaticamente? Você pode mudar isso depois em Ajustes.",
-    autoUpdatePromptEnable: "Sim, atualizar automaticamente",
-    autoUpdatePromptNotifyOnly: "Não, apenas avisar",
+    autoUpdatePromptEnable: "Atualizar automaticamente",
+    autoUpdatePromptNotifyOnly: "Apenas avisar",
     notificationSound: "Som de notificação",
     notificationSoundDefault: "Som padrão do app",
     notificationSoundCustom: "Som personalizado",

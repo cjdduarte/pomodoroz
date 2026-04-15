@@ -48,7 +48,7 @@ const FirstRunAutoUpdateOverlay = styled.div`
 `;
 
 const FirstRunAutoUpdateDialog = styled.section`
-  width: min(44rem, 100%);
+  width: min(40rem, 100%);
   border-radius: 4px;
   border: 1px solid var(--color-border-primary);
   background-color: var(--color-bg-primary);
@@ -59,14 +59,18 @@ const FirstRunAutoUpdateDialog = styled.section`
   row-gap: 1.2rem;
 
   & > h3 {
+    margin: 0;
     font-size: 1.4rem;
     font-weight: 600;
     color: var(--color-title);
+    text-align: center;
   }
 
   & > p {
+    margin: 0;
     color: var(--color-body-text);
     line-height: 1.4;
+    text-align: center;
   }
 `;
 
@@ -78,22 +82,22 @@ const FirstRunAutoUpdateActions = styled.div`
 
 const FirstRunAutoUpdatePrimaryButton = styled(StyledButtonPrimary)`
   min-width: 0;
-  min-height: 4rem;
+  min-height: 3.4rem;
   height: auto;
-  white-space: normal;
-  line-height: 1.25;
+  white-space: nowrap;
+  line-height: 1.2;
   text-align: center;
-  padding: 0.9rem 1rem;
+  padding: 0.7rem 0.9rem;
 `;
 
 const FirstRunAutoUpdateNormalButton = styled(StyledButtonNormal)`
   min-width: 0;
-  min-height: 4rem;
+  min-height: 3.4rem;
   height: auto;
-  white-space: normal;
-  line-height: 1.25;
+  white-space: nowrap;
+  line-height: 1.2;
   text-align: center;
-  padding: 0.9rem 1rem;
+  padding: 0.7rem 0.9rem;
 `;
 
 type Props = {
