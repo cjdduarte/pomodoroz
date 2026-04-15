@@ -28,18 +28,13 @@ function Die($message) {
     exit 1
 }
 
-function Invoke-Yarn {
+function Invoke-Pnpm {
     param(
         [Parameter(ValueFromRemainingArguments = $true)]
         [string[]]$Args
     )
 
-    if ($script:USE_COREPACK_YARN) {
-        & corepack yarn @Args
-    } else {
-        & yarn @Args
-    }
-
+    & pnpm @Args
     if ($LASTEXITCODE -ne 0) {
         exit $LASTEXITCODE
     }
@@ -64,23 +59,23 @@ Uso:
   ./scripts/validar-tudo.ps1    (menu interativo)
 
 Fluxo padrao:
-  1) valida Node + Yarn
-  2) yarn install (sincroniza lockfile)
-  3) yarn workspace @pomodoroz/shareables run build
-  4) yarn lint
-  5) yarn workspace @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json
+  1) valida Node + pnpm
+  2) pnpm install (sincroniza lockfile)
+  3) pnpm --filter @pomodoroz/shareables run build
+  4) lint por workspace (@pomodoroz/renderer, pomodoroz, @pomodoroz/shareables)
+  5) pnpm --filter @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json
   6) cargo fmt --check (src-tauri)
   7) cargo clippy -D warnings (src-tauri)
-  8) yarn build:dir
+  8) pnpm build + pnpm exec electron-builder --dir
 
 Opcoes:
-  -SkipInstall   Nao roda yarn install
-  -Dev           Apos validar, inicia yarn dev:app
+  -SkipInstall   Nao roda pnpm install
+  -Dev           Apos validar, inicia pnpm dev:app
   -RunPacked     Apos validar, executa binario empacotado local
   -BuildInstallers  Apos validar, gera instaladores da plataforma atual
   -InstallersProfile  Perfil para -BuildInstallers: slim (default) ou full
   -InstallLocal  Executa ./scripts/install.ps1
-  -QuickDev      Fluxo rapido: yarn lint + typecheck renderer + yarn dev:app
+  -QuickDev      Fluxo rapido: lint + typecheck renderer + pnpm dev:app
   -Help
 "@
 }
@@ -181,7 +176,7 @@ if ($InstallLocal) {
     exit $LASTEXITCODE
 }
 
-Step "Verificando ambiente (Node + Yarn)"
+Step "Verificando ambiente (Node + pnpm)"
 try {
     $nodeVersion = (node --version) -replace '^v', ''
     $nodeMajor = [int]($nodeVersion -split '\.')[0]
@@ -195,72 +190,61 @@ try {
     Die "Node nao encontrado."
 }
 
-if (-not (Get-Command yarn -ErrorAction SilentlyContinue)) {
-    if (Get-Command corepack -ErrorAction SilentlyContinue) {
-        try {
-            $yarnVersion = (& corepack yarn --version).Trim()
-            if ($LASTEXITCODE -ne 0) {
-                Die "Yarn nao encontrado e corepack yarn nao pode ser executado."
-            }
-            $script:USE_COREPACK_YARN = $true
-            Write-Host "Yarn via Corepack v$yarnVersion" -ForegroundColor Green
-            Write-Host "Obs: usando fallback 'corepack yarn' (sem 'corepack enable')." -ForegroundColor Yellow
-        } catch {
-            Die "Yarn nao encontrado e corepack yarn falhou. Instale Yarn 1.22.x ou execute como Administrador para habilitar corepack."
-        }
-    } else {
-        Die "Yarn nao encontrado."
-    }
-} else {
-    $yarnVersion = (yarn --version).Trim()
-    Write-Host "Yarn $yarnVersion" -ForegroundColor Green
+if (-not (Get-Command pnpm -ErrorAction SilentlyContinue)) {
+    Die "pnpm nao encontrado."
 }
+$pnpmVersion = (pnpm --version).Trim()
+Write-Host "pnpm $pnpmVersion" -ForegroundColor Green
 
 if (-not $SkipInstall) {
-    Step "Sincronizando dependencias (yarn install)"
+    Step "Sincronizando dependencias (pnpm install)"
     Push-Location $APP_DIR
-    Invoke-Yarn install
+    Invoke-Pnpm install
     Pop-Location
 } else {
-    Step "Pulando yarn install (-SkipInstall)"
+    Step "Pulando pnpm install (-SkipInstall)"
 }
 
 if ($QuickDev) {
     Step "Quick run: preparando @pomodoroz/shareables"
     Push-Location $APP_DIR
-    Invoke-Yarn workspace @pomodoroz/shareables run build
+    Invoke-Pnpm --filter @pomodoroz/shareables run build
     Pop-Location
 
     Step "Quick run: lint"
     Push-Location $APP_DIR
-    Invoke-Yarn lint
+    Invoke-Pnpm --filter @pomodoroz/renderer run lint
+    Invoke-Pnpm --filter pomodoroz run lint
+    Invoke-Pnpm --filter @pomodoroz/shareables run lint
     Pop-Location
 
     Step "Quick run: typecheck renderer"
     Push-Location $APP_DIR
-    Invoke-Yarn workspace @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json
+    Invoke-Pnpm --filter @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json
     Pop-Location
 
     Step "Quick run: dev:app"
     Push-Location $APP_DIR
-    Invoke-Yarn dev:app
+    Invoke-Pnpm dev:app
     Pop-Location
     exit 0
 }
 
 Step "Preparando @pomodoroz/shareables (tipos para dependencias internas)"
 Push-Location $APP_DIR
-Invoke-Yarn workspace @pomodoroz/shareables run build
+Invoke-Pnpm --filter @pomodoroz/shareables run build
 Pop-Location
 
 Step "Lint completo (ESLint renderer + TypeScript workspaces)"
 Push-Location $APP_DIR
-Invoke-Yarn lint
+Invoke-Pnpm --filter @pomodoroz/renderer run lint
+Invoke-Pnpm --filter pomodoroz run lint
+Invoke-Pnpm --filter @pomodoroz/shareables run lint
 Pop-Location
 
 Step "Typecheck do renderer (TypeScript)"
 Push-Location $APP_DIR
-Invoke-Yarn workspace @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json
+Invoke-Pnpm --filter @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json
 Pop-Location
 
 $tauriDir = Join-Path $APP_DIR "src-tauri"
@@ -278,54 +262,60 @@ if (Test-Path $tauriDir) {
 
 if ($BuildInstallers) {
     if ($IS_WINDOWS_OS) {
-        if ($InstallersProfile -eq "full") {
-            Step "Gerando instaladores Windows (full: build:win)"
-            Push-Location $APP_DIR
-            Invoke-Yarn build:win
-            Pop-Location
-        } else {
-            Step "Gerando instaladores Windows (slim: x64 setup+portable)"
-            Push-Location $APP_DIR
-            Invoke-Yarn build
-            Invoke-Yarn workspace pomodoroz run build:win-x64
-            Pop-Location
-        }
+        Step "Gerando instaladores Windows ($InstallersProfile: --win --ia32 --x64 --publish=never)"
+        Push-Location $APP_DIR
+        Invoke-Pnpm build
+        Pop-Location
+        Push-Location (Join-Path $APP_DIR "app/electron")
+        Invoke-Pnpm exec electron-builder --win --ia32 --x64 --publish=never
+        Pop-Location
     } elseif ((Get-Variable IsLinux -ErrorAction SilentlyContinue) -and $IsLinux) {
         if ($InstallersProfile -eq "full") {
-            Step "Gerando instaladores Linux (full: build:linux)"
+            Step "Gerando instaladores Linux (full: AppImage+deb+rpm x64/arm64)"
             Push-Location $APP_DIR
-            Invoke-Yarn build:linux
+            Invoke-Pnpm build
+            Pop-Location
+            Push-Location (Join-Path $APP_DIR "app/electron")
+            Invoke-Pnpm exec electron-builder --linux --x64 --arm64 --publish=never
             Pop-Location
         } else {
             Step "Gerando instaladores Linux (slim: AppImage+deb x64/arm64 + rpm x64)"
             Push-Location $APP_DIR
-            Invoke-Yarn build
-            Invoke-Yarn workspace pomodoroz run eb --linux AppImage deb --x64 --arm64 --publish=never
-            Invoke-Yarn workspace pomodoroz run eb --linux rpm --x64 --publish=never
+            Invoke-Pnpm build
+            Pop-Location
+            Push-Location (Join-Path $APP_DIR "app/electron")
+            Invoke-Pnpm exec electron-builder --linux AppImage deb --x64 --arm64 --publish=never
+            Invoke-Pnpm exec electron-builder --linux rpm --x64 --publish=never
             Pop-Location
         }
     } elseif ((Get-Variable IsMacOS -ErrorAction SilentlyContinue) -and $IsMacOS) {
-        Step "Gerando instaladores macOS (build:mac)"
+        Step "Gerando instaladores macOS ($InstallersProfile: --mac --publish=never)"
         Push-Location $APP_DIR
-        Invoke-Yarn build:mac
+        Invoke-Pnpm build
+        Pop-Location
+        Push-Location (Join-Path $APP_DIR "app/electron")
+        Invoke-Pnpm exec electron-builder --mac --publish=never
         Pop-Location
     } else {
         Step "Gerando instaladores (build)"
         Push-Location $APP_DIR
-        Invoke-Yarn build
+        Invoke-Pnpm build
         Pop-Location
     }
 } else {
-    Step "Build empacotado (build:dir)"
+    Step "Build empacotado (pnpm build + electron-builder --dir)"
     Push-Location $APP_DIR
-    Invoke-Yarn build:dir
+    Invoke-Pnpm build
+    Pop-Location
+    Push-Location (Join-Path $APP_DIR "app/electron")
+    Invoke-Pnpm exec electron-builder --dir
     Pop-Location
 }
 
 if ($Dev) {
     Step "Iniciando app em modo dev (Electron + Vite)"
     Push-Location $APP_DIR
-    Invoke-Yarn dev:app
+    Invoke-Pnpm dev:app
     Pop-Location
     exit 0
 }

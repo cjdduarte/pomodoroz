@@ -502,7 +502,9 @@ const pushRow = (pkgName, obj) => {
   const wanted = String(obj.wanted ?? "").replace(/\t/g, " ");
   const latest = String(obj.latest ?? "").replace(/\t/g, " ");
   const packageType = String(obj.dependencyType ?? obj.packageType ?? obj.type ?? "").replace(/\t/g, " ");
-  const workspace = String(obj.workspace ?? obj.project ?? obj.location ?? "").replace(/\t/g, " ");
+  const workspaceRaw = String(obj.workspace ?? obj.project ?? obj.location ?? "").replace(/\t/g, " ");
+  // Evita linha iniciando com TAB (workspace vazio), que desloca colunas no `read`.
+  const workspace = workspaceRaw || "__unknown__";
   rows.push([workspace, pkg, current, wanted, latest, packageType].join("\t"));
 };
 
@@ -535,7 +537,7 @@ if (rows.length > 0) {
   while IFS=$'\t' read -r ws_from_tool pkg current wanted latest ptype; do
     [ -z "$pkg" ] && continue
     local effective_ws="$ws_name"
-    if [ -n "${ws_from_tool:-}" ]; then
+    if [ -n "${ws_from_tool:-}" ] && [ "$ws_from_tool" != "__unknown__" ]; then
       local normalized_ws
       normalized_ws="$(normalize_workspace_name "$ws_from_tool")"
       if workspace_dir_by_name "$normalized_ws" >/dev/null 2>&1; then

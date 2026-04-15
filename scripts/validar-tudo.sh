@@ -30,24 +30,24 @@ Uso:
   ./scripts/validar-tudo.sh                  # menu interativo (quando TTY)
 
 Fluxo padrao:
-  1) valida Node + Yarn
-  2) yarn install (sincroniza lockfile)
-  3) yarn workspace @pomodoroz/shareables run build
-  4) yarn lint
-  5) yarn workspace @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json
+  1) valida Node + pnpm
+  2) pnpm install (sincroniza lockfile)
+  3) pnpm --filter @pomodoroz/shareables run build
+  4) lint por workspace (@pomodoroz/renderer, pomodoroz, @pomodoroz/shareables)
+  5) pnpm --filter @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json
   6) cargo fmt --check (src-tauri)
   7) cargo clippy -D warnings (src-tauri)
-  8) yarn build:dir
+  8) pnpm build + pnpm exec electron-builder --dir
 
 Opcoes:
-  --skip-install   Nao roda yarn install
-  --dev            Apos validar, inicia yarn dev:app
+  --skip-install   Nao roda pnpm install
+  --dev            Apos validar, inicia pnpm dev:app
   --run-packed     Apos validar, executa o binario empacotado local
   --installers     Apos validar, gera instaladores da plataforma atual
   --installers-full Perfil completo (targets padrao do projeto)
   --installers-slim Perfil enxuto (default)
   --install-local  Executa ./scripts/install.sh
-  --quick-dev      Fluxo rapido: yarn lint + typecheck renderer + yarn dev:app
+  --quick-dev      Fluxo rapido: lint + typecheck renderer + pnpm dev:app
   -h, --help       Mostra esta ajuda
 EOF
 }
@@ -193,9 +193,9 @@ if (( RUN_QUICK_DEV == 1 )); then
   fi
 fi
 
-step "Verificando ambiente (Node + Yarn)"
+step "Verificando ambiente (Node + pnpm)"
 command -v node >/dev/null 2>&1 || die "Node nao encontrado."
-command -v yarn >/dev/null 2>&1 || die "Yarn nao encontrado."
+command -v pnpm >/dev/null 2>&1 || die "pnpm nao encontrado."
 
 NODE_VERSION="$(node --version | sed 's/^v//')"
 NODE_MAJOR="$(echo "$NODE_VERSION" | cut -d. -f1)"
@@ -207,36 +207,46 @@ else
 fi
 
 if (( SKIP_INSTALL == 0 )); then
-  step "Sincronizando dependencias (yarn install)"
-  ( cd "$APP_DIR" && yarn install )
+  step "Sincronizando dependencias (pnpm install)"
+  ( cd "$APP_DIR" && pnpm install )
 else
-  step "Pulando yarn install (--skip-install)"
+  step "Pulando pnpm install (--skip-install)"
 fi
 
 if (( RUN_QUICK_DEV == 1 )); then
   step "Quick run: preparando @pomodoroz/shareables"
-  ( cd "$APP_DIR" && yarn workspace @pomodoroz/shareables run build )
+  ( cd "$APP_DIR" && pnpm --filter @pomodoroz/shareables run build )
   step "Quick run: lint"
-  ( cd "$APP_DIR" && yarn lint )
+  (
+    cd "$APP_DIR" &&
+      pnpm --filter @pomodoroz/renderer run lint &&
+      pnpm --filter pomodoroz run lint &&
+      pnpm --filter @pomodoroz/shareables run lint
+  )
   step "Quick run: typecheck renderer"
   (
     cd "$APP_DIR" &&
-      yarn workspace @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json
+      pnpm --filter @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json
   )
   step "Quick run: dev:app"
-  exec bash -lc "cd \"$APP_DIR\" && yarn dev:app"
+  exec bash -lc "cd \"$APP_DIR\" && pnpm dev:app"
 fi
 
 step "Preparando @pomodoroz/shareables (tipos para dependencias internas)"
-( cd "$APP_DIR" && yarn workspace @pomodoroz/shareables run build )
+( cd "$APP_DIR" && pnpm --filter @pomodoroz/shareables run build )
 
 step "Lint completo (ESLint renderer + TypeScript workspaces)"
-( cd "$APP_DIR" && yarn lint )
+(
+  cd "$APP_DIR" &&
+    pnpm --filter @pomodoroz/renderer run lint &&
+    pnpm --filter pomodoroz run lint &&
+    pnpm --filter @pomodoroz/shareables run lint
+)
 
 step "Typecheck do renderer (TypeScript)"
 (
   cd "$APP_DIR" &&
-    yarn workspace @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json
+    pnpm --filter @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json
 )
 
 if [[ -d "$APP_DIR/src-tauri" ]]; then
@@ -256,32 +266,36 @@ if (( RUN_INSTALLERS == 1 )); then
   case "$(uname -s)" in
     Linux*)
       if [[ "$INSTALLERS_PROFILE" == "full" ]]; then
-        step "Gerando instaladores Linux (full: build:linux)"
-        ( cd "$APP_DIR" && yarn build:linux )
+        step "Gerando instaladores Linux (full: AppImage+deb+rpm x64/arm64)"
+        ( cd "$APP_DIR" && pnpm build )
+        ( cd "$APP_DIR/app/electron" && pnpm exec electron-builder --linux --x64 --arm64 --publish=never )
       else
         step "Gerando instaladores Linux (slim: AppImage+deb x64/arm64 + rpm x64)"
-        ( cd "$APP_DIR" && yarn build )
-        ( cd "$APP_DIR" && yarn workspace pomodoroz run eb --linux AppImage deb --x64 --arm64 --publish=never )
-        ( cd "$APP_DIR" && yarn workspace pomodoroz run eb --linux rpm --x64 --publish=never )
+        ( cd "$APP_DIR" && pnpm build )
+        ( cd "$APP_DIR/app/electron" && pnpm exec electron-builder --linux AppImage deb --x64 --arm64 --publish=never )
+        ( cd "$APP_DIR/app/electron" && pnpm exec electron-builder --linux rpm --x64 --publish=never )
       fi
       ;;
     Darwin*)
-      step "Gerando instaladores macOS (build:mac)"
-      ( cd "$APP_DIR" && yarn build:mac )
+      step "Gerando instaladores macOS (full/slim: --mac --publish=never)"
+      ( cd "$APP_DIR" && pnpm build )
+      ( cd "$APP_DIR/app/electron" && pnpm exec electron-builder --mac --publish=never )
       ;;
     *)
-      step "Gerando instaladores (build)"
-      ( cd "$APP_DIR" && yarn build )
+      step "Gerando instaladores Windows (full/slim: --win --ia32 --x64 --publish=never)"
+      ( cd "$APP_DIR" && pnpm build )
+      ( cd "$APP_DIR/app/electron" && pnpm exec electron-builder --win --ia32 --x64 --publish=never )
       ;;
   esac
 else
-  step "Build empacotado (build:dir)"
-  ( cd "$APP_DIR" && yarn build:dir )
+  step "Build empacotado (pnpm build + electron-builder --dir)"
+  ( cd "$APP_DIR" && pnpm build )
+  ( cd "$APP_DIR/app/electron" && pnpm exec electron-builder --dir )
 fi
 
 if (( RUN_DEV == 1 )); then
   step "Iniciando app em modo dev (Electron + Vite)"
-  ( cd "$APP_DIR" && yarn dev:app )
+  ( cd "$APP_DIR" && pnpm dev:app )
 elif (( RUN_PACKED == 1 )); then
   step "Executando binario empacotado local"
   ( cd "$APP_DIR" && ./app/electron/dist/linux-unpacked/pomodoroz )

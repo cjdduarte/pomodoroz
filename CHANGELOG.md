@@ -52,6 +52,8 @@
 - **`validar-tudo` passou a validar qualidade Rust do `src-tauri`** — preflight padrão agora inclui `cargo fmt --all -- --check` e `cargo clippy --all-targets --all-features -- -D warnings` (mantendo `quick-dev` sem gate Rust para preservar velocidade).
 - **`check-updates` passou a incluir relatório Rust (Cargo)** — scripts `.sh`/`.ps1` agora executam bloco `[5/5]` com `cargo outdated` e `cargo audit` (quando instalados) e exibem comandos recomendados para atualização manual de crates.
 - **Scripts de instalação local migrados para `pnpm` sem fallback** — `scripts/install.sh` e `scripts/install.ps1` agora exigem `pnpm` e executam pre-check/build/AppImage com `pnpm` (`pnpm --filter ... run ...`, `pnpm build:dir`, `pnpm exec electron-builder`).
+- **`validar-tudo` migrado para `pnpm` sem fallback** — wrappers `.sh`/`.ps1` agora validam ambiente com `pnpm`, rodam lint/typecheck/build por `pnpm` e executam empacotamento/instaladores via `pnpm exec electron-builder`.
+- **Tabela de updates JS/TS corrigida no `check-updates.sh`** — parser do JSON do `pnpm outdated` agora preserva alinhamento das colunas quando `workspace` vem vazio, voltando a exibir nomes de pacote corretamente.
 
 ### Documentação
 
