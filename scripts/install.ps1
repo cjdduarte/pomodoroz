@@ -62,8 +62,8 @@ if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
     Die "node nao encontrado."
 }
 
-if (-not (Get-Command yarn -ErrorAction SilentlyContinue)) {
-    Die "yarn nao encontrado."
+if (-not (Get-Command pnpm -ErrorAction SilentlyContinue)) {
+    Die "pnpm nao encontrado."
 }
 
 $nodeVersion = (node --version) -replace '^v', ''
@@ -73,9 +73,9 @@ if ($nodeMajor -lt 24) {
 }
 
 if (-not (Test-Path (Join-Path $APP_DIR "node_modules"))) {
-    Step "Instalando dependencias Yarn"
+    Step "Instalando dependencias pnpm"
     Push-Location $APP_DIR
-    yarn install
+    pnpm install
     Pop-Location
 }
 
@@ -104,22 +104,22 @@ switch ($archRaw) {
 if (-not $SkipBuild) {
     Step "Preparando @pomodoroz/shareables (tipos para dependencias internas)"
     Push-Location $APP_DIR
-    yarn workspace @pomodoroz/shareables run build
+    pnpm --filter @pomodoroz/shareables run build
     Pop-Location
 
     Step "Lint completo (ESLint renderer + TypeScript workspaces)"
     Push-Location $APP_DIR
-    yarn lint
+    pnpm lint
     Pop-Location
 
     Step "Build empacotado (build:dir)"
     Push-Location $APP_DIR
-    yarn build:dir
+    pnpm build:dir
     Pop-Location
 
     Step "Gerando AppImage ($archRaw)"
     Push-Location (Join-Path $APP_DIR "app/electron")
-    yarn electron-builder --linux AppImage $electronArchFlag --publish=never
+    pnpm exec electron-builder --linux AppImage $electronArchFlag --publish=never
     Pop-Location
 }
 else {

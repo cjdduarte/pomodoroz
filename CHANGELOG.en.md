@@ -51,6 +51,7 @@
 - **`version/release/check-updates` scripts migrated to `pnpm` with no fallback** — `.sh`/`.ps1` pairs now require `pnpm`, use `pnpm version:sync` for version/release flows, and run updates via `pnpm outdated --format json` + `pnpm add`.
 - **`check-updates` now includes a Rust (Cargo) report step** — `.sh`/`.ps1` scripts now run a `[5/5]` block with `cargo outdated` and `cargo audit` (when installed) and show recommended manual crate-update commands.
 - **`validar-tudo` now enforces Rust quality gates for `src-tauri`** — default preflight now includes `cargo fmt --all -- --check` and `cargo clippy --all-targets --all-features -- -D warnings` (while keeping `quick-dev` fast without Rust gates).
+- **Local install scripts migrated to `pnpm` with no fallback** — `scripts/install.sh` and `scripts/install.ps1` now require `pnpm` and run pre-check/build/AppImage steps through `pnpm` (`pnpm --filter ... run ...`, `pnpm build:dir`, `pnpm exec electron-builder`).
 
 ### Documentation
 

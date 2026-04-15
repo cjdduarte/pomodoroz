@@ -332,7 +332,8 @@ Phase 2i kickoff snapshot (2026-04-15):
   - Keep monorepo structure intact (still `app/*` workspaces)
 - Progress snapshot (2026-04-15):
   - [x] `version.sh/.ps1`, `release.sh/.ps1`, and `check-updates.sh/.ps1` migrated to `pnpm` without Yarn fallback.
-  - [ ] `validar-tudo.sh/.ps1` and `install.sh/.ps1` still pending migration to `pnpm`.
+  - [x] `install.sh/.ps1` migrated to `pnpm` without Yarn fallback.
+  - [ ] `validar-tudo.sh/.ps1` still pending migration to `pnpm`.
   - [ ] Root scripts/workspace commands and lockfile transition (`pnpm-lock.yaml`, `yarn.lock` removal) still pending.
   - [ ] GitHub Actions workflow migration (`yarn` -> `pnpm`) still pending.
 - Validation:
@@ -419,7 +420,7 @@ Every migration phase that changes the build flow, package manager, or folder st
 | Script                      | Purpose                        | Phases that affect it                        |
 | --------------------------- | ------------------------------ | -------------------------------------------- |
 | `validar-tudo.sh` / `.ps1`  | Dev validation wrapper         | 1, 3a, 3b (paths, commands)                  |
-| `install.sh` / `.ps1`       | Local AppImage/desktop install | 3b (artifact paths)                          |
+| `install.sh` / `.ps1`       | Local AppImage/desktop install | 3a, 3b (pkg manager + artifact paths)        |
 | `uninstall.sh` / `.ps1`     | Local uninstall                | 3b (artifact paths)                          |
 | `release.sh` / `.ps1`       | Release flow (tag, publish)    | 3a, 3b, 4 (pkg manager, CI)                  |
 | `version.sh` / `.ps1`       | Version bump helper            | 3a, 3b (pkg manager + package.json location) |

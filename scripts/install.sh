@@ -73,7 +73,7 @@ if [[ "$(uname -s)" != "Linux" ]]; then
   die "Este script suporta apenas Linux."
 fi
 
-for cmd in node yarn; do
+for cmd in node pnpm; do
   command -v "$cmd" >/dev/null 2>&1 || die "$cmd nao encontrado."
 done
 
@@ -84,8 +84,8 @@ if (( NODE_MAJOR < 24 )); then
 fi
 
 if [[ ! -d "${APP_DIR}/node_modules" ]]; then
-  step "Instalando dependencias Yarn"
-  ( cd "$APP_DIR" && yarn install )
+  step "Instalando dependencias pnpm"
+  ( cd "$APP_DIR" && pnpm install )
 fi
 
 if (( SKIP_BUILD == 0 )); then
@@ -99,18 +99,18 @@ if (( SKIP_BUILD == 0 )); then
   esac
 
   step "Preparando @pomodoroz/shareables (tipos para dependencias internas)"
-  ( cd "$APP_DIR" && yarn workspace @pomodoroz/shareables run build )
+  ( cd "$APP_DIR" && pnpm --filter @pomodoroz/shareables run build )
 
   step "Lint completo (ESLint renderer + TypeScript workspaces)"
-  ( cd "$APP_DIR" && yarn lint )
+  ( cd "$APP_DIR" && pnpm lint )
 
   step "Build empacotado (build:dir)"
-  ( cd "$APP_DIR" && yarn build:dir )
+  ( cd "$APP_DIR" && pnpm build:dir )
 
   step "Gerando AppImage (${ARCH_RAW})"
   (
     cd "$APP_DIR/app/electron" && \
-    yarn electron-builder --linux AppImage "$ELECTRON_ARCH_FLAG" --publish=never
+    pnpm exec electron-builder --linux AppImage "$ELECTRON_ARCH_FLAG" --publish=never
   )
 else
   step "Pulando pre-check/build (--skip-build)"
