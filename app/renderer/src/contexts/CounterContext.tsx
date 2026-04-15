@@ -491,7 +491,7 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
   }, [timer.playing, timer.timerType, preventSleeping, allowSleeping]);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
 
     const { firstBreak, secondBreak, thirdBreak, fourthBreak } =
       config.specialBreaks;
@@ -605,7 +605,7 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
   ]);
 
   useEffect(() => {
-    let timerInterval: NodeJS.Timeout;
+    let timerInterval: ReturnType<typeof setInterval>;
 
     // calculate how far off a full second the countdown timer is and adjust the countdown timer accordingly
     const offset = count % 1;

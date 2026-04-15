@@ -45,6 +45,18 @@ function Invoke-Yarn {
     }
 }
 
+function Invoke-Cargo {
+    param(
+        [Parameter(ValueFromRemainingArguments = $true)]
+        [string[]]$Args
+    )
+
+    & cargo @Args
+    if ($LASTEXITCODE -ne 0) {
+        exit $LASTEXITCODE
+    }
+}
+
 function Show-Usage {
 @"
 Uso:
@@ -57,7 +69,9 @@ Fluxo padrao:
   3) yarn workspace @pomodoroz/shareables run build
   4) yarn lint
   5) yarn workspace @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json
-  6) yarn build:dir
+  6) cargo fmt --check (src-tauri)
+  7) cargo clippy -D warnings (src-tauri)
+  8) yarn build:dir
 
 Opcoes:
   -SkipInstall   Nao roda yarn install
@@ -248,6 +262,19 @@ Step "Typecheck do renderer (TypeScript)"
 Push-Location $APP_DIR
 Invoke-Yarn workspace @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json
 Pop-Location
+
+$tauriDir = Join-Path $APP_DIR "src-tauri"
+if (Test-Path $tauriDir) {
+    Step "Rust quality gate (fmt + clippy)"
+    if (-not (Get-Command cargo -ErrorAction SilentlyContinue)) {
+        Die "Cargo nao encontrado."
+    }
+
+    Push-Location $tauriDir
+    Invoke-Cargo fmt --all -- --check
+    Invoke-Cargo clippy --all-targets --all-features -- -D warnings
+    Pop-Location
+}
 
 if ($BuildInstallers) {
     if ($IS_WINDOWS_OS) {

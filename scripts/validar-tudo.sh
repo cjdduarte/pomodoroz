@@ -35,7 +35,9 @@ Fluxo padrao:
   3) yarn workspace @pomodoroz/shareables run build
   4) yarn lint
   5) yarn workspace @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json
-  6) yarn build:dir
+  6) cargo fmt --check (src-tauri)
+  7) cargo clippy -D warnings (src-tauri)
+  8) yarn build:dir
 
 Opcoes:
   --skip-install   Nao roda yarn install
@@ -236,6 +238,19 @@ step "Typecheck do renderer (TypeScript)"
   cd "$APP_DIR" &&
     yarn workspace @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json
 )
+
+if [[ -d "$APP_DIR/src-tauri" ]]; then
+  step "Rust quality gate (fmt + clippy)"
+  command -v cargo >/dev/null 2>&1 || die "Cargo nao encontrado."
+  (
+    cd "$APP_DIR/src-tauri" &&
+      cargo fmt --all -- --check
+  )
+  (
+    cd "$APP_DIR/src-tauri" &&
+      cargo clippy --all-targets --all-features -- -D warnings
+  )
+fi
 
 if (( RUN_INSTALLERS == 1 )); then
   case "$(uname -s)" in

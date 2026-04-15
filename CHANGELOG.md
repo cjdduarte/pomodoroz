@@ -49,6 +49,8 @@
 - **Solicitação de permissão de notificação ajustada para gesto do usuário** — o pedido de permissão saiu do fluxo assíncrono do timer e passou para a interação em Ajustes (tipo de notificação), evitando bloqueio do WebKit/Tauri (`Notification prompting can only be done from a user gesture`).
 - **Atalhos globais iniciais migrados para Tauri (Fase 2c kickoff)** — backend Rust agora registra `Alt+Shift+H` (ocultar app; fallback para minimizar sem tray) e `Alt+Shift+S` (restaurar/focar janela), alinhando paridade com o comportamento do Electron.
 - **Scripts `version/release/check-updates` migrados para `pnpm` sem fallback** — pares `.sh`/`.ps1` agora exigem `pnpm`, usam `pnpm version:sync` no fluxo de versionamento/release e `pnpm outdated --format json` + `pnpm add` no verificador de updates.
+- **`validar-tudo` passou a validar qualidade Rust do `src-tauri`** — preflight padrão agora inclui `cargo fmt --all -- --check` e `cargo clippy --all-targets --all-features -- -D warnings` (mantendo `quick-dev` sem gate Rust para preservar velocidade).
+- **`check-updates` passou a incluir relatório Rust (Cargo)** — scripts `.sh`/`.ps1` agora executam bloco `[5/5]` com `cargo outdated` e `cargo audit` (quando instalados) e exibem comandos recomendados para atualização manual de crates.
 
 ### Documentação
 

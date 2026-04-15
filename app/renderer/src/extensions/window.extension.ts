@@ -1,4 +1,3 @@
-import type { OpenExternalOptions } from "electron";
 import type {
   ToMainChannel,
   FromMainChannel,
@@ -8,6 +7,12 @@ import type {
   InvokeMainPayloadMap,
   InvokeMainResponseMap,
 } from "ipc";
+
+type OpenExternalOptions = {
+  activate?: boolean;
+  workingDirectory?: string;
+  logUsage?: boolean;
+};
 
 declare global {
   interface Window {

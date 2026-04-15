@@ -204,7 +204,7 @@ function Apply-DeclaredSemverPrefix {
 }
 
 function Check-DevEnvironment {
-    Step "[1/4] Ambiente de Desenvolvimento"
+    Step "[1/5] Ambiente de Desenvolvimento"
 
     if (Check-Command "node") {
         $nodeVersion = (node --version) -replace '^v', ''
@@ -229,7 +229,7 @@ function Check-DevEnvironment {
 }
 
 function Check-StackVersions {
-    Step "`n[2/4] Stack Atual do Projeto"
+    Step "`n[2/5] Stack Atual do Projeto"
 
     $rootPkg = Join-Path $POMODOROZ "package.json"
     $rendererPkg = Join-Path $POMODOROZ "app/renderer/package.json"
@@ -245,7 +245,7 @@ function Check-StackVersions {
 }
 
 function Check-FrameworkInventory {
-    Step "`n[3/4] Inventario de Frameworks e Ferramentas"
+    Step "`n[3/5] Inventario de Frameworks e Ferramentas"
 
     $rootPkg = Join-Path $POMODOROZ "package.json"
     $rendererPkg = Join-Path $POMODOROZ "app/renderer/package.json"
@@ -619,10 +619,16 @@ function Invoke-WorkspaceUpdate {
 }
 
 function Check-JsDependencies {
-    Step "`n[4/4] Dependencias JS/TS (pnpm)"
+    Step "`n[4/5] Dependencias JS/TS (pnpm)"
 
     if (-not (Check-Command "pnpm")) {
         Write-Host "  pnpm nao encontrado." -ForegroundColor Red
+        return
+    }
+    $pnpmLock = Join-Path $POMODOROZ "pnpm-lock.yaml"
+    if (-not (Test-Path $pnpmLock)) {
+        Write-Host "  ⚠ pnpm-lock.yaml nao encontrado em $POMODOROZ." -ForegroundColor Yellow
+        Write-Host "    Execute: cd `"$POMODOROZ`" && pnpm install" -ForegroundColor Yellow
         return
     }
 
@@ -674,9 +680,76 @@ function Check-JsDependencies {
     Write-Host "  cd `"$POMODOROZ`" && pnpm dev:app" -ForegroundColor Gray
 }
 
+function Test-CargoSubcommand {
+    param([string]$Subcommand)
+
+    if (-not (Check-Command "cargo")) {
+        return $false
+    }
+
+    & cargo $Subcommand --version *> $null
+    return $LASTEXITCODE -eq 0
+}
+
+function Check-RustDependencies {
+    Step "`n[5/5] Dependencias Rust (Cargo)"
+
+    if (-not (Check-Command "cargo")) {
+        Write-Host "  Cargo nao encontrado." -ForegroundColor Red
+        return
+    }
+
+    $tauriDir = Join-Path $POMODOROZ "src-tauri"
+    $cargoToml = Join-Path $tauriDir "Cargo.toml"
+    if (-not (Test-Path $cargoToml)) {
+        Write-Host "  src-tauri/Cargo.toml nao encontrado; pulando verificacao Rust." -ForegroundColor Yellow
+        return
+    }
+
+    Write-Host "  - Workspace Rust: $tauriDir"
+
+    if (Test-CargoSubcommand "outdated") {
+        Write-Host "  - Checando crates desatualizados (cargo outdated)..."
+        Push-Location $tauriDir
+        try {
+            & cargo outdated
+            if ($LASTEXITCODE -ne 0) {
+                Write-Host "  ⚠ Falha ao executar cargo outdated." -ForegroundColor Yellow
+            }
+        } finally {
+            Pop-Location
+        }
+    } else {
+        Write-Host "  ⚠ cargo-outdated nao instalado." -ForegroundColor Yellow
+        Write-Host "    Instale com: cargo install cargo-outdated" -ForegroundColor Yellow
+    }
+
+    if (Test-CargoSubcommand "audit") {
+        Write-Host "  - Checando vulnerabilidades (cargo audit)..."
+        Push-Location $tauriDir
+        try {
+            & cargo audit
+            if ($LASTEXITCODE -ne 0) {
+                Write-Host "  ⚠ Falha ao executar cargo audit." -ForegroundColor Yellow
+            }
+        } finally {
+            Pop-Location
+        }
+    } else {
+        Write-Host "  ⚠ cargo-audit nao instalado." -ForegroundColor Yellow
+        Write-Host "    Instale com: cargo install cargo-audit" -ForegroundColor Yellow
+    }
+
+    Write-Host "  Atualizacao manual recomendada:"
+    Write-Host "    cd `"$tauriDir`" && cargo add <crate>@<versao>"
+    Write-Host "    cd `"$tauriDir`" && cargo update -p <crate> --precise <versao>"
+    Write-Host "    cd `"$tauriDir`" && cargo check"
+}
+
 Print-Header
 Check-DevEnvironment
 Check-StackVersions
 Check-FrameworkInventory
 Check-JsDependencies
+Check-RustDependencies
 Write-Host "`nOK: Verificacao concluida!" -ForegroundColor Green

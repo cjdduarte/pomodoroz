@@ -254,7 +254,7 @@ const Control: React.FC<Props> = ({
   }, [dispatch]);
 
   useEffect(() => {
-    let timeout: NodeJS.Timeout;
+    let timeout: ReturnType<typeof setTimeout>;
 
     if (warn) {
       timeout = setTimeout(() => {

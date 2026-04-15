@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Verificador de Updates para Pomodoroz (Electron-only)
+# Verificador de Updates para Pomodoroz (JS/TS + Rust)
 #
 # Uso:
 #   ./scripts/check-updates.sh              # Modo interativo (padrao)
@@ -12,6 +12,7 @@
 #
 # Modo relatorio:
 #   - Apenas exibe o status (sem alterar arquivos)
+#   - Inclui bloco Rust (cargo outdated/audit, quando disponiveis)
 #
 
 set -euo pipefail
@@ -333,7 +334,7 @@ is_major_update() {
 }
 
 check_dev_environment() {
-  echo "[1/4] Ambiente de Desenvolvimento"
+  echo "[1/5] Ambiente de Desenvolvimento"
 
   if command -v node >/dev/null 2>&1; then
     local node_version
@@ -377,7 +378,7 @@ get_pkg_version() {
 
 check_stack_versions() {
   echo ""
-  echo "[2/4] Stack Atual do Projeto"
+  echo "[2/5] Stack Atual do Projeto"
 
   if ! require_cmd node "Node nao encontrado para leitura de package.json."; then
     return
@@ -395,7 +396,7 @@ check_stack_versions() {
 
 check_framework_inventory() {
   echo ""
-  echo "[3/4] Inventario de Frameworks e Ferramentas"
+  echo "[3/5] Inventario de Frameworks e Ferramentas"
 
   local root_pkg="$POMODOROZ_DIR/package.json"
   local renderer_pkg="$POMODOROZ_DIR/app/renderer/package.json"
@@ -616,12 +617,17 @@ run_updates_for_selected() {
 
 check_js_dependencies() {
   echo ""
-  echo "[4/4] Dependencias JS/TS (pnpm)"
+  echo "[4/5] Dependencias JS/TS (pnpm)"
 
   if ! require_cmd pnpm "pnpm nao encontrado."; then
     return
   fi
   if ! require_cmd node "Node nao encontrado (necessario para parse do pnpm outdated --format json)."; then
+    return
+  fi
+  if [ ! -f "$POMODOROZ_DIR/pnpm-lock.yaml" ]; then
+    echo "  ⚠ pnpm-lock.yaml nao encontrado em $POMODOROZ_DIR."
+    echo "    Execute: cd \"$POMODOROZ_DIR\" && pnpm install"
     return
   fi
 
@@ -704,10 +710,60 @@ check_js_dependencies() {
   echo "  cd \"$POMODOROZ_DIR\" && pnpm dev:app"
 }
 
+cargo_subcommand_available() {
+  local subcommand="$1"
+  cargo "$subcommand" --version >/dev/null 2>&1
+}
+
+check_rust_dependencies() {
+  echo ""
+  echo "[5/5] Dependencias Rust (Cargo)"
+
+  if ! require_cmd cargo "Cargo nao encontrado."; then
+    return
+  fi
+
+  local tauri_dir="$POMODOROZ_DIR/src-tauri"
+  if [ ! -f "$tauri_dir/Cargo.toml" ]; then
+    echo "  src-tauri/Cargo.toml nao encontrado; pulando verificacao Rust."
+    return
+  fi
+
+  echo "  - Workspace Rust: $tauri_dir"
+
+  if cargo_subcommand_available outdated; then
+    echo "  - Checando crates desatualizados (cargo outdated)..."
+    (
+      cd "$tauri_dir" &&
+        cargo outdated
+    ) || echo "  ⚠ Falha ao executar cargo outdated."
+  else
+    echo "  ⚠ cargo-outdated nao instalado."
+    echo "    Instale com: cargo install cargo-outdated"
+  fi
+
+  if cargo_subcommand_available audit; then
+    echo "  - Checando vulnerabilidades (cargo audit)..."
+    (
+      cd "$tauri_dir" &&
+        cargo audit
+    ) || echo "  ⚠ Falha ao executar cargo audit."
+  else
+    echo "  ⚠ cargo-audit nao instalado."
+    echo "    Instale com: cargo install cargo-audit"
+  fi
+
+  echo "  Atualizacao manual recomendada:"
+  echo "    cd \"$tauri_dir\" && cargo add <crate>@<versao>"
+  echo "    cd \"$tauri_dir\" && cargo update -p <crate> --precise <versao>"
+  echo "    cd \"$tauri_dir\" && cargo check"
+}
+
 print_header
 check_dev_environment
 check_stack_versions
 check_framework_inventory
 check_js_dependencies
+check_rust_dependencies
 echo ""
 echo "OK: Verificacao concluida!"
