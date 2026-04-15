@@ -55,6 +55,7 @@
 - **`validar-tudo` migrado para `pnpm` sem fallback** — wrappers `.sh`/`.ps1` agora validam ambiente com `pnpm`, rodam lint/typecheck/build por `pnpm` e executam empacotamento/instaladores via `pnpm exec electron-builder`.
 - **Tabela de updates JS/TS corrigida no `check-updates.sh`** — parser do JSON do `pnpm outdated` agora preserva alinhamento das colunas quando `workspace` vem vazio, voltando a exibir nomes de pacote corretamente.
 - **Scripts `package.json` (root/workspaces) migrados para `pnpm`** — comandos de build/lint/start/release em `package.json`, `app/electron/package.json`, `app/renderer/package.json` e `app/shareables/package.json` deixaram de chamar `yarn`, removendo fallback implícito no prebuild/build.
+- **Execução de scripts `pnpm` ficou resiliente a ambiente sem binário no PATH** — novo wrapper `scripts/pnpmw.mjs` foi aplicado nos `package.json` (root/workspaces) para usar `pnpm` quando disponível ou `corepack pnpm` quando necessário, corrigindo erros no Windows como `'pnpm' nao e reconhecido` em fluxos `corepack pnpm run ...`.
 - **`lerna` alinhado ao `pnpm`** — `lerna.json` agora usa `npmClient: \"pnpm\"`, evitando execução de tarefas via `yarn run` nos pipelines `lerna run`.
 
 ### Documentação

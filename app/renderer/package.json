@@ -12,12 +12,12 @@
   "homepage": "./",
   "scripts": {
     "clean": "rimraf build/",
-    "prebuild": "pnpm clean && copyfiles -u 3 \"src/assets/logos/*\" ../electron/src/assets",
+    "prebuild": "node ../../scripts/pnpmw.mjs clean && copyfiles -u 3 \"src/assets/logos/*\" ../electron/src/assets",
     "build": "vite build",
     "postbuild": "copyfiles -u 1 \"build/**/*\" ../electron/build",
     "dev:renderer": "vite --host localhost --port 3000 --strictPort",
-    "start": "pnpm dev:renderer",
-    "start:vite": "pnpm dev:renderer",
+    "start": "node ../../scripts/pnpmw.mjs dev:renderer",
+    "start:vite": "node ../../scripts/pnpmw.mjs dev:renderer",
     "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\""
   },
   "babelMacros": {
