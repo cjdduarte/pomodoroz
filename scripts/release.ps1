@@ -257,7 +257,7 @@ if ($versionFromPrompt -and [Environment]::UserInteractive) {
 }
 
 Ensure-Command git
-Ensure-Command yarn
+Ensure-Command pnpm
 Ensure-Command rg
 
 $currentBranch = (& git -C $ROOT branch --show-current).Trim()
@@ -288,7 +288,7 @@ if ($LASTEXITCODE -eq 0) {
 }
 
 Step "Sincronizando versao para $targetVersion"
-Invoke-CommandChecked -FilePath yarn -Arguments @("version:sync", $targetVersion)
+Invoke-CommandChecked -FilePath pnpm -Arguments @("version:sync", $targetVersion)
 
 Step "Validando entradas de changelog para $targetVersion"
 $escapedVersion = [regex]::Escape($targetVersion)

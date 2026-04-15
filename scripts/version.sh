@@ -4,6 +4,16 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 APP_DIR="$ROOT"
 
+die() {
+  printf "Erro: %s\n" "$1" >&2
+  exit 1
+}
+
+detect_package_manager() {
+  command -v pnpm >/dev/null 2>&1 || die "pnpm nao encontrado."
+  echo "pnpm"
+}
+
 get_suggested_version() {
   local current_major current_minor
   local max_patch=0
@@ -111,7 +121,8 @@ fi
 
 TARGET_VERSION_RAW="${INPUT_VERSION:-$SUGGESTED_VERSION}"
 TARGET_VERSION="$(normalize_version "$TARGET_VERSION_RAW")"
-COMMAND="yarn version:sync ${TARGET_VERSION}"
+PACKAGE_MANAGER="$(detect_package_manager)"
+COMMAND="${PACKAGE_MANAGER} version:sync ${TARGET_VERSION}"
 
 printf "Versao sugerida (data + tags locais): %s\n" "$SUGGESTED_VERSION"
 if [[ "$TARGET_VERSION" != "$TARGET_VERSION_RAW" ]]; then
@@ -132,4 +143,4 @@ if (( VERSION_FROM_PROMPT == 1 )) && [[ -t 0 ]]; then
   fi
 fi
 
-( cd "$APP_DIR" && yarn version:sync "$TARGET_VERSION" )
+( cd "$APP_DIR" && pnpm version:sync "$TARGET_VERSION" )

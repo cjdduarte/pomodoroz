@@ -5,6 +5,31 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+function Resolve-PackageManager {
+    if (-not (Get-Command pnpm -ErrorAction SilentlyContinue)) {
+        throw "pnpm nao encontrado."
+    }
+    return "pnpm"
+}
+
+function Invoke-PackageManager {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$PackageManager,
+        [Parameter(Mandatory = $true)]
+        [string[]]$Arguments
+    )
+
+    & pnpm @Arguments
+
+    if (-not $?) {
+        throw "Falha ao executar $PackageManager $($Arguments -join ' ')"
+    }
+    if ($LASTEXITCODE -ne $null -and $LASTEXITCODE -ne 0) {
+        throw "Falha ao executar $PackageManager $($Arguments -join ' ')"
+    }
+}
+
 function Show-Usage {
     @"
 Uso:
@@ -131,8 +156,9 @@ if ([string]::IsNullOrWhiteSpace($Version)) {
 
 $rawVersion = $Version
 $Version = Normalize-Version -RawVersion $rawVersion
+$packageManager = Resolve-PackageManager
 
-$command = "yarn version:sync $Version"
+$command = "$packageManager version:sync $Version"
 Write-Host "Versao sugerida (data + tags locais): $SUGGESTED_VERSION"
 if ($rawVersion -ne $Version) {
     Write-Host "Versao normalizada: $rawVersion -> $Version"
@@ -156,5 +182,5 @@ if ($versionFromPrompt) {
 }
 
 Push-Location $APP_DIR
-yarn version:sync $Version
+Invoke-PackageManager -PackageManager $packageManager -Arguments @("version:sync", $Version)
 Pop-Location

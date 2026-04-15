@@ -48,6 +48,7 @@
 - **External link opening on Tauri fixed through native opener path** — support/help links and release-note opening no longer rely on `window.open`/`target=\"_blank\"`; they now use `plugin-opener` (`@tauri-apps/plugin-opener` + `tauri-plugin-opener`).
 - **Notification permission request moved to user-gesture flow** — permission prompting was moved out of async timer events into Settings interaction (notification type selection), avoiding WebKit/Tauri prompt rejection (`Notification prompting can only be done from a user gesture`).
 - **Initial global shortcuts migrated to Tauri (Phase 2c kickoff)** — Rust backend now registers `Alt+Shift+H` (hide app; fallback to minimize when tray is unavailable) and `Alt+Shift+S` (restore/focus window), matching Electron behavior.
+- **`version/release/check-updates` scripts migrated to `pnpm` with no fallback** — `.sh`/`.ps1` pairs now require `pnpm`, use `pnpm version:sync` for version/release flows, and run updates via `pnpm outdated --format json` + `pnpm add`.
 
 ### Documentation
 

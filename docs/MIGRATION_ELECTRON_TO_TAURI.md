@@ -330,6 +330,11 @@ Phase 2i kickoff snapshot (2026-04-15):
   - Generate `pnpm-lock.yaml`, remove `yarn.lock`
   - Update CI and scripts to use `pnpm`
   - Keep monorepo structure intact (still `app/*` workspaces)
+- Progress snapshot (2026-04-15):
+  - [x] `version.sh/.ps1`, `release.sh/.ps1`, and `check-updates.sh/.ps1` migrated to `pnpm` without Yarn fallback.
+  - [ ] `validar-tudo.sh/.ps1` and `install.sh/.ps1` still pending migration to `pnpm`.
+  - [ ] Root scripts/workspace commands and lockfile transition (`pnpm-lock.yaml`, `yarn.lock` removal) still pending.
+  - [ ] GitHub Actions workflow migration (`yarn` -> `pnpm`) still pending.
 - Validation:
   - `pnpm install` succeeds
   - `pnpm dev` / `pnpm build` / `pnpm lint` work

@@ -220,15 +220,11 @@ function Check-DevEnvironment {
         Write-Host "  Node.js: ❌ nao encontrado" -ForegroundColor Red
     }
 
-    if (Check-Command "yarn") {
-        $yarnVersion = yarn --version
-        if ($yarnVersion -like "1.*") {
-            Write-Host "  Yarn: $yarnVersion ✓ (Classic)" -ForegroundColor Green
-        } else {
-            Write-Host "  Yarn: $yarnVersion ⚠ (projeto usa Yarn Classic 1.x)" -ForegroundColor Yellow
-        }
+    if (Check-Command "pnpm") {
+        $pnpmVersion = pnpm --version
+        Write-Host "  pnpm: $pnpmVersion ✓" -ForegroundColor Green
     } else {
-        Write-Host "  Yarn: ❌ nao encontrado" -ForegroundColor Red
+        Write-Host "  pnpm: ❌ nao encontrado" -ForegroundColor Red
     }
 }
 
@@ -310,7 +306,7 @@ function Get-WorkspaceOutdatedRows {
 
     Push-Location $WorkspacePath
     try {
-        $raw = yarn outdated --json 2>&1
+        $rawLines = pnpm outdated --format json 2>&1
         $status = $LASTEXITCODE
     } finally {
         Pop-Location
@@ -322,115 +318,124 @@ function Get-WorkspaceOutdatedRows {
         return $rows
     }
 
-    # Em alguns cenarios, o Yarn retorna exit code 1 tanto para "ha updates"
-    # quanto para erro de rede/registry. Detectamos erro no payload JSON.
-    $errorLine = $raw | Where-Object { $_ -match '"type":"error"' } | Select-Object -First 1
-    if ($null -ne $errorLine -and "$errorLine" -ne "") {
+    $rawText = (($rawLines | ForEach-Object { "$_" }) -join "`n").Trim()
+    if ($rawText -match "ERR_PNPM") {
         $script:OutdatedCheckFailed = $true
-        $errorText = $null
-        try {
-            $errorObj = $errorLine | ConvertFrom-Json
-            if ($null -ne $errorObj -and $errorObj.type -eq "error") {
-                $errorText = "$($errorObj.data)"
-            }
-        } catch {
-            $errorText = $null
-        }
-
-        if ([string]::IsNullOrWhiteSpace($errorText)) {
-            Write-Host "  ⚠ [$WorkspaceName] falha ao consultar updates (erro retornado pelo Yarn)." -ForegroundColor Yellow
+        $preview = ($rawText -split "`n" | Select-Object -First 4) -join " "
+        if ([string]::IsNullOrWhiteSpace($preview)) {
+            Write-Host "  ⚠ [$WorkspaceName] falha ao consultar updates (erro retornado pelo pnpm)." -ForegroundColor Yellow
         } else {
-            Write-Host "  ⚠ [$WorkspaceName] falha ao consultar updates: $errorText" -ForegroundColor Yellow
+            Write-Host "  ⚠ [$WorkspaceName] falha ao consultar updates: $preview" -ForegroundColor Yellow
         }
         return $rows
     }
 
-    foreach ($line in $raw) {
-        if ([string]::IsNullOrWhiteSpace($line)) {
-            continue
+    if ([string]::IsNullOrWhiteSpace($rawText)) {
+        if ($status -eq 1) {
+            $script:OutdatedCheckFailed = $true
+            Write-Host "  ⚠ [$WorkspaceName] resultado inconclusivo: pnpm retornou status 1, mas sem payload JSON." -ForegroundColor Yellow
         }
-        try {
-            $obj = $line | ConvertFrom-Json
-        } catch {
-            continue
-        }
+        return $rows
+    }
 
-        if ($obj.type -ne "table") {
-            continue
+    $parsed = $null
+    try {
+        $parsed = $rawText | ConvertFrom-Json
+    } catch {
+        if ($status -eq 1) {
+            $script:OutdatedCheckFailed = $true
+            Write-Host "  ⚠ [$WorkspaceName] resultado inconclusivo: pnpm retornou status 1, mas o JSON nao foi parseado." -ForegroundColor Yellow
         }
-        if ($null -eq $obj.data -or $null -eq $obj.data.body) {
-            continue
-        }
+        return $rows
+    }
 
-        $head = @()
-        if ($null -ne $obj.data.head) {
-            $head = @($obj.data.head)
-        }
+    $rowsList = New-Object 'System.Collections.Generic.List[object]'
 
-        $workspaceIndex = [Array]::IndexOf($head, "Workspace")
-        $packageIndex = [Array]::IndexOf($head, "Package")
-        $currentIndex = [Array]::IndexOf($head, "Current")
-        $wantedIndex = [Array]::IndexOf($head, "Wanted")
-        $latestIndex = [Array]::IndexOf($head, "Latest")
-        $packageTypeIndex = [Array]::IndexOf($head, "Package Type")
+    function Add-RowFromEntry {
+        param(
+            [string]$FallbackPackageName,
+            [object]$Entry
+        )
 
-        if ($packageIndex -lt 0) {
-            # fallback para formato antigo sem head mapeado
-            $packageIndex = 0
-            $currentIndex = 1
-            $wantedIndex = 2
-            $latestIndex = 3
-            $packageTypeIndex = 4
+        if ($null -eq $Entry) {
+            return
         }
 
-        foreach ($row in $obj.data.body) {
-            if ($row.Count -le $packageIndex) {
-                continue
-            }
+        $package = "$($Entry.name)"
+        if ([string]::IsNullOrWhiteSpace($package)) {
+            $package = "$($Entry.package)"
+        }
+        if ([string]::IsNullOrWhiteSpace($package)) {
+            $package = $FallbackPackageName
+        }
+        if ([string]::IsNullOrWhiteSpace($package)) {
+            return
+        }
 
-            $workspaceRaw = ""
-            if ($workspaceIndex -ge 0 -and $workspaceIndex -lt $row.Count) {
-                $workspaceRaw = "$($row[$workspaceIndex])"
+        $workspace = $WorkspaceName
+        $workspaceRaw = "$($Entry.workspace)"
+        if ([string]::IsNullOrWhiteSpace($workspaceRaw)) {
+            $workspaceRaw = "$($Entry.project)"
+        }
+        if ([string]::IsNullOrWhiteSpace($workspaceRaw)) {
+            $workspaceRaw = "$($Entry.location)"
+        }
+        if (-not [string]::IsNullOrWhiteSpace($workspaceRaw)) {
+            $candidateWorkspace = Normalize-WorkspaceName -WorkspaceName $workspaceRaw
+            $workspaceExists = $Workspaces | Where-Object { $_.Name -eq $candidateWorkspace } | Select-Object -First 1
+            if ($null -ne $workspaceExists) {
+                $workspace = $candidateWorkspace
             }
+        }
 
-            $workspace = if ([string]::IsNullOrWhiteSpace($workspaceRaw)) {
-                $WorkspaceName
-            } else {
-                Normalize-WorkspaceName -WorkspaceName $workspaceRaw
-            }
+        $current = "$($Entry.current)"
+        $wanted = "$($Entry.wanted)"
+        $latest = "$($Entry.latest)"
+        $packageType = "$($Entry.dependencyType)"
+        if ([string]::IsNullOrWhiteSpace($packageType)) {
+            $packageType = "$($Entry.packageType)"
+        }
+        if ([string]::IsNullOrWhiteSpace($packageType)) {
+            $packageType = "$($Entry.type)"
+        }
 
-            $package = if ($packageIndex -lt $row.Count) { "$($row[$packageIndex])" } else { "" }
-            $current = if ($currentIndex -ge 0 -and $currentIndex -lt $row.Count) { "$($row[$currentIndex])" } else { "" }
-            $wanted = if ($wantedIndex -ge 0 -and $wantedIndex -lt $row.Count) { "$($row[$wantedIndex])" } else { "" }
-            $latest = if ($latestIndex -ge 0 -and $latestIndex -lt $row.Count) { "$($row[$latestIndex])" } else { "" }
-            $packageType = if ($packageTypeIndex -ge 0 -and $packageTypeIndex -lt $row.Count) { "$($row[$packageTypeIndex])" } else { "" }
+        $dedupeKey = "$workspace`t$package`t$current`t$wanted`t$latest`t$packageType"
+        if ($script:OutdatedSeen.Contains($dedupeKey)) {
+            return
+        }
+        [void]$script:OutdatedSeen.Add($dedupeKey)
 
-            if ([string]::IsNullOrWhiteSpace($package)) {
-                continue
-            }
+        $item = [PSCustomObject]@{
+            Workspace   = $workspace
+            Package     = $package
+            Current     = $current
+            Wanted      = $wanted
+            Latest      = $latest
+            PackageType = $packageType
+        }
+        $item | Add-Member -NotePropertyName "IsMajor" -NotePropertyValue (Is-MajorUpdate -Current $item.Current -Latest $item.Latest)
+        [void]$rowsList.Add($item)
+    }
 
-            $dedupeKey = "$workspace`t$package`t$current`t$wanted`t$latest`t$packageType"
-            if ($script:OutdatedSeen.Contains($dedupeKey)) {
-                continue
-            }
-            [void]$script:OutdatedSeen.Add($dedupeKey)
-
-            $item = [PSCustomObject]@{
-                Workspace   = $workspace
-                Package     = $package
-                Current     = $current
-                Wanted      = $wanted
-                Latest      = $latest
-                PackageType = $packageType
-            }
-            $item | Add-Member -NotePropertyName "IsMajor" -NotePropertyValue (Is-MajorUpdate -Current $item.Current -Latest $item.Latest)
-            $rows += $item
+    if ($parsed -is [System.Collections.IDictionary]) {
+        foreach ($entry in $parsed.GetEnumerator()) {
+            Add-RowFromEntry -FallbackPackageName "$($entry.Key)" -Entry $entry.Value
+        }
+    } elseif ($parsed -is [System.Collections.IEnumerable] -and -not ($parsed -is [string])) {
+        foreach ($entry in $parsed) {
+            Add-RowFromEntry -FallbackPackageName "" -Entry $entry
+        }
+    } elseif ($null -ne $parsed.packages -and $parsed.packages -is [System.Collections.IEnumerable]) {
+        foreach ($entry in $parsed.packages) {
+            Add-RowFromEntry -FallbackPackageName "" -Entry $entry
         }
     }
 
+    $rows = @($rowsList)
+
     if ($status -eq 1 -and $rows.Count -eq 0) {
         $script:OutdatedCheckFailed = $true
-        Write-Host "  ⚠ [$WorkspaceName] resultado inconclusivo: Yarn retornou status 1, mas nao foi possivel parsear tabela de updates." -ForegroundColor Yellow
+        Write-Host "  ⚠ [$WorkspaceName] resultado inconclusivo: pnpm retornou status 1, mas nao foi possivel montar a tabela de updates." -ForegroundColor Yellow
     }
 
     return $rows
@@ -525,41 +530,41 @@ function Invoke-WorkspaceTypedUpdate {
     switch ("$($Row.PackageType)") {
         "devDependencies" {
             if ($Exact) {
-                Write-Host "  -> [$($row.Workspace)] yarn add -D --exact $($row.Package)@$TargetVersion"
-                yarn add -D --exact "$($row.Package)@$TargetVersion"
+                Write-Host "  -> [$($row.Workspace)] pnpm add -D -E $($row.Package)@$TargetVersion"
+                pnpm add -D -E "$($row.Package)@$TargetVersion"
             } else {
-                Write-Host "  -> [$($row.Workspace)] yarn add -D $($row.Package)@$TargetVersion"
-                yarn add -D "$($row.Package)@$TargetVersion"
+                Write-Host "  -> [$($row.Workspace)] pnpm add -D $($row.Package)@$TargetVersion"
+                pnpm add -D "$($row.Package)@$TargetVersion"
             }
             break
         }
         "dependencies" {
             if ($Exact) {
-                Write-Host "  -> [$($row.Workspace)] yarn add --exact $($row.Package)@$TargetVersion"
-                yarn add --exact "$($row.Package)@$TargetVersion"
+                Write-Host "  -> [$($row.Workspace)] pnpm add -E $($row.Package)@$TargetVersion"
+                pnpm add -E "$($row.Package)@$TargetVersion"
             } else {
-                Write-Host "  -> [$($row.Workspace)] yarn add $($row.Package)@$TargetVersion"
-                yarn add "$($row.Package)@$TargetVersion"
+                Write-Host "  -> [$($row.Workspace)] pnpm add $($row.Package)@$TargetVersion"
+                pnpm add "$($row.Package)@$TargetVersion"
             }
             break
         }
         "optionalDependencies" {
             if ($Exact) {
-                Write-Host "  -> [$($row.Workspace)] yarn add --optional --exact $($row.Package)@$TargetVersion"
-                yarn add --optional --exact "$($row.Package)@$TargetVersion"
+                Write-Host "  -> [$($row.Workspace)] pnpm add -O -E $($row.Package)@$TargetVersion"
+                pnpm add -O -E "$($row.Package)@$TargetVersion"
             } else {
-                Write-Host "  -> [$($row.Workspace)] yarn add --optional $($row.Package)@$TargetVersion"
-                yarn add --optional "$($row.Package)@$TargetVersion"
+                Write-Host "  -> [$($row.Workspace)] pnpm add -O $($row.Package)@$TargetVersion"
+                pnpm add -O "$($row.Package)@$TargetVersion"
             }
             break
         }
         default {
             if ($Exact) {
-                Write-Host "  -> [$($row.Workspace)] tipo '$($row.PackageType)' sem suporte direto para --exact; fallback: yarn upgrade --latest $($row.Package)@$TargetVersion"
-                yarn upgrade --latest "$($row.Package)@$TargetVersion"
+                Write-Host "  -> [$($row.Workspace)] tipo '$($row.PackageType)' sem suporte direto para -E; fallback: pnpm add -E $($row.Package)@$TargetVersion"
+                pnpm add -E "$($row.Package)@$TargetVersion"
             } else {
-                Write-Host "  -> [$($row.Workspace)] tipo '$($row.PackageType)' sem suporte direto; fallback: yarn upgrade $($row.Package)@$TargetVersion"
-                yarn upgrade "$($row.Package)@$TargetVersion"
+                Write-Host "  -> [$($row.Workspace)] tipo '$($row.PackageType)' sem suporte direto; fallback: pnpm add $($row.Package)@$TargetVersion"
+                pnpm add "$($row.Package)@$TargetVersion"
             }
         }
     }
@@ -583,11 +588,11 @@ function Invoke-WorkspaceUpdate {
             $targetVersion = Get-TargetVersion -Row $row -UseLatest:$UseLatest
             if ([string]::IsNullOrWhiteSpace($targetVersion)) {
                 if ($UseLatest) {
-                    Write-Host "  -> [$($row.Workspace)] sem target inferido; fallback: yarn upgrade --latest $($row.Package)"
-                    yarn upgrade --latest $row.Package
+                    Write-Host "  -> [$($row.Workspace)] sem target inferido; fallback: pnpm add $($row.Package)"
+                    pnpm add $row.Package
                 } else {
-                    Write-Host "  -> [$($row.Workspace)] sem target inferido; fallback: yarn upgrade $($row.Package)"
-                    yarn upgrade $row.Package
+                    Write-Host "  -> [$($row.Workspace)] sem target inferido; fallback: pnpm add $($row.Package)"
+                    pnpm add $row.Package
                 }
                 continue
             }
@@ -614,10 +619,10 @@ function Invoke-WorkspaceUpdate {
 }
 
 function Check-JsDependencies {
-    Step "`n[4/4] Dependencias JS/TS (Yarn)"
+    Step "`n[4/4] Dependencias JS/TS (pnpm)"
 
-    if (-not (Check-Command "yarn")) {
-        Write-Host "  Yarn nao encontrado." -ForegroundColor Red
+    if (-not (Check-Command "pnpm")) {
+        Write-Host "  pnpm nao encontrado." -ForegroundColor Red
         return
     }
 
@@ -665,8 +670,8 @@ function Check-JsDependencies {
 
     Write-Host "`n✓ Updates concluidos." -ForegroundColor Green
     Write-Host 'Recomendado:' -ForegroundColor Gray
-    Write-Host "  cd `"$POMODOROZ`" && yarn build" -ForegroundColor Gray
-    Write-Host "  cd `"$POMODOROZ`" && yarn dev:app" -ForegroundColor Gray
+    Write-Host "  cd `"$POMODOROZ`" && pnpm build" -ForegroundColor Gray
+    Write-Host "  cd `"$POMODOROZ`" && pnpm dev:app" -ForegroundColor Gray
 }
 
 Print-Header

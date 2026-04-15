@@ -229,7 +229,7 @@ if (( VERSION_FROM_PROMPT == 1 )) && [[ -t 0 ]]; then
 fi
 
 command -v git >/dev/null 2>&1 || die "git nao encontrado."
-command -v yarn >/dev/null 2>&1 || die "yarn nao encontrado."
+command -v pnpm >/dev/null 2>&1 || die "pnpm nao encontrado."
 command -v rg >/dev/null 2>&1 || die "rg nao encontrado."
 
 CURRENT_BRANCH="$(git -C "$APP_DIR" branch --show-current)"
@@ -250,7 +250,7 @@ if git -C "$APP_DIR" ls-remote --exit-code --tags origin "refs/tags/$TARGET_TAG"
 fi
 
 step "Sincronizando versao para $TARGET_VERSION"
-run_cmd "cd \"$APP_DIR\" && yarn version:sync \"$TARGET_VERSION\""
+run_cmd "cd \"$APP_DIR\" && pnpm version:sync \"$TARGET_VERSION\""
 
 step "Validando entradas de changelog para $TARGET_VERSION"
 if ! rg -q "^## \\[$TARGET_VERSION\\]" "$APP_DIR/CHANGELOG.md"; then

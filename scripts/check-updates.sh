@@ -230,20 +230,20 @@ apply_exact_update_by_type() {
 
   case "$ptype" in
     devDependencies)
-      echo "  -> [$ws] aplicando exato: yarn add -D --exact $pkg@$latest"
-      ( cd "$ws_dir" && yarn add -D --exact "$pkg@$latest" )
+      echo "  -> [$ws] aplicando exato: pnpm add -D -E $pkg@$latest"
+      ( cd "$ws_dir" && pnpm add -D -E "$pkg@$latest" )
       ;;
     dependencies)
-      echo "  -> [$ws] aplicando exato: yarn add --exact $pkg@$latest"
-      ( cd "$ws_dir" && yarn add --exact "$pkg@$latest" )
+      echo "  -> [$ws] aplicando exato: pnpm add -E $pkg@$latest"
+      ( cd "$ws_dir" && pnpm add -E "$pkg@$latest" )
       ;;
     optionalDependencies)
-      echo "  -> [$ws] aplicando exato: yarn add --optional --exact $pkg@$latest"
-      ( cd "$ws_dir" && yarn add --optional --exact "$pkg@$latest" )
+      echo "  -> [$ws] aplicando exato: pnpm add -O -E $pkg@$latest"
+      ( cd "$ws_dir" && pnpm add -O -E "$pkg@$latest" )
       ;;
     *)
-      echo "  -> [$ws] tipo '$ptype' sem suporte direto para --exact; fallback: yarn upgrade --latest $pkg@$latest"
-      ( cd "$ws_dir" && yarn upgrade --latest "$pkg@$latest" )
+      echo "  -> [$ws] tipo '$ptype' sem suporte direto para -E; fallback: pnpm add -E $pkg@$latest"
+      ( cd "$ws_dir" && pnpm add -E "$pkg@$latest" )
       ;;
   esac
 }
@@ -257,20 +257,20 @@ apply_update_by_type() {
 
   case "$ptype" in
     devDependencies)
-      echo "  -> [$ws] yarn add -D $pkg@$target"
-      ( cd "$ws_dir" && yarn add -D "$pkg@$target" )
+      echo "  -> [$ws] pnpm add -D $pkg@$target"
+      ( cd "$ws_dir" && pnpm add -D "$pkg@$target" )
       ;;
     dependencies)
-      echo "  -> [$ws] yarn add $pkg@$target"
-      ( cd "$ws_dir" && yarn add "$pkg@$target" )
+      echo "  -> [$ws] pnpm add $pkg@$target"
+      ( cd "$ws_dir" && pnpm add "$pkg@$target" )
       ;;
     optionalDependencies)
-      echo "  -> [$ws] yarn add --optional $pkg@$target"
-      ( cd "$ws_dir" && yarn add --optional "$pkg@$target" )
+      echo "  -> [$ws] pnpm add -O $pkg@$target"
+      ( cd "$ws_dir" && pnpm add -O "$pkg@$target" )
       ;;
     *)
-      echo "  -> [$ws] tipo '$ptype' sem suporte direto; fallback: yarn upgrade $pkg@$target"
-      ( cd "$ws_dir" && yarn upgrade "$pkg@$target" )
+      echo "  -> [$ws] tipo '$ptype' sem suporte direto; fallback: pnpm add $pkg@$target"
+      ( cd "$ws_dir" && pnpm add "$pkg@$target" )
       ;;
   esac
 }
@@ -351,17 +351,12 @@ check_dev_environment() {
     echo "  Node.js: ❌ nao encontrado"
   fi
 
-  if command -v yarn >/dev/null 2>&1; then
-    local yarn_version
-    yarn_version="$(yarn --version)"
-    printf "  Yarn: %s" "$yarn_version"
-    if [[ "$yarn_version" == 1.* ]]; then
-      echo " ✓ (Classic)"
-    else
-      echo " ⚠ (projeto atualmente usa Yarn Classic 1.x)"
-    fi
+  if command -v pnpm >/dev/null 2>&1; then
+    local pnpm_version
+    pnpm_version="$(pnpm --version)"
+    echo "  pnpm: ${pnpm_version} ✓"
   else
-    echo "  Yarn: ❌ nao encontrado"
+    echo "  pnpm: ❌ nao encontrado"
   fi
 }
 
@@ -457,11 +452,11 @@ collect_workspace_outdated() {
 
   local raw status
   set +e
-  raw="$(cd "$ws_dir" && yarn outdated --json 2>&1)"
+  raw="$(cd "$ws_dir" && pnpm outdated --format json 2>&1)"
   status=$?
   set -e
 
-  # yarn outdated:
+  # pnpm outdated:
   # 0 = sem updates
   # 1 = existem updates
   # >1 = falha
@@ -471,16 +466,14 @@ collect_workspace_outdated() {
     return
   fi
 
-  # Em alguns cenarios, yarn retorna exit code 1 tanto para "ha updates"
-  # quanto para erro de rede/registry. Detectamos erro explicitamente no JSON.
-  if printf "%s\n" "$raw" | grep -q '"type":"error"'; then
+  if printf "%s\n" "$raw" | grep -q "ERR_PNPM"; then
     OUTDATED_CHECK_FAILED=1
     local err
-    err="$(printf "%s\n" "$raw" | sed -n 's/.*"type":"error","data":"\(.*\)".*/\1/p' | head -n 1)"
+    err="$(printf "%s\n" "$raw" | sed -n '1,5p' | tr '\n' ' ' | sed -E 's/[[:space:]]+/ /g')"
     if [ -n "$err" ]; then
       echo "  ⚠ [$ws_name] falha ao consultar updates: $err"
     else
-      echo "  ⚠ [$ws_name] falha ao consultar updates (erro retornado pelo yarn)."
+      echo "  ⚠ [$ws_name] falha ao consultar updates (erro retornado pelo pnpm)."
     fi
     return
   fi
@@ -489,45 +482,43 @@ collect_workspace_outdated() {
   parsed="$(
     printf "%s\n" "$raw" | node -e '
 const fs = require("fs");
+const raw = fs.readFileSync(0, "utf8").trim();
+if (!raw) process.exit(0);
 
-const lines = fs.readFileSync(0, "utf8").split(/\r?\n/);
-for (const line of lines) {
-  const trimmed = line.trim();
-  if (!trimmed) continue;
+let data;
+try {
+  data = JSON.parse(raw);
+} catch {
+  process.exit(0);
+}
 
-  let obj;
-  try {
-    obj = JSON.parse(trimmed);
-  } catch {
-    continue;
+const rows = [];
+const pushRow = (pkgName, obj) => {
+  if (!obj || typeof obj !== "object") return;
+  const pkg = String(pkgName || obj.name || obj.package || "").trim();
+  if (!pkg) return;
+  const current = String(obj.current ?? "").replace(/\t/g, " ");
+  const wanted = String(obj.wanted ?? "").replace(/\t/g, " ");
+  const latest = String(obj.latest ?? "").replace(/\t/g, " ");
+  const packageType = String(obj.dependencyType ?? obj.packageType ?? obj.type ?? "").replace(/\t/g, " ");
+  const workspace = String(obj.workspace ?? obj.project ?? obj.location ?? "").replace(/\t/g, " ");
+  rows.push([workspace, pkg, current, wanted, latest, packageType].join("\t"));
+};
+
+if (Array.isArray(data)) {
+  for (const obj of data) pushRow("", obj);
+} else if (data && typeof data === "object") {
+  if (Array.isArray(data.packages)) {
+    for (const obj of data.packages) pushRow("", obj);
+  } else {
+    for (const [pkgName, obj] of Object.entries(data)) {
+      pushRow(pkgName, obj);
+    }
   }
+}
 
-  if (obj.type !== "table") continue;
-
-  const data = obj.data || {};
-  const head = Array.isArray(data.head) ? data.head : [];
-  const body = Array.isArray(data.body) ? data.body : [];
-  const idx = new Map(head.map((name, i) => [String(name), i]));
-
-  const val = (row, key) => {
-    const i = idx.get(key);
-    if (typeof i !== "number" || i >= row.length) return "";
-    const value = row[i];
-    return value == null ? "" : String(value).replace(/\t/g, " ");
-  };
-
-  for (const row of body) {
-    process.stdout.write(
-      [
-        val(row, "Workspace"),
-        val(row, "Package"),
-        val(row, "Current"),
-        val(row, "Wanted"),
-        val(row, "Latest"),
-        val(row, "Package Type"),
-      ].join("\t") + "\n"
-    );
-  }
+if (rows.length > 0) {
+  process.stdout.write(rows.join("\n"));
 }
 '
   )"
@@ -535,16 +526,20 @@ for (const line of lines) {
   if [ -z "$parsed" ]; then
     if [ "$status" -eq 1 ]; then
       OUTDATED_CHECK_FAILED=1
-      echo "  ⚠ [$ws_name] resultado inconclusivo: yarn retornou status 1, mas nao foi possivel parsear tabela de updates."
+      echo "  ⚠ [$ws_name] resultado inconclusivo: pnpm retornou status 1, mas nao foi possivel parsear tabela de updates."
     fi
     return
   fi
 
-  while IFS=$'\t' read -r ws_from_yarn pkg current wanted latest ptype; do
+  while IFS=$'\t' read -r ws_from_tool pkg current wanted latest ptype; do
     [ -z "$pkg" ] && continue
     local effective_ws="$ws_name"
-    if [ -n "${ws_from_yarn:-}" ]; then
-      effective_ws="$(normalize_workspace_name "$ws_from_yarn")"
+    if [ -n "${ws_from_tool:-}" ]; then
+      local normalized_ws
+      normalized_ws="$(normalize_workspace_name "$ws_from_tool")"
+      if workspace_dir_by_name "$normalized_ws" >/dev/null 2>&1; then
+        effective_ws="$normalized_ws"
+      fi
     fi
     add_outdated_row "$effective_ws" "$pkg" "$current" "$wanted" "$latest" "$ptype"
   done <<< "$parsed"
@@ -587,7 +582,7 @@ run_updates_for_selected() {
     fi
 
     if [ "$mode" = "safe" ]; then
-      # Ex.: "electron": "41.0.3" (range fixa). `yarn upgrade` nao altera esse caso.
+      # Ex.: "electron": "41.0.3" (range fixa). Precisamos aplicar target explicito.
       # Quando current==wanted e latest!=current, aplicamos versao explicita.
       if [ "$current" = "$wanted" ] && [ "$latest" != "$current" ]; then
         echo "  -> [$ws] versao fixa detectada para $pkg"
@@ -603,8 +598,8 @@ run_updates_for_selected() {
           target_version="$(apply_declared_semver_prefix "$ws_dir" "$pkg" "$ptype" "$target_version")"
           apply_update_by_type "$ws" "$ws_dir" "$pkg" "$target_version" "$ptype"
         else
-          echo "  -> [$ws] sem target inferido; fallback: yarn upgrade $pkg"
-          ( cd "$ws_dir" && yarn upgrade "$pkg" )
+          echo "  -> [$ws] sem target inferido; fallback: pnpm add $pkg"
+          ( cd "$ws_dir" && pnpm add "$pkg" )
         fi
       fi
     else
@@ -621,12 +616,12 @@ run_updates_for_selected() {
 
 check_js_dependencies() {
   echo ""
-  echo "[4/4] Dependencias JS/TS (Yarn)"
+  echo "[4/4] Dependencias JS/TS (pnpm)"
 
-  if ! require_cmd yarn "Yarn nao encontrado."; then
+  if ! require_cmd pnpm "pnpm nao encontrado."; then
     return
   fi
-  if ! require_cmd node "Node nao encontrado (necessario para parse do yarn outdated --json)."; then
+  if ! require_cmd node "Node nao encontrado (necessario para parse do pnpm outdated --format json)."; then
     return
   fi
 
@@ -704,9 +699,9 @@ check_js_dependencies() {
   echo ""
   echo "✓ Updates concluidos."
   echo "Recomendado:"
-  echo "  cd \"$POMODOROZ_DIR\" && yarn install"
-  echo "  cd \"$POMODOROZ_DIR\" && yarn build"
-  echo "  cd \"$POMODOROZ_DIR\" && yarn dev:app"
+  echo "  cd \"$POMODOROZ_DIR\" && pnpm install"
+  echo "  cd \"$POMODOROZ_DIR\" && pnpm build"
+  echo "  cd \"$POMODOROZ_DIR\" && pnpm dev:app"
 }
 
 print_header
