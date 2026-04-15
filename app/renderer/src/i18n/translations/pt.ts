@@ -168,13 +168,13 @@ export const pt = {
       description:
         "Exporte suas listas/tarefas para JSON ou importe um arquivo salvo.",
       desktopOnly:
-        "Importação/exportação disponível apenas no app desktop Electron.",
+        "Importação/exportação disponível apenas no app desktop.",
       export: "Exportar tarefas",
       exporting: "Exportando...",
       import: "Importar tarefas",
       importing: "Importando...",
-      merge: "Mesclar com atuais",
-      replace: "Substituir atuais",
+      merge: "Mesclar",
+      replace: "Substituir",
       unknownFile: "arquivo desconhecido",
       pendingSummary:
         "Versão {{version}} • {{lists}} listas • {{cards}} tarefas • {{file}}",

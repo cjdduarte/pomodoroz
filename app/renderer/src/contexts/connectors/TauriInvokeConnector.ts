@@ -5,6 +5,10 @@ import {
   enable as enableAutostart,
 } from "@tauri-apps/plugin-autostart";
 import {
+  open as openDialog,
+  save as saveDialog,
+} from "@tauri-apps/plugin-dialog";
+import {
   detectSystemLanguage,
   normalizeLanguageCode,
 } from "i18n/languages";
@@ -182,28 +186,40 @@ const emitTasksImportResult = async (
   await emitFromMain(TASKS_IMPORT_RESULT, payload);
 };
 
-const exportTasksFallback = async (
+const TASK_TRANSFER_FILTERS = [
+  {
+    name: "JSON",
+    extensions: ["json"],
+  },
+];
+
+const exportTasksWithNativeDialog = async (
   payload: ExportTasksDialogPayload
 ) => {
   try {
-    const blob = new Blob([payload.content], {
-      type: "application/json;charset=utf-8",
+    const filePath = await saveDialog({
+      defaultPath:
+        payload.suggestedFileName || "pomodoroz-tasks-export.json",
+      filters: TASK_TRANSFER_FILTERS,
     });
-    const objectUrl = URL.createObjectURL(blob);
 
-    const anchor = document.createElement("a");
-    anchor.href = objectUrl;
-    anchor.download =
-      payload.suggestedFileName || "pomodoroz-tasks-export.json";
-    anchor.style.display = "none";
-    document.body.append(anchor);
-    anchor.click();
-    anchor.remove();
-    URL.revokeObjectURL(objectUrl);
+    if (!filePath) {
+      await emitTasksExportResult({
+        ok: false,
+        canceled: true,
+      });
+      return;
+    }
+
+    await invoke("write_text_file", {
+      filePath,
+      content: payload.content,
+    });
 
     await emitTasksExportResult({
       ok: true,
       canceled: false,
+      filePath,
     });
   } catch (error) {
     await emitTasksExportResult({
@@ -214,70 +230,44 @@ const exportTasksFallback = async (
   }
 };
 
-const importTasksFallback = async () => {
+const importTasksWithNativeDialog = async () => {
   try {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = ".json,application/json";
-    input.style.display = "none";
-    document.body.append(input);
+    const selectedPath = await openDialog({
+      multiple: false,
+      directory: false,
+      filters: TASK_TRANSFER_FILTERS,
+    });
 
-    let handled = false;
-    const cleanup = () => {
-      input.remove();
-    };
-
-    const markCanceled = () => {
-      if (handled) return;
-      handled = true;
-      cleanup();
-      void emitTasksImportResult({
+    if (!selectedPath) {
+      await emitTasksImportResult({
         ok: false,
         canceled: true,
       });
-    };
+      return;
+    }
 
-    const onFocus = () => {
-      window.setTimeout(markCanceled, 280);
-    };
+    const filePath = Array.isArray(selectedPath)
+      ? selectedPath[0]
+      : selectedPath;
 
-    input.addEventListener("change", () => {
-      if (handled) return;
-      handled = true;
-      window.removeEventListener("focus", onFocus);
+    if (!filePath) {
+      await emitTasksImportResult({
+        ok: false,
+        canceled: true,
+      });
+      return;
+    }
 
-      const file = input.files?.[0];
-      cleanup();
-
-      if (!file) {
-        void emitTasksImportResult({
-          ok: false,
-          canceled: true,
-        });
-        return;
-      }
-
-      file
-        .text()
-        .then((content) =>
-          emitTasksImportResult({
-            ok: true,
-            canceled: false,
-            filePath: file.name,
-            content,
-          })
-        )
-        .catch((error: unknown) =>
-          emitTasksImportResult({
-            ok: false,
-            canceled: false,
-            error: buildErrorMessage(error),
-          })
-        );
+    const content = await invoke<string>("read_text_file", {
+      filePath,
     });
 
-    window.addEventListener("focus", onFocus, { once: true });
-    input.click();
+    await emitTasksImportResult({
+      ok: true,
+      canceled: false,
+      filePath,
+      content,
+    });
   } catch (error) {
     await emitTasksImportResult({
       ok: false,
@@ -372,12 +362,12 @@ const sendToTauri = async <C extends ToMainChannel>(
 
     case EXPORT_TASKS_DIALOG: {
       const data = payload[0] as ExportTasksDialogPayload;
-      await exportTasksFallback(data);
+      await exportTasksWithNativeDialog(data);
       return;
     }
 
     case IMPORT_TASKS_DIALOG: {
-      await importTasksFallback();
+      await importTasksWithNativeDialog();
       return;
     }
 

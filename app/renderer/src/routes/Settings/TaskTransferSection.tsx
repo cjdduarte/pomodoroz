@@ -70,15 +70,15 @@ const StyledTaskTransferButton = styled(StyledButtonSecondary)`
 `;
 
 const StyledTaskTransferMergeButton = styled(StyledButtonPrimary)`
-  width: auto;
-  min-width: 14rem;
+  width: 100%;
+  min-width: 0;
   padding-left: 1.2rem;
   padding-right: 1.2rem;
 `;
 
 const StyledTaskTransferReplaceButton = styled(StyledButtonDanger)`
-  width: auto;
-  min-width: 14rem;
+  width: 100%;
+  min-width: 0;
   padding-left: 1.2rem;
   padding-right: 1.2rem;
 `;
@@ -95,6 +95,13 @@ const StyledTaskTransferPendingText = styled.p`
   margin: 0;
   font-size: 1.1rem;
   color: var(--color-heading-text);
+`;
+
+const StyledTaskTransferPendingActions = styled.div`
+  margin-top: 0.8rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
 `;
 
 const StyledTaskTransferStatus = styled.p<{
@@ -334,7 +341,7 @@ const TaskTransferSection: React.FC = () => {
           <StyledTaskTransferPendingText>
             {pendingSummary}
           </StyledTaskTransferPendingText>
-          <StyledTaskTransferActions>
+          <StyledTaskTransferPendingActions>
             <StyledTaskTransferMergeButton
               onClick={() => applyImport("merge")}
               disabled={isExporting || isImporting}
@@ -347,7 +354,7 @@ const TaskTransferSection: React.FC = () => {
             >
               {t("settings.taskTransfer.replace")}
             </StyledTaskTransferReplaceButton>
-          </StyledTaskTransferActions>
+          </StyledTaskTransferPendingActions>
         </StyledTaskTransferPending>
       ) : null}
 

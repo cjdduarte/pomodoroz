@@ -163,13 +163,13 @@ export const zh = {
     taskTransfer: {
       heading: "任务导入/导出",
       description: "可将列表/任务导出为 JSON，或导入已保存的文件。",
-      desktopOnly: "导入/导出仅在 Electron 桌面应用中可用。",
+      desktopOnly: "导入/导出仅在桌面应用中可用。",
       export: "导出任务",
       exporting: "导出中...",
       import: "导入任务",
       importing: "导入中...",
-      merge: "与当前数据合并",
-      replace: "替换当前数据",
+      merge: "合并",
+      replace: "替换",
       unknownFile: "未知文件",
       pendingSummary:
         "版本 {{version}} • {{lists}} 个列表 • {{cards}} 个任务 • {{file}}",

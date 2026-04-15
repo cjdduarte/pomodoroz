@@ -168,13 +168,13 @@ export const ja = {
       description:
         "リスト/タスクを JSON にエクスポート、または保存済みファイルをインポートできます。",
       desktopOnly:
-        "インポート/エクスポートは Electron デスクトップ版でのみ利用できます。",
+        "インポート/エクスポートはデスクトップ版でのみ利用できます。",
       export: "タスクをエクスポート",
       exporting: "エクスポート中...",
       import: "タスクをインポート",
       importing: "インポート中...",
-      merge: "現在の内容にマージ",
-      replace: "現在の内容を置換",
+      merge: "マージ",
+      replace: "置換",
       unknownFile: "不明なファイル",
       pendingSummary:
         "バージョン {{version}} • {{lists}} リスト • {{cards}} タスク • {{file}}",

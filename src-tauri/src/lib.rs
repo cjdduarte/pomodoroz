@@ -5,9 +5,10 @@ mod constants;
 use std::path::{Path, PathBuf};
 use commands::window_bridge::{
   close_window, compact_collapse, compact_expand, minimize_window,
-  set_always_on_top, set_compact_mode, set_fullscreen_break,
-  set_native_titlebar, set_tray_behavior, set_tray_copy,
-  set_tray_icon, set_ui_theme, show_window, TrayBehaviorState,
+  read_text_file, set_always_on_top, set_compact_mode,
+  set_fullscreen_break, set_native_titlebar, set_tray_behavior,
+  set_tray_copy, set_tray_icon, set_ui_theme, show_window,
+  write_text_file, TrayBehaviorState,
 };
 use constants::{
   MAIN_TRAY_ID, MAIN_WINDOW_LABEL, TRAY_MENU_QUIT_ID, TRAY_MENU_RESTORE_ID,
@@ -258,6 +259,8 @@ pub fn run() {
       show_window,
       minimize_window,
       close_window,
+      write_text_file,
+      read_text_file,
       set_tray_behavior,
       set_tray_copy,
       set_tray_icon
@@ -310,6 +313,7 @@ pub fn run() {
 
       app_handle.plugin(tauri_plugin_notification::init())?;
       app_handle.plugin(tauri_plugin_opener::init())?;
+      app_handle.plugin(tauri_plugin_dialog::init())?;
 
       Ok(())
     })

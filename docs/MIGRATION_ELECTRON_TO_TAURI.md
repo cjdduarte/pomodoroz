@@ -136,14 +136,14 @@ pomodoroz/
 
 Current status is tracked here (not only in phase descriptions) so we can see exactly where work stopped and what is still pending before moving to the next phase.
 
-| Phase                             | Status                   | Last update | Gate to advance                                                                                    |
-| --------------------------------- | ------------------------ | ----------- | -------------------------------------------------------------------------------------------------- |
-| 0 — Tauri Scaffold + Dual Runtime | Completed                | 2026-04-09  | Closed after Tauri + Electron dev validation and script verification                               |
-| 1 — Connector Swap                | Completed                | 2026-04-10  | Closed after runtime + manual parity validation                                                    |
-| 2 — Native Features               | In progress (2g current) | 2026-04-14  | Implement open-at-login parity while keeping updater/release migration deferred to final hardening |
-| 3a — Yarn to pnpm                 | Not started              | -           | Start only after Phase 2 exit criteria are complete                                                |
-| 3b — Flatten Structure            | Not started              | -           | Start only after Phase 3a exit criteria are complete                                               |
-| 4 — CI for Tauri                  | Not started              | -           | Start only after Phase 3b exit criteria are complete                                               |
+| Phase                             | Status                   | Last update | Gate to advance                                                                                |
+| --------------------------------- | ------------------------ | ----------- | ---------------------------------------------------------------------------------------------- |
+| 0 — Tauri Scaffold + Dual Runtime | Completed                | 2026-04-09  | Closed after Tauri + Electron dev validation and script verification                           |
+| 1 — Connector Swap                | Completed                | 2026-04-10  | Closed after runtime + manual parity validation                                                |
+| 2 — Native Features               | In progress (2h current) | 2026-04-15  | Close pending 2g manual parity and validate native file dialogs (2h) while keeping 2f deferred |
+| 3a — Yarn to pnpm                 | Not started              | -           | Start only after Phase 2 exit criteria are complete                                            |
+| 3b — Flatten Structure            | Not started              | -           | Start only after Phase 3a exit criteria are complete                                           |
+| 4 — CI for Tauri                  | Not started              | -           | Start only after Phase 3b exit criteria are complete                                           |
 
 Phase 0 completion checklist (execution status):
 
@@ -156,7 +156,7 @@ Phase 0 completion checklist (execution status):
 - [x] Run/confirm script checklist impact for current phase (`scripts/` validation rule)
 
 Rule to move forward: only start Phase 1 after all Phase 0 checklist items above are checked.
-Current state: Phase 1 closed, Phase 2a/2b/2c/2d/2e validated (Linux dev runtime), Phase 2f is deferred by decision, and Phase 2g is now active.
+Current state: Phase 1 closed, Phase 2a/2b/2c/2d/2e validated (Linux dev runtime), Phase 2f is deferred by decision, Phase 2g is functionally wired with one manual parity checklist still open, and Phase 2h kickoff is now active.
 Current guardrail in Tauri runtime: `inAppAutoUpdate` (2f, deferred) remains disabled to avoid false-positive UX until final release hardening.
 
 Phase 1 progress checklist (execution status):
@@ -298,6 +298,13 @@ Phase 2g kickoff snapshot (2026-04-14):
 - [x] Single-instance guard restored on Tauri runtime (`tauri-plugin-single-instance`) to avoid multiple app instances on repeated launcher/start-menu double-clicks.
 - [x] NSIS start-menu shortcut path made explicit (`bundle.windows.nsis.startMenuFolder = "Pomodoroz"`) for clearer Windows discoverability.
 - [ ] Validate manual parity path for open-at-login behavior (enable/disable persistence + startup behavior) without regressions in timer/tray/notification flows.
+
+Phase 2h kickoff snapshot (2026-04-15):
+
+- [x] Scope activated after 2g functional wiring; manual 2g close item remains tracked independently.
+- [x] `tauri-plugin-dialog` wired in Rust and renderer runtime.
+- [x] Task transfer on Tauri moved from browser fallback (`<a download>` / `<input type="file">`) to native dialog flow (`save/open`) plus Rust file read/write bridge commands.
+- [ ] Validate manual parity path for native task transfer dialogs (export save path selection, import file picker, invalid JSON handling).
 
 - Validation per sub-phase:
   - Feature works identically to Electron version

@@ -1,4 +1,4 @@
-use std::sync::Mutex;
+use std::{fs, sync::Mutex};
 use crate::constants::{
   MAIN_TRAY_ID, TRAY_MENU_QUIT_ID, TRAY_MENU_RESTORE_ID,
 };
@@ -212,6 +212,19 @@ pub fn close_window(window: Window) -> Result<(), String> {
   // Um único caminho evita corridas de double-hide e reduz bugs de
   // input grab do webkit2gtk no Linux após restore.
   window.close().map_err(map_error)
+}
+
+#[tauri::command(rename_all = "camelCase")]
+pub fn write_text_file(
+  file_path: String,
+  content: String,
+) -> Result<(), String> {
+  fs::write(file_path, content).map_err(map_error)
+}
+
+#[tauri::command(rename_all = "camelCase")]
+pub fn read_text_file(file_path: String) -> Result<String, String> {
+  fs::read_to_string(file_path).map_err(map_error)
 }
 
 #[tauri::command(rename_all = "camelCase")]
