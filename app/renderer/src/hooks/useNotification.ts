@@ -1,6 +1,6 @@
 import { NotificationSoundTypes } from "store/settings/types";
 import { getNotificationSoundSource } from "store/settings/notificationSound";
-import { showDesktopNotification } from "utils";
+import { playNotificationAudio, showDesktopNotification } from "utils";
 
 type OptionProps = {
   mute?: boolean;
@@ -34,17 +34,10 @@ export const useNotification = (
     if (!mute) {
       const defaultSound =
         getNotificationSoundSource(notificationSound);
-
-      new Audio(defaultSound).play().catch((e) => {
-        console.warn("There was a problem playing sound", e);
-      });
+      void playNotificationAudio(defaultSound);
 
       if (audioSrc) {
-        setTimeout(() => {
-          new Audio(audioSrc).play().catch((e) => {
-            console.warn("There was a problem playing sound", e);
-          });
-        }, 1500);
+        void playNotificationAudio(audioSrc, { delayMs: 1500 });
       }
     }
 

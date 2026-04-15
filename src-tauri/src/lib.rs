@@ -5,10 +5,10 @@ mod constants;
 use std::path::{Path, PathBuf};
 use commands::window_bridge::{
   close_window, compact_collapse, compact_expand, minimize_window,
-  read_text_file, set_always_on_top, set_compact_mode,
-  set_fullscreen_break, set_native_titlebar, set_tray_behavior,
-  set_tray_copy, set_tray_icon, set_ui_theme, show_window,
-  write_text_file, TrayBehaviorState,
+  play_notification_sound, read_text_file, set_always_on_top,
+  set_compact_mode, set_fullscreen_break, set_native_titlebar,
+  set_tray_behavior, set_tray_copy, set_tray_icon, set_ui_theme,
+  show_window, write_text_file, TrayBehaviorState,
 };
 use constants::{
   MAIN_TRAY_ID, MAIN_WINDOW_LABEL, TRAY_MENU_QUIT_ID, TRAY_MENU_RESTORE_ID,
@@ -261,6 +261,7 @@ pub fn run() {
       close_window,
       write_text_file,
       read_text_file,
+      play_notification_sound,
       set_tray_behavior,
       set_tray_copy,
       set_tray_icon

@@ -1,7 +1,8 @@
-use std::{fs, sync::Mutex};
+use std::{fs, io::Cursor, sync::Mutex, time::Duration};
 use crate::constants::{
   MAIN_TRAY_ID, TRAY_MENU_QUIT_ID, TRAY_MENU_RESTORE_ID,
 };
+use rodio::{play, DeviceSinkBuilder};
 use tauri::{
   image::Image, Emitter, LogicalSize, Manager, State, Theme, Window,
   menu::{MenuBuilder, MenuItemBuilder},
@@ -225,6 +226,39 @@ pub fn write_text_file(
 #[tauri::command(rename_all = "camelCase")]
 pub fn read_text_file(file_path: String) -> Result<String, String> {
   fs::read_to_string(file_path).map_err(map_error)
+}
+
+#[tauri::command(rename_all = "camelCase")]
+pub fn play_notification_sound(
+  wav_bytes: Vec<u8>,
+  delay_ms: Option<u64>,
+) -> Result<(), String> {
+  if wav_bytes.is_empty() {
+    return Err("Notification sound payload is empty.".to_string());
+  }
+
+  std::thread::spawn(move || {
+    let playback_result = (|| -> Result<(), String> {
+      if let Some(delay_ms) = delay_ms.filter(|delay| *delay > 0) {
+        std::thread::sleep(Duration::from_millis(delay_ms));
+      }
+
+      let mut sink =
+        DeviceSinkBuilder::open_default_sink().map_err(map_error)?;
+      sink.log_on_drop(false);
+
+      let player = play(sink.mixer(), Cursor::new(wav_bytes))
+        .map_err(map_error)?;
+      player.sleep_until_end();
+      Ok(())
+    })();
+
+    if let Err(error) = playback_result {
+      log::warn!("[TAURI Audio] Falha ao reproduzir som: {error}");
+    }
+  });
+
+  Ok(())
 }
 
 #[tauri::command(rename_all = "camelCase")]

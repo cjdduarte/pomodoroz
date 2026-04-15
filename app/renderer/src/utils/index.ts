@@ -12,3 +12,4 @@ export * from "./openExternalUrl";
 export * from "./tasksTransfer";
 export * from "./activeTaskSelection";
 export * from "./desktopNotification";
+export * from "./notificationAudio";
