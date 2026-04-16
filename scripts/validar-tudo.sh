@@ -23,6 +23,36 @@ die() {
   exit 1
 }
 
+ensure_electron_runtime_for_dev() {
+  if (
+    cd "$APP_DIR/app/electron" &&
+      node -e "try { require('electron'); process.exit(0); } catch (error) { console.error(error.message); process.exit(1); }" >/dev/null 2>&1
+  ); then
+    return
+  fi
+
+  step "Reparando runtime do Electron para modo dev"
+
+  local electron_pkg_path=""
+  electron_pkg_path="$(
+    cd "$APP_DIR/app/electron" &&
+      node -e "try { process.stdout.write(require.resolve('electron/package.json')); } catch (error) { process.exit(1); }"
+  )" || die "Pacote electron nao encontrado no workspace app/electron. Rode: pnpm install"
+
+  local install_script
+  install_script="$(dirname "$electron_pkg_path")/install.js"
+
+  (
+    cd "$APP_DIR/app/electron" &&
+      node "$install_script"
+  ) || die "Falha no reparo automatico do Electron (install.js)."
+
+  (
+    cd "$APP_DIR/app/electron" &&
+      node -e "try { require('electron'); process.exit(0); } catch (error) { console.error(error.message); process.exit(1); }"
+  ) || die "Electron continua indisponivel apos reparo automatico."
+}
+
 usage() {
   cat <<'EOF'
 Uso:
@@ -228,6 +258,7 @@ if (( RUN_QUICK_DEV == 1 )); then
     cd "$APP_DIR" &&
       pnpm --filter @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json
   )
+  ensure_electron_runtime_for_dev
   step "Quick run: dev:app"
   exec bash -lc "cd \"$APP_DIR\" && pnpm dev:app"
 fi
@@ -294,6 +325,7 @@ else
 fi
 
 if (( RUN_DEV == 1 )); then
+  ensure_electron_runtime_for_dev
   step "Iniciando app em modo dev (Electron + Vite)"
   ( cd "$APP_DIR" && pnpm dev:app )
 elif (( RUN_PACKED == 1 )); then

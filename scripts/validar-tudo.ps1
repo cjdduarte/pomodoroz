@@ -29,6 +29,42 @@ function Die($message) {
     exit 1
 }
 
+function Ensure-ElectronRuntimeForDev {
+    $electronWorkspace = Join-Path $APP_DIR "app/electron"
+    $checkScript = "try { require('electron'); process.exit(0); } catch (error) { console.error(error.message); process.exit(1); }"
+
+    Push-Location $electronWorkspace
+    try {
+        & node -e $checkScript *> $null
+        if ($LASTEXITCODE -eq 0) {
+            return
+        }
+
+        Step "Reparando runtime do Electron para modo dev"
+
+        $pkgPathRaw = (& node -e "try { process.stdout.write(require.resolve('electron/package.json')); } catch (error) { process.exit(1); }" | Select-Object -First 1)
+        $pkgPath = "$pkgPathRaw".Trim()
+        if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($pkgPath)) {
+            throw "Pacote electron nao encontrado no workspace app/electron. Rode: pnpm install"
+        }
+
+        $installScript = Join-Path (Split-Path -Parent $pkgPath) "install.js"
+        & node $installScript
+        if ($LASTEXITCODE -ne 0) {
+            throw "Falha no reparo automatico do Electron (install.js)."
+        }
+
+        & node -e $checkScript
+        if ($LASTEXITCODE -ne 0) {
+            throw "Electron continua indisponivel apos reparo automatico."
+        }
+    } catch {
+        Die $_.Exception.Message
+    } finally {
+        Pop-Location
+    }
+}
+
 function Invoke-Pnpm {
     param(
         [Parameter(ValueFromRemainingArguments = $true)]
@@ -266,6 +302,7 @@ if ($QuickDev) {
     Invoke-Pnpm --filter @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json
     Pop-Location
 
+    Ensure-ElectronRuntimeForDev
     Step "Quick run: dev:app"
     Push-Location $APP_DIR
     Invoke-Pnpm dev:app
@@ -346,6 +383,7 @@ if ($BuildInstallers) {
 }
 
 if ($Dev) {
+    Ensure-ElectronRuntimeForDev
     Step "Iniciando app em modo dev (Electron + Vite)"
     Push-Location $APP_DIR
     Invoke-Pnpm dev:app

@@ -69,6 +69,7 @@
 - **`check-updates.ps1` `pnpm outdated` parser hardened for keyed-object payloads** — the script now correctly handles JSON returned as `PSCustomObject` with package names as keys, restoring JS/TS update rows on Windows PowerShell 5.1.
 - **Local operational logs excluded from Git tracking** — `.gitignore` now includes `/logs/`, avoiding runtime-noise files (`validar-tudo`, `check-updates`, `cargo audit/outdated`) in `git status`.
 - **SAFE dependency batch applied with full validation** — `@types/node` (`25.5.2 -> 25.6.0`) in root and renderer, `react-router` (`7.14.0 -> 7.14.1`) in renderer, `electron` (`41.2.0 -> 41.2.1`) in Electron workspace, and `tauri-plugin-global-shortcut` (`2.2.1 -> 2.3.1`) in `src-tauri`.
+- **`validar-tudo` now auto-repairs Electron runtime for `dev:app` flow** — `scripts/validar-tudo.sh` and `scripts/validar-tudo.ps1` now check `require('electron')` before starting dev mode and, when the binary is missing/incomplete, automatically run Electron package `install.js` in `app/electron`.
 - **`uninstall` purge mode now covers Tauri runtime data on Linux** — `scripts/uninstall.sh` and `scripts/uninstall.ps1` now also remove identifier-based paths (`~/.config/com.cjdduarte.pomodoroz`, `~/.cache/com.cjdduarte.pomodoroz`, and `~/.local/share/com.cjdduarte.pomodoroz`) in addition to legacy `~/.config/pomodoroz` and `~/.cache/pomodoroz`.
 
 ### Documentation
