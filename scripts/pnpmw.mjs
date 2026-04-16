@@ -23,7 +23,7 @@ function commandAvailable(command, probeArgs = ["--version"]) {
     stdio: "ignore",
     env: process.env,
   });
-  return !probe.error;
+  return !probe.error && probe.status === 0;
 }
 
 function executeOrExit(command, commandArgs) {
@@ -32,7 +32,11 @@ function executeOrExit(command, commandArgs) {
     return false;
   }
 
-  process.exit(result.status ?? 1);
+  if (result.status === 0) {
+    process.exit(0);
+  }
+
+  return false;
 }
 
 const npmExecPath = process.env.npm_execpath?.trim();
@@ -41,7 +45,14 @@ if (npmExecPath) {
   const execArgs = execBaseName.includes("corepack")
     ? [npmExecPath, "pnpm", ...args]
     : [npmExecPath, ...args];
-  executeOrExit(process.execPath, execArgs);
+
+  const probeArgs = execBaseName.includes("corepack")
+    ? [npmExecPath, "pnpm", "--version"]
+    : [npmExecPath, "--version"];
+
+  if (commandAvailable(process.execPath, probeArgs)) {
+    executeOrExit(process.execPath, execArgs);
+  }
 }
 
 const commandCandidates = [
@@ -79,7 +90,10 @@ for (const candidate of commandCandidates) {
   if (!commandAvailable(candidate.command, candidate.probeArgs)) {
     continue;
   }
-  executeOrExit(candidate.command, candidate.args);
+  const executed = executeOrExit(candidate.command, candidate.args);
+  if (executed === false) {
+    process.exit(1);
+  }
 }
 
 console.error("ERRO: pnpm nao encontrado e corepack nao esta disponivel no PATH.");
