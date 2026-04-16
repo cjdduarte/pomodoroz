@@ -80,6 +80,7 @@
 - **Rastreio de execução por marcos adicionado ao plano** — `docs/MIGRATION_ELECTRON_TO_TAURI.md` agora tem tracker explícito por fase (status, gate de avanço e checklists de execução para fases 0 e 1).
 - **Tracker da migração avançado para 2c após fechamento manual da 2b** — `docs/MIGRATION_ELECTRON_TO_TAURI.md` agora registra a validação de notificações (permissão por gesto do usuário + entrega de aviso) como concluída.
 - **Tracker avançado para 2d após validação manual da 2c no Linux** — `docs/MIGRATION_ELECTRON_TO_TAURI.md` agora marca os atalhos globais `Alt+Shift+H/S` como validados no runtime dev Linux e abre o snapshot operacional da 2d.
+- **Snapshot operacional Linux da Fase 2 atualizado no plano de migração** — `docs/MIGRATION_ELECTRON_TO_TAURI.md` agora registra a revalidação dos fluxos `validar-tudo` (opções 5 e 6) e `uninstall` em modo `purge`, com observação de logs não bloqueantes no `linux-unpacked`.
 
 ## [26.4.15] - 2026-04-09
 

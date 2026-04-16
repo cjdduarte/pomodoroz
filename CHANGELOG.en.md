@@ -80,6 +80,7 @@
 - **Milestone-based execution tracking added to migration plan** — `docs/MIGRATION_ELECTRON_TO_TAURI.md` now includes an explicit phase tracker (status, advancement gate, and execution checklists for phases 0 and 1).
 - **Migration tracker advanced to 2c after manual 2b closure** — `docs/MIGRATION_ELECTRON_TO_TAURI.md` now records notification parity validation (user-gesture permission prompt + notification delivery) as completed.
 - **Tracker advanced to 2d after Linux manual 2c validation** — `docs/MIGRATION_ELECTRON_TO_TAURI.md` now marks `Alt+Shift+H/S` global shortcut parity as validated on Linux dev runtime and opens the 2d operational snapshot.
+- **Phase 2 Linux operational snapshot updated in migration plan** — `docs/MIGRATION_ELECTRON_TO_TAURI.md` now records revalidation of `validar-tudo` flows (options 5 and 6) and `uninstall` `purge`, including non-blocking `linux-unpacked` diagnostics.
 
 ## [26.4.15] - 2026-04-09
 
