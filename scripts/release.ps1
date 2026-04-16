@@ -313,6 +313,8 @@ Invoke-CommandChecked -FilePath git -Arguments @(
     "package.json",
     "app/electron/package.json",
     "app/renderer/package.json",
+    "src-tauri/tauri.conf.json",
+    "src-tauri/Cargo.toml",
     "CHANGELOG.md",
     "CHANGELOG.en.md"
 )

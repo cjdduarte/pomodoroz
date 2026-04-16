@@ -1,0 +1,241 @@
+name: Release Tauri Updater Assets
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to publish assets to (ex: v26.4.17)"
+        required: true
+        type: string
+      target:
+        description: "Target to publish"
+        required: true
+        default: "all"
+        type: choice
+        options:
+          - all
+          - windows
+          - linux
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-tauri-updater-${{ github.event.inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  release-windows:
+    if: ${{ github.event.inputs.target == 'all' || github.event.inputs.target == 'windows' }}
+    runs-on: windows-latest
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+      TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Setup pnpm (Corepack)
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.33.0 --activate
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Validate required secrets
+        shell: pwsh
+        run: |
+          if (-not $env:GH_TOKEN) {
+            Write-Error "GH_TOKEN secret is required."
+            exit 1
+          }
+          if (-not $env:TAURI_SIGNING_PRIVATE_KEY) {
+            Write-Error "TAURI_SIGNING_PRIVATE_KEY secret is required."
+            exit 1
+          }
+          if (-not $env:TAURI_SIGNING_PRIVATE_KEY_PASSWORD) {
+            Write-Error "TAURI_SIGNING_PRIVATE_KEY_PASSWORD secret is required."
+            exit 1
+          }
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Tauri NSIS (x64)
+        run: pnpm tauri build --bundles nsis
+
+      - name: Ensure release exists
+        shell: pwsh
+        run: |
+          $tag = "${{ github.event.inputs.tag }}"
+          gh release view $tag *> $null
+          if ($LASTEXITCODE -ne 0) {
+            gh release create $tag --title $tag --notes ""
+          }
+
+      - name: Upload Tauri Windows updater assets
+        shell: pwsh
+        run: |
+          $tag = "${{ github.event.inputs.tag }}"
+          $files = Get-ChildItem -Path "src-tauri/target/release/bundle" -Recurse -File |
+            Where-Object { $_.Extension -in @(".exe", ".sig") } |
+            ForEach-Object { $_.FullName }
+
+          if (-not $files -or $files.Count -eq 0) {
+            Write-Error "No Tauri Windows assets found under src-tauri/target/release/bundle."
+            exit 1
+          }
+
+          $files | ForEach-Object { Write-Host "Uploading: $_" }
+          gh release upload $tag @files --clobber
+
+  release-linux:
+    if: ${{ github.event.inputs.target == 'all' || github.event.inputs.target == 'linux' }}
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+      TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Setup pnpm (Corepack)
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.33.0 --activate
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev patchelf
+
+      - name: Validate required secrets
+        run: |
+          if [ -z "${GH_TOKEN}" ]; then
+            echo "GH_TOKEN secret is required."
+            exit 1
+          fi
+          if [ -z "${TAURI_SIGNING_PRIVATE_KEY}" ]; then
+            echo "TAURI_SIGNING_PRIVATE_KEY secret is required."
+            exit 1
+          fi
+          if [ -z "${TAURI_SIGNING_PRIVATE_KEY_PASSWORD}" ]; then
+            echo "TAURI_SIGNING_PRIVATE_KEY_PASSWORD secret is required."
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Tauri AppImage (x64)
+        run: pnpm tauri build --bundles appimage
+
+      - name: Ensure release exists
+        run: |
+          TAG="${{ github.event.inputs.tag }}"
+          if ! gh release view "${TAG}" >/dev/null 2>&1; then
+            gh release create "${TAG}" --title "${TAG}" --notes ""
+          fi
+
+      - name: Upload Tauri Linux updater assets
+        run: |
+          TAG="${{ github.event.inputs.tag }}"
+          mapfile -t FILES < <(find src-tauri/target/release/bundle -type f \( -name "*.AppImage" -o -name "*.sig" \))
+          if [ "${#FILES[@]}" -eq 0 ]; then
+            echo "No Tauri Linux assets found under src-tauri/target/release/bundle."
+            exit 1
+          fi
+
+          printf 'Uploading: %s\n' "${FILES[@]}"
+          gh release upload "${TAG}" "${FILES[@]}" --clobber
+
+  sync-latest-json:
+    needs:
+      - release-windows
+      - release-linux
+    if: ${{ always() && ((github.event.inputs.target == 'all' && needs.release-windows.result == 'success' && needs.release-linux.result == 'success') || (github.event.inputs.target == 'windows' && needs.release-windows.result == 'success') || (github.event.inputs.target == 'linux' && needs.release-linux.result == 'success')) }}
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+    steps:
+      - name: Validate GH_TOKEN
+        run: |
+          if [ -z "${GH_TOKEN}" ]; then
+            echo "GH_TOKEN secret is required."
+            exit 1
+          fi
+
+      - name: Build merged latest.json
+        run: |
+          TAG="${{ github.event.inputs.tag }}"
+          VERSION="${TAG#v}"
+          RELEASE_JSON="$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${TAG}")"
+          DOWNLOAD_BASE="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}"
+          PUB_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+
+          add_platform() {
+            local asset_name="$1"
+            local platform_key="$2"
+            local sig_asset="${asset_name}.sig"
+            local sig_asset_id
+            local signature
+
+            sig_asset_id="$(echo "${RELEASE_JSON}" | jq -r --arg NAME "${sig_asset}" '.assets[] | select(.name == $NAME) | .id' | head -n1)"
+            if [ -z "${sig_asset_id}" ] || [ "${sig_asset_id}" = "null" ]; then
+              echo "Missing signature asset ${sig_asset} for ${asset_name}."
+              return 1
+            fi
+
+            signature="$(gh api "repos/${GITHUB_REPOSITORY}/releases/assets/${sig_asset_id}" -H "Accept: application/octet-stream" | tr -d '\r\n')"
+            if [ -z "${signature}" ]; then
+              echo "Empty signature payload for ${sig_asset}."
+              return 1
+            fi
+
+            LATEST_JSON="$(echo "${LATEST_JSON}" | jq --arg KEY "${platform_key}" --arg URL "${DOWNLOAD_BASE}/${asset_name}" --arg SIG "${signature}" '.platforms[$KEY] = { url: $URL, signature: $SIG }')"
+            return 0
+          }
+
+          LATEST_JSON="$(jq -n --arg VERSION "${VERSION}" --arg PUB_DATE "${PUB_DATE}" '{ version: $VERSION, notes: "", pub_date: $PUB_DATE, platforms: {} }')"
+
+          WINDOWS_EXE="$(echo "${RELEASE_JSON}" | jq -r '[.assets[].name] as $names | .assets[] | select(.name | test("\\.exe$")) | select(($names | index(.name + ".sig")) != null) | .name' | head -n1)"
+          if [ -n "${WINDOWS_EXE}" ] && [ "${WINDOWS_EXE}" != "null" ]; then
+            add_platform "${WINDOWS_EXE}" "windows-x86_64"
+            add_platform "${WINDOWS_EXE}" "windows-x86_64-nsis"
+          fi
+
+          LINUX_APPIMAGE="$(echo "${RELEASE_JSON}" | jq -r '[.assets[].name] as $names | .assets[] | select(.name | test("\\.AppImage$")) | select(($names | index(.name + ".sig")) != null) | .name' | head -n1)"
+          if [ -n "${LINUX_APPIMAGE}" ] && [ "${LINUX_APPIMAGE}" != "null" ]; then
+            add_platform "${LINUX_APPIMAGE}" "linux-x86_64"
+            add_platform "${LINUX_APPIMAGE}" "linux-x86_64-appimage"
+          fi
+
+          PLATFORM_COUNT="$(echo "${LATEST_JSON}" | jq '.platforms | length')"
+          if [ "${PLATFORM_COUNT}" -eq 0 ]; then
+            echo "No updater platforms were generated for latest.json."
+            exit 1
+          fi
+
+          echo "${LATEST_JSON}" | jq '.' > latest.json
+          cat latest.json
+
+      - name: Upload merged latest.json
+        run: |
+          TAG="${{ github.event.inputs.tag }}"
+          gh release upload "${TAG}" latest.json --clobber

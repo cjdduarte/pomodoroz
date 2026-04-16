@@ -268,7 +268,7 @@ else
 fi
 
 step "Criando commit de release"
-run_cmd "cd \"$APP_DIR\" && git add package.json app/electron/package.json app/renderer/package.json CHANGELOG.md CHANGELOG.en.md"
+run_cmd "cd \"$APP_DIR\" && git add package.json app/electron/package.json app/renderer/package.json src-tauri/tauri.conf.json src-tauri/Cargo.toml CHANGELOG.md CHANGELOG.en.md"
 if (( DRY_RUN == 0 )); then
   if git -C "$APP_DIR" diff --cached --quiet; then
     die "Nenhuma mudanca staged para commit de release."

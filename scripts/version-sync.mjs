@@ -23,6 +23,7 @@ const packageFiles = [
   "package.json",
   "app/electron/package.json",
   "app/renderer/package.json",
+  "src-tauri/tauri.conf.json",
 ];
 
 const updatedFiles = [];
@@ -41,6 +42,19 @@ for (const relativeFile of packageFiles) {
     );
     updatedFiles.push(relativeFile);
   }
+}
+
+const cargoTomlPath = path.join(repoRoot, "src-tauri/Cargo.toml");
+const cargoTomlContent = fs.readFileSync(cargoTomlPath, "utf8");
+const cargoTomlUpdated = cargoTomlContent.replace(
+  /^(\[package\][\s\S]*?^\s*version\s*=\s*")([^"]+)(")/m,
+  (_match, prefix, _currentVersion, suffix) =>
+    `${prefix}${targetVersion}${suffix}`
+);
+
+if (cargoTomlUpdated !== cargoTomlContent) {
+  fs.writeFileSync(cargoTomlPath, cargoTomlUpdated, "utf8");
+  updatedFiles.push("src-tauri/Cargo.toml");
 }
 
 if (!updatedFiles.length) {

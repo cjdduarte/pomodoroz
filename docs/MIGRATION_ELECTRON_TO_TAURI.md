@@ -156,7 +156,7 @@ Phase 0 completion checklist (execution status):
 - [x] Run/confirm script checklist impact for current phase (`scripts/` validation rule)
 
 Rule to move forward: only start Phase 1 after all Phase 0 checklist items above are checked.
-Current state: Phase 1 closed, Phase 2a/2b/2c/2d/2e validated (Linux dev runtime), Phase 2g/2h/2i manual parity checklists are closed, Linux operational script cycle (`validar-tudo` options 5/6 + `uninstall purge`) was revalidated on 2026-04-16, and Phase 2f resumed in 26.4.18 with updater wiring kickoff (`tauri-plugin-updater` + policy-sync checks) while install/restart hardening remains pending.
+Current state: Phase 1 closed, Phase 2a/2b/2c/2d/2e validated (Linux dev runtime), Phase 2g/2h/2i manual parity checklists are closed, Linux operational script cycle (`validar-tudo` options 5/6 + `uninstall purge`) was revalidated on 2026-04-16, and Phase 2f resumed in 26.4.18 with updater wiring kickoff (`tauri-plugin-updater` + policy-sync checks), updater key/feed scaffolding (`pubkey` + `createUpdaterArtifacts`) and a manual signed-assets workflow, while install/restart hardening remains pending.
 Current guardrail in Tauri runtime: `inAppAutoUpdate` setting remains disabled in UI until full 2f close (feed/signature + install/restart + packaged E2E).
 
 Phase 1 progress checklist (execution status):
@@ -291,6 +291,8 @@ Phase 2f kickoff snapshot (2026-04-16):
 - [x] `SET_IN_APP_AUTO_UPDATE` policy sync now runs in Tauri connector path and triggers guarded native update checks.
 - [x] Native update detection now feeds existing renderer update state via `UPDATE_AVAILABLE` payload (version/body) without introducing direct component-level `invoke`.
 - [x] Settings guardrail remains active in Tauri runtime (`inAppAutoUpdate` toggle disabled) while final 2f hardening is pending.
+- [x] Updater public key configured in `src-tauri/tauri.conf.json` and updater artifacts set to `v1Compatible` for `latest.json` generation.
+- [x] Manual GitHub Actions workflow added for signed Tauri updater assets upload by tag (`.github/workflows/release-tauri-updater.yml`).
 - [ ] Complete packaged install/restart flow (`downloadAndInstall` + relaunch strategy) and validate against signed Tauri release feed.
 
 Phase 2g kickoff snapshot (2026-04-14):
