@@ -344,7 +344,7 @@ Phase 2 operational validation snapshot (2026-04-16, Linux):
   - [x] Root/workspace `package.json` scripts migrated from `yarn` to `pnpm`.
   - [x] Lockfile transition completed (`pnpm-lock.yaml` canonical + `yarn.lock` removed).
   - [x] GitHub Actions release workflow migrated (`.github/workflows/release-autoupdate.yml`: `yarn` -> `pnpm`).
-  - [ ] Validate migrated release workflow on GitHub Actions run (manual dispatch or next `v*` tag).
+  - [x] Validate migrated release workflow on GitHub Actions run (manual dispatch or next `v*` tag) — validated on 2026-04-16 via `workflow_dispatch` on `main` after CI bootstrap fix.
 - Validation:
   - `pnpm install` succeeds
   - `pnpm dev` / `pnpm build` / `pnpm lint` work
