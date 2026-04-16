@@ -39,6 +39,19 @@ function executeOrExit(command, commandArgs) {
   return false;
 }
 
+function quoteForCmd(argument) {
+  return `"${String(argument).replace(/"/g, '""')}"`;
+}
+
+function buildCmdInvocation(command, commandArgs) {
+  const joinedArgs = commandArgs.map(quoteForCmd).join(" ");
+  const commandLine = `${quoteForCmd(command)}${joinedArgs ? ` ${joinedArgs}` : ""}`;
+  return {
+    command: "cmd.exe",
+    args: ["/d", "/s", "/c", commandLine],
+  };
+}
+
 const npmExecPath = process.env.npm_execpath?.trim();
 if (npmExecPath) {
   const execBaseName = path.basename(npmExecPath).toLowerCase();
@@ -86,13 +99,31 @@ commandCandidates.push({
   args: ["pnpm", ...args],
 });
 
+if (process.platform === "win32") {
+  const corepackViaCmd = buildCmdInvocation(corepackSibling, ["pnpm", ...args]);
+  const corepackProbeViaCmd = buildCmdInvocation(corepackSibling, ["pnpm", "--version"]);
+  commandCandidates.push({
+    command: corepackViaCmd.command,
+    args: corepackViaCmd.args,
+    probeArgs: corepackProbeViaCmd.args,
+  });
+
+  const pnpmViaCmd = buildCmdInvocation("pnpm", args);
+  const pnpmProbeViaCmd = buildCmdInvocation("pnpm", ["--version"]);
+  commandCandidates.push({
+    command: pnpmViaCmd.command,
+    args: pnpmViaCmd.args,
+    probeArgs: pnpmProbeViaCmd.args,
+  });
+}
+
 for (const candidate of commandCandidates) {
   if (!commandAvailable(candidate.command, candidate.probeArgs)) {
     continue;
   }
   const executed = executeOrExit(candidate.command, candidate.args);
   if (executed === false) {
-    process.exit(1);
+    continue;
   }
 }
 
