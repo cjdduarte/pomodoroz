@@ -65,6 +65,7 @@
 - **Empacotamento no `validar-tudo.ps1` ficou robusto em Windows sem `pnpm` no PATH** — o script passou a acionar `electron-builder` via script `eb` do workspace Electron (com `npm_config_user_agent=npm_execpath=traversal`), evitando falha do node-module-collector com `pnpm nao reconhecido`.
 - **`check-updates.ps1` corrigido para capturar saída real do `pnpmw`** — a função `pnpm` deixou de descartar stdout/stderr, restaurando detecção de versão do `pnpm` e parse do JSON de `pnpm outdated`.
 - **`check-updates.ps1` ajustado para PowerShell 5.1 na montagem da tabela de updates** — a conversão de `List[object]` para array passou a usar `ToArray()`, eliminando erro `Os tipos de argumento nao correspondem` no relatório por workspace.
+- **Parser do `pnpm outdated` no `check-updates.ps1` reforçado para saída em objeto chaveado** — o script agora lê corretamente payloads JSON em formato `PSCustomObject` (pacote como chave), restaurando listagem de updates em ambientes Windows/PowerShell 5.1.
 
 ### Documentação
 

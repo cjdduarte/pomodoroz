@@ -450,6 +450,40 @@ function Get-WorkspaceOutdatedRows {
 
     $rowsList = New-Object 'System.Collections.Generic.List[object]'
 
+    function Get-EntryFieldValue {
+        param(
+            [object]$Entry,
+            [string[]]$FieldNames
+        )
+
+        foreach ($fieldName in $FieldNames) {
+            if ([string]::IsNullOrWhiteSpace($fieldName)) {
+                continue
+            }
+
+            if ($Entry -is [System.Collections.IDictionary]) {
+                if ($Entry.Contains($fieldName)) {
+                    $value = $Entry[$fieldName]
+                    if ($null -ne $value -and -not [string]::IsNullOrWhiteSpace("$value")) {
+                        return "$value"
+                    }
+                }
+            }
+
+            if ($null -ne $Entry.PSObject) {
+                $prop = $Entry.PSObject.Properties[$fieldName]
+                if ($null -ne $prop) {
+                    $value = $prop.Value
+                    if ($null -ne $value -and -not [string]::IsNullOrWhiteSpace("$value")) {
+                        return "$value"
+                    }
+                }
+            }
+        }
+
+        return ""
+    }
+
     function Add-RowFromEntry {
         param(
             [string]$FallbackPackageName,
@@ -460,10 +494,7 @@ function Get-WorkspaceOutdatedRows {
             return
         }
 
-        $package = "$($Entry.name)"
-        if ([string]::IsNullOrWhiteSpace($package)) {
-            $package = "$($Entry.package)"
-        }
+        $package = Get-EntryFieldValue -Entry $Entry -FieldNames @("name", "package")
         if ([string]::IsNullOrWhiteSpace($package)) {
             $package = $FallbackPackageName
         }
@@ -472,13 +503,7 @@ function Get-WorkspaceOutdatedRows {
         }
 
         $workspace = $WorkspaceName
-        $workspaceRaw = "$($Entry.workspace)"
-        if ([string]::IsNullOrWhiteSpace($workspaceRaw)) {
-            $workspaceRaw = "$($Entry.project)"
-        }
-        if ([string]::IsNullOrWhiteSpace($workspaceRaw)) {
-            $workspaceRaw = "$($Entry.location)"
-        }
+        $workspaceRaw = Get-EntryFieldValue -Entry $Entry -FieldNames @("workspace", "project", "location")
         if (-not [string]::IsNullOrWhiteSpace($workspaceRaw)) {
             $candidateWorkspace = Normalize-WorkspaceName -WorkspaceName $workspaceRaw
             $workspaceExists = $Workspaces | Where-Object { $_.Name -eq $candidateWorkspace } | Select-Object -First 1
@@ -487,16 +512,10 @@ function Get-WorkspaceOutdatedRows {
             }
         }
 
-        $current = "$($Entry.current)"
-        $wanted = "$($Entry.wanted)"
-        $latest = "$($Entry.latest)"
-        $packageType = "$($Entry.dependencyType)"
-        if ([string]::IsNullOrWhiteSpace($packageType)) {
-            $packageType = "$($Entry.packageType)"
-        }
-        if ([string]::IsNullOrWhiteSpace($packageType)) {
-            $packageType = "$($Entry.type)"
-        }
+        $current = Get-EntryFieldValue -Entry $Entry -FieldNames @("current")
+        $wanted = Get-EntryFieldValue -Entry $Entry -FieldNames @("wanted")
+        $latest = Get-EntryFieldValue -Entry $Entry -FieldNames @("latest")
+        $packageType = Get-EntryFieldValue -Entry $Entry -FieldNames @("dependencyType", "packageType", "type")
 
         $dedupeKey = "$workspace`t$package`t$current`t$wanted`t$latest`t$packageType"
         if ($script:OutdatedSeen.Contains($dedupeKey)) {
@@ -520,12 +539,16 @@ function Get-WorkspaceOutdatedRows {
         foreach ($entry in $parsed.GetEnumerator()) {
             Add-RowFromEntry -FallbackPackageName "$($entry.Key)" -Entry $entry.Value
         }
-    } elseif ($parsed -is [System.Collections.IEnumerable] -and -not ($parsed -is [string])) {
-        foreach ($entry in $parsed) {
+    } elseif ($null -ne $parsed.PSObject -and $null -ne $parsed.PSObject.Properties["packages"] -and $parsed.packages -is [System.Collections.IEnumerable] -and -not ($parsed.packages -is [string])) {
+        foreach ($entry in $parsed.packages) {
             Add-RowFromEntry -FallbackPackageName "" -Entry $entry
         }
-    } elseif ($null -ne $parsed.packages -and $parsed.packages -is [System.Collections.IEnumerable]) {
-        foreach ($entry in $parsed.packages) {
+    } elseif ($parsed -is [PSCustomObject]) {
+        foreach ($property in $parsed.PSObject.Properties) {
+            Add-RowFromEntry -FallbackPackageName "$($property.Name)" -Entry $property.Value
+        }
+    } elseif ($parsed -is [System.Collections.IEnumerable] -and -not ($parsed -is [string])) {
+        foreach ($entry in $parsed) {
             Add-RowFromEntry -FallbackPackageName "" -Entry $entry
         }
     }
