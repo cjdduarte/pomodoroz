@@ -292,11 +292,26 @@ Invoke-CommandChecked -FilePath pnpm -Arguments @("version:sync", $targetVersion
 
 Step "Validando entradas de changelog para $targetVersion"
 $escapedVersion = [regex]::Escape($targetVersion)
-if (-not (Select-String -Path (Join-Path $ROOT "CHANGELOG.md") -Pattern "^## \[$escapedVersion\]" -Quiet)) {
-    Fail "CHANGELOG.md sem secao da versao [$targetVersion]."
+$ptMatch = Select-String -Path (Join-Path $ROOT "CHANGELOG.md") -Pattern "^## \[$escapedVersion\] - (.+)$" | Select-Object -First 1
+if (-not $ptMatch) {
+    Fail "CHANGELOG.md sem cabecalho de versao com data para [$targetVersion]. Esperado: ## [$targetVersion] - YYYY-MM-DD"
 }
-if (-not (Select-String -Path (Join-Path $ROOT "CHANGELOG.en.md") -Pattern "^## \[$escapedVersion\]" -Quiet)) {
-    Fail "CHANGELOG.en.md sem secao da versao [$targetVersion]."
+$enMatch = Select-String -Path (Join-Path $ROOT "CHANGELOG.en.md") -Pattern "^## \[$escapedVersion\] - (.+)$" | Select-Object -First 1
+if (-not $enMatch) {
+    Fail "CHANGELOG.en.md sem cabecalho de versao com data para [$targetVersion]. Esperado: ## [$targetVersion] - YYYY-MM-DD"
+}
+
+$ptDate = $ptMatch.Matches[0].Groups[1].Value.Trim()
+$enDate = $enMatch.Matches[0].Groups[1].Value.Trim()
+
+if ($ptDate -notmatch "^\d{4}-\d{2}-\d{2}$") {
+    Fail "CHANGELOG.md para [$targetVersion] precisa de data final no formato YYYY-MM-DD. Atual: '$ptDate'"
+}
+if ($enDate -notmatch "^\d{4}-\d{2}-\d{2}$") {
+    Fail "CHANGELOG.en.md para [$targetVersion] precisa de data final no formato YYYY-MM-DD. Atual: '$enDate'"
+}
+if ($ptDate -ne $enDate) {
+    Fail "Datas divergentes entre CHANGELOG.md ($ptDate) e CHANGELOG.en.md ($enDate) para [$targetVersion]."
 }
 
 if (-not $SkipValidate) {

@@ -253,11 +253,29 @@ step "Sincronizando versao para $TARGET_VERSION"
 run_cmd "cd \"$APP_DIR\" && pnpm version:sync \"$TARGET_VERSION\""
 
 step "Validando entradas de changelog para $TARGET_VERSION"
-if ! rg -q "^## \\[$TARGET_VERSION\\]" "$APP_DIR/CHANGELOG.md"; then
-  die "CHANGELOG.md sem secao da versao [$TARGET_VERSION]."
+pt_date="$(
+  rg -m1 "^## \\[$TARGET_VERSION\\] - " "$APP_DIR/CHANGELOG.md" \
+    | sed -E "s/^## \\[$TARGET_VERSION\\] - //"
+)"
+en_date="$(
+  rg -m1 "^## \\[$TARGET_VERSION\\] - " "$APP_DIR/CHANGELOG.en.md" \
+    | sed -E "s/^## \\[$TARGET_VERSION\\] - //"
+)"
+
+if [[ -z "$pt_date" ]]; then
+  die "CHANGELOG.md sem cabecalho de versao com data para [$TARGET_VERSION]. Esperado: ## [$TARGET_VERSION] - YYYY-MM-DD"
 fi
-if ! rg -q "^## \\[$TARGET_VERSION\\]" "$APP_DIR/CHANGELOG.en.md"; then
-  die "CHANGELOG.en.md sem secao da versao [$TARGET_VERSION]."
+if [[ -z "$en_date" ]]; then
+  die "CHANGELOG.en.md sem cabecalho de versao com data para [$TARGET_VERSION]. Esperado: ## [$TARGET_VERSION] - YYYY-MM-DD"
+fi
+if ! [[ "$pt_date" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+  die "CHANGELOG.md para [$TARGET_VERSION] precisa de data final no formato YYYY-MM-DD. Atual: '$pt_date'"
+fi
+if ! [[ "$en_date" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+  die "CHANGELOG.en.md para [$TARGET_VERSION] precisa de data final no formato YYYY-MM-DD. Atual: '$en_date'"
+fi
+if [[ "$pt_date" != "$en_date" ]]; then
+  die "Datas divergentes entre CHANGELOG.md ($pt_date) e CHANGELOG.en.md ($en_date) para [$TARGET_VERSION]."
 fi
 
 if (( SKIP_VALIDATE == 0 )); then

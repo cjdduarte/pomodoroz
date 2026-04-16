@@ -16,6 +16,7 @@
 - **Tauri updater now uses real public key + compatible updater artifacts (`latest.json`)** — `src-tauri/tauri.conf.json` now has `plugins.updater.pubkey` configured and `bundle.createUpdaterArtifacts: "v1Compatible"`, preparing signed feed generation for the configured update endpoint.
 - **Manual workflow to publish signed Tauri updater assets added** — `.github/workflows/release-tauri-updater.yml` builds/uploads updater artifacts (Windows NSIS and Linux AppImage + `.sig` + `latest*.json`) to a specific tag using `TAURI_SIGNING_PRIVATE_KEY` and `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`.
 - **`version-sync` and release scripts now include Tauri runtime version files** — `scripts/version-sync.mjs` now synchronizes `src-tauri/tauri.conf.json` and `src-tauri/Cargo.toml`; `scripts/release.sh`/`scripts/release.ps1` now stage those files in release commits to avoid Electron/Tauri version drift.
+- **Release now requires final date in both changelogs** — `scripts/release.sh` and `scripts/release.ps1` now validate `CHANGELOG.md` and `CHANGELOG.en.md` headings as `## [x.y.z] - YYYY-MM-DD` for the target version (blocking `A definir`/`TBD` and also blocking PT/EN date mismatch).
 
 ## [26.4.17] - 2026-04-16
 

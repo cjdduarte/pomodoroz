@@ -16,6 +16,7 @@
 - **Updater Tauri passou a usar chave pública real + artefatos compatíveis (`latest.json`)** — `src-tauri/tauri.conf.json` agora possui `plugins.updater.pubkey` configurada e `bundle.createUpdaterArtifacts: "v1Compatible"`, preparando geração de assinatura/feed para o endpoint de update.
 - **Workflow manual para publicar assets assinados do updater Tauri adicionado** — `.github/workflows/release-tauri-updater.yml` cria/upload de assets de updater (Windows NSIS e Linux AppImage + `.sig` + `latest*.json`) em uma tag específica usando `TAURI_SIGNING_PRIVATE_KEY` e `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`.
 - **`version-sync` e `release` passaram a incluir versão do runtime Tauri** — `scripts/version-sync.mjs` agora sincroniza também `src-tauri/tauri.conf.json` e `src-tauri/Cargo.toml`; `scripts/release.sh`/`scripts/release.ps1` passaram a stagear esses arquivos no commit de release para evitar divergência de versão entre Electron e Tauri.
+- **Release passou a exigir data final nos dois changelogs** — `scripts/release.sh` e `scripts/release.ps1` agora validam que `CHANGELOG.md` e `CHANGELOG.en.md` usam `## [x.y.z] - YYYY-MM-DD` para a versão alvo (bloqueando `A definir`/`TBD` e também datas divergentes entre PT/EN).
 
 ## [26.4.17] - 2026-04-16
 
