@@ -47,6 +47,34 @@ function Check-Command([string]$Cmd) {
     return $null -ne (Get-Command $Cmd -ErrorAction SilentlyContinue)
 }
 
+$script:PnpmWrapper = Join-Path $POMODOROZ "scripts/pnpmw.mjs"
+
+function Invoke-PnpmWrapper {
+    param(
+        [Parameter(ValueFromRemainingArguments = $true)]
+        [string[]]$Args
+    )
+
+    if (-not (Check-Command "node")) {
+        throw "Node nao encontrado para executar pnpmw."
+    }
+    if (-not (Test-Path $script:PnpmWrapper)) {
+        throw "Wrapper pnpmw nao encontrado em $script:PnpmWrapper"
+    }
+
+    & node $script:PnpmWrapper @Args
+    return $LASTEXITCODE
+}
+
+function pnpm {
+    param(
+        [Parameter(ValueFromRemainingArguments = $true)]
+        [string[]]$Args
+    )
+
+    [void](Invoke-PnpmWrapper @Args)
+}
+
 function Get-PackageJson {
     param([string]$Path)
     if (-not (Test-Path $Path)) {
@@ -259,18 +287,24 @@ function Check-DevEnvironment {
         $nodeMajor = 0
         [void][int]::TryParse(($nodeVersion -split '\.')[0], [ref]$nodeMajor)
         if ($nodeMajor -ge 24) {
-            Write-Host "  Node.js: v$nodeVersion ✓" -ForegroundColor Green
+            Write-Host "  Node.js: v$nodeVersion [OK]" -ForegroundColor Green
         } else {
-            Write-Host "  Node.js: v$nodeVersion ⚠ (recomendado: v24 LTS)" -ForegroundColor Yellow
+            Write-Host "  Node.js: v$nodeVersion [WARN] (recomendado: v24 LTS)" -ForegroundColor Yellow
             Write-Host "    Sugestao: nvm install 24; nvm use 24" -ForegroundColor Gray
         }
     } else {
-        Write-Host "  Node.js: ❌ nao encontrado" -ForegroundColor Red
+        Write-Host "  Node.js: [ERROR] nao encontrado" -ForegroundColor Red
     }
 
-    if (Check-Command "pnpm") {
-        $pnpmVersion = pnpm --version
-        Write-Host "  pnpm: $pnpmVersion ✓" -ForegroundColor Green
+    $pnpmVersion = ""
+    try {
+        $pnpmVersion = (& pnpm --version | Select-Object -First 1).Trim()
+    } catch {
+        $pnpmVersion = ""
+    }
+
+    if (-not [string]::IsNullOrWhiteSpace($pnpmVersion)) {
+        Write-Host "  pnpm: $pnpmVersion [OK]" -ForegroundColor Green
 
         if (Check-Command "npm") {
             $pnpmLatest = ""
@@ -288,7 +322,7 @@ function Check-DevEnvironment {
             }
         }
     } else {
-        Write-Host "  pnpm: ❌ nao encontrado" -ForegroundColor Red
+        Write-Host "  pnpm: [ERROR] nao encontrado (nem via corepack/pnpmw)." -ForegroundColor Red
     }
 }
 
@@ -378,7 +412,7 @@ function Get-WorkspaceOutdatedRows {
 
     if ($status -gt 1) {
         $script:OutdatedCheckFailed = $true
-        Write-Host "  ⚠ [$WorkspaceName] falha ao consultar updates (rede/registry)." -ForegroundColor Yellow
+        Write-Host "  [WARN] [$WorkspaceName] falha ao consultar updates (rede/registry)." -ForegroundColor Yellow
         return $rows
     }
 
@@ -387,9 +421,9 @@ function Get-WorkspaceOutdatedRows {
         $script:OutdatedCheckFailed = $true
         $preview = ($rawText -split "`n" | Select-Object -First 4) -join " "
         if ([string]::IsNullOrWhiteSpace($preview)) {
-            Write-Host "  ⚠ [$WorkspaceName] falha ao consultar updates (erro retornado pelo pnpm)." -ForegroundColor Yellow
+            Write-Host "  [WARN] [$WorkspaceName] falha ao consultar updates (erro retornado pelo pnpm)." -ForegroundColor Yellow
         } else {
-            Write-Host "  ⚠ [$WorkspaceName] falha ao consultar updates: $preview" -ForegroundColor Yellow
+            Write-Host "  [WARN] [$WorkspaceName] falha ao consultar updates: $preview" -ForegroundColor Yellow
         }
         return $rows
     }
@@ -397,7 +431,7 @@ function Get-WorkspaceOutdatedRows {
     if ([string]::IsNullOrWhiteSpace($rawText)) {
         if ($status -eq 1) {
             $script:OutdatedCheckFailed = $true
-            Write-Host "  ⚠ [$WorkspaceName] resultado inconclusivo: pnpm retornou status 1, mas sem payload JSON." -ForegroundColor Yellow
+            Write-Host "  [WARN] [$WorkspaceName] resultado inconclusivo: pnpm retornou status 1, mas sem payload JSON." -ForegroundColor Yellow
         }
         return $rows
     }
@@ -408,7 +442,7 @@ function Get-WorkspaceOutdatedRows {
     } catch {
         if ($status -eq 1) {
             $script:OutdatedCheckFailed = $true
-            Write-Host "  ⚠ [$WorkspaceName] resultado inconclusivo: pnpm retornou status 1, mas o JSON nao foi parseado." -ForegroundColor Yellow
+            Write-Host "  [WARN] [$WorkspaceName] resultado inconclusivo: pnpm retornou status 1, mas o JSON nao foi parseado." -ForegroundColor Yellow
         }
         return $rows
     }
@@ -499,7 +533,7 @@ function Get-WorkspaceOutdatedRows {
 
     if ($status -eq 1 -and $rows.Count -eq 0) {
         $script:OutdatedCheckFailed = $true
-        Write-Host "  ⚠ [$WorkspaceName] resultado inconclusivo: pnpm retornou status 1, mas nao foi possivel montar a tabela de updates." -ForegroundColor Yellow
+        Write-Host "  [WARN] [$WorkspaceName] resultado inconclusivo: pnpm retornou status 1, mas nao foi possivel montar a tabela de updates." -ForegroundColor Yellow
     }
 
     return $rows
@@ -510,7 +544,7 @@ function Show-OutdatedTable {
 
     if (-not $Rows -or $Rows.Count -eq 0) {
         if ($script:OutdatedCheckFailed) {
-            Write-Host "  ⚠ Resultado inconclusivo: houve falha ao consultar o registry em um ou mais workspaces." -ForegroundColor Yellow
+            Write-Host "  [WARN] Resultado inconclusivo: houve falha ao consultar o registry em um ou mais workspaces." -ForegroundColor Yellow
         } else {
             Write-Host "  Nenhuma dependencia desatualizada encontrada." -ForegroundColor Green
         }
@@ -643,7 +677,7 @@ function Invoke-WorkspaceUpdate {
     foreach ($row in $Rows) {
         $wsPath = ($Workspaces | Where-Object { $_.Name -eq $row.Workspace } | Select-Object -First 1).Path
         if (-not $wsPath) {
-            Write-Host "  ⚠ Workspace desconhecido: $($row.Workspace)" -ForegroundColor Yellow
+            Write-Host "  [WARN] Workspace desconhecido: $($row.Workspace)" -ForegroundColor Yellow
             continue
         }
 
@@ -685,13 +719,13 @@ function Invoke-WorkspaceUpdate {
 function Check-JsDependencies {
     Step "`n[4/5] Dependencias JS/TS (pnpm)"
 
-    if (-not (Check-Command "pnpm")) {
-        Write-Host "  pnpm nao encontrado." -ForegroundColor Red
+    if (-not (Check-Command "node")) {
+        Write-Host "  Node nao encontrado; nao foi possivel executar pnpm/pnpmw." -ForegroundColor Red
         return
     }
     $pnpmLock = Join-Path $POMODOROZ "pnpm-lock.yaml"
     if (-not (Test-Path $pnpmLock)) {
-        Write-Host "  ⚠ pnpm-lock.yaml nao encontrado em $POMODOROZ." -ForegroundColor Yellow
+        Write-Host "  [WARN] pnpm-lock.yaml nao encontrado em $POMODOROZ." -ForegroundColor Yellow
         Write-Host ('    Execute: Set-Location "{0}"; pnpm install' -f $POMODOROZ) -ForegroundColor Yellow
         return
     }
@@ -738,7 +772,7 @@ function Check-JsDependencies {
         Invoke-WorkspaceUpdate -Rows $selectedMajor -UseLatest
     }
 
-    Write-Host "`n✓ Updates concluidos." -ForegroundColor Green
+    Write-Host "`n[OK] Updates concluidos." -ForegroundColor Green
     Write-Host 'Recomendado:' -ForegroundColor Gray
     Write-Host ('  Set-Location "{0}"; pnpm build' -f $POMODOROZ) -ForegroundColor Gray
     Write-Host ('  Set-Location "{0}"; pnpm dev:app' -f $POMODOROZ) -ForegroundColor Gray
@@ -778,13 +812,13 @@ function Check-RustDependencies {
         try {
             & cargo outdated
             if ($LASTEXITCODE -ne 0) {
-                Write-Host "  ⚠ Falha ao executar cargo outdated." -ForegroundColor Yellow
+                Write-Host "  [WARN] Falha ao executar cargo outdated." -ForegroundColor Yellow
             }
         } finally {
             Pop-Location
         }
     } else {
-        Write-Host "  ⚠ cargo-outdated nao instalado." -ForegroundColor Yellow
+        Write-Host "  [WARN] cargo-outdated nao instalado." -ForegroundColor Yellow
         Write-Host "    Instale com: cargo install cargo-outdated" -ForegroundColor Yellow
     }
 
@@ -794,13 +828,13 @@ function Check-RustDependencies {
         try {
             & cargo audit
             if ($LASTEXITCODE -ne 0) {
-                Write-Host "  ⚠ Falha ao executar cargo audit." -ForegroundColor Yellow
+                Write-Host "  [WARN] Falha ao executar cargo audit." -ForegroundColor Yellow
             }
         } finally {
             Pop-Location
         }
     } else {
-        Write-Host "  ⚠ cargo-audit nao instalado." -ForegroundColor Yellow
+        Write-Host "  [WARN] cargo-audit nao instalado." -ForegroundColor Yellow
         Write-Host "    Instale com: cargo install cargo-audit" -ForegroundColor Yellow
     }
 

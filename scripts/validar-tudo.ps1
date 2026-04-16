@@ -17,6 +17,7 @@ $ErrorActionPreference = "Stop"
 $ROOT = Split-Path -Parent $PSScriptRoot
 $APP_DIR = $ROOT
 $INSTALL_SCRIPT = Join-Path $ROOT "scripts/install.ps1"
+$PNPM_WRAPPER = Join-Path $ROOT "scripts/pnpmw.mjs"
 $IS_WINDOWS_OS = ($env:OS -eq "Windows_NT")
 
 function Step($message) {
@@ -34,7 +35,11 @@ function Invoke-Pnpm {
         [string[]]$Args
     )
 
-    & pnpm @Args
+    if (-not (Test-Path $PNPM_WRAPPER)) {
+        Die "Wrapper pnpmw nao encontrado: $PNPM_WRAPPER"
+    }
+
+    & node $PNPM_WRAPPER @Args
     if ($LASTEXITCODE -ne 0) {
         exit $LASTEXITCODE
     }
@@ -190,10 +195,13 @@ try {
     Die "Node nao encontrado."
 }
 
-if (-not (Get-Command pnpm -ErrorAction SilentlyContinue)) {
-    Die "pnpm nao encontrado."
+if (-not (Test-Path $PNPM_WRAPPER)) {
+    Die "Wrapper pnpmw nao encontrado: $PNPM_WRAPPER"
 }
-$pnpmVersion = (pnpm --version).Trim()
+$pnpmVersion = (& node $PNPM_WRAPPER --version | Select-Object -First 1).Trim()
+if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($pnpmVersion)) {
+    Die "Nao foi possivel obter versao do pnpm via pnpmw/corepack."
+}
 Write-Host "pnpm $pnpmVersion" -ForegroundColor Green
 
 if (-not $SkipInstall) {
