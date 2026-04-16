@@ -6,8 +6,8 @@
   "build": {
     "frontendDist": "../app/renderer/build",
     "devUrl": "http://localhost:3000",
-    "beforeDevCommand": "node ../scripts/pnpmw.mjs --filter @pomodoroz/renderer run dev:renderer",
-    "beforeBuildCommand": "node ../scripts/pnpmw.mjs --filter @pomodoroz/renderer run build"
+    "beforeDevCommand": "node ./scripts/pnpmw.mjs --filter @pomodoroz/renderer run dev:renderer",
+    "beforeBuildCommand": "node ./scripts/pnpmw.mjs --filter @pomodoroz/renderer run build"
   },
   "app": {
     "windows": [
@@ -38,5 +38,13 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
+  },
+  "plugins": {
+    "updater": {
+      "endpoints": [
+        "https://github.com/cjdduarte/pomodoroz/releases/latest/download/latest.json"
+      ],
+      "pubkey": "REPLACE_WITH_TAURI_UPDATER_PUBKEY"
+    }
   }
 }
