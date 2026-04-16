@@ -71,6 +71,23 @@ function Invoke-CargoClippyStrict {
     }
 }
 
+function Invoke-ElectronBuilderViaScript {
+    param(
+        [Parameter(ValueFromRemainingArguments = $true)]
+        [string[]]$Args
+    )
+
+    Push-Location (Join-Path $APP_DIR "app/electron")
+    try {
+        # Usa o script `eb` do workspace Electron, que ja injeta:
+        # npm_config_user_agent=traversal e npm_execpath=traversal.
+        # Isso evita que o node-module-collector dependa de `pnpm` no PATH.
+        Invoke-Pnpm run eb -- @Args
+    } finally {
+        Pop-Location
+    }
+}
+
 function Show-Usage {
 @"
 Uso:
@@ -292,36 +309,28 @@ if ($BuildInstallers) {
         Push-Location $APP_DIR
         Invoke-Pnpm build
         Pop-Location
-        Push-Location (Join-Path $APP_DIR "app/electron")
-        Invoke-Pnpm exec electron-builder --win --ia32 --x64 --publish=never
-        Pop-Location
+        Invoke-ElectronBuilderViaScript --win --ia32 --x64 --publish=never
     } elseif ((Get-Variable IsLinux -ErrorAction SilentlyContinue) -and $IsLinux) {
         if ($InstallersProfile -eq "full") {
             Step "Gerando instaladores Linux (full: AppImage+deb+rpm x64/arm64)"
             Push-Location $APP_DIR
             Invoke-Pnpm build
             Pop-Location
-            Push-Location (Join-Path $APP_DIR "app/electron")
-            Invoke-Pnpm exec electron-builder --linux --x64 --arm64 --publish=never
-            Pop-Location
+            Invoke-ElectronBuilderViaScript --linux --x64 --arm64 --publish=never
         } else {
             Step "Gerando instaladores Linux (slim: AppImage+deb x64/arm64 + rpm x64)"
             Push-Location $APP_DIR
             Invoke-Pnpm build
             Pop-Location
-            Push-Location (Join-Path $APP_DIR "app/electron")
-            Invoke-Pnpm exec electron-builder --linux AppImage deb --x64 --arm64 --publish=never
-            Invoke-Pnpm exec electron-builder --linux rpm --x64 --publish=never
-            Pop-Location
+            Invoke-ElectronBuilderViaScript --linux AppImage deb --x64 --arm64 --publish=never
+            Invoke-ElectronBuilderViaScript --linux rpm --x64 --publish=never
         }
     } elseif ((Get-Variable IsMacOS -ErrorAction SilentlyContinue) -and $IsMacOS) {
         Step ("Gerando instaladores macOS ({0}: --mac --publish=never)" -f $InstallersProfile)
         Push-Location $APP_DIR
         Invoke-Pnpm build
         Pop-Location
-        Push-Location (Join-Path $APP_DIR "app/electron")
-        Invoke-Pnpm exec electron-builder --mac --publish=never
-        Pop-Location
+        Invoke-ElectronBuilderViaScript --mac --publish=never
     } else {
         Step "Gerando instaladores (build)"
         Push-Location $APP_DIR
@@ -333,9 +342,7 @@ if ($BuildInstallers) {
     Push-Location $APP_DIR
     Invoke-Pnpm build
     Pop-Location
-    Push-Location (Join-Path $APP_DIR "app/electron")
-    Invoke-Pnpm exec electron-builder --dir
-    Pop-Location
+    Invoke-ElectronBuilderViaScript --dir
 }
 
 if ($Dev) {

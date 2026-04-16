@@ -62,7 +62,9 @@
 - **`pnpmw` is now resilient to invalid `npm_execpath` in profile-less shells** — the wrapper now only accepts candidates whose probe exits with `status=0` and no longer aborts early when `npm_execpath` fails, preventing `validar-tudo.ps1` startup failure under `powershell -NoProfile`.
 - **`lerna run` execution stabilized for Corepack-only Windows environments** — `lerna.json` now uses `npmClient: \"npm\"` to avoid `'pnpm' is not recognized` failures in child processes, while dependency management remains on `pnpm` and scripts keep using `pnpmw`.
 - **`validar-tudo.ps1` fixed for strict Clippy gate on Windows** — Rust validation now enforces `-D warnings` through `RUSTFLAGS`, avoiding argument forwarding/parsing failures in environments where `cargo clippy -- -D warnings` is not accepted as expected.
+- **`validar-tudo.ps1` packaging path hardened for Windows without `pnpm` in PATH** — the script now invokes `electron-builder` through the Electron workspace `eb` script (which sets traversal env vars), avoiding node-module-collector failure with `'pnpm' is not recognized`.
 - **`check-updates.ps1` fixed to preserve real `pnpmw` output** — the `pnpm` function no longer discards stdout/stderr, restoring proper `pnpm` version detection and `pnpm outdated --format json` parsing.
+- **`check-updates.ps1` updated for PowerShell 5.1 list-to-array conversion** — update rows now use `ToArray()` instead of array-subexpression over `List[object]`, eliminating `Argument types do not match` during per-workspace reports.
 
 ### Documentation
 

@@ -62,7 +62,9 @@
 - **`pnpmw` ficou resiliente a `npm_execpath` inválido em shells sem profile** — o wrapper agora só aceita candidatos cujo probe retorna `status=0` e deixa de abortar cedo quando `npm_execpath` falha, evitando erro no `validar-tudo.ps1` em `powershell -NoProfile`.
 - **Execução do `lerna run` estabilizada em ambiente Corepack-only (Windows)** — `lerna.json` passou a usar `npmClient: \"npm\"` para evitar erro `'pnpm' nao e reconhecido` em subprocessos, mantendo `pnpm` no gerenciamento de dependências e scripts via `pnpmw`.
 - **`validar-tudo.ps1` corrigido para gate strict do Clippy no Windows** — a validação Rust passou a aplicar `-D warnings` via `RUSTFLAGS`, evitando falha de parsing/encaminhamento de argumentos em ambientes onde `cargo clippy` não aceita `-- -D warnings` no mesmo formato.
+- **Empacotamento no `validar-tudo.ps1` ficou robusto em Windows sem `pnpm` no PATH** — o script passou a acionar `electron-builder` via script `eb` do workspace Electron (com `npm_config_user_agent=npm_execpath=traversal`), evitando falha do node-module-collector com `pnpm nao reconhecido`.
 - **`check-updates.ps1` corrigido para capturar saída real do `pnpmw`** — a função `pnpm` deixou de descartar stdout/stderr, restaurando detecção de versão do `pnpm` e parse do JSON de `pnpm outdated`.
+- **`check-updates.ps1` ajustado para PowerShell 5.1 na montagem da tabela de updates** — a conversão de `List[object]` para array passou a usar `ToArray()`, eliminando erro `Os tipos de argumento nao correspondem` no relatório por workspace.
 
 ### Documentação
 

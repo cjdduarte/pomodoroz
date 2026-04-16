@@ -530,7 +530,7 @@ function Get-WorkspaceOutdatedRows {
         }
     }
 
-    $rows = @($rowsList)
+    $rows = $rowsList.ToArray()
 
     if ($status -eq 1 -and $rows.Count -eq 0) {
         $script:OutdatedCheckFailed = $true
