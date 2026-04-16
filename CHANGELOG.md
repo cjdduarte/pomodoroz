@@ -68,6 +68,7 @@
 - **`check-updates.ps1` ajustado para PowerShell 5.1 na montagem da tabela de updates** — a conversão de `List[object]` para array passou a usar `ToArray()`, eliminando erro `Os tipos de argumento nao correspondem` no relatório por workspace.
 - **Parser do `pnpm outdated` no `check-updates.ps1` reforçado para saída em objeto chaveado** — o script agora lê corretamente payloads JSON em formato `PSCustomObject` (pacote como chave), restaurando listagem de updates em ambientes Windows/PowerShell 5.1.
 - **Logs operacionais locais fora do versionamento Git** — `.gitignore` passou a incluir `/logs/`, evitando ruído de execução (`validar-tudo`, `check-updates`, `cargo audit/outdated`) no `git status`.
+- **Lote SAFE de dependências aplicado com validação completa** — `@types/node` (`25.5.2 -> 25.6.0`) no root e renderer, `react-router` (`7.14.0 -> 7.14.1`) no renderer, `electron` (`41.2.0 -> 41.2.1`) no workspace Electron e `tauri-plugin-global-shortcut` (`2.2.1 -> 2.3.1`) no `src-tauri`.
 
 ### Documentação
 
