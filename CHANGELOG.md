@@ -39,7 +39,7 @@
 - **Atalho do Menu Iniciar explicitado no NSIS** — `src-tauri/tauri.conf.json` agora define `bundle.windows.nsis.startMenuFolder = \"Pomodoroz\"` para melhorar previsibilidade da entrada no Windows Start Menu.
 - **Importação/Exportação de tarefas no Tauri migrada para diálogo nativo (Fase 2h kickoff)** — `TauriInvokeConnector` agora usa `tauri-plugin-dialog` (`save/open`) e bridge Rust (`write_text_file`/`read_text_file`), removendo o fallback web de `<a download>` e `<input type=\"file\">`.
 - **Som de notificação no Tauri migrado para playback nativo em Rust (Fase 2i kickoff)** — renderer agora envia bytes WAV para o comando Rust `play_notification_sound` (via `rodio`), mantendo fallback local no renderer fora do Tauri ou em falha de áudio nativo.
-- **Prompt inicial de política de atualização com layout refinado** — título e descrição agora ficam centralizados no modal, e os botões foram encurtados para `Atualizar automaticamente` e `Apenas avisar` (com textos equivalentes nos demais idiomas).
+- **Prompt inicial de política de atualização com layout refinado** — título e descrição agora ficam centralizados no modal, e os botões usam rótulos compactos para evitar overflow visual em janelas estreitas.
 - **Guardrail de update mantido no Tauri após defer da 2f** — somente `In-app auto update` permanece `disabled` em Ajustes até a etapa final de hardening de release.
 - **Conjunto Tauri pinado para reduzir drift de ecossistema** — `@tauri-apps/api`, `@tauri-apps/cli`, `tauri`, `tauri-build` e `tauri-plugin-log` agora usam versões fixas no projeto.
 - **Ícone de tray no Linux isolado por sessão para evitar “ícone aleatório” entre execuções dev** — `setup_tray` agora usa `temp_dir_path` próprio (`$XDG_RUNTIME_DIR`/`pomodoroz-tray` por processo+timestamp) e faz limpeza defensiva de sessões órfãs, reduzindo reutilização de caminhos antigos no status notifier.
@@ -70,6 +70,7 @@
 - **Logs operacionais locais fora do versionamento Git** — `.gitignore` passou a incluir `/logs/`, evitando ruído de execução (`validar-tudo`, `check-updates`, `cargo audit/outdated`) no `git status`.
 - **Lote SAFE de dependências aplicado com validação completa** — `@types/node` (`25.5.2 -> 25.6.0`) no root e renderer, `react-router` (`7.14.0 -> 7.14.1`) no renderer, `electron` (`41.2.0 -> 41.2.1`) no workspace Electron e `tauri-plugin-global-shortcut` (`2.2.1 -> 2.3.1`) no `src-tauri`.
 - **`validar-tudo` ganhou auto-reparo do runtime Electron para fluxo `dev:app`** — `scripts/validar-tudo.sh` e `scripts/validar-tudo.ps1` agora verificam `require('electron')` antes de iniciar o modo dev e, se o binário estiver ausente/incompleto, executam automaticamente o `install.js` do pacote Electron no workspace `app/electron`.
+- **Rótulo do botão principal do prompt de auto update encurtado em PT-BR/EN/ES** — `settings.autoUpdatePromptEnable` agora usa `Atualizar auto.` (pt), `Auto update` (en) e `Actualizar auto.` (es), evitando overflow visual em janelas estreitas.
 - **`uninstall` em modo purge passou a cobrir dados do runtime Tauri no Linux** — `scripts/uninstall.sh` e `scripts/uninstall.ps1` agora removem também paths por identificador (`~/.config/com.cjdduarte.pomodoroz`, `~/.cache/com.cjdduarte.pomodoroz` e `~/.local/share/com.cjdduarte.pomodoroz`), além dos paths legados de `~/.config/pomodoroz` e `~/.cache/pomodoroz`.
 
 ### Documentação
