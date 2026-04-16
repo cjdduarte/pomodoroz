@@ -2,4 +2,4 @@
 
 cd -- "$(dirname "$0")/.." || exit 1
 
-yarn lint-staged
+node ./scripts/pnpmw.mjs exec lint-staged
