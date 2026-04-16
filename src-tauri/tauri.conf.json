@@ -44,7 +44,7 @@
       "endpoints": [
         "https://github.com/cjdduarte/pomodoroz/releases/latest/download/latest.json"
       ],
-      "pubkey": "REPLACE_WITH_TAURI_UPDATER_PUBKEY"
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDRDMjc4MjMxODRCN0Y3NzMKUldSejk3ZUVNWUluVEtlRDJkMjBJRmxWL0V4bmVVazZ5dWFrTkFXUkl5eUtweGl0dE01V05yWGcK"
     }
   }
 }
