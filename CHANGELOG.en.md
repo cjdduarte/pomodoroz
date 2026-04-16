@@ -56,7 +56,7 @@
 - **`check-updates.sh` JS/TS table alignment fixed** — `pnpm outdated` JSON parsing now keeps columns aligned when `workspace` is empty, so package names are shown correctly again.
 - **Root/workspace `package.json` scripts migrated to `pnpm`** — build/lint/start/release commands in `package.json`, `app/electron/package.json`, `app/renderer/package.json`, and `app/shareables/package.json` no longer call `yarn`, removing implicit fallback in prebuild/build flows.
 - **`pnpm` script execution made resilient when binary is missing from PATH** — new wrapper `scripts/pnpmw.mjs` is now used by root/workspace `package.json` scripts to run `pnpm` directly when available or `corepack pnpm` when needed, fixing Windows failures such as `'pnpm' is not recognized` during `corepack pnpm run ...` flows.
-- **`lerna` aligned to `pnpm`** — `lerna.json` now sets `npmClient: \"pnpm\"`, preventing `lerna run` pipelines from invoking workspace scripts through `yarn run`.
+- **`lerna run` execution stabilized for Corepack-only Windows environments** — `lerna.json` now uses `npmClient: \"npm\"` to avoid `'pnpm' is not recognized` failures in child processes, while dependency management remains on `pnpm` and scripts keep using `pnpmw`.
 
 ### Documentation
 
