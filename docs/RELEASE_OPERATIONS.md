@@ -33,25 +33,26 @@ Current status: **Completed** (release 26.4.9+).
 
 ### Step 1 — Prepare Version
 
-1. Set new version (e.g., `26.4.14`).
-2. Update both changelogs:
+1. Define target version (e.g., `26.4.16`).
+2. Update both changelogs for the target version section:
    - `CHANGELOG.md` (PT)
    - `CHANGELOG.en.md` (EN)
-3. Prepare commit/tag with dedicated script:
-   - Unix: `yarn release:tag -- <version>`
-   - PowerShell: `yarn release:tag:ps -- -Version <version>`
-4. (Optional) dry run: `yarn release:tag:dry -- <version>`
-5. Validate baseline:
-   - `yarn lint`
-   - `yarn build`
-   - `yarn build:dir`
+3. Keep next version as `A definir` / `TBD` while unreleased; set final date only on release day.
+4. Prepare commit/tag with dedicated script:
+   - Unix: `./scripts/release.sh <version>` (or `pnpm release:tag -- <version>`)
+   - PowerShell: `pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/release.ps1 -Version <version>`
+5. (Optional) dry run: `./scripts/release.sh --dry-run <version>` (or `pnpm release:tag:dry -- <version>`)
+6. Validate baseline:
+   - `pnpm lint`
+   - `pnpm build`
+   - `pnpm build:dir`
 
 ### Step 2 — Publish Artifacts
 
 1. Export token: `GH_TOKEN=<token>`
 2. Publish release:
-   - All targets: `yarn release`
-   - Mac + Windows: `yarn release:mw`
+   - All targets: `pnpm release`
+   - Mac + Windows: `pnpm release:mw`
    - Linux dedicated: run in Linux environment when needed
 3. `Release Auto Update` workflow syncs release title/notes from `CHANGELOG.md` section when triggered by `v*` tag.
 4. Confirm published release contains:
@@ -119,7 +120,7 @@ Future optional review: if manual bandwidth/download control is needed, evaluate
 ### CH-01 — Preparation and Local Validation
 
 - [ ] Define target version and update both changelogs
-- [ ] Confirm `release` and `release:mw` scripts exist and run
+- [ ] Confirm `release:tag`, `release`, and `release:mw` scripts exist and run (`pnpm`)
 - [ ] Execute baseline (`lint`, `build`, `build:dir`)
 
 ### CH-02 — Feed Publishing

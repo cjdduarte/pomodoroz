@@ -342,8 +342,9 @@ Phase 2 operational validation snapshot (2026-04-16, Linux):
   - [x] `install.sh/.ps1` migrated to `pnpm` without Yarn fallback.
   - [x] `validar-tudo.sh/.ps1` migrated to `pnpm` without Yarn fallback.
   - [x] Root/workspace `package.json` scripts migrated from `yarn` to `pnpm`.
-  - [ ] Lockfile transition (`pnpm-lock.yaml` canonical + `yarn.lock` removal) still pending.
-  - [ ] GitHub Actions workflow migration (`yarn` -> `pnpm`) still pending.
+  - [x] Lockfile transition completed (`pnpm-lock.yaml` canonical + `yarn.lock` removed).
+  - [x] GitHub Actions release workflow migrated (`.github/workflows/release-autoupdate.yml`: `yarn` -> `pnpm`).
+  - [ ] Validate migrated release workflow on GitHub Actions run (manual dispatch or next `v*` tag).
 - Validation:
   - `pnpm install` succeeds
   - `pnpm dev` / `pnpm build` / `pnpm lint` work

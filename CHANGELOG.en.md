@@ -81,6 +81,8 @@
 - **Migration tracker advanced to 2c after manual 2b closure** — `docs/MIGRATION_ELECTRON_TO_TAURI.md` now records notification parity validation (user-gesture permission prompt + notification delivery) as completed.
 - **Tracker advanced to 2d after Linux manual 2c validation** — `docs/MIGRATION_ELECTRON_TO_TAURI.md` now marks `Alt+Shift+H/S` global shortcut parity as validated on Linux dev runtime and opens the 2d operational snapshot.
 - **Phase 2 Linux operational snapshot updated in migration plan** — `docs/MIGRATION_ELECTRON_TO_TAURI.md` now records revalidation of `validar-tudo` flows (options 5 and 6) and `uninstall` `purge`, including non-blocking `linux-unpacked` diagnostics.
+- **Phase 3a checklist updated for lockfile and release workflow migration** — `docs/MIGRATION_ELECTRON_TO_TAURI.md` now marks `yarn.lock` removal and `.github/workflows/release-autoupdate.yml` migration to `pnpm` as completed, keeping only the GitHub Actions runtime validation pending.
+- **Release operations guide aligned with current flow (`pnpm` + `release.sh`)** — `docs/RELEASE_OPERATIONS.md` now reflects real tagging/publishing commands and explicitly documents keeping `A definir`/`TBD` until release day, setting the final date only at publication time.
 
 ## [26.4.15] - 2026-04-09
 
