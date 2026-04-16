@@ -149,10 +149,10 @@ Phase 0 completion checklist (execution status):
 
 - [x] `src-tauri/` scaffold created and version/identifier aligned with project
 - [x] `@tauri-apps/cli` and `@tauri-apps/api` added, plus root `"tauri"` script
-- [x] Tauri dev flow validated (`yarn tauri dev` opened and ran the app)
+- [x] Tauri dev flow validated (`pnpm tauri dev` opened and ran the app)
 - [x] No Electron code removed yet
 - [x] Package manager still Yarn (pnpm remains Phase 3a)
-- [x] Revalidate `yarn dev:app` after Tauri scaffold (Electron path still green)
+- [x] Revalidate `pnpm dev:app` after Tauri scaffold (Electron path still green)
 - [x] Run/confirm script checklist impact for current phase (`scripts/` validation rule)
 
 Rule to move forward: only start Phase 1 after all Phase 0 checklist items above are checked.
@@ -166,7 +166,7 @@ Phase 1 progress checklist (execution status):
 - [x] Implement Rust command/event bridge in `src-tauri/src/commands/` for migrated channels
 - [x] Replace remaining renderer dependency on Electron IPC contract package (`@pomodoroz/shareables`) with local runtime command/event types
 - [x] Validate feature parity for migrated flows (timer reset confirmation, fullscreen events, task import/export; reset confirmation currently uses two-step confirm fallback on Tauri)
-  - [x] Runtime smoke validation completed (`yarn tauri dev --no-watch` booted successfully after connector decoupling)
+  - [x] Runtime smoke validation completed (`pnpm tauri dev --no-watch` booted successfully after connector decoupling)
   - [x] Manual functional validation completed (`cancelar/não/sim` reset decision, fullscreen + `Esc`, window actions, and import/export fallback messaging)
 
 Phase 1 manual validation matrix (to close the last checklist item):
@@ -182,13 +182,13 @@ Phase 1 manual validation matrix (to close the last checklist item):
 - Goal: get Tauri running alongside the existing renderer without breaking Electron.
 - Scope:
   - Scaffold `src-tauri/` (Cargo.toml, tauri.conf.json, src/main.rs)
-  - Add `@tauri-apps/cli` and `@tauri-apps/api` as devDependencies via Yarn
+  - Add `@tauri-apps/cli` and `@tauri-apps/api` as devDependencies via pnpm
   - Add `"tauri": "tauri"` script to root `package.json` (uses local bin from `@tauri-apps/cli`)
   - Keep the existing renderer Vite config (`app/renderer/vite.config.ts`) and wire Tauri via `src-tauri/tauri.conf.json` (`devUrl` + `beforeDevCommand`) — no folder restructuring yet
   - Verify the renderer loads inside a Tauri window (no native features yet)
 - Validation:
-  - `yarn tauri dev` opens a Tauri window with the React UI
-  - `yarn dev:app` (Electron) still works in parallel (not broken)
+  - `pnpm tauri dev` opens a Tauri window with the React UI
+  - `pnpm dev:app` (Electron) still works in parallel (not broken)
 - Exit criteria:
   - Tauri window renders the existing React app
   - No Electron code removed yet (including `app/shareables/` — IPC contracts stay until Phase 1)
@@ -241,7 +241,7 @@ Phase 2a current validation snapshot (2026-04-10):
 Linux tray icon dev-session note (record for future revisit):
 
 - Root context: `tray-icon` (via Tauri Linux stack) writes tray PNGs to runtime temp paths and uses file paths with appindicator/status notifier.
-- Observed symptom: in repeated `yarn tauri dev` cycles, tray icon could appear stale/“random” at startup in some sessions.
+- Observed symptom: in repeated `pnpm tauri dev` cycles, tray icon could appear stale/“random” at startup in some sessions.
 - Mitigation applied: app-specific Linux tray `temp_dir_path` is now session-isolated (`pid + timestamp`) and startup performs defensive cleanup of orphan `session-*` folders based on `/proc/<pid>` existence.
 - Residual note: if compositor-side cache behavior still appears, revisit in Phase 2a polish and re-evaluate with packaged builds (not only dev loop).
 

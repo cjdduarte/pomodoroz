@@ -18,17 +18,17 @@ Please use conventional commit messages in your PRs (or PR titles for squash mer
 ### Requirements
 
 - Node.js v24
-- Yarn Classic (1.x)
+- pnpm v10
 
 ### Commands
 
 ```sh
-yarn install              # Install dependencies
-yarn dev:app              # Electron + Vite renderer
-yarn dev:renderer         # Renderer only (Vite on localhost:3000)
-yarn dev:main             # Electron main only
-yarn lint                 # Lint + typecheck
-yarn build:dir            # Unpacked build for smoke testing
+pnpm install              # Install dependencies
+pnpm dev:app              # Electron + Vite renderer
+pnpm dev:renderer         # Renderer only (Vite on localhost:3000)
+pnpm dev:main             # Electron main only
+pnpm lint                 # Lint + typecheck
+pnpm build:dir            # Unpacked build for smoke testing
 ```
 
 Any IDE should work — it will pick up `package.json` in the root folder.
@@ -43,17 +43,17 @@ Any IDE should work — it will pick up `package.json` in the root folder.
 ## Building for Production
 
 ```sh
-yarn build:win            # Windows (portable + setup)
-yarn build:mac            # macOS
-yarn build:linux          # Linux (AppImage, deb, rpm)
-yarn build:mwl            # All platforms
+pnpm build:win            # Windows (portable + setup)
+pnpm build:mac            # macOS
+pnpm build:linux          # Linux (AppImage, deb, rpm)
+pnpm build:mwl            # All platforms
 ```
 
 ## Pre-Commit
 
 This project uses Husky + lint-staged for pre-commit checks.
-Hooks are installed automatically when you run `yarn install`.
-To run the same checks manually: `yarn lint-staged`.
+Hooks are installed automatically when you run `pnpm install`.
+To run the same checks manually: `pnpm exec lint-staged`.
 
 ### Generated Files (Tauri)
 

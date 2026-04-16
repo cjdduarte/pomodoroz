@@ -11,6 +11,7 @@
 ### Changed
 
 - **Release workflow `pnpm` bootstrap fixed to avoid Actions failure (`pnpm` not found)** — `.github/workflows/release-autoupdate.yml` no longer uses `pnpm` cache in `actions/setup-node`, keeping `pnpm` activation via Corepack before build/publish commands.
+- **Tauri flow and contributor docs aligned to `pnpm`** — `src-tauri/tauri.conf.json` now uses `scripts/pnpmw.mjs` for `beforeDevCommand`/`beforeBuildCommand` (removing Yarn dependency from Tauri runtime bootstrap), and `README*`, `CONTRIBUTING.md`, `CLAUDE.md`, and `docs/MIGRATION_ELECTRON_TO_TAURI.md` were updated to `pnpm`-based commands/requirements.
 
 ## [26.4.17] - 2026-04-16
 

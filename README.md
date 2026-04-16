@@ -203,11 +203,11 @@ Download the latest version from the [Releases page](https://github.com/cjdduart
 ### Build From Source
 
 ```sh
-yarn install
-yarn build:dir    # Unpacked build
-yarn build:linux  # Linux (AppImage, deb, rpm)
-yarn build:win    # Windows (portable + setup)
-yarn build:mac    # macOS
+pnpm install
+pnpm build:dir    # Unpacked build
+pnpm build:linux  # Linux (AppImage, deb, rpm)
+pnpm build:win    # Windows (portable + setup)
+pnpm build:mac    # macOS
 ```
 
 ## 🛠️ Development
@@ -215,15 +215,15 @@ yarn build:mac    # macOS
 ### Requirements
 
 - Node.js v24
-- Yarn Classic (1.x)
+- pnpm v10
 
 ### Commands
 
 ```sh
-yarn dev:app          # Electron + Vite renderer
-yarn dev:renderer     # Renderer only (Vite on localhost:3000)
-yarn lint             # Monorepo lint/typecheck
-yarn build:dir        # Unpacked build
+pnpm dev:app          # Electron + Vite renderer
+pnpm dev:renderer     # Renderer only (Vite on localhost:3000)
+pnpm lint             # Monorepo lint/typecheck
+pnpm build:dir        # Unpacked build
 ```
 
 ### Stack
@@ -234,7 +234,7 @@ yarn build:dir        # Unpacked build
 - @dnd-kit (drag-and-drop)
 - Styled Components
 - i18next
-- Lerna 9 + Yarn Classic
+- Lerna 9 + pnpm workspaces
 
 ## 🤝 Contributing
 

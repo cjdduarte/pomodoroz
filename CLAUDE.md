@@ -24,7 +24,7 @@ Pomodoroz is a cross-platform Pomodoro desktop app, forked from [Pomatez](https:
 <repo-root>/
 ├── AGENTS.md
 ├── CLAUDE.md
-├── package.json                 # Root workspace config (Lerna + Yarn Classic)
+├── package.json                 # Root workspace config (Lerna + pnpm workspaces)
 ├── app/
 │   ├── electron/                # Electron main process (entry: src/main.ts)
 │   ├── renderer/                # React renderer (Vite dev + build)
@@ -46,7 +46,7 @@ Pomodoroz is a cross-platform Pomodoro desktop app, forked from [Pomatez](https:
 - **i18next** — internationalization (en, pt, es, ja, zh)
 - **ESLint 9** + `@typescript-eslint 8` (flat config)
 - **Lerna 9** + Nx — monorepo orchestration
-- **Yarn Classic** `1.22.x` — package manager
+- **pnpm** `10.x` — package manager
 - **Node.js** `v24` (see `.nvmrc`)
 
 ## Development Commands
@@ -54,27 +54,27 @@ Pomodoroz is a cross-platform Pomodoro desktop app, forked from [Pomatez](https:
 All commands run from the repo root:
 
 ```sh
-yarn install
+pnpm install
 
-yarn dev:app                 # Main dev flow (Electron + Vite renderer in parallel)
-yarn dev:renderer            # Renderer only (Vite on localhost:3000)
-yarn dev:main                # Electron main only (waits for renderer on port 3000)
+pnpm dev:app                 # Main dev flow (Electron + Vite renderer in parallel)
+pnpm dev:renderer            # Renderer only (Vite on localhost:3000)
+pnpm dev:main                # Electron main only (waits for renderer on port 3000)
 
-yarn lint                    # Lint + typecheck: renderer + electron + shareables
-yarn build                   # Build all workspaces
-yarn build:dir               # Build unpacked Electron app (for smoke testing)
-yarn format                  # Prettier across all files
+pnpm lint                    # Lint + typecheck: renderer + electron + shareables
+pnpm build                   # Build all workspaces
+pnpm build:dir               # Build unpacked Electron app (for smoke testing)
+pnpm format                  # Prettier across all files
 
 # Platform-specific packaged builds
-yarn build:win
-yarn build:mac
-yarn build:linux
-yarn build:mwl               # All platforms
+pnpm build:win
+pnpm build:mac
+pnpm build:linux
+pnpm build:mwl               # All platforms
 
 # Release helper scripts (version + tag + push)
-yarn release:tag -- 26.4.10
-yarn release:tag:dry -- 26.4.10
-yarn release:tag:ps -- -Version 26.4.10
+pnpm release:tag -- 26.4.10
+pnpm release:tag:dry -- 26.4.10
+pnpm release:tag:ps -- -Version 26.4.10
 ```
 
 Validation wrapper scripts:
@@ -88,7 +88,7 @@ Validation wrapper scripts:
 Smoke test a packaged build:
 
 ```sh
-yarn build:dir
+pnpm build:dir
 ./app/electron/dist/linux-unpacked/pomodoroz
 ```
 
@@ -96,7 +96,7 @@ yarn build:dir
 
 ### Monorepo
 
-Three workspaces under `app/*`, orchestrated by Lerna. Yarn Classic manages dependencies at the root. The `prebuild` script ensures `@pomodoroz/shareables` and the electron workspace are prepared before builds.
+Three workspaces under `app/*`, orchestrated by Lerna. pnpm manages dependencies at the root. The `prebuild` script ensures `@pomodoroz/shareables` and the electron workspace are prepared before builds.
 
 ### Renderer <-> Electron Bridge
 
@@ -134,7 +134,7 @@ Renderer persists state in `localStorage`. Electron uses `electron-store` for na
 
 - Wayland/DBus/KWin logs on Linux (environment-specific, harmless)
 - `@typescript-eslint` declares peer support `<6` while project uses TS 6 (non-blocking)
-- Yarn Classic may warn about cache/global folders depending on permissions
+- pnpm global install may require permission-aware setup (`PNPM_HOME` / user-local bin)
 
 ## Key Policies
 

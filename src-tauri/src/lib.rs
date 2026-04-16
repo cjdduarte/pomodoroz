@@ -82,7 +82,7 @@ fn resolve_linux_tray_temp_dir() -> PathBuf {
         .unwrap_or_default();
 
     // Diretório por processo/sessão evita colisão de path com runs
-    // anteriores do `yarn tauri dev` no cache do status notifier.
+    // anteriores do `pnpm tauri dev` no cache do status notifier.
     base_dir.join(format!("session-{}-{}", std::process::id(), session_nonce))
 }
 
