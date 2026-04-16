@@ -182,7 +182,7 @@ try {
     $nodeMajor = [int]($nodeVersion -split '\.')[0]
     if ($nodeMajor -lt 24) {
         Write-Host "Node atual: v$nodeVersion (recomendado: v24 LTS)." -ForegroundColor Yellow
-        Write-Host "Use: nvm install 24 && nvm use 24" -ForegroundColor Yellow
+        Write-Host "Use: nvm install 24; nvm use 24" -ForegroundColor Yellow
     } else {
         Write-Host "Node v$nodeVersion" -ForegroundColor Green
     }
@@ -262,7 +262,7 @@ if (Test-Path $tauriDir) {
 
 if ($BuildInstallers) {
     if ($IS_WINDOWS_OS) {
-        Step "Gerando instaladores Windows ($InstallersProfile: --win --ia32 --x64 --publish=never)"
+        Step ("Gerando instaladores Windows ({0}: --win --ia32 --x64 --publish=never)" -f $InstallersProfile)
         Push-Location $APP_DIR
         Invoke-Pnpm build
         Pop-Location
@@ -289,7 +289,7 @@ if ($BuildInstallers) {
             Pop-Location
         }
     } elseif ((Get-Variable IsMacOS -ErrorAction SilentlyContinue) -and $IsMacOS) {
-        Step "Gerando instaladores macOS ($InstallersProfile: --mac --publish=never)"
+        Step ("Gerando instaladores macOS ({0}: --mac --publish=never)" -f $InstallersProfile)
         Push-Location $APP_DIR
         Invoke-Pnpm build
         Pop-Location

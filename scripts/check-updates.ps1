@@ -262,7 +262,7 @@ function Check-DevEnvironment {
             Write-Host "  Node.js: v$nodeVersion ✓" -ForegroundColor Green
         } else {
             Write-Host "  Node.js: v$nodeVersion ⚠ (recomendado: v24 LTS)" -ForegroundColor Yellow
-            Write-Host "    Sugestao: nvm install 24 && nvm use 24" -ForegroundColor Gray
+            Write-Host "    Sugestao: nvm install 24; nvm use 24" -ForegroundColor Gray
         }
     } else {
         Write-Host "  Node.js: ❌ nao encontrado" -ForegroundColor Red
@@ -692,7 +692,7 @@ function Check-JsDependencies {
     $pnpmLock = Join-Path $POMODOROZ "pnpm-lock.yaml"
     if (-not (Test-Path $pnpmLock)) {
         Write-Host "  ⚠ pnpm-lock.yaml nao encontrado em $POMODOROZ." -ForegroundColor Yellow
-        Write-Host "    Execute: cd `"$POMODOROZ`" && pnpm install" -ForegroundColor Yellow
+        Write-Host ('    Execute: Set-Location "{0}"; pnpm install' -f $POMODOROZ) -ForegroundColor Yellow
         return
     }
 
@@ -740,8 +740,8 @@ function Check-JsDependencies {
 
     Write-Host "`n✓ Updates concluidos." -ForegroundColor Green
     Write-Host 'Recomendado:' -ForegroundColor Gray
-    Write-Host "  cd `"$POMODOROZ`" && pnpm build" -ForegroundColor Gray
-    Write-Host "  cd `"$POMODOROZ`" && pnpm dev:app" -ForegroundColor Gray
+    Write-Host ('  Set-Location "{0}"; pnpm build' -f $POMODOROZ) -ForegroundColor Gray
+    Write-Host ('  Set-Location "{0}"; pnpm dev:app' -f $POMODOROZ) -ForegroundColor Gray
 }
 
 function Test-CargoSubcommand {
@@ -805,9 +805,9 @@ function Check-RustDependencies {
     }
 
     Write-Host "  Atualizacao manual recomendada:"
-    Write-Host "    cd `"$tauriDir`" && cargo add <crate>@<versao>"
-    Write-Host "    cd `"$tauriDir`" && cargo update -p <crate> --precise <versao>"
-    Write-Host "    cd `"$tauriDir`" && cargo check"
+    Write-Host ('    Set-Location "{0}"; cargo add <crate>@<versao>' -f $tauriDir)
+    Write-Host ('    Set-Location "{0}"; cargo update -p <crate> --precise <versao>' -f $tauriDir)
+    Write-Host ('    Set-Location "{0}"; cargo check' -f $tauriDir)
 }
 
 Print-Header
