@@ -6,7 +6,7 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
-## [26.4.16] - A definir
+## [26.4.16] - 2026-04-16
 
 ### Adicionado
 
@@ -84,6 +84,10 @@
 - **Snapshot operacional Linux da Fase 2 atualizado no plano de migração** — `docs/MIGRATION_ELECTRON_TO_TAURI.md` agora registra a revalidação dos fluxos `validar-tudo` (opções 5 e 6) e `uninstall` em modo `purge`, com observação de logs não bloqueantes no `linux-unpacked`.
 - **Checklist da Fase 3a atualizado para lockfile e workflow de release** — `docs/MIGRATION_ELECTRON_TO_TAURI.md` agora marca como concluídos a remoção do `yarn.lock` e a migração de `.github/workflows/release-autoupdate.yml` para `pnpm`, mantendo pendente apenas a validação do workflow no GitHub Actions.
 - **Guia de release alinhado ao fluxo atual (`pnpm` + `release.sh`)** — `docs/RELEASE_OPERATIONS.md` foi atualizado para comandos reais de publicação/tag, incluindo regra explícita de manter `A definir`/`TBD` até o dia do release e datar a versão apenas na publicação.
+
+### Observação
+
+- Esta release `26.4.16` ainda publica artefatos Electron (`.exe` NSIS + `.AppImage` + `latest*.yml`). Os itens Tauri acima representam avanço de migração interna (dual runtime), sem troca do pipeline oficial de release nesta versão.
 
 ## [26.4.15] - 2026-04-09
 
