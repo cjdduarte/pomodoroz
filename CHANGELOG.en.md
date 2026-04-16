@@ -67,6 +67,7 @@
 - **`check-updates.ps1` fixed to preserve real `pnpmw` output** — the `pnpm` function no longer discards stdout/stderr, restoring proper `pnpm` version detection and `pnpm outdated --format json` parsing.
 - **`check-updates.ps1` updated for PowerShell 5.1 list-to-array conversion** — update rows now use `ToArray()` instead of array-subexpression over `List[object]`, eliminating `Argument types do not match` during per-workspace reports.
 - **`check-updates.ps1` `pnpm outdated` parser hardened for keyed-object payloads** — the script now correctly handles JSON returned as `PSCustomObject` with package names as keys, restoring JS/TS update rows on Windows PowerShell 5.1.
+- **Local operational logs excluded from Git tracking** — `.gitignore` now includes `/logs/`, avoiding runtime-noise files (`validar-tudo`, `check-updates`, `cargo audit/outdated`) in `git status`.
 
 ### Documentation
 

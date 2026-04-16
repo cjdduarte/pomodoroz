@@ -67,6 +67,7 @@
 - **`check-updates.ps1` corrigido para capturar saída real do `pnpmw`** — a função `pnpm` deixou de descartar stdout/stderr, restaurando detecção de versão do `pnpm` e parse do JSON de `pnpm outdated`.
 - **`check-updates.ps1` ajustado para PowerShell 5.1 na montagem da tabela de updates** — a conversão de `List[object]` para array passou a usar `ToArray()`, eliminando erro `Os tipos de argumento nao correspondem` no relatório por workspace.
 - **Parser do `pnpm outdated` no `check-updates.ps1` reforçado para saída em objeto chaveado** — o script agora lê corretamente payloads JSON em formato `PSCustomObject` (pacote como chave), restaurando listagem de updates em ambientes Windows/PowerShell 5.1.
+- **Logs operacionais locais fora do versionamento Git** — `.gitignore` passou a incluir `/logs/`, evitando ruído de execução (`validar-tudo`, `check-updates`, `cargo audit/outdated`) no `git status`.
 
 ### Documentação
 
