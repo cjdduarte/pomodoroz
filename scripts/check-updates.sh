@@ -157,6 +157,12 @@ collect_release_workflow_pnpm_pins() {
     in_setup && /^[[:space:]]*-[[:space:]]+name:/ {
       in_setup = 0
     }
+    {
+      line = $0
+      if (match(line, /corepack[[:space:]]+prepare[[:space:]]+pnpm@([0-9][0-9A-Za-z._-]*)[[:space:]]+--activate/, m)) {
+        print m[1]
+      }
+    }
   ' "$workflow_file" | sort -u
 }
 
@@ -164,7 +170,7 @@ check_release_workflow_pnpm_pin() {
   local pins_raw
   pins_raw="$(collect_release_workflow_pnpm_pins || true)"
   if [ -z "$pins_raw" ]; then
-    echo "  Release workflow pin (pnpm/action-setup): ⚠ nao encontrado"
+    echo "  Release workflow pin (pnpm): ⚠ nao encontrado"
     echo "    Arquivo esperado: .github/workflows/release-autoupdate.yml"
     return
   fi
@@ -173,7 +179,7 @@ check_release_workflow_pnpm_pin() {
   pin_count="$(printf "%s\n" "$pins_raw" | wc -l | tr -d '[:space:]')"
   local pins_display
   pins_display="$(printf "%s\n" "$pins_raw" | paste -sd', ' -)"
-  echo "  Release workflow pin (pnpm/action-setup): ${pins_display}"
+  echo "  Release workflow pin (pnpm): ${pins_display}"
 
   local first_pin
   first_pin="$(printf "%s\n" "$pins_raw" | head -n 1)"
@@ -201,41 +207,62 @@ update_release_workflow_pnpm_pin() {
     return 1
   fi
 
-  local tmp_file
-  tmp_file="$(mktemp)"
+  if ! command -v node >/dev/null 2>&1; then
+    echo "  ⚠ Node nao encontrado para atualizar pin no workflow."
+    return 1
+  fi
 
-  if ! awk -v target="$target_version" '
-    /uses:[[:space:]]*pnpm\/action-setup@/ {
-      in_setup = 1
-      print
-      next
-    }
-    in_setup && /^[[:space:]]*version:[[:space:]]*/ {
-      sub(/version:[[:space:]]*.*/, "version: " target)
-      print
-      in_setup = 0
-      changed = 1
-      next
-    }
-    in_setup && /^[[:space:]]*-[[:space:]]+name:/ {
-      in_setup = 0
-    }
-    { print }
-    END {
-      if (!changed) exit 3
-    }
-  ' "$workflow_file" > "$tmp_file"; then
-    rm -f "$tmp_file"
+  local node_code
+  node_code='
+const fs = require("fs");
+const file = process.argv[1];
+const target = process.argv[2];
+const source = fs.readFileSync(file, "utf8");
+const lines = source.split(/\r?\n/);
+const hadFinalNewline = /\r?\n$/.test(source);
+let inSetup = false;
+let found = false;
+let changed = false;
+
+const out = lines.map((line) => {
+  if (/uses:\s*pnpm\/action-setup@/.test(line)) {
+    inSetup = true;
+    return line;
+  }
+
+  if (inSetup && /^\s*version:\s*/.test(line)) {
+    found = true;
+    const next = line.replace(/version:\s*.*/, `version: ${target}`);
+    if (next !== line) changed = true;
+    inSetup = false;
+    return next;
+  }
+
+  if (inSetup && /^\s*-\s+name:/.test(line)) {
+    inSetup = false;
+  }
+
+  if (/corepack\s+prepare\s+pnpm@/.test(line) && /--activate/.test(line)) {
+    found = true;
+    const next = line.replace(/(corepack\s+prepare\s+pnpm@)([0-9][0-9A-Za-z._-]*)/, `$1${target}`);
+    if (next !== line) changed = true;
+    return next;
+  }
+
+  return line;
+});
+
+if (!found) process.exit(3);
+if (!changed) process.exit(0);
+fs.writeFileSync(file, out.join("\n") + (hadFinalNewline ? "\n" : ""), "utf8");
+'
+
+  if ! node -e "$node_code" "$workflow_file" "$target_version" >/dev/null 2>&1; then
     echo "  ⚠ Falha ao atualizar pin no workflow."
     return 1
   fi
 
-  if cmp -s "$workflow_file" "$tmp_file"; then
-    rm -f "$tmp_file"
-    return 0
-  fi
-
-  mv "$tmp_file" "$workflow_file"
+  return 0
 }
 
 maybe_offer_release_workflow_pnpm_pin_update() {
@@ -274,7 +301,7 @@ maybe_offer_release_workflow_pnpm_pin_update() {
 
   if [[ "$confirm" =~ ^[sS]$ ]]; then
     update_release_workflow_pnpm_pin "$PNPM_VERSION_LATEST"
-    echo "  ✓ Workflow atualizado: pnpm/action-setup version: ${PNPM_VERSION_LATEST}"
+    echo "  ✓ Workflow atualizado: pnpm ${PNPM_VERSION_LATEST}"
   else
     echo "  Pin do workflow mantido em ${current_pin}."
   fi

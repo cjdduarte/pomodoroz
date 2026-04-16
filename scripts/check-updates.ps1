@@ -296,6 +296,13 @@ function Get-ReleaseWorkflowPnpmPins {
         if ($inSetup -and $line -match '^\s*-\s+name:') {
             $inSetup = $false
         }
+
+        if ($line -match 'corepack\s+prepare\s+pnpm@([0-9][0-9A-Za-z._-]*)\s+--activate') {
+            $value = "$($Matches[1])".Trim().Trim('"').Trim("'")
+            if (-not [string]::IsNullOrWhiteSpace($value)) {
+                [void]$pins.Add($value)
+            }
+        }
     }
 
     return @($pins | Sort-Object)
@@ -304,13 +311,13 @@ function Get-ReleaseWorkflowPnpmPins {
 function Show-ReleaseWorkflowPnpmPinStatus {
     $pins = @(Get-ReleaseWorkflowPnpmPins)
     if (-not $pins -or $pins.Count -eq 0) {
-        Write-Host "  Release workflow pin (pnpm/action-setup): [WARN] nao encontrado" -ForegroundColor Yellow
+        Write-Host "  Release workflow pin (pnpm): [WARN] nao encontrado" -ForegroundColor Yellow
         Write-Host "    Arquivo esperado: .github/workflows/release-autoupdate.yml" -ForegroundColor Yellow
         return
     }
 
     $pinsDisplay = ($pins -join ", ")
-    Write-Host "  Release workflow pin (pnpm/action-setup): $pinsDisplay"
+    Write-Host "  Release workflow pin (pnpm): $pinsDisplay"
 
     if ($pins.Count -gt 1) {
         Write-Host "    [WARN] Inconsistencia: workflow possui mais de um pin de versao para pnpm." -ForegroundColor Yellow
@@ -370,6 +377,13 @@ const out = lines.map((line) => {
     inSetup = false;
   }
 
+  if (/corepack\s+prepare\s+pnpm@/.test(line) && /--activate/.test(line)) {
+    found = true;
+    const next = line.replace(/(corepack\s+prepare\s+pnpm@)([0-9][0-9A-Za-z._-]*)/, `$1${target}`);
+    if (next !== line) changed = true;
+    return next;
+  }
+
   return line;
 });
 
@@ -416,7 +430,7 @@ function Maybe-OfferReleaseWorkflowPnpmPinUpdate {
     $confirm = Read-Host "Atualizar pin do workflow de release para pnpm@$($script:PnpmVersionLatest)? (s/N)"
     if ($confirm -match '^[sS]$') {
         if (Update-ReleaseWorkflowPnpmPin -TargetVersion $script:PnpmVersionLatest) {
-            Write-Host "  [OK] Workflow atualizado: pnpm/action-setup version: $($script:PnpmVersionLatest)" -ForegroundColor Green
+            Write-Host "  [OK] Workflow atualizado: pnpm $($script:PnpmVersionLatest)" -ForegroundColor Green
         } else {
             Write-Host "  [WARN] Falha ao atualizar pin do workflow." -ForegroundColor Yellow
         }
