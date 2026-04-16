@@ -22,7 +22,7 @@ function commandAvailable(command, probeArgs = ["--version"]) {
     stdio: "ignore",
     env: process.env,
   });
-  return !probe.error && probe.status === 0;
+  return !probe.error;
 }
 
 function executeOrExit(command, commandArgs) {

@@ -198,7 +198,11 @@ try {
 if (-not (Test-Path $PNPM_WRAPPER)) {
     Die "Wrapper pnpmw nao encontrado: $PNPM_WRAPPER"
 }
-$pnpmVersion = (& node $PNPM_WRAPPER --version | Select-Object -First 1).Trim()
+$pnpmVersionRaw = (& node $PNPM_WRAPPER --version | Select-Object -First 1)
+if ($null -eq $pnpmVersionRaw) {
+    $pnpmVersionRaw = ""
+}
+$pnpmVersion = "$pnpmVersionRaw".Trim()
 if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($pnpmVersion)) {
     Die "Nao foi possivel obter versao do pnpm via pnpmw/corepack."
 }
