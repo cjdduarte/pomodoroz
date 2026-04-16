@@ -57,6 +57,20 @@ function Invoke-Cargo {
     }
 }
 
+function Invoke-CargoClippyStrict {
+    $previousRustFlags = $env:RUSTFLAGS
+    try {
+        $env:RUSTFLAGS = "-D warnings"
+        Invoke-Cargo clippy --all-targets --all-features
+    } finally {
+        if ($null -eq $previousRustFlags) {
+            Remove-Item Env:RUSTFLAGS -ErrorAction SilentlyContinue
+        } else {
+            $env:RUSTFLAGS = $previousRustFlags
+        }
+    }
+}
+
 function Show-Usage {
 @"
 Uso:
@@ -268,7 +282,7 @@ if (Test-Path $tauriDir) {
 
     Push-Location $tauriDir
     Invoke-Cargo fmt --all -- --check
-    Invoke-Cargo clippy --all-targets --all-features -- -D warnings
+    Invoke-CargoClippyStrict
     Pop-Location
 }
 

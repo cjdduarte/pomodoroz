@@ -58,7 +58,10 @@
 - **`check-updates.sh` JS/TS table alignment fixed** — `pnpm outdated` JSON parsing now keeps columns aligned when `workspace` is empty, so package names are shown correctly again.
 - **Root/workspace `package.json` scripts migrated to `pnpm`** — build/lint/start/release commands in `package.json`, `app/electron/package.json`, `app/renderer/package.json`, and `app/shareables/package.json` no longer call `yarn`, removing implicit fallback in prebuild/build flows.
 - **`pnpm` script execution made resilient when binary is missing from PATH** — new wrapper `scripts/pnpmw.mjs` is now used by root/workspace `package.json` scripts to run `pnpm` directly when available or `corepack pnpm` when needed, fixing Windows failures such as `'pnpm' is not recognized` during `corepack pnpm run ...` flows.
+- **`pnpmw` on Windows now invokes `corepack.js` directly from the Node installation directory** — the wrapper now resolves `node_modules/corepack/dist/corepack.js` next to `node.exe`, so `pnpm` works even when `corepack.cmd` resolution fails in child-process PATH lookup.
 - **`lerna run` execution stabilized for Corepack-only Windows environments** — `lerna.json` now uses `npmClient: \"npm\"` to avoid `'pnpm' is not recognized` failures in child processes, while dependency management remains on `pnpm` and scripts keep using `pnpmw`.
+- **`validar-tudo.ps1` fixed for strict Clippy gate on Windows** — Rust validation now enforces `-D warnings` through `RUSTFLAGS`, avoiding argument forwarding/parsing failures in environments where `cargo clippy -- -D warnings` is not accepted as expected.
+- **`check-updates.ps1` fixed to preserve real `pnpmw` output** — the `pnpm` function no longer discards stdout/stderr, restoring proper `pnpm` version detection and `pnpm outdated --format json` parsing.
 
 ### Documentation
 

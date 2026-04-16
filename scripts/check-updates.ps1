@@ -63,7 +63,8 @@ function Invoke-PnpmWrapper {
     }
 
     & node $script:PnpmWrapper @Args
-    return $LASTEXITCODE
+    $exitCode = $LASTEXITCODE
+    $global:LASTEXITCODE = $exitCode
 }
 
 function pnpm {
@@ -72,7 +73,7 @@ function pnpm {
         [string[]]$Args
     )
 
-    [void](Invoke-PnpmWrapper @Args)
+    Invoke-PnpmWrapper @Args
 }
 
 function Get-PackageJson {

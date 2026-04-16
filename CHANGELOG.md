@@ -58,7 +58,10 @@
 - **Tabela de updates JS/TS corrigida no `check-updates.sh`** — parser do JSON do `pnpm outdated` agora preserva alinhamento das colunas quando `workspace` vem vazio, voltando a exibir nomes de pacote corretamente.
 - **Scripts `package.json` (root/workspaces) migrados para `pnpm`** — comandos de build/lint/start/release em `package.json`, `app/electron/package.json`, `app/renderer/package.json` e `app/shareables/package.json` deixaram de chamar `yarn`, removendo fallback implícito no prebuild/build.
 - **Execução de scripts `pnpm` ficou resiliente a ambiente sem binário no PATH** — novo wrapper `scripts/pnpmw.mjs` foi aplicado nos `package.json` (root/workspaces) para usar `pnpm` quando disponível ou `corepack pnpm` quando necessário, corrigindo erros no Windows como `'pnpm' nao e reconhecido` em fluxos `corepack pnpm run ...`.
+- **`pnpmw` no Windows passou a invocar `corepack.js` diretamente pelo diretório do `node.exe`** — o wrapper agora resolve `node_modules/corepack/dist/corepack.js` ao lado do Node e executa `pnpm` sem depender da resolução de `corepack.cmd` via PATH/processo filho.
 - **Execução do `lerna run` estabilizada em ambiente Corepack-only (Windows)** — `lerna.json` passou a usar `npmClient: \"npm\"` para evitar erro `'pnpm' nao e reconhecido` em subprocessos, mantendo `pnpm` no gerenciamento de dependências e scripts via `pnpmw`.
+- **`validar-tudo.ps1` corrigido para gate strict do Clippy no Windows** — a validação Rust passou a aplicar `-D warnings` via `RUSTFLAGS`, evitando falha de parsing/encaminhamento de argumentos em ambientes onde `cargo clippy` não aceita `-- -D warnings` no mesmo formato.
+- **`check-updates.ps1` corrigido para capturar saída real do `pnpmw`** — a função `pnpm` deixou de descartar stdout/stderr, restaurando detecção de versão do `pnpm` e parse do JSON de `pnpm outdated`.
 
 ### Documentação
 
