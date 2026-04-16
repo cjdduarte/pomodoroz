@@ -6,6 +6,12 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.4.18] - TBD
+
+### Changed
+
+- **Release workflow `pnpm` bootstrap fixed to avoid Actions failure (`pnpm` not found)** — `.github/workflows/release-autoupdate.yml` no longer uses `pnpm` cache in `actions/setup-node`, keeping `pnpm` activation via Corepack before build/publish commands.
+
 ## [26.4.17] - 2026-04-16
 
 ### Changed

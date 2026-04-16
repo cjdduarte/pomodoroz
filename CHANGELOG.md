@@ -6,6 +6,12 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.4.18] - A definir
+
+### Alterado
+
+- **Bootstrap de `pnpm` no workflow de release corrigido para evitar falha em Actions (`pnpm` não encontrado)** — `.github/workflows/release-autoupdate.yml` removeu o cache `pnpm` do `actions/setup-node`, mantendo ativação de `pnpm` via Corepack antes dos comandos de build/publicação.
+
 ## [26.4.17] - 2026-04-16
 
 ### Alterado
