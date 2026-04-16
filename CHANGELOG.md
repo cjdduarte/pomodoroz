@@ -12,6 +12,7 @@
 
 - **Bootstrap de `pnpm` no workflow de release corrigido para evitar falha em Actions (`pnpm` não encontrado)** — `.github/workflows/release-autoupdate.yml` removeu o cache `pnpm` do `actions/setup-node`, mantendo ativação de `pnpm` via Corepack antes dos comandos de build/publicação.
 - **Fluxo Tauri e guias de contribuição/documentação alinhados ao `pnpm`** — `src-tauri/tauri.conf.json` trocou `beforeDevCommand`/`beforeBuildCommand` para `scripts/pnpmw.mjs` (sem dependência de Yarn no runtime Tauri), e os guias `README*`, `CONTRIBUTING.md`, `CLAUDE.md` e `docs/MIGRATION_ELECTRON_TO_TAURI.md` foram atualizados para comandos/requisitos em `pnpm`.
+- **Kickoff da Fase 2f no Tauri com updater nativo em modo seguro (notify-only)** — integração inicial de `tauri-plugin-updater` no `src-tauri` + `@tauri-apps/plugin-updater` no renderer, com bridge de política (`SET_IN_APP_AUTO_UPDATE`) no `TauriConnector` e emissão de `UPDATE_AVAILABLE` para a UI existente. O fluxo de instalação/restart (`downloadAndInstall` + relaunch) permanece pendente para o hardening final do feed assinado de release Tauri.
 
 ## [26.4.17] - 2026-04-16
 

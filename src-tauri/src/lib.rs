@@ -287,6 +287,7 @@ pub fn run() {
             app_handle.plugin(tauri_plugin_notification::init())?;
             app_handle.plugin(tauri_plugin_opener::init())?;
             app_handle.plugin(tauri_plugin_dialog::init())?;
+            app_handle.plugin(tauri_plugin_updater::Builder::new().build())?;
 
             Ok(())
         })

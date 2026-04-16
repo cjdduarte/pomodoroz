@@ -156,8 +156,8 @@ Phase 0 completion checklist (execution status):
 - [x] Run/confirm script checklist impact for current phase (`scripts/` validation rule)
 
 Rule to move forward: only start Phase 1 after all Phase 0 checklist items above are checked.
-Current state: Phase 1 closed, Phase 2a/2b/2c/2d/2e validated (Linux dev runtime), Phase 2g/2h/2i manual parity checklists are closed, Linux operational script cycle (`validar-tudo` options 5/6 + `uninstall purge`) was revalidated on 2026-04-16, and Phase 2f remains deferred to final release hardening.
-Current guardrail in Tauri runtime: `inAppAutoUpdate` (2f, deferred) remains disabled to avoid false-positive UX until final release hardening.
+Current state: Phase 1 closed, Phase 2a/2b/2c/2d/2e validated (Linux dev runtime), Phase 2g/2h/2i manual parity checklists are closed, Linux operational script cycle (`validar-tudo` options 5/6 + `uninstall purge`) was revalidated on 2026-04-16, and Phase 2f resumed in 26.4.18 with updater wiring kickoff (`tauri-plugin-updater` + policy-sync checks) while install/restart hardening remains pending.
+Current guardrail in Tauri runtime: `inAppAutoUpdate` setting remains disabled in UI until full 2f close (feed/signature + install/restart + packaged E2E).
 
 Phase 1 progress checklist (execution status):
 
@@ -285,11 +285,13 @@ Phase 2e kickoff snapshot (2026-04-14):
 - [x] Baseline fullscreen break enter/exit plumbing already active in native window bridge.
 - [x] Consolidated parity pass completed for 2e sign-off (fullscreen break lifecycle + `Esc` behavior + no regression in timer flow).
 
-Phase 2f kickoff snapshot (2026-04-14):
+Phase 2f kickoff snapshot (2026-04-16):
 
-- [x] Decision recorded: defer updater migration (`tauri-plugin-updater` + release pipeline changes) to final release hardening, avoiding intermediate beta/release churn during core migration.
-- [x] Settings guardrail remains active in Tauri runtime (`inAppAutoUpdate` toggle disabled) while 2f is deferred.
-- [ ] Execute 2f integration at final hardening checkpoint (after remaining native sub-phases are closed).
+- [x] `tauri-plugin-updater` wired in Rust runtime (`src-tauri`) and renderer dependency set (`@tauri-apps/plugin-updater`).
+- [x] `SET_IN_APP_AUTO_UPDATE` policy sync now runs in Tauri connector path and triggers guarded native update checks.
+- [x] Native update detection now feeds existing renderer update state via `UPDATE_AVAILABLE` payload (version/body) without introducing direct component-level `invoke`.
+- [x] Settings guardrail remains active in Tauri runtime (`inAppAutoUpdate` toggle disabled) while final 2f hardening is pending.
+- [ ] Complete packaged install/restart flow (`downloadAndInstall` + relaunch strategy) and validate against signed Tauri release feed.
 
 Phase 2g kickoff snapshot (2026-04-14):
 

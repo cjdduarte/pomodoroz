@@ -8,6 +8,7 @@ import {
   open as openDialog,
   save as saveDialog,
 } from "@tauri-apps/plugin-dialog";
+import { check as checkForUpdates } from "@tauri-apps/plugin-updater";
 import {
   detectSystemLanguage,
   normalizeLanguageCode,
@@ -22,10 +23,12 @@ import type {
   InvokeMainPayloadMap,
   InvokeMainResponseMap,
   ResetFocusToIdleDialogResult,
+  SetInAppAutoUpdatePayload,
   ToMainChannel,
   ToMainPayloadMap,
   TasksExportResultPayload,
   TasksImportResultPayload,
+  UpdateAvailablePayload,
 } from "ipc";
 import {
   CLOSE_WINDOW,
@@ -40,6 +43,7 @@ import {
   SET_ALWAYS_ON_TOP,
   SET_COMPACT_MODE,
   SET_FULLSCREEN_BREAK,
+  SET_IN_APP_AUTO_UPDATE,
   SET_NATIVE_TITLEBAR,
   SET_OPEN_AT_LOGIN,
   SET_TRAY_BEHAVIOR,
@@ -49,6 +53,7 @@ import {
   TASKS_EXPORT_RESULT,
   TASKS_IMPORT_RESULT,
   TRAY_ICON_UPDATE,
+  UPDATE_AVAILABLE,
 } from "ipc";
 import type { InvokeConnector } from "../InvokeConnector";
 
@@ -80,6 +85,8 @@ const buildErrorMessage = (error: unknown): string =>
 
 const toInvokeArgs = (payload: unknown): Record<string, unknown> =>
   (payload ?? {}) as Record<string, unknown>;
+
+let updaterPolicySyncPromise: Promise<void> | null = null;
 
 const dataUrlToPngBytes = (dataUrl: string): number[] => {
   const separatorIndex = dataUrl.indexOf(",");
@@ -277,6 +284,66 @@ const importTasksWithNativeDialog = async () => {
   }
 };
 
+const toUpdateAvailablePayload = (
+  version: string,
+  updateBody?: string
+): UpdateAvailablePayload => ({
+  version,
+  updateBody: updateBody?.trim() ?? "",
+});
+
+const syncTauriUpdatePolicy = async (
+  enableInAppAutoUpdate: boolean
+) => {
+  if (updaterPolicySyncPromise) {
+    return updaterPolicySyncPromise;
+  }
+
+  updaterPolicySyncPromise = (async () => {
+    let updateHandle: Awaited<ReturnType<typeof checkForUpdates>> =
+      null;
+
+    try {
+      updateHandle = await checkForUpdates();
+
+      if (!updateHandle) {
+        return;
+      }
+
+      await emitFromMain(
+        UPDATE_AVAILABLE,
+        toUpdateAvailablePayload(
+          updateHandle.version,
+          updateHandle.body
+        )
+      );
+
+      if (enableInAppAutoUpdate) {
+        // Mantemos modo notify-only no runtime Tauri até o hardening
+        // completo do pipeline de release nativo (assinatura/feed/restart).
+        console.info(
+          "[TAURI Updater] Update available with in-app auto update enabled. Install flow remains deferred to final hardening."
+        );
+      }
+    } catch (error) {
+      console.warn(
+        "[TAURI Updater] Failed to check updates. Ensure updater plugin endpoints/signature are configured for Tauri releases.",
+        error
+      );
+    } finally {
+      await updateHandle?.close().catch((closeError: unknown) => {
+        console.warn(
+          "[TAURI Updater] Failed to close updater handle.",
+          closeError
+        );
+      });
+      updaterPolicySyncPromise = null;
+    }
+  })();
+
+  return updaterPolicySyncPromise;
+};
+
 const sendToTauri = async <C extends ToMainChannel>(
   event: C,
   payload: ToMainPayloadMap[C]
@@ -309,6 +376,12 @@ const sendToTauri = async <C extends ToMainChannel>(
 
     case SET_UI_THEME: {
       await invoke("set_ui_theme", toInvokeArgs(payload[0]));
+      return;
+    }
+
+    case SET_IN_APP_AUTO_UPDATE: {
+      const data = payload[0] as SetInAppAutoUpdatePayload;
+      await syncTauriUpdatePolicy(data.enableInAppAutoUpdate);
       return;
     }
 

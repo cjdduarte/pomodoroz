@@ -14,7 +14,7 @@ import {
   normalizeLanguageCode,
 } from "i18n/languages";
 import type { LanguageCode } from "store/settings/types";
-import { detectOS } from "utils";
+import { detectOS, getFromStorage } from "utils";
 import {
   CLOSE_WINDOW,
   MINIMIZE_WINDOW,
@@ -22,6 +22,7 @@ import {
   SET_ALWAYS_ON_TOP,
   SET_COMPACT_MODE,
   SET_FULLSCREEN_BREAK,
+  SET_IN_APP_AUTO_UPDATE,
   SET_NATIVE_TITLEBAR,
   SET_OPEN_AT_LOGIN,
   SET_TRAY_BEHAVIOR,
@@ -38,10 +39,15 @@ import {
 import { listen } from "@tauri-apps/api/event";
 import { useTrayIconUpdates } from "hooks/useTrayIconUpdates";
 import { setUpdateBody, setUpdateVersion } from "store/update";
+import { isFreshInstallProfile } from "store";
 import { TauriInvokeConnector } from "./TauriInvokeConnector";
 
 const IPC_ERROR_MESSAGE =
   "Falha ao comunicar com o runtime nativo (Tauri). Reinicie o app.";
+const AUTO_UPDATE_POLICY_PROMPT_SEEN_KEY =
+  "auto-update-policy-prompt-seen";
+const AUTO_UPDATE_POLICY_PROMPT_PENDING_KEY =
+  "auto-update-policy-prompt-pending-choice";
 
 type TrayCopy = {
   restoreLabel: string;
@@ -199,6 +205,25 @@ export const TauriConnectorProvider = ({
       openAtLogin: settings.openAtLogin,
     });
   }, [sendToMain, settings.openAtLogin]);
+
+  useEffect(() => {
+    const hasSeenPrompt =
+      getFromStorage<boolean>(AUTO_UPDATE_POLICY_PROMPT_SEEN_KEY) ===
+      true;
+    const hasPendingChoice =
+      getFromStorage<boolean>(AUTO_UPDATE_POLICY_PROMPT_PENDING_KEY) ===
+      true;
+    const shouldDeferPolicySync =
+      hasPendingChoice || (isFreshInstallProfile && !hasSeenPrompt);
+
+    if (shouldDeferPolicySync) {
+      return;
+    }
+
+    sendToMain(SET_IN_APP_AUTO_UPDATE, {
+      enableInAppAutoUpdate: settings.enableInAppAutoUpdate,
+    });
+  }, [sendToMain, settings.enableInAppAutoUpdate]);
 
   useEffect(() => {
     if (detectOS() !== "Linux") {

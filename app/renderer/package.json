@@ -36,6 +36,7 @@
     "@tauri-apps/plugin-dialog": "2.7.0",
     "@tauri-apps/plugin-notification": "2.3.3",
     "@tauri-apps/plugin-opener": "2.5.3",
+    "@tauri-apps/plugin-updater": "2.10.1",
     "@types/lodash.debounce": "^4.0.9",
     "@types/node": "25.6.0",
     "@types/react": "^19.0.0",
