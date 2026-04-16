@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { spawnSync } from "node:child_process";
+import fs from "node:fs";
 import path from "node:path";
 
 const args = process.argv.slice(2);
@@ -49,9 +50,24 @@ const commandCandidates = [
 ];
 
 const nodeDir = path.dirname(process.execPath);
+const corepackScriptPath = path.join(
+  nodeDir,
+  "node_modules",
+  "corepack",
+  "dist",
+  "corepack.js"
+);
 const commandExtension = process.platform === "win32" ? ".cmd" : "";
 const pnpmSibling = path.join(nodeDir, `pnpm${commandExtension}`);
 const corepackSibling = path.join(nodeDir, `corepack${commandExtension}`);
+
+if (fs.existsSync(corepackScriptPath)) {
+  commandCandidates.push({
+    command: process.execPath,
+    args: [corepackScriptPath, "pnpm", ...args],
+    probeArgs: [corepackScriptPath, "--version"],
+  });
+}
 
 commandCandidates.push({ command: pnpmSibling, args });
 commandCandidates.push({
@@ -60,7 +76,7 @@ commandCandidates.push({
 });
 
 for (const candidate of commandCandidates) {
-  if (!commandAvailable(candidate.command)) {
+  if (!commandAvailable(candidate.command, candidate.probeArgs)) {
     continue;
   }
   executeOrExit(candidate.command, candidate.args);
