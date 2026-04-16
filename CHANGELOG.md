@@ -6,6 +6,12 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.4.17] - A definir
+
+### Alterado
+
+- **Workflow de release no GitHub Actions corrigido para setup confiável do `pnpm`** — `.github/workflows/release-autoupdate.yml` passou a usar `pnpm/action-setup@v4` (Linux/Windows), eliminando falha `Unable to locate executable file: pnpm` nos jobs de publicação.
+
 ## [26.4.16] - 2026-04-16
 
 ### Adicionado
