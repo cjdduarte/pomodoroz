@@ -35,7 +35,7 @@ Padrao:
   Sem parametros em terminal interativo, mostra um menu de opcoes.
 
 Opcoes:
-  -Purge   Remove tambem dados locais em ~/.config e ~/.cache.
+  -Purge   Remove tambem dados locais em ~/.config, ~/.cache e ~/.local/share.
   -Yes     Pula confirmacao interativa exigida por -Purge.
   -Help
 "@
@@ -45,11 +45,11 @@ function Show-ModeMenu {
     Write-Host "Menu de desinstalacao:"
     Write-Host "Escolha o nivel de limpeza."
     Write-Host "- Padrao: remove apenas app/atalho/icone instalados localmente."
-    Write-Host "- Purge: faz o padrao + remove dados locais (config/cache)."
+    Write-Host "- Purge: faz o padrao + remove dados locais (config/cache/share)."
     Write-Host ""
     Write-Host "Escolha o modo de desinstalacao:"
     Write-Host "  1) Padrao  - remove apenas instalacao local do pomodoroz"
-    Write-Host "  2) Purge   - padrao + dados locais (~/.config e ~/.cache)"
+    Write-Host "  2) Purge   - padrao + dados locais (~/.config, ~/.cache e ~/.local/share)"
     Write-Host "  3) Cancelar"
 
     $menuOption = Read-Host "Opcao [1-3]"
@@ -90,7 +90,10 @@ $APPIMAGE_PREVIOUS_PATH = Join-Path $INSTALL_ROOT "Pomodoroz.AppImage.previous"
 
 $USER_DATA_PATHS = @(
     (Join-Path $HOME ".config/pomodoroz"),
-    (Join-Path $HOME ".cache/pomodoroz")
+    (Join-Path $HOME ".cache/pomodoroz"),
+    (Join-Path $HOME ".config/com.cjdduarte.pomodoroz"),
+    (Join-Path $HOME ".cache/com.cjdduarte.pomodoroz"),
+    (Join-Path $HOME ".local/share/com.cjdduarte.pomodoroz")
 )
 
 if ($PSBoundParameters.Count -eq 0 -and [Environment]::UserInteractive) {
@@ -141,7 +144,7 @@ if (Test-Path $INSTALL_ROOT) {
 }
 
 if ($Purge) {
-    Step "Removendo dados locais (config/cache)"
+    Step "Removendo dados locais (config/cache/share)"
     foreach ($path in $USER_DATA_PATHS) {
         Remove-IfExists $path
     }

@@ -14,6 +14,9 @@ APPIMAGE_PREVIOUS_PATH="${INSTALL_ROOT}/Pomodoroz.AppImage.previous"
 USER_DATA_PATHS=(
   "${HOME}/.config/pomodoroz"
   "${HOME}/.cache/pomodoroz"
+  "${HOME}/.config/com.cjdduarte.pomodoroz"
+  "${HOME}/.cache/com.cjdduarte.pomodoroz"
+  "${HOME}/.local/share/com.cjdduarte.pomodoroz"
 )
 
 PURGE=0
@@ -38,7 +41,7 @@ Padrao:
   Sem parametros em terminal interativo, mostra um menu de opcoes.
 
 Opcoes:
-  --purge   Remove tambem dados locais em ~/.config e ~/.cache.
+  --purge   Remove tambem dados locais em ~/.config, ~/.cache e ~/.local/share.
   --yes     Pula confirmacao interativa exigida por --purge.
   -h, --help
 EOF
@@ -57,11 +60,11 @@ show_mode_menu() {
 Menu de desinstalacao:
 Escolha o nivel de limpeza.
 - Padrao: remove apenas app/atalho/icone instalados localmente.
-- Purge: faz o padrao + remove dados locais (config/cache).
+- Purge: faz o padrao + remove dados locais (config/cache/share).
 
 Escolha o modo de desinstalacao:
   1) Padrao  - remove apenas instalacao local do pomodoroz
-  2) Purge   - padrao + dados locais (~/.config e ~/.cache)
+  2) Purge   - padrao + dados locais (~/.config, ~/.cache e ~/.local/share)
   3) Cancelar
 EOF
 
@@ -143,7 +146,7 @@ if [[ -d "$INSTALL_ROOT" ]]; then
 fi
 
 if (( PURGE == 1 )); then
-  step "Removendo dados locais (config/cache)"
+  step "Removendo dados locais (config/cache/share)"
   for path in "${USER_DATA_PATHS[@]}"; do
     remove_path_if_exists "$path"
   done
