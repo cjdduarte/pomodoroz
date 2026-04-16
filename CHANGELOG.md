@@ -10,7 +10,10 @@
 
 ### Alterado
 
-- **Workflow de release no GitHub Actions corrigido para setup confiável do `pnpm`** — `.github/workflows/release-autoupdate.yml` passou a usar `pnpm/action-setup@v4` (Linux/Windows), eliminando falha `Unable to locate executable file: pnpm` nos jobs de publicação.
+- **Workflow de release no GitHub Actions padronizado entre Linux/Windows** — `.github/workflows/release-autoupdate.yml` mantém `Setup pnpm` antes do `setup-node` com cache `pnpm` e pin alinhado em ambos os jobs (`pnpm` `10.33.0`), evitando drift entre plataformas e falha `Unable to locate executable file: pnpm`.
+- **`check-updates` reforçado para orientar pin do workflow e reduzir ruído no Cargo em shell/PowerShell** — `scripts/check-updates.sh` e `scripts/check-updates.ps1` agora mostram status/sugestão do pin `pnpm/action-setup`, exibem aviso claro de que `report` não aplica updates JS/TS e resumem Cargo (`root-deps-only` + advisories) no terminal; no modo interativo, os detalhes completos de `cargo outdated`/`cargo audit` passam a ser gravados em `logs/`. Também foi adicionado fallback de atualização do `pnpm` via `npm install -g` quando `corepack` não está disponível no PATH, além de menu inicial de tipo de log (`none`, `cargo`, `full`) ao rodar sem argumentos.
+- **`check-updates` ganhou seleção Rust no estilo JS para root crates (`SAFE`/`MAJOR`)** — no modo interativo, quando `cargo outdated --root-deps-only` encontra updates, `scripts/check-updates.sh` e `scripts/check-updates.ps1` agora permitem selecionar e aplicar updates Rust por categoria, com confirmação explícita antes de executar `cargo update -p <crate> --precise <versao>`.
+- **`validar-tudo` ganhou menu de tipo de log e trilhas separadas para o gate Rust** — quando executado em modo interativo sem argumentos, `scripts/validar-tudo.sh` e `scripts/validar-tudo.ps1` agora perguntam o tipo de log (`none`, `full`, `full-cargo`); no modo `full-cargo`, `cargo fmt` e `cargo clippy` também são gravados em arquivos dedicados em `logs/`.
 
 ## [26.4.16] - 2026-04-16
 

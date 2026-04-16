@@ -3,8 +3,14 @@
 # Verificador de Updates para Pomodoroz (JS/TS + Rust)
 #
 # Uso:
-#   ./scripts/check-updates.sh              # Modo interativo (padrao)
-#   ./scripts/check-updates.sh report       # Modo relatorio (sem interacao)
+#   ./scripts/check-updates.sh                      # Modo interativo (padrao)
+#   ./scripts/check-updates.sh report               # Modo relatorio (sem interacao)
+#   ./scripts/check-updates.sh [interactive|report] [none|cargo|full]
+#
+# Modo de log:
+#   - none: sem logs em arquivo
+#   - cargo: logs de cargo outdated/audit (padrao atual)
+#   - full: log geral + logs de cargo outdated/audit
 #
 # Modo interativo:
 #   - Lista dependencias JS/TS desatualizadas por workspace
@@ -12,20 +18,77 @@
 #
 # Modo relatorio:
 #   - Apenas exibe o status (sem alterar arquivos)
-#   - Inclui bloco Rust (cargo outdated/audit, quando disponiveis)
+#   - Inclui bloco Rust (cargo outdated/audit) em resumo compacto
 #
 
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 POMODOROZ_DIR="$ROOT_DIR"
+ORIGINAL_ARGC=$#
 
-MODE="${1:-interactive}"
-if [[ "$MODE" != "interactive" && "$MODE" != "report" ]]; then
-  echo "Uso: $0 [interactive|report]"
-  echo ""
-  echo "  interactive  - Modo interativo com selecao de updates (padrao)"
-  echo "  report       - Modo relatorio, sem alteracoes"
+MODE="interactive"
+LOG_MODE="cargo"
+LOG_TIMESTAMP=""
+GENERAL_LOG_FILE=""
+CARGO_OUTDATED_LOG_FILE=""
+CARGO_AUDIT_LOG_FILE=""
+
+if [[ $# -gt 0 ]]; then
+  case "$1" in
+    interactive|report)
+      MODE="$1"
+      shift
+      ;;
+    none|log-none|--log-none)
+      LOG_MODE="none"
+      shift
+      ;;
+    cargo|log-cargo|--log-cargo)
+      LOG_MODE="cargo"
+      shift
+      ;;
+    full|log-full|--log-full)
+      LOG_MODE="full"
+      shift
+      ;;
+    *)
+      echo "Uso: $0 [interactive|report] [none|cargo|full]"
+      echo ""
+      echo "  interactive  - Modo interativo com selecao de updates (padrao)"
+      echo "  report       - Modo relatorio, sem alteracoes"
+      echo ""
+      echo "  none         - Sem log em arquivo"
+      echo "  cargo        - Apenas logs de cargo outdated/audit (default)"
+      echo "  full         - Log geral + logs de cargo"
+      exit 1
+      ;;
+  esac
+fi
+
+if [[ $# -gt 0 ]]; then
+  case "$1" in
+    none|log-none|--log-none)
+      LOG_MODE="none"
+      shift
+      ;;
+    cargo|log-cargo|--log-cargo)
+      LOG_MODE="cargo"
+      shift
+      ;;
+    full|log-full|--log-full)
+      LOG_MODE="full"
+      shift
+      ;;
+    *)
+      echo "Uso: $0 [interactive|report] [none|cargo|full]"
+      exit 1
+      ;;
+  esac
+fi
+
+if [[ $# -gt 0 ]]; then
+  echo "Uso: $0 [interactive|report] [none|cargo|full]"
   exit 1
 fi
 
@@ -39,6 +102,8 @@ WORKSPACES=(
 OUTDATED_ROWS=()
 declare -A OUTDATED_SEEN=()
 OUTDATED_CHECK_FAILED=0
+PNPM_VERSION_CURRENT=""
+PNPM_VERSION_LATEST=""
 CRITICAL_EXACT_PACKAGES=(
   "electron"
   "typescript"
@@ -71,9 +136,207 @@ version_gt() {
   [ "$max_version" = "$left" ] && [ "$left" != "$right" ]
 }
 
+collect_release_workflow_pnpm_pins() {
+  local workflow_file="$POMODOROZ_DIR/.github/workflows/release-autoupdate.yml"
+  if [ ! -f "$workflow_file" ]; then
+    return
+  fi
+
+  awk '
+    /uses:[[:space:]]*pnpm\/action-setup@/ {
+      in_setup = 1
+      next
+    }
+    in_setup && /^[[:space:]]*version:[[:space:]]*/ {
+      value = $2
+      gsub(/"/, "", value)
+      print value
+      in_setup = 0
+      next
+    }
+    in_setup && /^[[:space:]]*-[[:space:]]+name:/ {
+      in_setup = 0
+    }
+  ' "$workflow_file" | sort -u
+}
+
+check_release_workflow_pnpm_pin() {
+  local pins_raw
+  pins_raw="$(collect_release_workflow_pnpm_pins || true)"
+  if [ -z "$pins_raw" ]; then
+    echo "  Release workflow pin (pnpm/action-setup): ⚠ nao encontrado"
+    echo "    Arquivo esperado: .github/workflows/release-autoupdate.yml"
+    return
+  fi
+
+  local pin_count
+  pin_count="$(printf "%s\n" "$pins_raw" | wc -l | tr -d '[:space:]')"
+  local pins_display
+  pins_display="$(printf "%s\n" "$pins_raw" | paste -sd', ' -)"
+  echo "  Release workflow pin (pnpm/action-setup): ${pins_display}"
+
+  local first_pin
+  first_pin="$(printf "%s\n" "$pins_raw" | head -n 1)"
+
+  if [ "$pin_count" -gt 1 ]; then
+    echo "    ⚠ Inconsistencia: workflow possui mais de um pin de versao para pnpm."
+  fi
+
+  if [ -n "$PNPM_VERSION_CURRENT" ] && [ "$first_pin" != "$PNPM_VERSION_CURRENT" ]; then
+    echo "    Aviso: pnpm local (${PNPM_VERSION_CURRENT}) difere do pin do workflow (${first_pin})."
+  fi
+
+  if [ -n "$PNPM_VERSION_LATEST" ] && version_gt "$PNPM_VERSION_LATEST" "$first_pin"; then
+    echo "    Suggestion: update workflow pin ${first_pin} -> ${PNPM_VERSION_LATEST}"
+    echo "    File: .github/workflows/release-autoupdate.yml"
+  fi
+}
+
+update_release_workflow_pnpm_pin() {
+  local target_version="$1"
+  local workflow_file="$POMODOROZ_DIR/.github/workflows/release-autoupdate.yml"
+
+  if [ ! -f "$workflow_file" ]; then
+    echo "  ⚠ Arquivo de workflow nao encontrado: .github/workflows/release-autoupdate.yml"
+    return 1
+  fi
+
+  local tmp_file
+  tmp_file="$(mktemp)"
+
+  if ! awk -v target="$target_version" '
+    /uses:[[:space:]]*pnpm\/action-setup@/ {
+      in_setup = 1
+      print
+      next
+    }
+    in_setup && /^[[:space:]]*version:[[:space:]]*/ {
+      sub(/version:[[:space:]]*.*/, "version: " target)
+      print
+      in_setup = 0
+      changed = 1
+      next
+    }
+    in_setup && /^[[:space:]]*-[[:space:]]+name:/ {
+      in_setup = 0
+    }
+    { print }
+    END {
+      if (!changed) exit 3
+    }
+  ' "$workflow_file" > "$tmp_file"; then
+    rm -f "$tmp_file"
+    echo "  ⚠ Falha ao atualizar pin no workflow."
+    return 1
+  fi
+
+  if cmp -s "$workflow_file" "$tmp_file"; then
+    rm -f "$tmp_file"
+    return 0
+  fi
+
+  mv "$tmp_file" "$workflow_file"
+}
+
+maybe_offer_release_workflow_pnpm_pin_update() {
+  if [ "$MODE" != "interactive" ]; then
+    return
+  fi
+
+  if [ -z "$PNPM_VERSION_LATEST" ]; then
+    return
+  fi
+
+  local pins_raw
+  pins_raw="$(collect_release_workflow_pnpm_pins || true)"
+  if [ -z "$pins_raw" ]; then
+    return
+  fi
+
+  local pin_count
+  pin_count="$(printf "%s\n" "$pins_raw" | wc -l | tr -d '[:space:]')"
+  if [ "$pin_count" -ne 1 ]; then
+    echo "  ⚠ Pulando atualizacao automatica do pin do workflow: multiplos pins detectados."
+    return
+  fi
+
+  local current_pin
+  current_pin="$(printf "%s\n" "$pins_raw" | head -n 1)"
+  if ! version_gt "$PNPM_VERSION_LATEST" "$current_pin"; then
+    return
+  fi
+
+  echo ""
+  local confirm
+  if ! read -r -p "Atualizar pin do workflow de release para pnpm@${PNPM_VERSION_LATEST}? (s/N): " confirm; then
+    die "falha ao ler confirmacao para update de pin do workflow."
+  fi
+
+  if [[ "$confirm" =~ ^[sS]$ ]]; then
+    update_release_workflow_pnpm_pin "$PNPM_VERSION_LATEST"
+    echo "  ✓ Workflow atualizado: pnpm/action-setup version: ${PNPM_VERSION_LATEST}"
+  else
+    echo "  Pin do workflow mantido em ${current_pin}."
+  fi
+}
+
 die() {
   echo "ERRO: $1" >&2
   exit 1
+}
+
+show_log_menu() {
+  cat <<'EOF'
+Tipo de log:
+- 1) Sem log em arquivo.
+- 2) Apenas logs de cargo outdated/audit (padrao).
+- 3) Log geral + logs de cargo.
+EOF
+  local choice=""
+  if ! read -r -p "Opcao de log [1-3]: " choice; then
+    die "falha ao ler opcao de log."
+  fi
+
+  case "$choice" in
+    1) LOG_MODE="none" ;;
+    2) LOG_MODE="cargo" ;;
+    3) LOG_MODE="full" ;;
+    *) die "Opcao de log invalida: $choice" ;;
+  esac
+}
+
+setup_logging() {
+  if [[ "$LOG_MODE" != "full" ]]; then
+    return
+  fi
+
+  local logs_dir="$POMODOROZ_DIR/logs"
+  mkdir -p "$logs_dir"
+  LOG_TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
+  GENERAL_LOG_FILE="$logs_dir/check-updates-$LOG_TIMESTAMP.log"
+  exec > >(tee -a "$GENERAL_LOG_FILE") 2>&1
+}
+
+show_generated_logs() {
+  if [[ "$LOG_MODE" == "none" ]]; then
+    return
+  fi
+
+  if [[ -z "$GENERAL_LOG_FILE" && -z "$CARGO_OUTDATED_LOG_FILE" && -z "$CARGO_AUDIT_LOG_FILE" ]]; then
+    return
+  fi
+
+  echo ""
+  echo "Logs gerados:"
+  if [[ -n "$GENERAL_LOG_FILE" ]]; then
+    echo "  - Geral: $GENERAL_LOG_FILE"
+  fi
+  if [[ -n "$CARGO_OUTDATED_LOG_FILE" ]]; then
+    echo "  - Cargo outdated: $CARGO_OUTDATED_LOG_FILE"
+  fi
+  if [[ -n "$CARGO_AUDIT_LOG_FILE" ]]; then
+    echo "  - Cargo audit: $CARGO_AUDIT_LOG_FILE"
+  fi
 }
 
 choose_items() {
@@ -364,6 +627,7 @@ check_dev_environment() {
     local pnpm_version pnpm_latest
     local lookup_status
     pnpm_version="$(pnpm --version)"
+    PNPM_VERSION_CURRENT="$pnpm_version"
     echo "  pnpm: ${pnpm_version} ✓"
 
     if command -v npm >/dev/null 2>&1; then
@@ -376,14 +640,27 @@ check_dev_environment() {
       lookup_status=$?
       set -e
 
-      if [ "$lookup_status" -eq 0 ] && [ -n "$pnpm_latest" ] && version_gt "$pnpm_latest" "$pnpm_version"; then
-        echo "    Update available: ${pnpm_version} -> ${pnpm_latest}"
-        echo "    To update: corepack use pnpm@${pnpm_latest}"
+      if [ "$lookup_status" -eq 0 ] && [ -n "$pnpm_latest" ]; then
+        PNPM_VERSION_LATEST="$pnpm_latest"
+      fi
+
+      if [ -n "$PNPM_VERSION_LATEST" ] && version_gt "$PNPM_VERSION_LATEST" "$pnpm_version"; then
+        echo "    Update available: ${pnpm_version} -> ${PNPM_VERSION_LATEST}"
+        if command -v corepack >/dev/null 2>&1; then
+          echo "    To update: corepack use pnpm@${PNPM_VERSION_LATEST}"
+        else
+          echo "    Corepack nao encontrado no PATH."
+          echo "    To update (fallback sem root): npm install -g pnpm@${PNPM_VERSION_LATEST} --prefix \"\$HOME/.local\""
+          echo "    Se necessario, adicione ao PATH: export PATH=\"\$HOME/.local/bin:\$PATH\""
+        fi
       fi
     fi
   else
     echo "  pnpm: ❌ nao encontrado"
   fi
+
+  check_release_workflow_pnpm_pin
+  maybe_offer_release_workflow_pnpm_pin_update
 }
 
 get_pkg_version() {
@@ -673,6 +950,10 @@ check_js_dependencies() {
   show_outdated_table
 
   if [ "$MODE" = "report" ]; then
+    if [ ${#OUTDATED_ROWS[@]} -gt 0 ]; then
+      echo "  INFO: modo report nao aplica updates."
+      echo "        Para selecionar/aplicar updates JS/TS: ./scripts/check-updates.sh"
+    fi
     return
   fi
 
@@ -742,6 +1023,251 @@ cargo_subcommand_available() {
   cargo "$subcommand" --version >/dev/null 2>&1
 }
 
+show_cargo_outdated_report_summary() {
+  local raw_json="$1"
+  printf "%s\n" "$raw_json" | node -e '
+const fs = require("fs");
+const raw = fs.readFileSync(0, "utf8").trim();
+if (!raw) {
+  console.log("  Nenhum update de crate root detectado.");
+  process.exit(0);
+}
+
+let data;
+try {
+  data = JSON.parse(raw);
+} catch {
+  console.log("  ⚠ Nao foi possivel parsear a saida JSON de cargo outdated.");
+  process.exit(0);
+}
+
+const deps = Array.isArray(data.dependencies) ? data.dependencies : [];
+if (deps.length === 0) {
+  console.log("  Nenhum update de crate root detectado.");
+  process.exit(0);
+}
+
+console.log("  Root crates com update disponivel:");
+console.log("  Crate                           Atual        Latest");
+for (const dep of deps) {
+  const name = String(dep.name ?? dep.crate ?? dep.package ?? "n/a");
+  const current = String(dep.project ?? dep.current ?? dep.version ?? "n/a");
+  const latest = String(dep.latest ?? dep.newest ?? dep.target ?? "n/a");
+  const n = name.padEnd(31, " ");
+  const c = current.padEnd(12, " ");
+  console.log(`  ${n} ${c} ${latest}`);
+}
+'
+}
+
+cargo_outdated_root_rows_tsv() {
+  local raw_json="$1"
+  printf "%s\n" "$raw_json" | node -e '
+const fs = require("fs");
+const raw = fs.readFileSync(0, "utf8").trim();
+if (!raw) process.exit(0);
+
+let data;
+try {
+  data = JSON.parse(raw);
+} catch {
+  process.exit(0);
+}
+
+const deps = Array.isArray(data.dependencies) ? data.dependencies : [];
+for (const dep of deps) {
+  const name = String(dep.name ?? dep.crate ?? dep.package ?? "").trim();
+  if (!name) continue;
+  const project = String(dep.project ?? dep.current ?? dep.version ?? "n/a").trim();
+  const compat = String(dep.compat ?? dep.wanted ?? dep.compatible ?? "n/a").trim();
+  const latest = String(dep.latest ?? dep.newest ?? dep.target ?? "n/a").trim();
+  process.stdout.write([name, project, compat, latest].join("\t") + "\n");
+}
+'
+}
+
+run_rust_updates_for_selected() {
+  local tauri_dir="$1"
+  local -n __rows=$2
+  local row ws crate current compat target update_kind
+
+  for row in "${__rows[@]}"; do
+    IFS=$'\t' read -r ws crate current compat target update_kind <<< "$row"
+    if [ -z "$crate" ] || [ -z "$target" ]; then
+      continue
+    fi
+
+    echo "  -> [$ws] cargo update -p $crate --precise $target"
+    local status=0
+    set +e
+    (
+      cd "$tauri_dir" &&
+        cargo update -p "$crate" --precise "$target"
+    )
+    status=$?
+    set -e
+
+    if [ "$status" -eq 0 ]; then
+      echo "     ✓ atualizado: $crate => $target"
+    else
+      echo "     ⚠ falha ao aplicar automaticamente para $crate (target $target)."
+      echo "       Dica: cd \"$tauri_dir\" && cargo add \"$crate@$target\""
+    fi
+  done
+}
+
+maybe_offer_rust_root_updates() {
+  local raw_json="$1"
+  local tauri_dir="$2"
+
+  if [ "$MODE" != "interactive" ]; then
+    return
+  fi
+  if [ -z "$raw_json" ]; then
+    return
+  fi
+
+  local parsed_rows
+  parsed_rows="$(cargo_outdated_root_rows_tsv "$raw_json")"
+  if [ -z "$parsed_rows" ]; then
+    return
+  fi
+
+  local safe_candidates=()
+  local major_candidates=()
+  local crate project compat latest
+
+  while IFS=$'\t' read -r crate project compat latest; do
+    [ -z "$crate" ] && continue
+
+    if [ -n "$compat" ] && [ "$compat" != "n/a" ] && [ "$compat" != "Removed" ] && [ "$compat" != "$project" ]; then
+      if ! is_major_update "$project" "$compat"; then
+        safe_candidates+=("src-tauri"$'\t'"$crate"$'\t'"$project"$'\t'"$compat"$'\t'"$compat"$'\t'"safe")
+      fi
+    fi
+
+    if [ -n "$latest" ] && [ "$latest" != "n/a" ] && [ "$latest" != "Removed" ] && [ "$latest" != "$project" ]; then
+      if is_major_update "$project" "$latest"; then
+        major_candidates+=("src-tauri"$'\t'"$crate"$'\t'"$project"$'\t'"$latest"$'\t'"$latest"$'\t'"major")
+      fi
+    fi
+  done <<< "$parsed_rows"
+
+  local selected_safe=()
+  local selected_major=()
+
+  if [ ${#safe_candidates[@]} -gt 0 ]; then
+    echo ""
+    choose_items safe_candidates "Atualizacoes Rust SEGURAS (root crates, patch/minor):" selected_safe
+  fi
+  if [ ${#major_candidates[@]} -gt 0 ]; then
+    echo ""
+    choose_items major_candidates "Atualizacoes Rust MAJOR (root crates, podem quebrar):" selected_major
+  fi
+
+  if [ ${#selected_safe[@]} -eq 0 ] && [ ${#selected_major[@]} -eq 0 ]; then
+    if [ ${#safe_candidates[@]} -eq 0 ] && [ ${#major_candidates[@]} -eq 0 ]; then
+      echo "  Nenhum update Rust root elegivel para selecao automatica."
+    else
+      echo "Nenhum pacote selecionado."
+    fi
+    return
+  fi
+
+  echo ""
+  local confirm=""
+  if ! read -r -p "Aplicar updates Rust selecionados agora? (s/N): " confirm; then
+    die "falha ao ler confirmacao de update Rust."
+  fi
+  if [[ ! "$confirm" =~ ^[sS]$ ]]; then
+    echo "Atualizacao Rust cancelada."
+    return
+  fi
+
+  if [ ${#selected_safe[@]} -gt 0 ]; then
+    echo ""
+    echo "Aplicando updates Rust seguros..."
+    run_rust_updates_for_selected "$tauri_dir" selected_safe
+  fi
+  if [ ${#selected_major[@]} -gt 0 ]; then
+    echo ""
+    echo "Aplicando updates Rust major..."
+    run_rust_updates_for_selected "$tauri_dir" selected_major
+  fi
+
+  echo "  Recomendado apos updates Rust:"
+  echo "    cd \"$tauri_dir\" && cargo check"
+}
+
+show_cargo_audit_report_summary() {
+  local raw_json="$1"
+  printf "%s\n" "$raw_json" | node -e '
+const fs = require("fs");
+const raw = fs.readFileSync(0, "utf8").trim();
+if (!raw) {
+  console.log("  ⚠ cargo audit sem saida.");
+  process.exit(0);
+}
+
+let data;
+try {
+  data = JSON.parse(raw);
+} catch {
+  console.log("  ⚠ Nao foi possivel parsear a saida JSON de cargo audit.");
+  process.exit(0);
+}
+
+const vulnerabilities = data.vulnerabilities?.list ?? [];
+const vulnCount = Number(data.vulnerabilities?.count ?? vulnerabilities.length);
+const warnings = data.warnings ?? {};
+const unmaintained = Array.isArray(warnings.unmaintained) ? warnings.unmaintained : [];
+const unsound = Array.isArray(warnings.unsound) ? warnings.unsound : [];
+const yanked = Array.isArray(warnings.yanked) ? warnings.yanked : [];
+const notice = Array.isArray(warnings.notice) ? warnings.notice : [];
+
+console.log(`  Vulnerabilities: ${vulnCount}`);
+console.log(`  Warnings: unmaintained=${unmaintained.length}, unsound=${unsound.length}, yanked=${yanked.length}, notice=${notice.length}`);
+
+const all = [];
+const add = (kind, list) => {
+  for (const item of list || []) {
+    const adv = item.advisory || {};
+    const pkg = item.package || {};
+    const id = String(adv.id || "n/a");
+    const name = String(pkg.name || adv.package || "n/a");
+    const version = String(pkg.version || "n/a");
+    all.push({ kind, id, name, version });
+  }
+};
+add("vuln", vulnerabilities);
+add("unsound", unsound);
+add("unmaintained", unmaintained);
+add("yanked", yanked);
+add("notice", notice);
+
+const seen = new Set();
+const unique = [];
+for (const item of all) {
+  const key = `${item.kind}|${item.id}|${item.name}|${item.version}`;
+  if (seen.has(key)) continue;
+  seen.add(key);
+  unique.push(item);
+}
+
+if (unique.length === 0) {
+  process.exit(0);
+}
+
+console.log("  Advisories (resumo):");
+for (const item of unique.slice(0, 20)) {
+  console.log(`  - [${item.kind}] ${item.id} :: ${item.name}@${item.version}`);
+}
+if (unique.length > 20) {
+  console.log(`  ... (+${unique.length - 20} itens; use cargo audit para detalhes completos)`);
+}
+'
+}
+
 check_rust_dependencies() {
   echo ""
   echo "[5/5] Dependencias Rust (Cargo)"
@@ -751,34 +1277,193 @@ check_rust_dependencies() {
   fi
 
   local tauri_dir="$POMODOROZ_DIR/src-tauri"
+  local logs_dir="$POMODOROZ_DIR/logs"
+  local write_cargo_logs=0
+  local log_stamp
+  local outdated_log
+  local audit_log
+  local outdated_json_for_selection=""
   if [ ! -f "$tauri_dir/Cargo.toml" ]; then
     echo "  src-tauri/Cargo.toml nao encontrado; pulando verificacao Rust."
     return
   fi
 
+  if [ "$MODE" != "report" ] && [ "$LOG_MODE" != "none" ]; then
+    write_cargo_logs=1
+    mkdir -p "$logs_dir"
+    log_stamp="$(date +%Y%m%d-%H%M%S)"
+    outdated_log="$logs_dir/check-updates-cargo-outdated-$log_stamp.log"
+    audit_log="$logs_dir/check-updates-cargo-audit-$log_stamp.log"
+    CARGO_OUTDATED_LOG_FILE="$outdated_log"
+    CARGO_AUDIT_LOG_FILE="$audit_log"
+  fi
+
   echo "  - Workspace Rust: $tauri_dir"
 
+  if [ "$MODE" = "report" ]; then
+    if cargo_subcommand_available outdated; then
+      echo "  - Checando crates desatualizados (cargo outdated --root-deps-only --format json)..."
+      local outdated_json=""
+      local outdated_status=0
+      set +e
+      outdated_json="$(
+        cd "$tauri_dir" &&
+          cargo outdated --root-deps-only --format json 2>/dev/null
+      )"
+      outdated_status=$?
+      set -e
+      if [ "$outdated_status" -eq 0 ]; then
+        show_cargo_outdated_report_summary "$outdated_json"
+      else
+        echo "  ⚠ Falha ao executar cargo outdated em modo resumo."
+      fi
+    else
+      echo "  ⚠ cargo-outdated nao instalado."
+      echo "    Instale com: cargo install cargo-outdated"
+    fi
+
+    if cargo_subcommand_available audit; then
+      echo "  - Checando vulnerabilidades (cargo audit --json --no-fetch)..."
+      local audit_json=""
+      local audit_status=0
+      set +e
+      audit_json="$(
+        cd "$tauri_dir" &&
+          cargo audit --json --no-fetch 2>/dev/null
+      )"
+      audit_status=$?
+      set -e
+      if [ "$audit_status" -eq 0 ] && [ -n "$audit_json" ]; then
+        show_cargo_audit_report_summary "$audit_json"
+      else
+        echo "  ⚠ Falha ao executar cargo audit em modo resumo."
+        echo "    Dica: rode manualmente para detalhes: cd \"$tauri_dir\" && cargo audit"
+      fi
+    else
+      echo "  ⚠ cargo-audit nao instalado."
+      echo "    Instale com: cargo install cargo-audit"
+    fi
+
+    echo "  Atualizacao manual recomendada:"
+    echo "    cd \"$tauri_dir\" && cargo outdated --root-deps-only"
+    echo "    cd \"$tauri_dir\" && cargo audit"
+    echo "    cd \"$tauri_dir\" && cargo add <crate>@<versao>"
+    echo "    cd \"$tauri_dir\" && cargo update -p <crate> --precise <versao>"
+    echo "    cd \"$tauri_dir\" && cargo check"
+    return
+  fi
+
   if cargo_subcommand_available outdated; then
-    echo "  - Checando crates desatualizados (cargo outdated)..."
-    (
-      cd "$tauri_dir" &&
-        cargo outdated
-    ) || echo "  ⚠ Falha ao executar cargo outdated."
+    local outdated_json=""
+    local outdated_json_status=0
+    if [ "$write_cargo_logs" -eq 1 ]; then
+      echo "  - Checando crates desatualizados (resumo + log)..."
+      local outdated_full_status=0
+      set +e
+      outdated_json="$(
+        cd "$tauri_dir" &&
+          cargo outdated --root-deps-only --format json 2>/dev/null
+      )"
+      outdated_json_status=$?
+      (
+        cd "$tauri_dir" &&
+          cargo outdated >"$outdated_log" 2>&1
+      )
+      outdated_full_status=$?
+      set -e
+
+      if [ "$outdated_json_status" -eq 0 ]; then
+        show_cargo_outdated_report_summary "$outdated_json"
+        outdated_json_for_selection="$outdated_json"
+      else
+        echo "  ⚠ Falha ao executar resumo de cargo outdated."
+      fi
+
+      if [ "$outdated_full_status" -eq 0 ]; then
+        echo "  Detalhes completos: $outdated_log"
+      elif [ -s "$outdated_log" ]; then
+        echo "  Detalhes (com erro de execucao): $outdated_log"
+      else
+        echo "  ⚠ Falha ao gerar log completo de cargo outdated."
+        echo "    Verifique: $outdated_log"
+      fi
+    else
+      echo "  - Checando crates desatualizados (resumo)..."
+      set +e
+      outdated_json="$(
+        cd "$tauri_dir" &&
+          cargo outdated --root-deps-only --format json 2>/dev/null
+      )"
+      outdated_json_status=$?
+      set -e
+      if [ "$outdated_json_status" -eq 0 ]; then
+        show_cargo_outdated_report_summary "$outdated_json"
+        outdated_json_for_selection="$outdated_json"
+      else
+        echo "  ⚠ Falha ao executar resumo de cargo outdated."
+      fi
+    fi
   else
     echo "  ⚠ cargo-outdated nao instalado."
     echo "    Instale com: cargo install cargo-outdated"
   fi
 
   if cargo_subcommand_available audit; then
-    echo "  - Checando vulnerabilidades (cargo audit)..."
-    (
-      cd "$tauri_dir" &&
-        cargo audit
-    ) || echo "  ⚠ Falha ao executar cargo audit."
+    local audit_json=""
+    local audit_json_status=0
+    if [ "$write_cargo_logs" -eq 1 ]; then
+      echo "  - Checando vulnerabilidades (resumo + log)..."
+      local audit_full_status=0
+      set +e
+      audit_json="$(
+        cd "$tauri_dir" &&
+          cargo audit --json --no-fetch 2>/dev/null
+      )"
+      audit_json_status=$?
+      (
+        cd "$tauri_dir" &&
+          cargo audit >"$audit_log" 2>&1
+      )
+      audit_full_status=$?
+      set -e
+
+      if [ "$audit_json_status" -eq 0 ] && [ -n "$audit_json" ]; then
+        show_cargo_audit_report_summary "$audit_json"
+      else
+        echo "  ⚠ Falha ao executar resumo de cargo audit."
+        echo "    Dica: rode manualmente para detalhes: cd \"$tauri_dir\" && cargo audit"
+      fi
+
+      if [ "$audit_full_status" -eq 0 ]; then
+        echo "  Detalhes completos: $audit_log"
+      elif [ -s "$audit_log" ]; then
+        echo "  Detalhes (com erro de execucao): $audit_log"
+      else
+        echo "  ⚠ Falha ao gerar log completo de cargo audit."
+        echo "    Verifique: $audit_log"
+      fi
+    else
+      echo "  - Checando vulnerabilidades (resumo)..."
+      set +e
+      audit_json="$(
+        cd "$tauri_dir" &&
+          cargo audit --json --no-fetch 2>/dev/null
+      )"
+      audit_json_status=$?
+      set -e
+      if [ "$audit_json_status" -eq 0 ] && [ -n "$audit_json" ]; then
+        show_cargo_audit_report_summary "$audit_json"
+      else
+        echo "  ⚠ Falha ao executar resumo de cargo audit."
+        echo "    Dica: rode manualmente para detalhes: cd \"$tauri_dir\" && cargo audit"
+      fi
+    fi
   else
     echo "  ⚠ cargo-audit nao instalado."
     echo "    Instale com: cargo install cargo-audit"
   fi
+
+  maybe_offer_rust_root_updates "$outdated_json_for_selection" "$tauri_dir"
 
   echo "  Atualizacao manual recomendada:"
   echo "    cd \"$tauri_dir\" && cargo add <crate>@<versao>"
@@ -786,11 +1471,18 @@ check_rust_dependencies() {
   echo "    cd \"$tauri_dir\" && cargo check"
 }
 
+if (( ORIGINAL_ARGC == 0 )) && [[ -t 0 ]] && [ "$MODE" = "interactive" ]; then
+  show_log_menu
+fi
+
+setup_logging
+
 print_header
 check_dev_environment
 check_stack_versions
 check_framework_inventory
 check_js_dependencies
 check_rust_dependencies
+show_generated_logs
 echo ""
 echo "OK: Verificacao concluida!"

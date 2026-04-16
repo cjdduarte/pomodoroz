@@ -1,13 +1,17 @@
 # Pomodoroz - Verificador de Updates (Windows PowerShell)
 #
 # Uso:
-#   .\scripts\check-updates.ps1              # Modo interativo (padrao)
-#   .\scripts\check-updates.ps1 report       # Modo relatorio (sem interacao)
+#   .\scripts\check-updates.ps1                      # Modo interativo (padrao)
+#   .\scripts\check-updates.ps1 report               # Modo relatorio (sem interacao)
+#   .\scripts\check-updates.ps1 [interactive|report] [none|cargo|full]
 
 param(
     [Parameter(Position = 0)]
     [ValidateSet("interactive", "report")]
-    [string]$Mode = "interactive"
+    [string]$Mode = "interactive",
+    [Parameter(Position = 1)]
+    [ValidateSet("none", "cargo", "full")]
+    [string]$LogMode = "cargo"
 )
 
 $ErrorActionPreference = "Continue"
@@ -24,6 +28,14 @@ $Workspaces = @(
 
 $script:OutdatedCheckFailed = $false
 $script:OutdatedSeen = [System.Collections.Generic.HashSet[string]]::new()
+$script:PnpmVersionCurrent = ""
+$script:PnpmVersionLatest = ""
+$script:LogModeSelection = $LogMode
+$script:LogTimestamp = ""
+$script:GeneralLogFile = ""
+$script:CargoOutdatedLogFile = ""
+$script:CargoAuditLogFile = ""
+$script:TranscriptStarted = $false
 $CriticalExactPackages = @(
     "electron",
     "typescript",
@@ -41,6 +53,77 @@ function Print-Header {
 
 function Step([string]$Message) {
     Write-Host $Message -ForegroundColor Cyan
+}
+
+function Stop-CheckUpdatesTranscript {
+    if ($script:TranscriptStarted) {
+        try {
+            Stop-Transcript | Out-Null
+        } catch {
+            # ignora falha de finalizacao de transcript
+        } finally {
+            $script:TranscriptStarted = $false
+        }
+    }
+}
+
+function Show-LogMenu {
+    Write-Host "Tipo de log:"
+    Write-Host "- 1) Sem log em arquivo."
+    Write-Host "- 2) Apenas logs de cargo outdated/audit (padrao)."
+    Write-Host "- 3) Log geral + logs de cargo."
+    Write-Host ""
+
+    $choice = Read-Host "Opcao de log [1-3]"
+    switch ($choice) {
+        "1" { $script:LogModeSelection = "none" }
+        "2" { $script:LogModeSelection = "cargo" }
+        "3" { $script:LogModeSelection = "full" }
+        default { throw "Opcao de log invalida: $choice" }
+    }
+}
+
+function Initialize-Logging {
+    if ($script:LogModeSelection -ne "full") {
+        return
+    }
+
+    $logsDir = Join-Path $POMODOROZ "logs"
+    if (-not (Test-Path $logsDir)) {
+        [void](New-Item -ItemType Directory -Path $logsDir -Force)
+    }
+
+    $script:LogTimestamp = Get-Date -Format "yyyyMMdd-HHmmss"
+    $script:GeneralLogFile = Join-Path $logsDir "check-updates-$($script:LogTimestamp).log"
+
+    try {
+        Start-Transcript -Path $script:GeneralLogFile -Force | Out-Null
+        $script:TranscriptStarted = $true
+    } catch {
+        Write-Host "Aviso: nao foi possivel iniciar transcript para log geral." -ForegroundColor Yellow
+    }
+}
+
+function Show-GeneratedLogs {
+    if ($script:LogModeSelection -eq "none") {
+        return
+    }
+
+    if ([string]::IsNullOrWhiteSpace($script:GeneralLogFile) -and [string]::IsNullOrWhiteSpace($script:CargoOutdatedLogFile) -and [string]::IsNullOrWhiteSpace($script:CargoAuditLogFile)) {
+        return
+    }
+
+    Write-Host ""
+    Write-Host "Logs gerados:" -ForegroundColor Cyan
+    if (-not [string]::IsNullOrWhiteSpace($script:GeneralLogFile)) {
+        Write-Host "  - Geral: $($script:GeneralLogFile)"
+    }
+    if (-not [string]::IsNullOrWhiteSpace($script:CargoOutdatedLogFile)) {
+        Write-Host "  - Cargo outdated: $($script:CargoOutdatedLogFile)"
+    }
+    if (-not [string]::IsNullOrWhiteSpace($script:CargoAuditLogFile)) {
+        Write-Host "  - Cargo audit: $($script:CargoAuditLogFile)"
+    }
 }
 
 function Check-Command([string]$Cmd) {
@@ -187,6 +270,161 @@ function Compare-Semver {
     return 0
 }
 
+function Get-ReleaseWorkflowPnpmPins {
+    $workflowFile = Join-Path $POMODOROZ ".github/workflows/release-autoupdate.yml"
+    if (-not (Test-Path $workflowFile)) {
+        return @()
+    }
+
+    $pins = [System.Collections.Generic.HashSet[string]]::new()
+    $inSetup = $false
+    foreach ($line in (Get-Content $workflowFile)) {
+        if ($line -match 'uses:\s*pnpm/action-setup@') {
+            $inSetup = $true
+            continue
+        }
+
+        if ($inSetup -and $line -match '^\s*version:\s*(.+?)\s*$') {
+            $value = $Matches[1].Trim().Trim('"').Trim("'")
+            if (-not [string]::IsNullOrWhiteSpace($value)) {
+                [void]$pins.Add($value)
+            }
+            $inSetup = $false
+            continue
+        }
+
+        if ($inSetup -and $line -match '^\s*-\s+name:') {
+            $inSetup = $false
+        }
+    }
+
+    return @($pins | Sort-Object)
+}
+
+function Show-ReleaseWorkflowPnpmPinStatus {
+    $pins = @(Get-ReleaseWorkflowPnpmPins)
+    if (-not $pins -or $pins.Count -eq 0) {
+        Write-Host "  Release workflow pin (pnpm/action-setup): [WARN] nao encontrado" -ForegroundColor Yellow
+        Write-Host "    Arquivo esperado: .github/workflows/release-autoupdate.yml" -ForegroundColor Yellow
+        return
+    }
+
+    $pinsDisplay = ($pins -join ", ")
+    Write-Host "  Release workflow pin (pnpm/action-setup): $pinsDisplay"
+
+    if ($pins.Count -gt 1) {
+        Write-Host "    [WARN] Inconsistencia: workflow possui mais de um pin de versao para pnpm." -ForegroundColor Yellow
+    }
+
+    $firstPin = "$($pins[0])"
+    if (-not [string]::IsNullOrWhiteSpace($script:PnpmVersionCurrent) -and $firstPin -ne $script:PnpmVersionCurrent) {
+        Write-Host "    Aviso: pnpm local ($($script:PnpmVersionCurrent)) difere do pin do workflow ($firstPin)." -ForegroundColor Yellow
+    }
+
+    if (-not [string]::IsNullOrWhiteSpace($script:PnpmVersionLatest) -and (Compare-Semver -Left $firstPin -Right $script:PnpmVersionLatest) -lt 0) {
+        Write-Host "    Suggestion: update workflow pin $firstPin -> $($script:PnpmVersionLatest)" -ForegroundColor Yellow
+        Write-Host "    File: .github/workflows/release-autoupdate.yml" -ForegroundColor Gray
+    }
+}
+
+function Update-ReleaseWorkflowPnpmPin {
+    param([string]$TargetVersion)
+
+    $workflowFile = Join-Path $POMODOROZ ".github/workflows/release-autoupdate.yml"
+    if (-not (Test-Path $workflowFile)) {
+        Write-Host "  [WARN] Arquivo de workflow nao encontrado: .github/workflows/release-autoupdate.yml" -ForegroundColor Yellow
+        return $false
+    }
+
+    if (-not (Check-Command "node")) {
+        Write-Host "  [WARN] Node nao encontrado para atualizar pin do workflow." -ForegroundColor Yellow
+        return $false
+    }
+
+    $nodeCode = @'
+const fs = require("fs");
+const file = process.argv[1];
+const target = process.argv[2];
+const source = fs.readFileSync(file, "utf8");
+const lines = source.split(/\r?\n/);
+const hadFinalNewline = /\r?\n$/.test(source);
+let inSetup = false;
+let found = false;
+let changed = false;
+
+const out = lines.map((line) => {
+  if (/uses:\s*pnpm\/action-setup@/.test(line)) {
+    inSetup = true;
+    return line;
+  }
+
+  if (inSetup && /^\s*version:\s*/.test(line)) {
+    found = true;
+    const next = line.replace(/version:\s*.*/, `version: ${target}`);
+    if (next !== line) changed = true;
+    inSetup = false;
+    return next;
+  }
+
+  if (inSetup && /^\s*-\s+name:/.test(line)) {
+    inSetup = false;
+  }
+
+  return line;
+});
+
+if (!found) {
+  process.exit(3);
+}
+
+if (!changed) {
+  process.exit(0);
+}
+
+fs.writeFileSync(file, out.join("\n") + (hadFinalNewline ? "\n" : ""), "utf8");
+'@
+
+    & node -e $nodeCode $workflowFile $TargetVersion *> $null
+    return $LASTEXITCODE -eq 0
+}
+
+function Maybe-OfferReleaseWorkflowPnpmPinUpdate {
+    if ($Mode -ne "interactive") {
+        return
+    }
+
+    if ([string]::IsNullOrWhiteSpace($script:PnpmVersionLatest)) {
+        return
+    }
+
+    $pins = @(Get-ReleaseWorkflowPnpmPins)
+    if (-not $pins -or $pins.Count -eq 0) {
+        return
+    }
+
+    if ($pins.Count -ne 1) {
+        Write-Host "  [WARN] Pulando atualizacao automatica do pin do workflow: multiplos pins detectados." -ForegroundColor Yellow
+        return
+    }
+
+    $currentPin = "$($pins[0])"
+    if ((Compare-Semver -Left $currentPin -Right $script:PnpmVersionLatest) -ge 0) {
+        return
+    }
+
+    Write-Host ""
+    $confirm = Read-Host "Atualizar pin do workflow de release para pnpm@$($script:PnpmVersionLatest)? (s/N)"
+    if ($confirm -match '^[sS]$') {
+        if (Update-ReleaseWorkflowPnpmPin -TargetVersion $script:PnpmVersionLatest) {
+            Write-Host "  [OK] Workflow atualizado: pnpm/action-setup version: $($script:PnpmVersionLatest)" -ForegroundColor Green
+        } else {
+            Write-Host "  [WARN] Falha ao atualizar pin do workflow." -ForegroundColor Yellow
+        }
+    } else {
+        Write-Host "  Pin do workflow mantido em $currentPin."
+    }
+}
+
 function Normalize-WorkspaceName {
     param([string]$WorkspaceName)
 
@@ -305,6 +543,7 @@ function Check-DevEnvironment {
     }
 
     if (-not [string]::IsNullOrWhiteSpace($pnpmVersion)) {
+        $script:PnpmVersionCurrent = $pnpmVersion
         Write-Host "  pnpm: $pnpmVersion [OK]" -ForegroundColor Green
 
         if (Check-Command "npm") {
@@ -316,15 +555,25 @@ function Check-DevEnvironment {
             }
 
             if (-not [string]::IsNullOrWhiteSpace($pnpmLatest)) {
+                $script:PnpmVersionLatest = $pnpmLatest
                 if ((Compare-Semver -Left $pnpmVersion -Right $pnpmLatest) -lt 0) {
                     Write-Host "    Update available: $pnpmVersion -> $pnpmLatest" -ForegroundColor Yellow
-                    Write-Host "    To update: corepack use pnpm@$pnpmLatest" -ForegroundColor Gray
+                    if (Check-Command "corepack") {
+                        Write-Host "    To update: corepack use pnpm@$pnpmLatest" -ForegroundColor Gray
+                    } else {
+                        Write-Host "    Corepack nao encontrado no PATH." -ForegroundColor Yellow
+                        Write-Host ('    To update (fallback sem root): npm install -g pnpm@{0} --prefix $HOME/.local' -f $pnpmLatest) -ForegroundColor Gray
+                        Write-Host '    Se necessario, adicione ao PATH: $env:PATH="$HOME/.local/bin;$env:PATH"' -ForegroundColor Gray
+                    }
                 }
             }
         }
     } else {
         Write-Host "  pnpm: [ERROR] nao encontrado (nem via corepack/pnpmw)." -ForegroundColor Red
     }
+
+    Show-ReleaseWorkflowPnpmPinStatus
+    Maybe-OfferReleaseWorkflowPnpmPinUpdate
 }
 
 function Check-StackVersions {
@@ -764,6 +1013,10 @@ function Check-JsDependencies {
     Show-OutdatedTable -Rows $rows
 
     if ($Mode -eq "report") {
+        if ($rows -and $rows.Count -gt 0) {
+            Write-Host "  INFO: modo report nao aplica updates." -ForegroundColor Gray
+            Write-Host "        Para selecionar/aplicar updates JS/TS: .\scripts\check-updates.ps1" -ForegroundColor Gray
+        }
         return
     }
     if (-not $rows -or $rows.Count -eq 0) {
@@ -813,6 +1066,355 @@ function Test-CargoSubcommand {
     return $LASTEXITCODE -eq 0
 }
 
+function Get-ObjectFieldText {
+    param(
+        [object]$Entry,
+        [string[]]$FieldNames
+    )
+
+    if ($null -eq $Entry) {
+        return "n/a"
+    }
+
+    foreach ($fieldName in $FieldNames) {
+        if ([string]::IsNullOrWhiteSpace($fieldName)) {
+            continue
+        }
+
+        if ($Entry -is [System.Collections.IDictionary] -and $Entry.Contains($fieldName)) {
+            $value = $Entry[$fieldName]
+            if ($null -ne $value -and -not [string]::IsNullOrWhiteSpace("$value")) {
+                return "$value"
+            }
+        }
+
+        if ($null -ne $Entry.PSObject) {
+            $prop = $Entry.PSObject.Properties[$fieldName]
+            if ($null -ne $prop) {
+                $value = $prop.Value
+                if ($null -ne $value -and -not [string]::IsNullOrWhiteSpace("$value")) {
+                    return "$value"
+                }
+            }
+        }
+    }
+
+    return "n/a"
+}
+
+function Show-CargoOutdatedReportSummary {
+    param([string]$RawJson)
+
+    if ([string]::IsNullOrWhiteSpace($RawJson)) {
+        Write-Host "  Nenhum update de crate root detectado."
+        return
+    }
+
+    $data = $null
+    try {
+        $data = $RawJson | ConvertFrom-Json
+    } catch {
+        Write-Host "  [WARN] Nao foi possivel parsear a saida JSON de cargo outdated." -ForegroundColor Yellow
+        return
+    }
+
+    $deps = @()
+    if ($null -ne $data -and $null -ne $data.PSObject.Properties["dependencies"]) {
+        $deps = @($data.dependencies)
+    }
+
+    if (-not $deps -or $deps.Count -eq 0) {
+        Write-Host "  Nenhum update de crate root detectado."
+        return
+    }
+
+    Write-Host "  Root crates com update disponivel:"
+    Write-Host "  Crate                           Atual        Latest"
+    foreach ($dep in $deps) {
+        $name = Get-ObjectFieldText -Entry $dep -FieldNames @("name", "crate", "package")
+        $current = Get-ObjectFieldText -Entry $dep -FieldNames @("project", "current", "version")
+        $latest = Get-ObjectFieldText -Entry $dep -FieldNames @("latest", "newest", "target")
+        $namePadded = $name.PadRight(31)
+        $currentPadded = $current.PadRight(12)
+        Write-Host "  $namePadded $currentPadded $latest"
+    }
+}
+
+function Get-CargoOutdatedRootRowsFromJson {
+    param([string]$RawJson)
+
+    if ([string]::IsNullOrWhiteSpace($RawJson)) {
+        return @()
+    }
+
+    $data = $null
+    try {
+        $data = $RawJson | ConvertFrom-Json
+    } catch {
+        return @()
+    }
+
+    $deps = @()
+    if ($null -ne $data -and $null -ne $data.PSObject.Properties["dependencies"]) {
+        $deps = @($data.dependencies)
+    }
+    if (-not $deps) {
+        return @()
+    }
+
+    $rows = @()
+    foreach ($dep in $deps) {
+        $name = Get-ObjectFieldText -Entry $dep -FieldNames @("name", "crate", "package")
+        if ($name -eq "n/a") {
+            continue
+        }
+        $project = Get-ObjectFieldText -Entry $dep -FieldNames @("project", "current", "version")
+        $compat = Get-ObjectFieldText -Entry $dep -FieldNames @("compat", "wanted", "compatible")
+        $latest = Get-ObjectFieldText -Entry $dep -FieldNames @("latest", "newest", "target")
+        $rows += [PSCustomObject]@{
+            Name = $name
+            Project = $project
+            Compat = $compat
+            Latest = $latest
+        }
+    }
+
+    return $rows
+}
+
+function Invoke-RustRootUpdates {
+    param(
+        [object[]]$Rows,
+        [string]$TauriDir
+    )
+
+    foreach ($row in $Rows) {
+        $target = "$($row.Target)"
+        if ([string]::IsNullOrWhiteSpace($row.Package) -or [string]::IsNullOrWhiteSpace($target)) {
+            continue
+        }
+
+        Write-Host "  -> [$($row.Workspace)] cargo update -p $($row.Package) --precise $target"
+        Push-Location $TauriDir
+        try {
+            & cargo update -p $row.Package --precise $target
+            if ($LASTEXITCODE -eq 0) {
+                Write-Host "     [OK] atualizado: $($row.Package) => $target" -ForegroundColor Green
+            } else {
+                Write-Host "     [WARN] falha ao aplicar automaticamente para $($row.Package) (target $target)." -ForegroundColor Yellow
+                Write-Host ('       Dica: Set-Location "{0}"; cargo add "{1}@{2}"' -f $TauriDir, $row.Package, $target) -ForegroundColor Yellow
+            }
+        } finally {
+            Pop-Location
+        }
+    }
+}
+
+function Maybe-OfferRustRootUpdates {
+    param(
+        [string]$OutdatedJson,
+        [string]$TauriDir
+    )
+
+    if ($Mode -ne "interactive") {
+        return
+    }
+    if ([string]::IsNullOrWhiteSpace($OutdatedJson)) {
+        return
+    }
+
+    $rootRows = @(Get-CargoOutdatedRootRowsFromJson -RawJson $OutdatedJson)
+    if (-not $rootRows -or $rootRows.Count -eq 0) {
+        return
+    }
+
+    $safeCandidates = @()
+    $majorCandidates = @()
+    foreach ($item in $rootRows) {
+        $name = "$($item.Name)"
+        $project = "$($item.Project)"
+        $compat = "$($item.Compat)"
+        $latest = "$($item.Latest)"
+
+        if (-not [string]::IsNullOrWhiteSpace($compat) -and $compat -ne "n/a" -and $compat -ne "Removed" -and $compat -ne $project) {
+            if (-not (Is-MajorUpdate -Current $project -Latest $compat)) {
+                $safeCandidates += [PSCustomObject]@{
+                    Workspace = "src-tauri"
+                    Package = $name
+                    Current = $project
+                    Wanted = $compat
+                    Latest = $compat
+                    PackageType = "cargo"
+                    Target = $compat
+                    UpdateKind = "safe"
+                }
+            }
+        }
+
+        if (-not [string]::IsNullOrWhiteSpace($latest) -and $latest -ne "n/a" -and $latest -ne "Removed" -and $latest -ne $project) {
+            if (Is-MajorUpdate -Current $project -Latest $latest) {
+                $majorCandidates += [PSCustomObject]@{
+                    Workspace = "src-tauri"
+                    Package = $name
+                    Current = $project
+                    Wanted = $latest
+                    Latest = $latest
+                    PackageType = "cargo"
+                    Target = $latest
+                    UpdateKind = "major"
+                }
+            }
+        }
+    }
+
+    $selectedSafe = @()
+    $selectedMajor = @()
+    if ($safeCandidates.Count -gt 0) {
+        $selectedSafe = Select-UpdateRows -Rows $safeCandidates -Prompt "Atualizacoes Rust SEGURAS (root crates, patch/minor):"
+    }
+    if ($majorCandidates.Count -gt 0) {
+        $selectedMajor = Select-UpdateRows -Rows $majorCandidates -Prompt "Atualizacoes Rust MAJOR (root crates, podem quebrar):"
+    }
+
+    if (($selectedSafe.Count + $selectedMajor.Count) -eq 0) {
+        if (($safeCandidates.Count + $majorCandidates.Count) -eq 0) {
+            Write-Host "  Nenhum update Rust root elegivel para selecao automatica."
+        } else {
+            Write-Host "Nenhum pacote selecionado."
+        }
+        return
+    }
+
+    $confirm = Read-Host "Aplicar updates Rust selecionados agora? (s/N)"
+    if ($confirm -notmatch '^[sS]$') {
+        Write-Host "Atualizacao Rust cancelada."
+        return
+    }
+
+    if ($selectedSafe.Count -gt 0) {
+        Write-Host "`nAplicando updates Rust seguros..."
+        Invoke-RustRootUpdates -Rows $selectedSafe -TauriDir $TauriDir
+    }
+    if ($selectedMajor.Count -gt 0) {
+        Write-Host "`nAplicando updates Rust major..."
+        Invoke-RustRootUpdates -Rows $selectedMajor -TauriDir $TauriDir
+    }
+
+    Write-Host "  Recomendado apos updates Rust:"
+    Write-Host ('    Set-Location "{0}"; cargo check' -f $TauriDir)
+}
+
+function Add-CargoAdvisoryRows {
+    param(
+        [System.Collections.Generic.List[object]]$Rows,
+        [string]$Kind,
+        [object[]]$Items
+    )
+
+    if (-not $Items) {
+        return
+    }
+
+    foreach ($item in $Items) {
+        $advisory = $null
+        $package = $null
+        if ($null -ne $item.PSObject.Properties["advisory"]) {
+            $advisory = $item.advisory
+        }
+        if ($null -ne $item.PSObject.Properties["package"]) {
+            $package = $item.package
+        }
+
+        $id = Get-ObjectFieldText -Entry $advisory -FieldNames @("id")
+        $name = Get-ObjectFieldText -Entry $package -FieldNames @("name")
+        if ($name -eq "n/a") {
+            $name = Get-ObjectFieldText -Entry $advisory -FieldNames @("package")
+        }
+        $version = Get-ObjectFieldText -Entry $package -FieldNames @("version")
+
+        $Rows.Add([PSCustomObject]@{
+            Kind = $Kind
+            Id = $id
+            Name = $name
+            Version = $version
+        }) | Out-Null
+    }
+}
+
+function Show-CargoAuditReportSummary {
+    param([string]$RawJson)
+
+    if ([string]::IsNullOrWhiteSpace($RawJson)) {
+        Write-Host "  [WARN] cargo audit sem saida." -ForegroundColor Yellow
+        return
+    }
+
+    $data = $null
+    try {
+        $data = $RawJson | ConvertFrom-Json
+    } catch {
+        Write-Host "  [WARN] Nao foi possivel parsear a saida JSON de cargo audit." -ForegroundColor Yellow
+        return
+    }
+
+    $vulnList = @()
+    if ($null -ne $data.vulnerabilities -and $null -ne $data.vulnerabilities.PSObject.Properties["list"]) {
+        $vulnList = @($data.vulnerabilities.list)
+    }
+
+    $vulnCount = $vulnList.Count
+    if ($null -ne $data.vulnerabilities -and $null -ne $data.vulnerabilities.PSObject.Properties["count"] -and "$($data.vulnerabilities.count)" -match '^\d+$') {
+        $vulnCount = [int]$data.vulnerabilities.count
+    }
+
+    $warnings = $data.warnings
+    $unmaintained = @()
+    $unsound = @()
+    $yanked = @()
+    $notice = @()
+    if ($null -ne $warnings) {
+        if ($null -ne $warnings.PSObject.Properties["unmaintained"]) { $unmaintained = @($warnings.unmaintained) }
+        if ($null -ne $warnings.PSObject.Properties["unsound"]) { $unsound = @($warnings.unsound) }
+        if ($null -ne $warnings.PSObject.Properties["yanked"]) { $yanked = @($warnings.yanked) }
+        if ($null -ne $warnings.PSObject.Properties["notice"]) { $notice = @($warnings.notice) }
+    }
+
+    Write-Host "  Vulnerabilities: $vulnCount"
+    Write-Host ("  Warnings: unmaintained={0}, unsound={1}, yanked={2}, notice={3}" -f $unmaintained.Count, $unsound.Count, $yanked.Count, $notice.Count)
+
+    $allRows = New-Object 'System.Collections.Generic.List[object]'
+    Add-CargoAdvisoryRows -Rows $allRows -Kind "vuln" -Items $vulnList
+    Add-CargoAdvisoryRows -Rows $allRows -Kind "unsound" -Items $unsound
+    Add-CargoAdvisoryRows -Rows $allRows -Kind "unmaintained" -Items $unmaintained
+    Add-CargoAdvisoryRows -Rows $allRows -Kind "yanked" -Items $yanked
+    Add-CargoAdvisoryRows -Rows $allRows -Kind "notice" -Items $notice
+
+    $unique = @()
+    $seen = [System.Collections.Generic.HashSet[string]]::new()
+    foreach ($row in $allRows) {
+        $key = "$($row.Kind)|$($row.Id)|$($row.Name)|$($row.Version)"
+        if ($seen.Contains($key)) {
+            continue
+        }
+        [void]$seen.Add($key)
+        $unique += $row
+    }
+
+    if (-not $unique -or $unique.Count -eq 0) {
+        return
+    }
+
+    Write-Host "  Advisories (resumo):"
+    $limit = [Math]::Min(20, $unique.Count)
+    for ($i = 0; $i -lt $limit; $i++) {
+        $item = $unique[$i]
+        Write-Host "  - [$($item.Kind)] $($item.Id) :: $($item.Name)@$($item.Version)"
+    }
+    if ($unique.Count -gt 20) {
+        Write-Host "  ... (+$($unique.Count - 20) itens; use cargo audit para detalhes completos)"
+    }
+}
+
 function Check-RustDependencies {
     Step "`n[5/5] Dependencias Rust (Cargo)"
 
@@ -829,17 +1431,118 @@ function Check-RustDependencies {
     }
 
     Write-Host "  - Workspace Rust: $tauriDir"
+    $writeCargoLogs = ($Mode -ne "report" -and $script:LogModeSelection -ne "none")
+    $outdatedLog = ""
+    $auditLog = ""
+    $outdatedJsonForSelection = ""
+    if ($writeCargoLogs) {
+        $logsDir = Join-Path $POMODOROZ "logs"
+        if (-not (Test-Path $logsDir)) {
+            [void](New-Item -ItemType Directory -Path $logsDir -Force)
+        }
+        $logStamp = Get-Date -Format "yyyyMMdd-HHmmss"
+        $outdatedLog = Join-Path $logsDir "check-updates-cargo-outdated-$logStamp.log"
+        $auditLog = Join-Path $logsDir "check-updates-cargo-audit-$logStamp.log"
+        $script:CargoOutdatedLogFile = $outdatedLog
+        $script:CargoAuditLogFile = $auditLog
+    }
+
+    if ($Mode -eq "report") {
+        if (Test-CargoSubcommand "outdated") {
+            Write-Host "  - Checando crates desatualizados (cargo outdated --root-deps-only --format json)..."
+            Push-Location $tauriDir
+            try {
+                $outdatedJson = (& cargo outdated --root-deps-only --format json 2>$null | Out-String).Trim()
+                if ($LASTEXITCODE -eq 0) {
+                    Show-CargoOutdatedReportSummary -RawJson $outdatedJson
+                } else {
+                    Write-Host "  [WARN] Falha ao executar cargo outdated em modo resumo." -ForegroundColor Yellow
+                }
+            } finally {
+                Pop-Location
+            }
+        } else {
+            Write-Host "  [WARN] cargo-outdated nao instalado." -ForegroundColor Yellow
+            Write-Host "    Instale com: cargo install cargo-outdated" -ForegroundColor Yellow
+        }
+
+        if (Test-CargoSubcommand "audit") {
+            Write-Host "  - Checando vulnerabilidades (cargo audit --json --no-fetch)..."
+            Push-Location $tauriDir
+            try {
+                $auditJson = (& cargo audit --json --no-fetch 2>$null | Out-String).Trim()
+                if ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrWhiteSpace($auditJson)) {
+                    Show-CargoAuditReportSummary -RawJson $auditJson
+                } else {
+                    Write-Host "  [WARN] Falha ao executar cargo audit em modo resumo." -ForegroundColor Yellow
+                    Write-Host ('    Dica: Set-Location "{0}"; cargo audit' -f $tauriDir) -ForegroundColor Yellow
+                }
+            } finally {
+                Pop-Location
+            }
+        } else {
+            Write-Host "  [WARN] cargo-audit nao instalado." -ForegroundColor Yellow
+            Write-Host "    Instale com: cargo install cargo-audit" -ForegroundColor Yellow
+        }
+
+        Write-Host "  Atualizacao manual recomendada:"
+        Write-Host ('    Set-Location "{0}"; cargo outdated --root-deps-only' -f $tauriDir)
+        Write-Host ('    Set-Location "{0}"; cargo audit' -f $tauriDir)
+        Write-Host ('    Set-Location "{0}"; cargo add <crate>@<versao>' -f $tauriDir)
+        Write-Host ('    Set-Location "{0}"; cargo update -p <crate> --precise <versao>' -f $tauriDir)
+        Write-Host ('    Set-Location "{0}"; cargo check' -f $tauriDir)
+        return
+    }
 
     if (Test-CargoSubcommand "outdated") {
-        Write-Host "  - Checando crates desatualizados (cargo outdated)..."
-        Push-Location $tauriDir
-        try {
-            & cargo outdated
-            if ($LASTEXITCODE -ne 0) {
-                Write-Host "  [WARN] Falha ao executar cargo outdated." -ForegroundColor Yellow
+        $outdatedJson = ""
+        $outdatedJsonStatus = 0
+
+        if ($writeCargoLogs) {
+            Write-Host "  - Checando crates desatualizados (resumo + log)..."
+            $outdatedLogStatus = 0
+            Push-Location $tauriDir
+            try {
+                $outdatedJson = (& cargo outdated --root-deps-only --format json 2>$null | Out-String).Trim()
+                $outdatedJsonStatus = $LASTEXITCODE
+
+                & cargo outdated *> $outdatedLog
+                $outdatedLogStatus = $LASTEXITCODE
+            } finally {
+                Pop-Location
             }
-        } finally {
-            Pop-Location
+
+            if ($outdatedJsonStatus -eq 0) {
+                Show-CargoOutdatedReportSummary -RawJson $outdatedJson
+                $outdatedJsonForSelection = $outdatedJson
+            } else {
+                Write-Host "  [WARN] Falha ao executar resumo de cargo outdated." -ForegroundColor Yellow
+            }
+
+            if ($outdatedLogStatus -eq 0) {
+                Write-Host "  Detalhes completos: $outdatedLog" -ForegroundColor Gray
+            } elseif ((Test-Path $outdatedLog) -and ((Get-Item $outdatedLog).Length -gt 0)) {
+                Write-Host "  Detalhes (com erro de execucao): $outdatedLog" -ForegroundColor Yellow
+            } else {
+                Write-Host "  [WARN] Falha ao gerar log completo de cargo outdated." -ForegroundColor Yellow
+                Write-Host "    Verifique: $outdatedLog" -ForegroundColor Yellow
+            }
+        } else {
+            Write-Host "  - Checando crates desatualizados (resumo)..."
+            Push-Location $tauriDir
+            try {
+                $outdatedJson = (& cargo outdated --root-deps-only --format json 2>$null | Out-String).Trim()
+                $outdatedJsonStatus = $LASTEXITCODE
+            } finally {
+                Pop-Location
+            }
+
+            if ($outdatedJsonStatus -eq 0) {
+                Show-CargoOutdatedReportSummary -RawJson $outdatedJson
+                $outdatedJsonForSelection = $outdatedJson
+            } else {
+                Write-Host "  [WARN] Falha ao executar resumo de cargo outdated." -ForegroundColor Yellow
+            }
         }
     } else {
         Write-Host "  [WARN] cargo-outdated nao instalado." -ForegroundColor Yellow
@@ -847,20 +1550,61 @@ function Check-RustDependencies {
     }
 
     if (Test-CargoSubcommand "audit") {
-        Write-Host "  - Checando vulnerabilidades (cargo audit)..."
-        Push-Location $tauriDir
-        try {
-            & cargo audit
-            if ($LASTEXITCODE -ne 0) {
-                Write-Host "  [WARN] Falha ao executar cargo audit." -ForegroundColor Yellow
+        $auditJson = ""
+        $auditJsonStatus = 0
+
+        if ($writeCargoLogs) {
+            Write-Host "  - Checando vulnerabilidades (resumo + log)..."
+            $auditLogStatus = 0
+            Push-Location $tauriDir
+            try {
+                $auditJson = (& cargo audit --json --no-fetch 2>$null | Out-String).Trim()
+                $auditJsonStatus = $LASTEXITCODE
+
+                & cargo audit *> $auditLog
+                $auditLogStatus = $LASTEXITCODE
+            } finally {
+                Pop-Location
             }
-        } finally {
-            Pop-Location
+
+            if ($auditJsonStatus -eq 0 -and -not [string]::IsNullOrWhiteSpace($auditJson)) {
+                Show-CargoAuditReportSummary -RawJson $auditJson
+            } else {
+                Write-Host "  [WARN] Falha ao executar resumo de cargo audit." -ForegroundColor Yellow
+                Write-Host ('    Dica: Set-Location "{0}"; cargo audit' -f $tauriDir) -ForegroundColor Yellow
+            }
+
+            if ($auditLogStatus -eq 0) {
+                Write-Host "  Detalhes completos: $auditLog" -ForegroundColor Gray
+            } elseif ((Test-Path $auditLog) -and ((Get-Item $auditLog).Length -gt 0)) {
+                Write-Host "  Detalhes (com erro de execucao): $auditLog" -ForegroundColor Yellow
+            } else {
+                Write-Host "  [WARN] Falha ao gerar log completo de cargo audit." -ForegroundColor Yellow
+                Write-Host "    Verifique: $auditLog" -ForegroundColor Yellow
+            }
+        } else {
+            Write-Host "  - Checando vulnerabilidades (resumo)..."
+            Push-Location $tauriDir
+            try {
+                $auditJson = (& cargo audit --json --no-fetch 2>$null | Out-String).Trim()
+                $auditJsonStatus = $LASTEXITCODE
+            } finally {
+                Pop-Location
+            }
+
+            if ($auditJsonStatus -eq 0 -and -not [string]::IsNullOrWhiteSpace($auditJson)) {
+                Show-CargoAuditReportSummary -RawJson $auditJson
+            } else {
+                Write-Host "  [WARN] Falha ao executar resumo de cargo audit." -ForegroundColor Yellow
+                Write-Host ('    Dica: Set-Location "{0}"; cargo audit' -f $tauriDir) -ForegroundColor Yellow
+            }
         }
     } else {
         Write-Host "  [WARN] cargo-audit nao instalado." -ForegroundColor Yellow
         Write-Host "    Instale com: cargo install cargo-audit" -ForegroundColor Yellow
     }
+
+    Maybe-OfferRustRootUpdates -OutdatedJson $outdatedJsonForSelection -TauriDir $tauriDir
 
     Write-Host "  Atualizacao manual recomendada:"
     Write-Host ('    Set-Location "{0}"; cargo add <crate>@<versao>' -f $tauriDir)
@@ -868,10 +1612,21 @@ function Check-RustDependencies {
     Write-Host ('    Set-Location "{0}"; cargo check' -f $tauriDir)
 }
 
-Print-Header
-Check-DevEnvironment
-Check-StackVersions
-Check-FrameworkInventory
-Check-JsDependencies
-Check-RustDependencies
-Write-Host "`nOK: Verificacao concluida!" -ForegroundColor Green
+if ($PSBoundParameters.Count -eq 0 -and [Environment]::UserInteractive -and $Mode -eq "interactive") {
+    Show-LogMenu
+}
+
+Initialize-Logging
+
+try {
+    Print-Header
+    Check-DevEnvironment
+    Check-StackVersions
+    Check-FrameworkInventory
+    Check-JsDependencies
+    Check-RustDependencies
+    Show-GeneratedLogs
+    Write-Host "`nOK: Verificacao concluida!" -ForegroundColor Green
+} finally {
+    Stop-CheckUpdatesTranscript
+}

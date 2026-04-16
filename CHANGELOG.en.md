@@ -10,7 +10,10 @@
 
 ### Changed
 
-- **GitHub Actions release workflow fixed for reliable `pnpm` setup** — `.github/workflows/release-autoupdate.yml` now uses `pnpm/action-setup@v4` (Linux/Windows), removing `Unable to locate executable file: pnpm` failures in publish jobs.
+- **GitHub Actions release workflow standardized across Linux/Windows** — `.github/workflows/release-autoupdate.yml` keeps `Setup pnpm` before `setup-node` with `pnpm` cache and aligns the pin in both jobs (`pnpm` `10.33.0`), avoiding cross-platform drift and `Unable to locate executable file: pnpm` publish failures.
+- **`check-updates` improved for workflow pin guidance and cleaner Cargo output in shell/PowerShell** — `scripts/check-updates.sh` and `scripts/check-updates.ps1` now show `pnpm/action-setup` pin status/suggestions, clearly state that `report` mode does not apply JS/TS updates, keep Cargo output compact (`root-deps-only` + advisory summary), and write full `cargo outdated`/`cargo audit` details to `logs/` in interactive mode. A fallback `pnpm` update hint via `npm install -g` was also added for environments without `corepack` in PATH, plus an initial log-type menu (`none`, `cargo`, `full`) when running with no arguments.
+- **`check-updates` now includes JS-style Rust selection for root crates (`SAFE`/`MAJOR`)** — in interactive mode, when `cargo outdated --root-deps-only` reports updates, `scripts/check-updates.sh` and `scripts/check-updates.ps1` now let you select Rust updates by category and confirm before applying `cargo update -p <crate> --precise <version>`.
+- **`validar-tudo` now includes a log-type menu and split Rust gate traces** — when run interactively with no arguments, `scripts/validar-tudo.sh` and `scripts/validar-tudo.ps1` now prompt for log mode (`none`, `full`, `full-cargo`); under `full-cargo`, `cargo fmt` and `cargo clippy` are also written to dedicated files in `logs/`.
 
 ## [26.4.16] - 2026-04-16
 

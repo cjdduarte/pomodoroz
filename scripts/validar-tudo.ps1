@@ -9,6 +9,8 @@ param(
     [string]$InstallersProfile = "slim",
     [switch]$InstallLocal,
     [switch]$QuickDev,
+    [ValidateSet("none", "full", "full-cargo")]
+    [string]$LogMode = "none",
     [switch]$Help
 )
 
@@ -19,13 +21,32 @@ $APP_DIR = $ROOT
 $INSTALL_SCRIPT = Join-Path $ROOT "scripts/install.ps1"
 $PNPM_WRAPPER = Join-Path $ROOT "scripts/pnpmw.mjs"
 $IS_WINDOWS_OS = ($env:OS -eq "Windows_NT")
+$script:LogModeSelection = $LogMode
+$script:LogTimestamp = ""
+$script:GeneralLogFile = ""
+$script:CargoFmtLogFile = ""
+$script:CargoClippyLogFile = ""
+$script:TranscriptStarted = $false
 
 function Step($message) {
     Write-Host "`n==> $message" -ForegroundColor Cyan
 }
 
+function Stop-ValidationTranscript {
+    if ($script:TranscriptStarted) {
+        try {
+            Stop-Transcript | Out-Null
+        } catch {
+            # ignora falha de finalizacao de transcript
+        } finally {
+            $script:TranscriptStarted = $false
+        }
+    }
+}
+
 function Die($message) {
     Write-Host "Erro: $message" -ForegroundColor Red
+    Stop-ValidationTranscript
     exit 1
 }
 
@@ -94,10 +115,21 @@ function Invoke-Cargo {
 }
 
 function Invoke-CargoClippyStrict {
+    param(
+        [string]$LogPath = ""
+    )
+
     $previousRustFlags = $env:RUSTFLAGS
     try {
         $env:RUSTFLAGS = "-D warnings"
-        Invoke-Cargo clippy --all-targets --all-features
+        if ([string]::IsNullOrWhiteSpace($LogPath)) {
+            Invoke-Cargo clippy --all-targets --all-features
+        } else {
+            & cargo clippy --all-targets --all-features *>&1 | Tee-Object -FilePath $LogPath
+            if ($LASTEXITCODE -ne 0) {
+                exit $LASTEXITCODE
+            }
+        }
     } finally {
         if ($null -eq $previousRustFlags) {
             Remove-Item Env:RUSTFLAGS -ErrorAction SilentlyContinue
@@ -127,7 +159,7 @@ function Invoke-ElectronBuilderViaScript {
 function Show-Usage {
 @"
 Uso:
-  ./scripts/validar-tudo.ps1 [-SkipInstall] [-Dev | -RunPacked | -BuildInstallers [-InstallersProfile slim|full] | -InstallLocal | -QuickDev]
+  ./scripts/validar-tudo.ps1 [-SkipInstall] [-Dev | -RunPacked | -BuildInstallers [-InstallersProfile slim|full] | -InstallLocal | -QuickDev] [-LogMode none|full|full-cargo]
   ./scripts/validar-tudo.ps1    (menu interativo)
 
 Fluxo padrao:
@@ -148,8 +180,71 @@ Opcoes:
   -InstallersProfile  Perfil para -BuildInstallers: slim (default) ou full
   -InstallLocal  Executa ./scripts/install.ps1
   -QuickDev      Fluxo rapido: lint + typecheck renderer + pnpm dev:app
+  -LogMode       Tipo de log: none (default), full, full-cargo
   -Help
 "@
+}
+
+function Show-LogMenu {
+    Write-Host "Tipo de log:"
+    Write-Host "- 1) Sem log em arquivo."
+    Write-Host "- 2) Log geral da execucao (validar-tudo-<timestamp>.log)."
+    Write-Host "- 3) Log geral + logs separados do Rust gate (fmt/clippy)."
+    Write-Host ""
+
+    $choice = Read-Host "Opcao de log [1-3]"
+    switch ($choice) {
+        "1" { $script:LogModeSelection = "none" }
+        "2" { $script:LogModeSelection = "full" }
+        "3" { $script:LogModeSelection = "full-cargo" }
+        default { Die "Opcao de log invalida: $choice" }
+    }
+}
+
+function Initialize-Logging {
+    if ($script:LogModeSelection -eq "none") {
+        return
+    }
+
+    $logsDir = Join-Path $APP_DIR "logs"
+    if (-not (Test-Path $logsDir)) {
+        [void](New-Item -ItemType Directory -Path $logsDir -Force)
+    }
+
+    $script:LogTimestamp = Get-Date -Format "yyyyMMdd-HHmmss"
+    $script:GeneralLogFile = Join-Path $logsDir "validar-tudo-$($script:LogTimestamp).log"
+
+    if ($script:LogModeSelection -eq "full-cargo") {
+        $script:CargoFmtLogFile = Join-Path $logsDir "validar-tudo-cargo-fmt-$($script:LogTimestamp).log"
+        $script:CargoClippyLogFile = Join-Path $logsDir "validar-tudo-cargo-clippy-$($script:LogTimestamp).log"
+    }
+
+    try {
+        Start-Transcript -Path $script:GeneralLogFile -Force | Out-Null
+        $script:TranscriptStarted = $true
+    } catch {
+        Write-Host "Aviso: nao foi possivel iniciar transcript para log geral." -ForegroundColor Yellow
+    }
+
+    Step "Logs ativados"
+    Write-Host "Log geral: $($script:GeneralLogFile)"
+    if ($script:LogModeSelection -eq "full-cargo") {
+        Write-Host "Log cargo fmt: $($script:CargoFmtLogFile)"
+        Write-Host "Log cargo clippy: $($script:CargoClippyLogFile)"
+    }
+}
+
+function Show-LogSummary {
+    if ($script:LogModeSelection -eq "none") {
+        return
+    }
+
+    Step "Logs gerados"
+    Write-Host "Log geral: $($script:GeneralLogFile)"
+    if ($script:LogModeSelection -eq "full-cargo") {
+        Write-Host "Log cargo fmt: $($script:CargoFmtLogFile)"
+        Write-Host "Log cargo clippy: $($script:CargoClippyLogFile)"
+    }
 }
 
 function Show-ModeMenu {
@@ -219,12 +314,16 @@ function Get-PackagedBinaryPath {
 
 if ($Help) {
     Show-Usage
+    Stop-ValidationTranscript
     exit 0
 }
 
 if ($PSBoundParameters.Count -eq 0 -and [Environment]::UserInteractive) {
+    Show-LogMenu
     Show-ModeMenu
 }
+
+Initialize-Logging
 
 if (($Dev -and $RunPacked) -or ($Dev -and $BuildInstallers) -or ($RunPacked -and $BuildInstallers)) {
     Die "Use apenas um modo final: -Dev, -RunPacked ou -BuildInstallers."
@@ -245,6 +344,8 @@ if ($QuickDev -and ($Dev -or $RunPacked -or $BuildInstallers)) {
 if ($InstallLocal) {
     Step "Instalacao local (install.ps1)"
     & $INSTALL_SCRIPT
+    Show-LogSummary
+    Stop-ValidationTranscript
     exit $LASTEXITCODE
 }
 
@@ -307,6 +408,8 @@ if ($QuickDev) {
     Push-Location $APP_DIR
     Invoke-Pnpm dev:app
     Pop-Location
+    Show-LogSummary
+    Stop-ValidationTranscript
     exit 0
 }
 
@@ -335,8 +438,16 @@ if (Test-Path $tauriDir) {
     }
 
     Push-Location $tauriDir
-    Invoke-Cargo fmt --all -- --check
-    Invoke-CargoClippyStrict
+    if ($script:LogModeSelection -eq "full-cargo") {
+        & cargo fmt --all -- --check *>&1 | Tee-Object -FilePath $script:CargoFmtLogFile
+        if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+        }
+        Invoke-CargoClippyStrict -LogPath $script:CargoClippyLogFile
+    } else {
+        Invoke-Cargo fmt --all -- --check
+        Invoke-CargoClippyStrict
+    }
     Pop-Location
 }
 
@@ -388,6 +499,8 @@ if ($Dev) {
     Push-Location $APP_DIR
     Invoke-Pnpm dev:app
     Pop-Location
+    Show-LogSummary
+    Stop-ValidationTranscript
     exit 0
 }
 
@@ -399,12 +512,16 @@ if ($RunPacked) {
 
     Step "Executando binario empacotado local"
     & $binaryPath
+    Show-LogSummary
+    Stop-ValidationTranscript
     exit $LASTEXITCODE
 }
 
 if ($BuildInstallers) {
     Step "Instaladores gerados"
     Write-Host "Arquivos em: $APP_DIR/app/electron/dist"
+    Show-LogSummary
+    Stop-ValidationTranscript
     exit 0
 }
 
@@ -412,3 +529,5 @@ Step "Validacao concluida"
 Write-Host "Sem execucao final. Para abrir o app:"
 Write-Host "  Dev: ./scripts/validar-tudo.ps1 -Dev"
 Write-Host "  Empacotado: ./scripts/validar-tudo.ps1 -RunPacked"
+Show-LogSummary
+Stop-ValidationTranscript

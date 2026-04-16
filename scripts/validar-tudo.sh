@@ -12,6 +12,11 @@ RUN_INSTALLERS=0
 INSTALLERS_PROFILE="slim"
 RUN_INSTALL_LOCAL=0
 RUN_QUICK_DEV=0
+LOG_MODE="none"
+LOG_TIMESTAMP=""
+GENERAL_LOG_FILE=""
+CARGO_FMT_LOG_FILE=""
+CARGO_CLIPPY_LOG_FILE=""
 ORIGINAL_ARGC=$#
 
 step() {
@@ -56,7 +61,7 @@ ensure_electron_runtime_for_dev() {
 usage() {
   cat <<'EOF'
 Uso:
-  ./scripts/validar-tudo.sh [--skip-install] [--dev | --run-packed | --installers [--installers-full|--installers-slim] | --install-local | --quick-dev]
+  ./scripts/validar-tudo.sh [--skip-install] [--dev | --run-packed | --installers [--installers-full|--installers-slim] | --install-local | --quick-dev] [--log-none|--log-full|--log-full-cargo]
   ./scripts/validar-tudo.sh                  # menu interativo (quando TTY)
 
 Fluxo padrao:
@@ -78,8 +83,56 @@ Opcoes:
   --installers-slim Perfil enxuto (default)
   --install-local  Executa ./scripts/install.sh
   --quick-dev      Fluxo rapido: lint + typecheck renderer + pnpm dev:app
+  --log-none       Nao grava logs em arquivo (default)
+  --log-full       Grava log geral em logs/validar-tudo-<timestamp>.log
+  --log-full-cargo Grava log geral + logs separados do gate Rust (fmt/clippy)
   -h, --help       Mostra esta ajuda
 EOF
+}
+
+show_log_menu() {
+  cat <<'EOF'
+Tipo de log:
+- 1) Sem log em arquivo.
+- 2) Log geral da execucao (validar-tudo-<timestamp>.log).
+- 3) Log geral + logs separados do Rust gate (fmt/clippy).
+EOF
+  local log_choice=""
+  if ! read -r -p "Opcao de log [1-3]: " log_choice; then
+    die "falha ao ler opcao de log."
+  fi
+
+  case "$log_choice" in
+    1) LOG_MODE="none" ;;
+    2) LOG_MODE="full" ;;
+    3) LOG_MODE="full-cargo" ;;
+    *) die "Opcao de log invalida: $log_choice" ;;
+  esac
+}
+
+setup_logging() {
+  if [[ "$LOG_MODE" == "none" ]]; then
+    return
+  fi
+
+  local logs_dir="$APP_DIR/logs"
+  mkdir -p "$logs_dir"
+
+  LOG_TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
+  GENERAL_LOG_FILE="$logs_dir/validar-tudo-$LOG_TIMESTAMP.log"
+
+  if [[ "$LOG_MODE" == "full-cargo" ]]; then
+    CARGO_FMT_LOG_FILE="$logs_dir/validar-tudo-cargo-fmt-$LOG_TIMESTAMP.log"
+    CARGO_CLIPPY_LOG_FILE="$logs_dir/validar-tudo-cargo-clippy-$LOG_TIMESTAMP.log"
+  fi
+
+  exec > >(tee -a "$GENERAL_LOG_FILE") 2>&1
+  step "Logs ativados"
+  printf "Log geral: %s\n" "$GENERAL_LOG_FILE"
+  if [[ "$LOG_MODE" == "full-cargo" ]]; then
+    printf "Log cargo fmt: %s\n" "$CARGO_FMT_LOG_FILE"
+    printf "Log cargo clippy: %s\n" "$CARGO_CLIPPY_LOG_FILE"
+  fi
 }
 
 show_menu() {
@@ -190,6 +243,18 @@ while [[ $# -gt 0 ]]; do
       SKIP_INSTALL=1
       shift
       ;;
+    --log-none)
+      LOG_MODE="none"
+      shift
+      ;;
+    --log-full)
+      LOG_MODE="full"
+      shift
+      ;;
+    --log-full-cargo)
+      LOG_MODE="full-cargo"
+      shift
+      ;;
     -h|--help)
       usage
       exit 0
@@ -201,8 +266,11 @@ while [[ $# -gt 0 ]]; do
 done
 
 if (( ORIGINAL_ARGC == 0 )) && [[ -t 0 ]]; then
+  show_log_menu
   show_menu
 fi
+
+setup_logging
 
 if (( RUN_DEV + RUN_PACKED + RUN_INSTALLERS > 1 )); then
   die "Use apenas uma opcao de execucao final: --dev, --run-packed ou --installers."
@@ -283,14 +351,25 @@ step "Typecheck do renderer (TypeScript)"
 if [[ -d "$APP_DIR/src-tauri" ]]; then
   step "Rust quality gate (fmt + clippy)"
   command -v cargo >/dev/null 2>&1 || die "Cargo nao encontrado."
-  (
-    cd "$APP_DIR/src-tauri" &&
-      cargo fmt --all -- --check
-  )
-  (
-    cd "$APP_DIR/src-tauri" &&
-      cargo clippy --all-targets --all-features -- -D warnings
-  )
+  if [[ "$LOG_MODE" == "full-cargo" ]]; then
+    (
+      cd "$APP_DIR/src-tauri" &&
+        cargo fmt --all -- --check 2>&1 | tee "$CARGO_FMT_LOG_FILE"
+    )
+    (
+      cd "$APP_DIR/src-tauri" &&
+        cargo clippy --all-targets --all-features -- -D warnings 2>&1 | tee "$CARGO_CLIPPY_LOG_FILE"
+    )
+  else
+    (
+      cd "$APP_DIR/src-tauri" &&
+        cargo fmt --all -- --check
+    )
+    (
+      cd "$APP_DIR/src-tauri" &&
+        cargo clippy --all-targets --all-features -- -D warnings
+    )
+  fi
 fi
 
 if (( RUN_INSTALLERS == 1 )); then
@@ -339,4 +418,13 @@ else
   printf "Sem execucao final. Para abrir o app:\n"
   printf "  Dev: ./scripts/validar-tudo.sh --dev\n"
   printf "  Empacotado: ./scripts/validar-tudo.sh --run-packed\n"
+fi
+
+if [[ "$LOG_MODE" != "none" ]]; then
+  step "Logs gerados"
+  printf "Log geral: %s\n" "$GENERAL_LOG_FILE"
+  if [[ "$LOG_MODE" == "full-cargo" ]]; then
+    printf "Log cargo fmt: %s\n" "$CARGO_FMT_LOG_FILE"
+    printf "Log cargo clippy: %s\n" "$CARGO_CLIPPY_LOG_FILE"
+  fi
 fi
