@@ -54,9 +54,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build shareables package
-        run: pnpm --filter @pomodoroz/shareables run build
-
       - name: Lint
         run: pnpm lint
 
@@ -94,9 +91,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
-      - name: Build shareables package
-        run: pnpm --filter @pomodoroz/shareables run build
 
       - name: Lint
         run: pnpm lint

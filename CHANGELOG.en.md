@@ -14,6 +14,7 @@
 - **Remaining Lerna/Nx orchestration leftovers removed from the repository** — `lerna.json` was removed, root `package.json` dropped the `lerna` script/dependency, and `pnpm-workspace.yaml` no longer carries the `nx` toggle, keeping daily builds on pure `pnpm`; `check-updates` tooling inventory no longer reports `lerna`.
 - **Renderer flatten kickoff completed with root-level `src`** — frontend source was moved from `app/renderer/src` to `src`, and `app/renderer/index.html`, `app/renderer/tsconfig.json`, `app/renderer/vite.config.ts`, and `app/renderer/package.json` scripts (lint/prebuild) were updated to keep `pnpm lint` and `pnpm build` green during the transition.
 - **Renderer dependency source consolidated into the root manifest** — duplicated entries between root `package.json` and `app/renderer/package.json` were removed from the renderer workspace (keeping only renderer-local specifics), and `check-updates.sh/.ps1` now reads the `[Renderer]` inventory directly from the root (`root/src`) manifest during the flat-structure transition.
+- **Operational flow decoupled from `@pomodoroz/shareables`** — `app/electron` now uses a local IPC contract (`app/electron/src/ipc.ts`), the `workspace:*` dependency was removed from `app/electron/package.json`, and scripts/workflow (`validar-tudo*`, `install*`, `check-updates*`, `release-autoupdate.yml`) no longer run build/lint steps scanning the `app/shareables` workspace.
 
 ## [26.4.18] - 2026-04-16
 

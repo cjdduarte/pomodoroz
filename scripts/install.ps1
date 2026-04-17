@@ -102,11 +102,6 @@ switch ($archRaw) {
 }
 
 if (-not $SkipBuild) {
-    Step "Preparando @pomodoroz/shareables (tipos para dependencias internas)"
-    Push-Location $APP_DIR
-    pnpm --filter @pomodoroz/shareables run build
-    Pop-Location
-
     Step "Lint completo (ESLint renderer + TypeScript workspaces)"
     Push-Location $APP_DIR
     pnpm lint

@@ -7,7 +7,7 @@ import {
   type FromMainPayloadMap,
   type InvokeMainPayloadMap,
   type InvokeMainResponseMap,
-} from "@pomodoroz/shareables";
+} from "./ipc";
 
 type IpcResponseHandler<C extends FromMainChannel> = (
   ...args: FromMainPayloadMap[C]

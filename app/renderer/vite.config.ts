@@ -39,9 +39,6 @@ export default defineConfig({
       styles: `${ROOT_SRC_DIR}/styles`,
       "styled-components/macro": "styled-components",
       utils: `${ROOT_SRC_DIR}/utils`,
-      "@pomodoroz/shareables": fileURLToPath(
-        new URL("../shareables/src/index.ts", import.meta.url)
-      ),
     },
   },
   build: {

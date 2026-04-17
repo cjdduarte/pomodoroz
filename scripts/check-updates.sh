@@ -96,7 +96,6 @@ WORKSPACES=(
   "root|$POMODOROZ_DIR"
   "app/electron|$POMODOROZ_DIR/app/electron"
   "app/renderer|$POMODOROZ_DIR/app/renderer"
-  "app/shareables|$POMODOROZ_DIR/app/shareables"
 )
 
 OUTDATED_ROWS=()
@@ -424,10 +423,7 @@ normalize_workspace_name() {
     "@pomodoroz/renderer")
       echo "app/renderer"
       ;;
-    "@pomodoroz/shareables")
-      echo "app/shareables"
-      ;;
-    "app/electron" | "app/renderer" | "app/shareables")
+    "app/electron" | "app/renderer")
       echo "$ws"
       ;;
     *)
@@ -872,6 +868,8 @@ if (rows.length > 0) {
       normalized_ws="$(normalize_workspace_name "$ws_from_tool")"
       if workspace_dir_by_name "$normalized_ws" >/dev/null 2>&1; then
         effective_ws="$normalized_ws"
+      else
+        continue
       fi
     fi
     add_outdated_row "$effective_ws" "$pkg" "$current" "$wanted" "$latest" "$ptype"

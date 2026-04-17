@@ -67,12 +67,11 @@ Uso:
 Fluxo padrao:
   1) valida Node + pnpm
   2) pnpm install (sincroniza lockfile)
-  3) pnpm --filter @pomodoroz/shareables run build
-  4) lint por workspace (@pomodoroz/renderer, pomodoroz, @pomodoroz/shareables)
-  5) pnpm --filter @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json
-  6) cargo fmt --check (src-tauri)
-  7) cargo clippy -D warnings (src-tauri)
-  8) pnpm build + pnpm exec electron-builder --dir
+  3) lint por workspace (@pomodoroz/renderer, pomodoroz)
+  4) pnpm --filter @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json
+  5) cargo fmt --check (src-tauri)
+  6) cargo clippy -D warnings (src-tauri)
+  7) pnpm build + pnpm exec electron-builder --dir
 
 Opcoes:
   --skip-install   Nao roda pnpm install
@@ -312,14 +311,11 @@ else
 fi
 
 if (( RUN_QUICK_DEV == 1 )); then
-  step "Quick run: preparando @pomodoroz/shareables"
-  ( cd "$APP_DIR" && pnpm --filter @pomodoroz/shareables run build )
   step "Quick run: lint"
   (
     cd "$APP_DIR" &&
       pnpm --filter @pomodoroz/renderer run lint &&
-      pnpm --filter pomodoroz run lint &&
-      pnpm --filter @pomodoroz/shareables run lint
+      pnpm --filter pomodoroz run lint
   )
   step "Quick run: typecheck renderer"
   (
@@ -331,15 +327,11 @@ if (( RUN_QUICK_DEV == 1 )); then
   exec bash -lc "cd \"$APP_DIR\" && pnpm dev:app"
 fi
 
-step "Preparando @pomodoroz/shareables (tipos para dependencias internas)"
-( cd "$APP_DIR" && pnpm --filter @pomodoroz/shareables run build )
-
 step "Lint completo (ESLint renderer + TypeScript workspaces)"
 (
   cd "$APP_DIR" &&
     pnpm --filter @pomodoroz/renderer run lint &&
-    pnpm --filter pomodoroz run lint &&
-    pnpm --filter @pomodoroz/shareables run lint
+    pnpm --filter pomodoroz run lint
 )
 
 step "Typecheck do renderer (TypeScript)"

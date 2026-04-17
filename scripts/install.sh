@@ -33,7 +33,7 @@ Uso:
   ./scripts/install.sh [--skip-build]
 
 O que faz:
-  1) (Padrao) roda pre-check completo (shareables build + lint + build:dir)
+  1) (Padrao) roda pre-check completo (lint + build:dir)
   2) gera AppImage
   3) instala AppImage em ~/.local/opt/pomodoroz
   4) cria launcher em ~/.local/bin/pomodoroz
@@ -97,9 +97,6 @@ if (( SKIP_BUILD == 0 )); then
       die "Arquitetura nao suportada para build automatico: ${ARCH_RAW}"
       ;;
   esac
-
-  step "Preparando @pomodoroz/shareables (tipos para dependencias internas)"
-  ( cd "$APP_DIR" && pnpm --filter @pomodoroz/shareables run build )
 
   step "Lint completo (ESLint renderer + TypeScript workspaces)"
   ( cd "$APP_DIR" && pnpm lint )

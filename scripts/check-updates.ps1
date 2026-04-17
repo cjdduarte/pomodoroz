@@ -22,8 +22,7 @@ $POMODOROZ = $ROOT
 $Workspaces = @(
     @{ Name = "root"; Path = $POMODOROZ },
     @{ Name = "app/electron"; Path = (Join-Path $POMODOROZ "app/electron") },
-    @{ Name = "app/renderer"; Path = (Join-Path $POMODOROZ "app/renderer") },
-    @{ Name = "app/shareables"; Path = (Join-Path $POMODOROZ "app/shareables") }
+    @{ Name = "app/renderer"; Path = (Join-Path $POMODOROZ "app/renderer") }
 )
 
 $script:OutdatedCheckFailed = $false
@@ -447,7 +446,6 @@ function Normalize-WorkspaceName {
         "root" { return "root" }
         "pomodoroz" { return "app/electron" }
         "@pomodoroz/renderer" { return "app/renderer" }
-        "@pomodoroz/shareables" { return "app/shareables" }
         default { return $WorkspaceName }
     }
 }
@@ -769,6 +767,8 @@ function Get-WorkspaceOutdatedRows {
             $workspaceExists = $Workspaces | Where-Object { $_.Name -eq $candidateWorkspace } | Select-Object -First 1
             if ($null -ne $workspaceExists) {
                 $workspace = $candidateWorkspace
+            } else {
+                return
             }
         }
 

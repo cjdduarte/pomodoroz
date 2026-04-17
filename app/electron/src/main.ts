@@ -47,7 +47,7 @@ import {
   type FromMainPayloadMap,
   type UpdateAvailablePayload,
   type ResetFocusToIdleDialogResult,
-} from "@pomodoroz/shareables";
+} from "./ipc";
 import type { AppUpdater, UpdateInfo } from "electron-updater";
 import {
   activateGlobalShortcuts,
