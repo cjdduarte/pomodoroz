@@ -20,16 +20,28 @@ if (!targetVersion || !semverPattern.test(targetVersion)) {
 }
 
 const packageFiles = [
-  "package.json",
-  "app/electron/package.json",
-  "app/renderer/package.json",
-  "src-tauri/tauri.conf.json",
+  { path: "package.json", required: true },
+  { path: "app/electron/package.json", required: false },
+  { path: "app/renderer/package.json", required: false },
+  { path: "src-tauri/tauri.conf.json", required: true },
 ];
 
 const updatedFiles = [];
 
-for (const relativeFile of packageFiles) {
+for (const fileDef of packageFiles) {
+  const relativeFile = fileDef.path;
   const absoluteFile = path.join(repoRoot, relativeFile);
+
+  if (!fs.existsSync(absoluteFile)) {
+    if (fileDef.required) {
+      console.error(
+        `Arquivo obrigatorio ausente para sincronizacao de versao: ${relativeFile}`
+      );
+      process.exit(1);
+    }
+    continue;
+  }
+
   const content = fs.readFileSync(absoluteFile, "utf8");
   const json = JSON.parse(content);
 

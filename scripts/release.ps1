@@ -51,7 +51,7 @@ Uso:
 
 Fluxo:
   1) valida repo limpo e branch atual
-  2) sincroniza versao (package.json raiz/electron/renderer)
+  2) sincroniza versao (package.json raiz + manifests de pacote existentes)
   3) valida changelog da versao
   4) (opcional) preflight local (validar-tudo --skip-install)
   5) commit de release
@@ -322,17 +322,27 @@ if (-not $SkipValidate) {
 }
 
 Step "Criando commit de release"
-Invoke-CommandChecked -FilePath git -Arguments @(
-    "-C", $ROOT,
-    "add",
+$releaseFiles = @(
     "package.json",
-    "app/electron/package.json",
-    "app/renderer/package.json",
     "src-tauri/tauri.conf.json",
     "src-tauri/Cargo.toml",
     "CHANGELOG.md",
     "CHANGELOG.en.md"
 )
+
+$optionalReleaseFiles = @(
+    "app/electron/package.json",
+    "app/renderer/package.json"
+)
+
+foreach ($optionalFile in $optionalReleaseFiles) {
+    if (Test-Path (Join-Path $ROOT $optionalFile)) {
+        $releaseFiles += $optionalFile
+    }
+}
+
+$gitAddArguments = @("-C", $ROOT, "add") + $releaseFiles
+Invoke-CommandChecked -FilePath git -Arguments $gitAddArguments
 
 if (-not $DryRun) {
     & git -C $ROOT diff --cached --quiet

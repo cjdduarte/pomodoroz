@@ -10,6 +10,7 @@
 
 ### Changed
 
+- **`version-sync`/`release` are now resilient to optional manifest flattening** — `scripts/version-sync.mjs` now treats `app/electron/package.json` and `app/renderer/package.json` as optional (while keeping root `package.json` + Tauri files required), and `scripts/release.sh`/`scripts/release.ps1` now build `git add` inputs dynamically so release flow does not break when those manifests are removed.
 - **Root scripts no longer depend on `lerna run` for daily operations** — `package.json` now uses `scripts/pnpmw.mjs` with `pnpm -r --filter` for `dev:*`, `build*`, `release*`, and `clean`, starting the Phase 3b kickoff (progressively removing Lerna/Nx coupling while keeping the current `app/*` structure for now).
 - **Remaining Lerna/Nx orchestration leftovers removed from the repository** — `lerna.json` was removed, root `package.json` dropped the `lerna` script/dependency, and `pnpm-workspace.yaml` no longer carries the `nx` toggle, keeping daily builds on pure `pnpm`; `check-updates` tooling inventory no longer reports `lerna`.
 - **Renderer flatten kickoff completed with root-level `src`** — frontend source was moved from `app/renderer/src` to `src`, and `app/renderer/index.html`, `app/renderer/tsconfig.json`, `app/renderer/vite.config.ts`, and `app/renderer/package.json` scripts (lint/prebuild) were updated to keep `pnpm lint` and `pnpm build` green during the transition.

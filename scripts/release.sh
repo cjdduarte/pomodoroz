@@ -94,7 +94,7 @@ Sem argumentos em terminal interativo, abre menu de modo:
 
 Fluxo:
   1) valida repo limpo e branch atual
-  2) sincroniza versao (package.json raiz/electron/renderer)
+  2) sincroniza versao (package.json raiz + manifests de pacote existentes)
   3) valida changelog da versao
   4) (opcional) preflight local (validar-tudo --skip-install)
   5) commit de release
@@ -133,6 +133,32 @@ run_cmd() {
   else
     bash -lc "$cmd"
   fi
+}
+
+build_release_git_add_cmd() {
+  local -a files=(
+    "package.json"
+    "src-tauri/tauri.conf.json"
+    "src-tauri/Cargo.toml"
+    "CHANGELOG.md"
+    "CHANGELOG.en.md"
+  )
+  local -a optional_files=(
+    "app/electron/package.json"
+    "app/renderer/package.json"
+  )
+  local file
+  for file in "${optional_files[@]}"; do
+    if [[ -f "$APP_DIR/$file" ]]; then
+      files+=("$file")
+    fi
+  done
+
+  local cmd="cd \"$APP_DIR\" && git add"
+  for file in "${files[@]}"; do
+    cmd+=" $(printf '%q' "$file")"
+  done
+  printf "%s" "$cmd"
 }
 
 select_release_mode() {
@@ -286,7 +312,8 @@ else
 fi
 
 step "Criando commit de release"
-run_cmd "cd \"$APP_DIR\" && git add package.json app/electron/package.json app/renderer/package.json src-tauri/tauri.conf.json src-tauri/Cargo.toml CHANGELOG.md CHANGELOG.en.md"
+release_git_add_cmd="$(build_release_git_add_cmd)"
+run_cmd "$release_git_add_cmd"
 if (( DRY_RUN == 0 )); then
   if git -C "$APP_DIR" diff --cached --quiet; then
     die "Nenhuma mudanca staged para commit de release."
