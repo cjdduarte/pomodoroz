@@ -6,6 +6,12 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.4.21] - 2026-04-17
+
+### Corrigido
+
+- **Publicacao de instaladores Electron no GitHub Actions voltou a usar contexto valido de package manager** — o script `eb` raiz (`package.json`) deixou de forcar `npm_execpath=traversal`/`npm_config_user_agent=traversal`; com isso, os jobs do `release-autoupdate` voltam a executar `pnpm eb ... --publish always` sem erro `spawn traversal ENOENT` em Windows e Linux.
+
 ## [26.4.20] - 2026-04-17
 
 ### Corrigido

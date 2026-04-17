@@ -32,7 +32,7 @@
     "dev:app:vite": "cross-env ELECTRON_ENABLE_LOGGING=1 node ./scripts/dev-app.mjs",
     "prebuild": "node ./scripts/pnpmw.mjs build:renderer:assets",
     "build": "node ./scripts/pnpmw.mjs build:renderer && node ./scripts/pnpmw.mjs build:electron",
-    "eb": "cd app/electron && node ../../node_modules/cross-env/dist/bin/cross-env.js npm_config_user_agent=traversal npm_execpath=traversal node ../../node_modules/electron-builder/cli.js",
+    "eb": "cd app/electron && node ../../node_modules/electron-builder/cli.js",
     "build:mwl": "node ./scripts/pnpmw.mjs build && node ./scripts/pnpmw.mjs eb -mwl --ia32 --x64 --arm64",
     "build:dir": "node ./scripts/pnpmw.mjs build && node ./scripts/pnpmw.mjs eb --dir",
     "build:win": "node ./scripts/pnpmw.mjs build && node ./scripts/pnpmw.mjs eb --win --ia32 --x64 --publish=never",

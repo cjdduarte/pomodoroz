@@ -6,6 +6,12 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.4.21] - 2026-04-17
+
+### Fixed
+
+- **Electron installer publishing in GitHub Actions now uses a valid package-manager context again** — the root `eb` script (`package.json`) no longer forces `npm_execpath=traversal`/`npm_config_user_agent=traversal`; as a result, `release-autoupdate` jobs can run `pnpm eb ... --publish always` without `spawn traversal ENOENT` on Windows and Linux.
+
 ## [26.4.20] - 2026-04-17
 
 ### Fixed

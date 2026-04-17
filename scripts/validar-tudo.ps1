@@ -333,9 +333,7 @@ function Invoke-ElectronBuilderViaScript {
 
     Push-Location $APP_DIR
     try {
-        # Usa o script `eb` raiz, que ja injeta:
-        # npm_config_user_agent=traversal e npm_execpath=traversal.
-        # Isso evita que o node-module-collector dependa de `pnpm` no PATH.
+        # Usa o script `eb` raiz (electron-builder via workspace app/electron).
         Invoke-Pnpm run eb -- @Args
     } finally {
         Pop-Location
