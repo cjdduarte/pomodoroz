@@ -3,11 +3,14 @@ import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
 import { fileURLToPath, URL } from "node:url";
 
+const RENDERER_ROOT_DIR = fileURLToPath(new URL("./", import.meta.url));
+
 const ROOT_SRC_DIR = fileURLToPath(
   new URL("../../src", import.meta.url)
 );
 
 export default defineConfig({
+  root: RENDERER_ROOT_DIR,
   base: "./",
   plugins: [
     react(),

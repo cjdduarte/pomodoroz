@@ -20,9 +20,7 @@ $ROOT = Split-Path -Parent $PSScriptRoot
 $POMODOROZ = $ROOT
 
 $Workspaces = @(
-    @{ Name = "root"; Path = $POMODOROZ },
-    @{ Name = "app/electron"; Path = (Join-Path $POMODOROZ "app/electron") },
-    @{ Name = "app/renderer"; Path = (Join-Path $POMODOROZ "app/renderer") }
+    @{ Name = "root"; Path = $POMODOROZ }
 )
 
 $script:OutdatedCheckFailed = $false
@@ -444,8 +442,7 @@ function Normalize-WorkspaceName {
     switch ($WorkspaceName) {
         "" { return "root" }
         "root" { return "root" }
-        "pomodoroz" { return "app/electron" }
-        "@pomodoroz/renderer" { return "app/renderer" }
+        "pomodoroz" { return "root" }
         default { return $WorkspaceName }
     }
 }
@@ -592,13 +589,11 @@ function Check-StackVersions {
     Step "`n[2/5] Stack Atual do Projeto"
 
     $rootPkg = Join-Path $POMODOROZ "package.json"
-    $electronPkg = Join-Path $POMODOROZ "app/electron/package.json"
-
-    $electron = Get-PackageJsonVersion -PackageJsonPath $electronPkg -DependencyName "electron"
+    $electron = Get-PackageJsonVersion -PackageJsonPath $rootPkg -DependencyName "electron"
     $react = Get-PackageJsonVersion -PackageJsonPath $rootPkg -DependencyName "react"
     $typescript = Get-PackageJsonVersion -PackageJsonPath $rootPkg -DependencyName "typescript"
 
-    Write-Host "  Electron (app/electron): $electron"
+    Write-Host "  Electron (root): $electron"
     Write-Host "  React (root/src): $react"
     Write-Host "  TypeScript (root): $typescript"
 }
@@ -607,8 +602,6 @@ function Check-FrameworkInventory {
     Step "`n[3/5] Inventario de Frameworks e Ferramentas"
 
     $rootPkg = Join-Path $POMODOROZ "package.json"
-    $electronPkg = Join-Path $POMODOROZ "app/electron/package.json"
-
     Write-Host "  [Renderer]"
     Write-Host "    react: $(Get-PackageJsonVersion $rootPkg 'react')"
     Write-Host "    react-dom: $(Get-PackageJsonVersion $rootPkg 'react-dom')"
@@ -623,10 +616,10 @@ function Check-FrameworkInventory {
     Write-Host "    @vitejs/plugin-react: $(Get-PackageJsonVersion $rootPkg '@vitejs/plugin-react')"
 
     Write-Host "  [Electron]"
-    Write-Host "    electron: $(Get-PackageJsonVersion $electronPkg 'electron')"
-    Write-Host "    electron-builder: $(Get-PackageJsonVersion $electronPkg 'electron-builder')"
-    Write-Host "    electron-updater: $(Get-PackageJsonVersion $electronPkg 'electron-updater')"
-    Write-Host "    electron-store: $(Get-PackageJsonVersion $electronPkg 'electron-store')"
+    Write-Host "    electron: $(Get-PackageJsonVersion $rootPkg 'electron')"
+    Write-Host "    electron-builder: $(Get-PackageJsonVersion $rootPkg 'electron-builder')"
+    Write-Host "    electron-updater: $(Get-PackageJsonVersion $rootPkg 'electron-updater')"
+    Write-Host "    electron-store: $(Get-PackageJsonVersion $rootPkg 'electron-store')"
 
     Write-Host "  [Monorepo/Tooling]"
     Write-Host "    typescript: $(Get-PackageJsonVersion $rootPkg 'typescript')"
@@ -1468,6 +1461,7 @@ function Check-RustDependencies {
                     Show-CargoOutdatedReportSummary -RawJson $outdatedJson
                 } else {
                     Write-Host "  [WARN] Falha ao executar cargo outdated em modo resumo." -ForegroundColor Yellow
+                    Write-Host "    Dica: verifique rede/crates.io e lock do cache Cargo." -ForegroundColor Yellow
                 }
             } finally {
                 Pop-Location
@@ -1486,6 +1480,7 @@ function Check-RustDependencies {
                     Show-CargoAuditReportSummary -RawJson $auditJson
                 } else {
                     Write-Host "  [WARN] Falha ao executar cargo audit em modo resumo." -ForegroundColor Yellow
+                    Write-Host "    Dica: verifique lock do advisory-db em ~/.cargo." -ForegroundColor Yellow
                     Write-Host ('    Dica: Set-Location "{0}"; cargo audit' -f $tauriDir) -ForegroundColor Yellow
                 }
             } finally {
@@ -1512,6 +1507,7 @@ function Check-RustDependencies {
         if ($writeCargoLogs) {
             Write-Host "  - Checando crates desatualizados (resumo + log)..."
             $outdatedLogStatus = 0
+            $outdatedLogMode = "full"
             Push-Location $tauriDir
             try {
                 $outdatedJson = (& cargo outdated --root-deps-only --format json 2>$null | Out-String).Trim()
@@ -1519,6 +1515,13 @@ function Check-RustDependencies {
 
                 & cargo outdated *> $outdatedLog
                 $outdatedLogStatus = $LASTEXITCODE
+                if ($outdatedLogStatus -ne 0) {
+                    & cargo outdated --root-deps-only --format json *> $outdatedLog
+                    $outdatedLogStatus = $LASTEXITCODE
+                    if ($outdatedLogStatus -eq 0) {
+                        $outdatedLogMode = "fallback"
+                    }
+                }
             } finally {
                 Pop-Location
             }
@@ -1528,10 +1531,15 @@ function Check-RustDependencies {
                 $outdatedJsonForSelection = $outdatedJson
             } else {
                 Write-Host "  [WARN] Falha ao executar resumo de cargo outdated." -ForegroundColor Yellow
+                Write-Host "    Dica: verifique rede/crates.io e lock do cache Cargo." -ForegroundColor Yellow
             }
 
             if ($outdatedLogStatus -eq 0) {
-                Write-Host "  Detalhes completos: $outdatedLog" -ForegroundColor Gray
+                if ($outdatedLogMode -eq "fallback") {
+                    Write-Host "  Detalhes (modo fallback root-deps-only): $outdatedLog" -ForegroundColor Gray
+                } else {
+                    Write-Host "  Detalhes completos: $outdatedLog" -ForegroundColor Gray
+                }
             } elseif ((Test-Path $outdatedLog) -and ((Get-Item $outdatedLog).Length -gt 0)) {
                 Write-Host "  Detalhes (com erro de execucao): $outdatedLog" -ForegroundColor Yellow
             } else {
@@ -1553,6 +1561,7 @@ function Check-RustDependencies {
                 $outdatedJsonForSelection = $outdatedJson
             } else {
                 Write-Host "  [WARN] Falha ao executar resumo de cargo outdated." -ForegroundColor Yellow
+                Write-Host "    Dica: verifique rede/crates.io e lock do cache Cargo." -ForegroundColor Yellow
             }
         }
     } else {
@@ -1567,6 +1576,7 @@ function Check-RustDependencies {
         if ($writeCargoLogs) {
             Write-Host "  - Checando vulnerabilidades (resumo + log)..."
             $auditLogStatus = 0
+            $auditLogMode = "full"
             Push-Location $tauriDir
             try {
                 $auditJson = (& cargo audit --json --no-fetch 2>$null | Out-String).Trim()
@@ -1574,6 +1584,13 @@ function Check-RustDependencies {
 
                 & cargo audit *> $auditLog
                 $auditLogStatus = $LASTEXITCODE
+                if ($auditLogStatus -ne 0) {
+                    & cargo audit --json --no-fetch *> $auditLog
+                    $auditLogStatus = $LASTEXITCODE
+                    if ($auditLogStatus -eq 0) {
+                        $auditLogMode = "fallback"
+                    }
+                }
             } finally {
                 Pop-Location
             }
@@ -1582,11 +1599,16 @@ function Check-RustDependencies {
                 Show-CargoAuditReportSummary -RawJson $auditJson
             } else {
                 Write-Host "  [WARN] Falha ao executar resumo de cargo audit." -ForegroundColor Yellow
+                Write-Host "    Dica: verifique lock do advisory-db em ~/.cargo." -ForegroundColor Yellow
                 Write-Host ('    Dica: Set-Location "{0}"; cargo audit' -f $tauriDir) -ForegroundColor Yellow
             }
 
             if ($auditLogStatus -eq 0) {
-                Write-Host "  Detalhes completos: $auditLog" -ForegroundColor Gray
+                if ($auditLogMode -eq "fallback") {
+                    Write-Host "  Detalhes (modo fallback --no-fetch): $auditLog" -ForegroundColor Gray
+                } else {
+                    Write-Host "  Detalhes completos: $auditLog" -ForegroundColor Gray
+                }
             } elseif ((Test-Path $auditLog) -and ((Get-Item $auditLog).Length -gt 0)) {
                 Write-Host "  Detalhes (com erro de execucao): $auditLog" -ForegroundColor Yellow
             } else {
@@ -1607,6 +1629,7 @@ function Check-RustDependencies {
                 Show-CargoAuditReportSummary -RawJson $auditJson
             } else {
                 Write-Host "  [WARN] Falha ao executar resumo de cargo audit." -ForegroundColor Yellow
+                Write-Host "    Dica: verifique lock do advisory-db em ~/.cargo." -ForegroundColor Yellow
                 Write-Host ('    Dica: Set-Location "{0}"; cargo audit' -f $tauriDir) -ForegroundColor Yellow
             }
         }

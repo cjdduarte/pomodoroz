@@ -1,7 +1,0 @@
-packages:
-  - "app/electron"
-  - "app/renderer"
-allowBuilds:
-  electron: true
-  electron-winstaller: true
-  unrs-resolver: false

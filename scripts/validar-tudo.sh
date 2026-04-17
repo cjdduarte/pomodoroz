@@ -67,8 +67,8 @@ Uso:
 Fluxo padrao:
   1) valida Node + pnpm
   2) pnpm install (sincroniza lockfile)
-  3) lint por pacote (app/renderer, app/electron)
-  4) pnpm --filter ./app/renderer exec tsc --noEmit -p tsconfig.json
+  3) pnpm lint (renderer + electron)
+  4) pnpm typecheck:renderer
   5) cargo fmt --check (src-tauri)
   6) cargo clippy -D warnings (src-tauri)
   7) pnpm build + pnpm exec electron-builder --dir
@@ -314,30 +314,28 @@ if (( RUN_QUICK_DEV == 1 )); then
   step "Quick run: lint"
   (
     cd "$APP_DIR" &&
-      pnpm --filter ./app/renderer run lint &&
-      pnpm --filter ./app/electron run lint
+      pnpm lint
   )
   step "Quick run: typecheck renderer"
   (
     cd "$APP_DIR" &&
-      pnpm --filter ./app/renderer exec tsc --noEmit -p tsconfig.json
+      pnpm typecheck:renderer
   )
   ensure_electron_runtime_for_dev
   step "Quick run: dev:app"
   exec bash -lc "cd \"$APP_DIR\" && pnpm dev:app"
 fi
 
-step "Lint completo (ESLint renderer + TypeScript workspaces)"
+step "Lint completo (ESLint renderer + TypeScript)"
 (
   cd "$APP_DIR" &&
-    pnpm --filter ./app/renderer run lint &&
-    pnpm --filter ./app/electron run lint
+    pnpm lint
 )
 
 step "Typecheck do renderer (TypeScript)"
 (
   cd "$APP_DIR" &&
-    pnpm --filter ./app/renderer exec tsc --noEmit -p tsconfig.json
+    pnpm typecheck:renderer
 )
 
 if [[ -d "$APP_DIR/src-tauri" ]]; then
@@ -370,29 +368,29 @@ if (( RUN_INSTALLERS == 1 )); then
       if [[ "$INSTALLERS_PROFILE" == "full" ]]; then
         step "Gerando instaladores Linux (full: AppImage+deb+rpm x64/arm64)"
         ( cd "$APP_DIR" && pnpm build )
-        ( cd "$APP_DIR/app/electron" && pnpm exec electron-builder --linux --x64 --arm64 --publish=never )
+        ( cd "$APP_DIR" && pnpm eb --linux --x64 --arm64 --publish=never )
       else
         step "Gerando instaladores Linux (slim: AppImage+deb x64/arm64 + rpm x64)"
         ( cd "$APP_DIR" && pnpm build )
-        ( cd "$APP_DIR/app/electron" && pnpm exec electron-builder --linux AppImage deb --x64 --arm64 --publish=never )
-        ( cd "$APP_DIR/app/electron" && pnpm exec electron-builder --linux rpm --x64 --publish=never )
+        ( cd "$APP_DIR" && pnpm eb --linux AppImage deb --x64 --arm64 --publish=never )
+        ( cd "$APP_DIR" && pnpm eb --linux rpm --x64 --publish=never )
       fi
       ;;
     Darwin*)
       step "Gerando instaladores macOS (full/slim: --mac --publish=never)"
       ( cd "$APP_DIR" && pnpm build )
-      ( cd "$APP_DIR/app/electron" && pnpm exec electron-builder --mac --publish=never )
+      ( cd "$APP_DIR" && pnpm eb --mac --publish=never )
       ;;
     *)
       step "Gerando instaladores Windows (full/slim: --win --ia32 --x64 --publish=never)"
       ( cd "$APP_DIR" && pnpm build )
-      ( cd "$APP_DIR/app/electron" && pnpm exec electron-builder --win --ia32 --x64 --publish=never )
+      ( cd "$APP_DIR" && pnpm eb --win --ia32 --x64 --publish=never )
       ;;
   esac
 else
   step "Build empacotado (pnpm build + electron-builder --dir)"
   ( cd "$APP_DIR" && pnpm build )
-  ( cd "$APP_DIR/app/electron" && pnpm exec electron-builder --dir )
+  ( cd "$APP_DIR" && pnpm eb --dir )
 fi
 
 if (( RUN_DEV == 1 )); then

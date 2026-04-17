@@ -222,7 +222,7 @@ pnpm build:mac    # macOS
 ```sh
 pnpm dev:app          # Electron + Vite renderer
 pnpm dev:renderer     # Renderer only (Vite em localhost:3000)
-pnpm lint             # Lint/typecheck do monorepo
+pnpm lint             # Lint/typecheck (renderer + electron)
 pnpm build:dir        # Build desempacotado
 ```
 
@@ -234,7 +234,7 @@ pnpm build:dir        # Build desempacotado
 - @dnd-kit (arrastar e soltar)
 - Styled Components
 - i18next
-- Lerna 9 + workspaces pnpm
+- Scripts pnpm centralizados no root (shell do renderer em `app/renderer` e shell do Electron em `app/electron`)
 
 ## 🤝 Contribuindo
 

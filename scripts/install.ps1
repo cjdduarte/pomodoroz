@@ -102,7 +102,7 @@ switch ($archRaw) {
 }
 
 if (-not $SkipBuild) {
-    Step "Lint completo (ESLint renderer + TypeScript workspaces)"
+    Step "Lint completo (ESLint renderer + TypeScript)"
     Push-Location $APP_DIR
     pnpm lint
     Pop-Location
@@ -113,8 +113,8 @@ if (-not $SkipBuild) {
     Pop-Location
 
     Step "Gerando AppImage ($archRaw)"
-    Push-Location (Join-Path $APP_DIR "app/electron")
-    pnpm exec electron-builder --linux AppImage $electronArchFlag --publish=never
+    Push-Location $APP_DIR
+    pnpm eb --linux AppImage $electronArchFlag --publish=never
     Pop-Location
 }
 else {

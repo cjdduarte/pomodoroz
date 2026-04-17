@@ -98,7 +98,7 @@ if (( SKIP_BUILD == 0 )); then
       ;;
   esac
 
-  step "Lint completo (ESLint renderer + TypeScript workspaces)"
+  step "Lint completo (ESLint renderer + TypeScript)"
   ( cd "$APP_DIR" && pnpm lint )
 
   step "Build empacotado (build:dir)"
@@ -106,8 +106,8 @@ if (( SKIP_BUILD == 0 )); then
 
   step "Gerando AppImage (${ARCH_RAW})"
   (
-    cd "$APP_DIR/app/electron" && \
-    pnpm exec electron-builder --linux AppImage "$ELECTRON_ARCH_FLAG" --publish=never
+    cd "$APP_DIR" &&
+      pnpm eb --linux AppImage "$ELECTRON_ARCH_FLAG" --publish=never
   )
 else
   step "Pulando pre-check/build (--skip-build)"

@@ -10,6 +10,7 @@
 
 ### Changed
 
+- **Operational flow is now root-driven (without `pnpm-workspace.yaml`)** — day-to-day `dev/build/lint` now runs directly from root scripts (`build:renderer`, `build:electron`, `typecheck:renderer`, `dev:app` via `scripts/dev-app.mjs`), `app/renderer/package.json` was removed, and wrappers (`validar-tudo*`, `install*`, `check-updates*`, `release-autoupdate.yml`) no longer depend on workspace `pnpm --filter` calls.
 - **`version-sync`/`release` are now resilient to optional manifest flattening** — `scripts/version-sync.mjs` now treats `app/electron/package.json` and `app/renderer/package.json` as optional (while keeping root `package.json` + Tauri files required), and `scripts/release.sh`/`scripts/release.ps1` now build `git add` inputs dynamically so release flow does not break when those manifests are removed.
 - **Root scripts no longer depend on `lerna run` for daily operations** — `package.json` now uses `scripts/pnpmw.mjs` with `pnpm -r --filter` for `dev:*`, `build*`, `release*`, and `clean`, starting the Phase 3b kickoff (progressively removing Lerna/Nx coupling while keeping the current `app/*` structure for now).
 - **Remaining Lerna/Nx orchestration leftovers removed from the repository** — `lerna.json` was removed, root `package.json` dropped the `lerna` script/dependency, and `pnpm-workspace.yaml` no longer carries the `nx` toggle, keeping daily builds on pure `pnpm`; `check-updates` tooling inventory no longer reports `lerna`.

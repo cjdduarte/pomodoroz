@@ -24,7 +24,7 @@ Pomodoroz is a cross-platform Pomodoro desktop app, forked from [Pomatez](https:
 <repo-root>/
 ├── AGENTS.md
 ├── CLAUDE.md
-├── package.json                 # Root workspace config (pnpm workspaces)
+├── package.json                 # Root operational manifest (pnpm scripts + deps)
 ├── src/                         # React renderer source (flat at repo root)
 ├── app/
 │   ├── electron/                # Electron main process (entry: src/main.ts)
@@ -60,7 +60,7 @@ pnpm dev:renderer            # Renderer only (Vite on localhost:3000)
 pnpm dev:main                # Electron main only (waits for renderer on port 3000)
 
 pnpm lint                    # Lint + typecheck: renderer + electron
-pnpm build                   # Build all workspaces
+pnpm build                   # Build renderer + electron
 pnpm build:dir               # Build unpacked Electron app (for smoke testing)
 pnpm format                  # Prettier across all files
 
@@ -93,9 +93,10 @@ pnpm build:dir
 
 ## Architecture
 
-### Monorepo
+### Package Layout
 
-Two workspaces under `app/` (`electron` and `renderer`). pnpm manages dependencies at the root.
+Root package is the source of truth for dependencies and day-to-day scripts.  
+`app/electron` and `app/renderer` remain as runtime/build shells.
 
 ### Renderer <-> Electron Bridge
 

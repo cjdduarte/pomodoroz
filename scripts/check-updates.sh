@@ -94,8 +94,6 @@ fi
 
 WORKSPACES=(
   "root|$POMODOROZ_DIR"
-  "app/electron|$POMODOROZ_DIR/app/electron"
-  "app/renderer|$POMODOROZ_DIR/app/renderer"
 )
 
 OUTDATED_ROWS=()
@@ -418,13 +416,7 @@ normalize_workspace_name() {
       echo "root"
       ;;
     "pomodoroz")
-      echo "app/electron"
-      ;;
-    "@pomodoroz/renderer")
-      echo "app/renderer"
-      ;;
-    "app/electron" | "app/renderer")
-      echo "$ws"
+      echo "root"
       ;;
     *)
       echo "$ws"
@@ -710,14 +702,13 @@ check_stack_versions() {
   fi
 
   local electron_version react_version ts_version
-  local root_pkg electron_pkg
+  local root_pkg
   root_pkg="$POMODOROZ_DIR/package.json"
-  electron_pkg="$POMODOROZ_DIR/app/electron/package.json"
-  electron_version="$(node -e "const p=require('$electron_pkg'); console.log((p.devDependencies&&p.devDependencies.electron)||(p.dependencies&&p.dependencies.electron)||'n/a');" 2>/dev/null || true)"
+  electron_version="$(node -e "const p=require('$root_pkg'); console.log((p.devDependencies&&p.devDependencies.electron)||(p.dependencies&&p.dependencies.electron)||'n/a');" 2>/dev/null || true)"
   react_version="$(get_pkg_version "$root_pkg" "react")"
   ts_version="$(node -e "const p=require('$root_pkg'); console.log((p.devDependencies&&p.devDependencies.typescript)||'n/a');" 2>/dev/null || true)"
 
-  echo "  Electron (app/electron): ${electron_version:-n/a}"
+  echo "  Electron (root): ${electron_version:-n/a}"
   echo "  React (root/src): ${react_version:-n/a}"
   echo "  TypeScript (root): ${ts_version:-n/a}"
 }
@@ -727,7 +718,6 @@ check_framework_inventory() {
   echo "[3/5] Inventario de Frameworks e Ferramentas"
 
   local root_pkg="$POMODOROZ_DIR/package.json"
-  local electron_pkg="$POMODOROZ_DIR/app/electron/package.json"
 
   echo "  [Renderer]"
   echo "    react: $(get_pkg_version "$root_pkg" "react")"
@@ -743,10 +733,10 @@ check_framework_inventory() {
   echo "    @vitejs/plugin-react: $(get_pkg_version "$root_pkg" "@vitejs/plugin-react")"
 
   echo "  [Electron]"
-  echo "    electron: $(get_pkg_version "$electron_pkg" "electron")"
-  echo "    electron-builder: $(get_pkg_version "$electron_pkg" "electron-builder")"
-  echo "    electron-updater: $(get_pkg_version "$electron_pkg" "electron-updater")"
-  echo "    electron-store: $(get_pkg_version "$electron_pkg" "electron-store")"
+  echo "    electron: $(get_pkg_version "$root_pkg" "electron")"
+  echo "    electron-builder: $(get_pkg_version "$root_pkg" "electron-builder")"
+  echo "    electron-updater: $(get_pkg_version "$root_pkg" "electron-updater")"
+  echo "    electron-store: $(get_pkg_version "$root_pkg" "electron-store")"
 
   echo "  [Monorepo/Tooling]"
   echo "    typescript: $(get_pkg_version "$root_pkg" "typescript")"
@@ -1342,6 +1332,7 @@ check_rust_dependencies() {
         show_cargo_outdated_report_summary "$outdated_json"
       else
         echo "  ⚠ Falha ao executar cargo outdated em modo resumo."
+        echo "    Dica: verifique rede/crates.io e lock do cache Cargo."
       fi
     else
       echo "  ⚠ cargo-outdated nao instalado."
@@ -1363,6 +1354,7 @@ check_rust_dependencies() {
         show_cargo_audit_report_summary "$audit_json"
       else
         echo "  ⚠ Falha ao executar cargo audit em modo resumo."
+        echo "    Dica: verifique lock do advisory-db em ~/.cargo."
         echo "    Dica: rode manualmente para detalhes: cd \"$tauri_dir\" && cargo audit"
       fi
     else
@@ -1385,6 +1377,7 @@ check_rust_dependencies() {
     if [ "$write_cargo_logs" -eq 1 ]; then
       echo "  - Checando crates desatualizados (resumo + log)..."
       local outdated_full_status=0
+      local outdated_log_mode="full"
       set +e
       outdated_json="$(
         cd "$tauri_dir" &&
@@ -1396,6 +1389,16 @@ check_rust_dependencies() {
           cargo outdated >"$outdated_log" 2>&1
       )
       outdated_full_status=$?
+      if [ "$outdated_full_status" -ne 0 ]; then
+        (
+          cd "$tauri_dir" &&
+            cargo outdated --root-deps-only --format json >"$outdated_log" 2>&1
+        )
+        outdated_full_status=$?
+        if [ "$outdated_full_status" -eq 0 ]; then
+          outdated_log_mode="fallback"
+        fi
+      fi
       set -e
 
       if [ "$outdated_json_status" -eq 0 ]; then
@@ -1403,10 +1406,15 @@ check_rust_dependencies() {
         outdated_json_for_selection="$outdated_json"
       else
         echo "  ⚠ Falha ao executar resumo de cargo outdated."
+        echo "    Dica: verifique rede/crates.io e lock do cache Cargo."
       fi
 
       if [ "$outdated_full_status" -eq 0 ]; then
-        echo "  Detalhes completos: $outdated_log"
+        if [ "$outdated_log_mode" = "fallback" ]; then
+          echo "  Detalhes (modo fallback root-deps-only): $outdated_log"
+        else
+          echo "  Detalhes completos: $outdated_log"
+        fi
       elif [ -s "$outdated_log" ]; then
         echo "  Detalhes (com erro de execucao): $outdated_log"
       else
@@ -1427,6 +1435,7 @@ check_rust_dependencies() {
         outdated_json_for_selection="$outdated_json"
       else
         echo "  ⚠ Falha ao executar resumo de cargo outdated."
+        echo "    Dica: verifique rede/crates.io e lock do cache Cargo."
       fi
     fi
   else
@@ -1440,6 +1449,7 @@ check_rust_dependencies() {
     if [ "$write_cargo_logs" -eq 1 ]; then
       echo "  - Checando vulnerabilidades (resumo + log)..."
       local audit_full_status=0
+      local audit_log_mode="full"
       set +e
       audit_json="$(
         cd "$tauri_dir" &&
@@ -1451,17 +1461,32 @@ check_rust_dependencies() {
           cargo audit >"$audit_log" 2>&1
       )
       audit_full_status=$?
+      if [ "$audit_full_status" -ne 0 ]; then
+        (
+          cd "$tauri_dir" &&
+            cargo audit --json --no-fetch >"$audit_log" 2>&1
+        )
+        audit_full_status=$?
+        if [ "$audit_full_status" -eq 0 ]; then
+          audit_log_mode="fallback"
+        fi
+      fi
       set -e
 
       if [ "$audit_json_status" -eq 0 ] && [ -n "$audit_json" ]; then
         show_cargo_audit_report_summary "$audit_json"
       else
         echo "  ⚠ Falha ao executar resumo de cargo audit."
+        echo "    Dica: verifique lock do advisory-db em ~/.cargo."
         echo "    Dica: rode manualmente para detalhes: cd \"$tauri_dir\" && cargo audit"
       fi
 
       if [ "$audit_full_status" -eq 0 ]; then
-        echo "  Detalhes completos: $audit_log"
+        if [ "$audit_log_mode" = "fallback" ]; then
+          echo "  Detalhes (modo fallback --no-fetch): $audit_log"
+        else
+          echo "  Detalhes completos: $audit_log"
+        fi
       elif [ -s "$audit_log" ]; then
         echo "  Detalhes (com erro de execucao): $audit_log"
       else
@@ -1481,6 +1506,7 @@ check_rust_dependencies() {
         show_cargo_audit_report_summary "$audit_json"
       else
         echo "  ⚠ Falha ao executar resumo de cargo audit."
+        echo "    Dica: verifique lock do advisory-db em ~/.cargo."
         echo "    Dica: rode manualmente para detalhes: cd \"$tauri_dir\" && cargo audit"
       fi
     fi
