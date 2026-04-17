@@ -16,6 +16,7 @@
 - **Renderer dependency source consolidated into the root manifest** — duplicated entries between root `package.json` and `app/renderer/package.json` were removed from the renderer workspace (keeping only renderer-local specifics), and `check-updates.sh/.ps1` now reads the `[Renderer]` inventory directly from the root (`root/src`) manifest during the flat-structure transition.
 - **Operational flow decoupled from `@pomodoroz/shareables`** — `app/electron` now uses a local IPC contract (`app/electron/src/ipc.ts`), the `workspace:*` dependency was removed from `app/electron/package.json`, and scripts/workflow (`validar-tudo*`, `install*`, `check-updates*`, `release-autoupdate.yml`) no longer run build/lint steps scanning the `app/shareables` workspace.
 - **Legacy `app/shareables` workspace removed from the monorepo** — package files were deleted, `package.json`/`pnpm-workspace.yaml` now list only `app/electron` and `app/renderer`, and the lockfile was regenerated without local link references to `@pomodoroz/shareables`.
+- **`pnpm` orchestration switched to path-based filters (instead of workspace names)** — root scripts (`package.json`), validation wrappers (`validar-tudo.sh/.ps1`), Tauri bootstrap (`src-tauri/tauri.conf.json`), and release workflow (`release-autoupdate.yml`) now target `./app/renderer` and `./app/electron`, reducing coupling to workspace names (`@pomodoroz/renderer`/`pomodoroz`) during the final flatten stage.
 
 ## [26.4.18] - 2026-04-16
 

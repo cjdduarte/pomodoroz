@@ -67,8 +67,8 @@ Uso:
 Fluxo padrao:
   1) valida Node + pnpm
   2) pnpm install (sincroniza lockfile)
-  3) lint por workspace (@pomodoroz/renderer, pomodoroz)
-  4) pnpm --filter @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json
+  3) lint por pacote (app/renderer, app/electron)
+  4) pnpm --filter ./app/renderer exec tsc --noEmit -p tsconfig.json
   5) cargo fmt --check (src-tauri)
   6) cargo clippy -D warnings (src-tauri)
   7) pnpm build + pnpm exec electron-builder --dir
@@ -314,13 +314,13 @@ if (( RUN_QUICK_DEV == 1 )); then
   step "Quick run: lint"
   (
     cd "$APP_DIR" &&
-      pnpm --filter @pomodoroz/renderer run lint &&
-      pnpm --filter pomodoroz run lint
+      pnpm --filter ./app/renderer run lint &&
+      pnpm --filter ./app/electron run lint
   )
   step "Quick run: typecheck renderer"
   (
     cd "$APP_DIR" &&
-      pnpm --filter @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json
+      pnpm --filter ./app/renderer exec tsc --noEmit -p tsconfig.json
   )
   ensure_electron_runtime_for_dev
   step "Quick run: dev:app"
@@ -330,14 +330,14 @@ fi
 step "Lint completo (ESLint renderer + TypeScript workspaces)"
 (
   cd "$APP_DIR" &&
-    pnpm --filter @pomodoroz/renderer run lint &&
-    pnpm --filter pomodoroz run lint
+    pnpm --filter ./app/renderer run lint &&
+    pnpm --filter ./app/electron run lint
 )
 
 step "Typecheck do renderer (TypeScript)"
 (
   cd "$APP_DIR" &&
-    pnpm --filter @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json
+    pnpm --filter ./app/renderer exec tsc --noEmit -p tsconfig.json
 )
 
 if [[ -d "$APP_DIR/src-tauri" ]]; then

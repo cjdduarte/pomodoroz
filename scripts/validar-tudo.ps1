@@ -165,8 +165,8 @@ Uso:
 Fluxo padrao:
   1) valida Node + pnpm
   2) pnpm install (sincroniza lockfile)
-  3) lint por workspace (@pomodoroz/renderer, pomodoroz)
-  4) pnpm --filter @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json
+  3) lint por pacote (app/renderer, app/electron)
+  4) pnpm --filter ./app/renderer exec tsc --noEmit -p tsconfig.json
   5) cargo fmt --check (src-tauri)
   6) cargo clippy -D warnings (src-tauri)
   7) pnpm build + pnpm exec electron-builder --dir
@@ -387,13 +387,13 @@ if (-not $SkipInstall) {
 if ($QuickDev) {
     Step "Quick run: lint"
     Push-Location $APP_DIR
-    Invoke-Pnpm --filter @pomodoroz/renderer run lint
-    Invoke-Pnpm --filter pomodoroz run lint
+    Invoke-Pnpm --filter ./app/renderer run lint
+    Invoke-Pnpm --filter ./app/electron run lint
     Pop-Location
 
     Step "Quick run: typecheck renderer"
     Push-Location $APP_DIR
-    Invoke-Pnpm --filter @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json
+    Invoke-Pnpm --filter ./app/renderer exec tsc --noEmit -p tsconfig.json
     Pop-Location
 
     Ensure-ElectronRuntimeForDev
@@ -408,13 +408,13 @@ if ($QuickDev) {
 
 Step "Lint completo (ESLint renderer + TypeScript workspaces)"
 Push-Location $APP_DIR
-Invoke-Pnpm --filter @pomodoroz/renderer run lint
-Invoke-Pnpm --filter pomodoroz run lint
+Invoke-Pnpm --filter ./app/renderer run lint
+Invoke-Pnpm --filter ./app/electron run lint
 Pop-Location
 
 Step "Typecheck do renderer (TypeScript)"
 Push-Location $APP_DIR
-Invoke-Pnpm --filter @pomodoroz/renderer exec tsc --noEmit -p tsconfig.json
+Invoke-Pnpm --filter ./app/renderer exec tsc --noEmit -p tsconfig.json
 Pop-Location
 
 $tauriDir = Join-Path $APP_DIR "src-tauri"

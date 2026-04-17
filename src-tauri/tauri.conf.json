@@ -6,8 +6,8 @@
   "build": {
     "frontendDist": "../app/renderer/build",
     "devUrl": "http://localhost:3000",
-    "beforeDevCommand": "node ./scripts/pnpmw.mjs --filter @pomodoroz/renderer run dev:renderer",
-    "beforeBuildCommand": "node ./scripts/pnpmw.mjs --filter @pomodoroz/renderer run build"
+    "beforeDevCommand": "node ./scripts/pnpmw.mjs --filter ./app/renderer run dev:renderer",
+    "beforeBuildCommand": "node ./scripts/pnpmw.mjs --filter ./app/renderer run build"
   },
   "app": {
     "windows": [
