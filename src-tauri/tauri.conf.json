@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "Pomodoroz",
-  "version": "26.4.21",
+  "version": "26.4.22",
   "identifier": "com.cjdduarte.pomodoroz",
   "build": {
     "frontendDist": "../app/renderer/build",

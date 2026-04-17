@@ -1,6 +1,6 @@
 {
   "name": "pomodoroz",
-  "version": "26.4.21",
+  "version": "26.4.22",
   "private": true,
   "license": "MIT",
   "main": "./build/main.js",
