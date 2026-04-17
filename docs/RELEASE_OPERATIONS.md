@@ -38,11 +38,12 @@ Current status: **Completed** (release 26.4.9+).
    - `CHANGELOG.md` (PT)
    - `CHANGELOG.en.md` (EN)
 3. Keep next version as `A definir` / `TBD` while unreleased; set final date only on release day.
-4. Prepare commit/tag with dedicated script:
+4. In AI-assisted flow, the agent must fill `YYYY-MM-DD` in both changelog headers for the target version before suggesting `./scripts/release.sh` or `./scripts/release.ps1`.
+5. Prepare commit/tag with dedicated script:
    - Unix: `./scripts/release.sh <version>` (or `pnpm release:tag -- <version>`)
    - PowerShell: `pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/release.ps1 -Version <version>`
-5. (Optional) dry run: `./scripts/release.sh --dry-run <version>` (or `pnpm release:tag:dry -- <version>`)
-6. Validate baseline:
+6. (Optional) dry run: `./scripts/release.sh --dry-run <version>` (or `pnpm release:tag:dry -- <version>`)
+7. Validate baseline:
    - `pnpm lint`
    - `pnpm build`
    - `pnpm build:dir`

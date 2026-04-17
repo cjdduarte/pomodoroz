@@ -56,6 +56,7 @@ Do not create loose specs/checklists for topics already covered in the documents
 3. Never edit items of an already-published version; new changes go in the next version.
 4. Keep the next version at the top as `A definir` (PT) / `TBD` (EN); set date only on release day.
 5. Do not create tag `v*` without a valid entry in both changelogs.
+6. When an AI agent suggests running `./scripts/release.sh` or `./scripts/release.ps1`, it must first set the target version date (`YYYY-MM-DD`) in both changelog headers for that version.
 
 ---
 

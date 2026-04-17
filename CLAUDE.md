@@ -142,6 +142,7 @@ Renderer persists state in `localStorage`. Electron uses `electron-store` for na
 - **Documentation**: Log implemented changes in `CHANGELOG.md` and `CHANGELOG.en.md`. Track migration in `docs/MIGRATION_ELECTRON_TO_TAURI.md`. Track future features in `docs/PRODUCT_BACKLOG.md`.
 - **Release Notes Source of Truth**: GitHub Release title/notes are generated from `CHANGELOG.md` section `## [x.y.z]`. Always update both changelogs before tag/release.
 - **Changelog Fill Rule**: Never add new items to a published version. Keep the next version at the top as `A definir` (PT) / `TBD` (EN), set the date only on release day, and move subsequent work to the next version.
+- **Agent Release Prompt Rule**: Before suggesting `./scripts/release.sh` or `./scripts/release.ps1`, the agent must set `YYYY-MM-DD` in both changelog headers of the target version.
 - **Language**: Code in English. Logs/comments in Portuguese (PT-BR) where appropriate.
 - **Commits**: Commit messages and PR titles must be in English (Conventional Commits).
 - **AI Finalization Output**: At the end of each finalized implementation, suggest a ready-to-use Conventional Commit message in English.

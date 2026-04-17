@@ -6,6 +6,12 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.4.23] - 2026-04-17
+
+### Alterado
+
+- **Regra operacional de release para agentes reforçada na documentação** — `AGENTS.md`, `CLAUDE.md` e `docs/RELEASE_OPERATIONS.md` agora exigem que o agente preencha a data (`YYYY-MM-DD`) no cabeçalho da versão alvo em `CHANGELOG.md` e `CHANGELOG.en.md` antes de sugerir `./scripts/release.sh`/`./scripts/release.ps1`.
+
 ## [26.4.22] - 2026-04-17
 
 ### Alterado
