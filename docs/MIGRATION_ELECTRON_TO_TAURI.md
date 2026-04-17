@@ -142,7 +142,7 @@ Current status is tracked here (not only in phase descriptions) so we can see ex
 | 1 — Connector Swap                | Completed   | 2026-04-10  | Closed after runtime + manual parity validation                                                                                                                   |
 | 2 — Native Features               | In progress | 2026-04-16  | 2c/2g/2h/2i validated in available environments; Linux script cycle (5/6 + purge uninstall) revalidated; final hardening checkpoint still pending for deferred 2f |
 | 3a — Yarn to pnpm                 | Completed   | 2026-04-16  | Closed after lockfile/script/workflow migration and release workflow validation on GitHub Actions                                                                 |
-| 3b — Flatten Structure            | In progress | 2026-04-16  | Kickoff started with root script decoupling from `lerna run`; folder flatten and monorepo tool removal remain pending                                             |
+| 3b — Flatten Structure            | In progress | 2026-04-17  | Kickoff completed (scripts + renderer `src` relocation + dependency consolidation); remaining step is final monorepo collapse to single root package layout       |
 | 4 — CI for Tauri                  | Not started | -           | Start only after Phase 3b exit criteria are complete                                                                                                              |
 
 Phase 0 completion checklist (execution status):
@@ -156,7 +156,7 @@ Phase 0 completion checklist (execution status):
 - [x] Run/confirm script checklist impact for current phase (`scripts/` validation rule)
 
 Rule to move forward: only start Phase 1 after all Phase 0 checklist items above are checked.
-Current state: Phase 1 closed, Phase 2a/2b/2c/2d/2e validated (Linux dev runtime), Phase 2g/2h/2i manual parity checklists are closed, Linux operational script cycle (`validar-tudo` options 5/6 + `uninstall purge`) was revalidated on 2026-04-16, and Phase 2f resumed in 26.4.18 with updater wiring kickoff (`tauri-plugin-updater` + policy-sync checks), updater key/feed scaffolding (`pubkey` + `createUpdaterArtifacts`) and a manual signed-assets workflow, while install/restart hardening remains pending. Phase 3a is closed, and Phase 3b kickoff now includes both root script decoupling from `lerna run` and renderer source relocation to root `src`.
+Current state: Phase 1 closed, Phase 2a/2b/2c/2d/2e validated (Linux dev runtime), Phase 2g/2h/2i manual parity checklists are closed, Linux operational script cycle (`validar-tudo` options 5/6 + `uninstall purge`) was revalidated on 2026-04-16, and Phase 2f resumed in 26.4.18 with updater wiring kickoff (`tauri-plugin-updater` + policy-sync checks), updater key/feed scaffolding (`pubkey` + `createUpdaterArtifacts`) and a manual signed-assets workflow, while install/restart hardening remains pending. Phase 3a is closed, and Phase 3b kickoff now includes root script decoupling from `lerna run`, renderer source relocation to root `src`, and renderer dependency consolidation on the root manifest.
 Current guardrail in Tauri runtime: `inAppAutoUpdate` setting remains disabled in UI until full 2f close (feed/signature + install/restart + packaged E2E).
 
 Phase 1 progress checklist (execution status):
@@ -366,11 +366,11 @@ Phase 2 operational validation snapshot (2026-04-16, Linux):
   - Remove Lerna, Nx from dependencies
   - Update all import paths
   - Consolidate to single `package.json`
-- Progress snapshot (2026-04-16):
+- Progress snapshot (2026-04-17):
   - [x] Root operational scripts migrated from `lerna run` to `pnpm -r --filter` (`dev:*`, `build*`, `release*`, `clean`).
   - [x] Folder flatten kickoff completed (`app/renderer/src` -> `src`) with renderer config/script updates (`index.html`, `tsconfig`, `vite` aliases, lint/prebuild paths).
   - [x] Remove monorepo orchestration leftovers (`lerna.json`, root `lerna` dependency, Nx toggle in workspace config).
-  - [ ] Dependency consolidation pending (renderer deps temporarily duplicated at root during transition to single `package.json`).
+  - [x] Dependency consolidation applied (renderer duplicated deps removed from `app/renderer/package.json`, with root manifest as source of truth for relocated `src`).
 - Validation:
   - `pnpm dev` works
   - `pnpm build` works

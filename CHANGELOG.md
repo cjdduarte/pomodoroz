@@ -13,6 +13,7 @@
 - **Scripts raiz deixaram de depender de `lerna run` no fluxo operacional** — `package.json` passou a usar `scripts/pnpmw.mjs` com `pnpm -r --filter` para `dev:*`, `build*`, `release*` e `clean`, iniciando o kickoff da Fase 3b (remoção progressiva do acoplamento Lerna/Nx sem alterar ainda a estrutura `app/*`).
 - **Sobras de orquestração Lerna/Nx removidas do repositório** — `lerna.json` foi removido, o script/dependência `lerna` saiu do `package.json` raiz e o toggle `nx` foi retirado de `pnpm-workspace.yaml`, mantendo o build diário apenas com `pnpm`; o inventário do `check-updates` também deixou de listar `lerna` no bloco de tooling.
 - **Kickoff de flatten do renderer concluído com `src` no root** — código do frontend foi movido de `app/renderer/src` para `src`, com ajustes em `app/renderer/index.html`, `app/renderer/tsconfig.json`, `app/renderer/vite.config.ts` e scripts de `app/renderer/package.json` (lint/prebuild) para manter `pnpm lint` e `pnpm build` verdes durante a transição.
+- **Consolidação de dependências do renderer no manifesto raiz** — duplicações entre `package.json` (root) e `app/renderer/package.json` foram removidas do workspace do renderer (mantendo apenas dependências locais específicas), e `check-updates.sh/.ps1` passou a ler o inventário do bloco `[Renderer]` diretamente do manifesto raiz (`root/src`) durante a transição para estrutura flat.
 
 ## [26.4.18] - 2026-04-16
 

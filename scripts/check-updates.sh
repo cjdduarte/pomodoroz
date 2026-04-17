@@ -714,12 +714,15 @@ check_stack_versions() {
   fi
 
   local electron_version react_version ts_version
-  electron_version="$(node -e "const p=require('$POMODOROZ_DIR/app/electron/package.json'); console.log((p.devDependencies&&p.devDependencies.electron)||(p.dependencies&&p.dependencies.electron)||'n/a');" 2>/dev/null || true)"
-  react_version="$(node -e "const p=require('$POMODOROZ_DIR/app/renderer/package.json'); console.log((p.dependencies&&p.dependencies.react)||'n/a');" 2>/dev/null || true)"
-  ts_version="$(node -e "const p=require('$POMODOROZ_DIR/package.json'); console.log((p.devDependencies&&p.devDependencies.typescript)||'n/a');" 2>/dev/null || true)"
+  local root_pkg electron_pkg
+  root_pkg="$POMODOROZ_DIR/package.json"
+  electron_pkg="$POMODOROZ_DIR/app/electron/package.json"
+  electron_version="$(node -e "const p=require('$electron_pkg'); console.log((p.devDependencies&&p.devDependencies.electron)||(p.dependencies&&p.dependencies.electron)||'n/a');" 2>/dev/null || true)"
+  react_version="$(get_pkg_version "$root_pkg" "react")"
+  ts_version="$(node -e "const p=require('$root_pkg'); console.log((p.devDependencies&&p.devDependencies.typescript)||'n/a');" 2>/dev/null || true)"
 
   echo "  Electron (app/electron): ${electron_version:-n/a}"
-  echo "  React (app/renderer): ${react_version:-n/a}"
+  echo "  React (root/src): ${react_version:-n/a}"
   echo "  TypeScript (root): ${ts_version:-n/a}"
 }
 
@@ -728,21 +731,20 @@ check_framework_inventory() {
   echo "[3/5] Inventario de Frameworks e Ferramentas"
 
   local root_pkg="$POMODOROZ_DIR/package.json"
-  local renderer_pkg="$POMODOROZ_DIR/app/renderer/package.json"
   local electron_pkg="$POMODOROZ_DIR/app/electron/package.json"
 
   echo "  [Renderer]"
-  echo "    react: $(get_pkg_version "$renderer_pkg" "react")"
-  echo "    react-dom: $(get_pkg_version "$renderer_pkg" "react-dom")"
-  echo "    react-router: $(get_pkg_version "$renderer_pkg" "react-router")"
-  echo "    react-router-dom: $(get_pkg_version "$renderer_pkg" "react-router-dom")"
-  echo "    @reduxjs/toolkit: $(get_pkg_version "$renderer_pkg" "@reduxjs/toolkit")"
-  echo "    styled-components: $(get_pkg_version "$renderer_pkg" "styled-components")"
-  echo "    i18next: $(get_pkg_version "$renderer_pkg" "i18next")"
-  echo "    @dnd-kit/sortable: $(get_pkg_version "$renderer_pkg" "@dnd-kit/sortable")"
-  echo "    @dnd-kit/core: $(get_pkg_version "$renderer_pkg" "@dnd-kit/core")"
-  echo "    vite: $(get_pkg_version "$renderer_pkg" "vite")"
-  echo "    @vitejs/plugin-react: $(get_pkg_version "$renderer_pkg" "@vitejs/plugin-react")"
+  echo "    react: $(get_pkg_version "$root_pkg" "react")"
+  echo "    react-dom: $(get_pkg_version "$root_pkg" "react-dom")"
+  echo "    react-router: $(get_pkg_version "$root_pkg" "react-router")"
+  echo "    react-router-dom: $(get_pkg_version "$root_pkg" "react-router-dom")"
+  echo "    @reduxjs/toolkit: $(get_pkg_version "$root_pkg" "@reduxjs/toolkit")"
+  echo "    styled-components: $(get_pkg_version "$root_pkg" "styled-components")"
+  echo "    i18next: $(get_pkg_version "$root_pkg" "i18next")"
+  echo "    @dnd-kit/sortable: $(get_pkg_version "$root_pkg" "@dnd-kit/sortable")"
+  echo "    @dnd-kit/core: $(get_pkg_version "$root_pkg" "@dnd-kit/core")"
+  echo "    vite: $(get_pkg_version "$root_pkg" "vite")"
+  echo "    @vitejs/plugin-react: $(get_pkg_version "$root_pkg" "@vitejs/plugin-react")"
 
   echo "  [Electron]"
   echo "    electron: $(get_pkg_version "$electron_pkg" "electron")"

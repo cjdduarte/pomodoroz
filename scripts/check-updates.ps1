@@ -594,15 +594,14 @@ function Check-StackVersions {
     Step "`n[2/5] Stack Atual do Projeto"
 
     $rootPkg = Join-Path $POMODOROZ "package.json"
-    $rendererPkg = Join-Path $POMODOROZ "app/renderer/package.json"
     $electronPkg = Join-Path $POMODOROZ "app/electron/package.json"
 
     $electron = Get-PackageJsonVersion -PackageJsonPath $electronPkg -DependencyName "electron"
-    $react = Get-PackageJsonVersion -PackageJsonPath $rendererPkg -DependencyName "react"
+    $react = Get-PackageJsonVersion -PackageJsonPath $rootPkg -DependencyName "react"
     $typescript = Get-PackageJsonVersion -PackageJsonPath $rootPkg -DependencyName "typescript"
 
     Write-Host "  Electron (app/electron): $electron"
-    Write-Host "  React (app/renderer): $react"
+    Write-Host "  React (root/src): $react"
     Write-Host "  TypeScript (root): $typescript"
 }
 
@@ -610,21 +609,20 @@ function Check-FrameworkInventory {
     Step "`n[3/5] Inventario de Frameworks e Ferramentas"
 
     $rootPkg = Join-Path $POMODOROZ "package.json"
-    $rendererPkg = Join-Path $POMODOROZ "app/renderer/package.json"
     $electronPkg = Join-Path $POMODOROZ "app/electron/package.json"
 
     Write-Host "  [Renderer]"
-    Write-Host "    react: $(Get-PackageJsonVersion $rendererPkg 'react')"
-    Write-Host "    react-dom: $(Get-PackageJsonVersion $rendererPkg 'react-dom')"
-    Write-Host "    react-router: $(Get-PackageJsonVersion $rendererPkg 'react-router')"
-    Write-Host "    react-router-dom: $(Get-PackageJsonVersion $rendererPkg 'react-router-dom')"
-    Write-Host "    @reduxjs/toolkit: $(Get-PackageJsonVersion $rendererPkg '@reduxjs/toolkit')"
-    Write-Host "    styled-components: $(Get-PackageJsonVersion $rendererPkg 'styled-components')"
-    Write-Host "    i18next: $(Get-PackageJsonVersion $rendererPkg 'i18next')"
-    Write-Host "    @dnd-kit/sortable: $(Get-PackageJsonVersion $rendererPkg '@dnd-kit/sortable')"
-    Write-Host "    @dnd-kit/core: $(Get-PackageJsonVersion $rendererPkg '@dnd-kit/core')"
-    Write-Host "    vite: $(Get-PackageJsonVersion $rendererPkg 'vite')"
-    Write-Host "    @vitejs/plugin-react: $(Get-PackageJsonVersion $rendererPkg '@vitejs/plugin-react')"
+    Write-Host "    react: $(Get-PackageJsonVersion $rootPkg 'react')"
+    Write-Host "    react-dom: $(Get-PackageJsonVersion $rootPkg 'react-dom')"
+    Write-Host "    react-router: $(Get-PackageJsonVersion $rootPkg 'react-router')"
+    Write-Host "    react-router-dom: $(Get-PackageJsonVersion $rootPkg 'react-router-dom')"
+    Write-Host "    @reduxjs/toolkit: $(Get-PackageJsonVersion $rootPkg '@reduxjs/toolkit')"
+    Write-Host "    styled-components: $(Get-PackageJsonVersion $rootPkg 'styled-components')"
+    Write-Host "    i18next: $(Get-PackageJsonVersion $rootPkg 'i18next')"
+    Write-Host "    @dnd-kit/sortable: $(Get-PackageJsonVersion $rootPkg '@dnd-kit/sortable')"
+    Write-Host "    @dnd-kit/core: $(Get-PackageJsonVersion $rootPkg '@dnd-kit/core')"
+    Write-Host "    vite: $(Get-PackageJsonVersion $rootPkg 'vite')"
+    Write-Host "    @vitejs/plugin-react: $(Get-PackageJsonVersion $rootPkg '@vitejs/plugin-react')"
 
     Write-Host "  [Electron]"
     Write-Host "    electron: $(Get-PackageJsonVersion $electronPkg 'electron')"
