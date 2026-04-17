@@ -599,7 +599,12 @@ if ($BuildInstallers) {
         if (-not [string]::IsNullOrWhiteSpace($baseBundles)) {
             Step ("Gerando instaladores Tauri (bundles base: {0})" -f $baseBundles)
             Push-Location $APP_DIR
-            Invoke-Pnpm tauri build --bundles $baseBundles
+            if (((Get-Variable IsLinux -ErrorAction SilentlyContinue) -and $IsLinux) -and $hasAppImage) {
+                # Sem appimage no lote base, o updater do Tauri pode falhar ao tentar gerar artefatos.
+                Invoke-Pnpm tauri build --bundles $baseBundles --config '{"bundle":{"createUpdaterArtifacts":false}}'
+            } else {
+                Invoke-Pnpm tauri build --bundles $baseBundles
+            }
             Pop-Location
         }
 
