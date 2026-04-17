@@ -372,6 +372,7 @@ Phase 2 operational validation snapshot (2026-04-16, Linux):
   - [x] Remove monorepo orchestration leftovers (`lerna.json`, root `lerna` dependency, Nx toggle in workspace config).
   - [x] Dependency consolidation applied (renderer duplicated deps removed from `app/renderer/package.json`, with root manifest as source of truth for relocated `src`).
   - [x] `pnpm-workspace.yaml` removed and wrappers/workflows migrated away from `pnpm --filter` workspace assumptions.
+  - [x] Electron builder metadata moved to root-managed config (`electron-builder.config.json`), with root `eb` script as source of truth.
   - [ ] Remove Electron packaging manifest (`app/electron/package.json`) only after moving its `electron-builder` metadata to a non-breaking root-managed layout.
 - Validation:
   - `pnpm dev` works

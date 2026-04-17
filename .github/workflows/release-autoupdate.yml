@@ -61,7 +61,7 @@ jobs:
         run: pnpm build
 
       - name: Publish Windows NSIS (x64)
-        run: pnpm eb --win nsis --x64 --publish always
+        run: node ./node_modules/electron-builder/cli.js --projectDir app/electron --config ../../electron-builder.config.json --win nsis --x64 --publish always
 
   release-linux:
     if: ${{ github.event_name == 'push' || github.event.inputs.target == 'all' || github.event.inputs.target == 'linux' }}
@@ -99,7 +99,7 @@ jobs:
         run: pnpm build
 
       - name: Publish Linux AppImage (x64)
-        run: pnpm eb --linux AppImage --x64 --publish always
+        run: node ./node_modules/electron-builder/cli.js --projectDir app/electron --config ../../electron-builder.config.json --linux AppImage --x64 --publish always
 
   sync-release-notes:
     if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}

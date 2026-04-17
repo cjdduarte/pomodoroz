@@ -6,6 +6,12 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.4.22] - TBD
+
+### Changed
+
+- **`electron-builder` metadata migrated to a root-managed layout** — new root-level `electron-builder.config.json` is now the single source of truth for Electron packaging; the root `eb` script now uses this config explicitly, and `app/electron/package.json` no longer carries an embedded `build` block, preparing safe removal of the Electron packaging manifest in the final Phase 3b step.
+
 ## [26.4.21] - 2026-04-17
 
 ### Fixed

@@ -6,6 +6,12 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.4.22] - A definir
+
+### Alterado
+
+- **Metadata do `electron-builder` migrado para layout root-managed** — novo `electron-builder.config.json` no root virou fonte unica da configuracao de empacotamento Electron; o script `eb` do root passou a usar esse arquivo explicitamente e `app/electron/package.json` deixou de carregar bloco `build` embutido, preparando a remocao segura do manifesto de empacotamento na etapa final da Fase 3b.
+
 ## [26.4.21] - 2026-04-17
 
 ### Corrigido
