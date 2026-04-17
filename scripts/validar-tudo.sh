@@ -160,7 +160,15 @@ tauri_bundles_include_appimage() {
   esac
 }
 
-ensure_tauri_appimage_prereqs() {
+tauri_bundles_without_appimage() {
+  local bundles_csv="$1"
+  echo "$bundles_csv" | tr ',' '\n' | awk '
+    $1 == "appimage" { next }
+    NF > 0 { print $1 }
+  ' | paste -sd, -
+}
+
+tauri_appimage_prereqs_ok() {
   local bundles_csv="$1"
   case "$(uname -s)" in
     Linux*) ;;
@@ -172,12 +180,16 @@ ensure_tauri_appimage_prereqs() {
   fi
 
   if [[ ! -e /dev/fuse ]]; then
-    die "Bundle AppImage requer FUSE no Linux (/dev/fuse ausente). Use bundle sem appimage ou habilite FUSE (ex.: sudo modprobe fuse)."
+    printf "Aviso: AppImage requer FUSE no Linux (/dev/fuse ausente). Pulando bundle appimage.\n" >&2
+    return 1
   fi
 
   if ! command -v fusermount >/dev/null 2>&1 && ! command -v fusermount3 >/dev/null 2>&1; then
-    die "Bundle AppImage requer fusermount/fusermount3 no PATH. Instale suporte FUSE (ex.: pacote fuse2)."
+    printf "Aviso: AppImage requer fusermount/fusermount3 no PATH. Pulando bundle appimage.\n" >&2
+    return 1
   fi
+
+  return 0
 }
 
 tauri_release_binary_path() {
@@ -520,9 +532,22 @@ if (( RUN_INSTALLERS == 1 )); then
   if [[ "$DEV_RUNTIME" == "tauri" ]]; then
     bundles=""
     bundles="$(tauri_installers_bundles "$INSTALLERS_PROFILE")"
-    ensure_tauri_appimage_prereqs "$bundles"
-    step "Gerando instaladores Tauri (bundles: $bundles)"
-    ( cd "$APP_DIR" && pnpm tauri build --bundles "$bundles" )
+    bundles_without_appimage=""
+    bundles_without_appimage="$(tauri_bundles_without_appimage "$bundles")"
+
+    if [[ -n "$bundles_without_appimage" ]]; then
+      step "Gerando instaladores Tauri (bundles base: $bundles_without_appimage)"
+      ( cd "$APP_DIR" && pnpm tauri build --bundles "$bundles_without_appimage" )
+    fi
+
+    if tauri_bundles_include_appimage "$bundles"; then
+      if tauri_appimage_prereqs_ok "$bundles"; then
+        step "Gerando instalador Tauri adicional (bundle: appimage)"
+        if ! ( cd "$APP_DIR" && pnpm tauri build --bundles appimage ); then
+          printf "Aviso: Falha ao gerar AppImage com linuxdeploy. Bundles base (deb/rpm) podem ter sido gerados.\n" >&2
+        fi
+      fi
+    fi
   else
     case "$(uname -s)" in
       Linux*)

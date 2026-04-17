@@ -209,22 +209,26 @@ function Test-TauriAppImagePrerequisites {
     )
 
     if (-not ((Get-Variable IsLinux -ErrorAction SilentlyContinue) -and $IsLinux)) {
-        return
+        return $true
     }
 
     if ("," + $BundlesCsv + "," -notmatch ",appimage,") {
-        return
+        return $true
     }
 
     if (-not (Test-Path "/dev/fuse")) {
-        Die "Bundle AppImage requer FUSE no Linux (/dev/fuse ausente). Use bundle sem appimage ou habilite FUSE (ex.: sudo modprobe fuse)."
+        Write-Host "Aviso: AppImage requer FUSE no Linux (/dev/fuse ausente). Pulando bundle appimage." -ForegroundColor Yellow
+        return $false
     }
 
     $hasFusermount = $null -ne (Get-Command fusermount -ErrorAction SilentlyContinue)
     $hasFusermount3 = $null -ne (Get-Command fusermount3 -ErrorAction SilentlyContinue)
     if (-not $hasFusermount -and -not $hasFusermount3) {
-        Die "Bundle AppImage requer fusermount/fusermount3 no PATH. Instale suporte FUSE (ex.: pacote fuse2)."
+        Write-Host "Aviso: AppImage requer fusermount/fusermount3 no PATH. Pulando bundle appimage." -ForegroundColor Yellow
+        return $false
     }
+
+    return $true
 }
 
 function Invoke-Cargo {
@@ -588,11 +592,28 @@ if (Test-Path $tauriDir) {
 if ($BuildInstallers) {
     if ($DevRuntime -eq "tauri") {
         $bundles = Get-TauriInstallerBundles -Profile $InstallersProfile
-        Test-TauriAppImagePrerequisites -BundlesCsv $bundles
-        Step ("Gerando instaladores Tauri (bundles: {0})" -f $bundles)
-        Push-Location $APP_DIR
-        Invoke-Pnpm tauri build --bundles $bundles
-        Pop-Location
+        $bundleList = $bundles -split "," | ForEach-Object { $_.Trim() } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+        $baseBundles = ($bundleList | Where-Object { $_ -ne "appimage" }) -join ","
+        $hasAppImage = $bundleList -contains "appimage"
+
+        if (-not [string]::IsNullOrWhiteSpace($baseBundles)) {
+            Step ("Gerando instaladores Tauri (bundles base: {0})" -f $baseBundles)
+            Push-Location $APP_DIR
+            Invoke-Pnpm tauri build --bundles $baseBundles
+            Pop-Location
+        }
+
+        if ($hasAppImage -and (Test-TauriAppImagePrerequisites -BundlesCsv $bundles)) {
+            Step "Gerando instalador Tauri adicional (bundle: appimage)"
+            Push-Location $APP_DIR
+            & node $PNPM_WRAPPER tauri build --bundles appimage
+            $appImageExit = $LASTEXITCODE
+            Pop-Location
+
+            if ($appImageExit -ne 0) {
+                Write-Host "Aviso: Falha ao gerar AppImage com linuxdeploy. Bundles base (deb/rpm) podem ter sido gerados." -ForegroundColor Yellow
+            }
+        }
     } else {
         if ($IS_WINDOWS_OS) {
             Step ("Gerando instaladores Windows ({0}: --win --ia32 --x64 --publish=never)" -f $InstallersProfile)
