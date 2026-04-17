@@ -12,6 +12,7 @@ RUN_INSTALLERS=0
 INSTALLERS_PROFILE="slim"
 RUN_INSTALL_LOCAL=0
 RUN_QUICK_DEV=0
+DEV_RUNTIME="electron"
 LOG_MODE="none"
 LOG_TIMESTAMP=""
 GENERAL_LOG_FILE=""
@@ -58,10 +59,138 @@ ensure_electron_runtime_for_dev() {
   ) || die "Electron continua indisponivel apos reparo automatico."
 }
 
+runtime_label() {
+  case "$DEV_RUNTIME" in
+    tauri) echo "Tauri" ;;
+    *) echo "Electron + Vite" ;;
+  esac
+}
+
+show_runtime_menu() {
+  cat <<'EOF'
+Runtime para validacao:
+- 1) Electron + Vite (padrao atual)
+- 2) Tauri (pnpm tauri dev)
+EOF
+  local runtime_choice=""
+  if ! read -r -p "Opcao de runtime [1-2]: " runtime_choice; then
+    die "falha ao ler opcao de runtime."
+  fi
+
+  case "$runtime_choice" in
+    1) DEV_RUNTIME="electron" ;;
+    2) DEV_RUNTIME="tauri" ;;
+    *) die "Opcao de runtime invalida: $runtime_choice" ;;
+  esac
+}
+
+ensure_runtime_for_mode() {
+  case "$DEV_RUNTIME" in
+    electron)
+      ensure_electron_runtime_for_dev
+      ;;
+    tauri)
+      [[ -d "$APP_DIR/src-tauri" ]] || die "src-tauri nao encontrado para dev runtime tauri."
+      command -v cargo >/dev/null 2>&1 || die "Cargo nao encontrado para dev runtime tauri."
+      ;;
+    *)
+      die "Runtime dev invalido: $DEV_RUNTIME"
+      ;;
+  esac
+}
+
+run_dev_runtime_allow_interrupt() {
+  local interrupted=0
+  local rc=0
+
+  trap 'interrupted=1' INT
+  set +e
+  (
+    cd "$APP_DIR" &&
+      if [[ "$DEV_RUNTIME" == "tauri" ]]; then
+        pnpm tauri dev
+      else
+        pnpm dev:app
+      fi
+  )
+  rc=$?
+  set -e
+  trap - INT
+
+  if (( interrupted == 1 || rc == 130 )); then
+    echo "Execucao dev interrompida pelo usuario (Ctrl+C)."
+    return 0
+  fi
+
+  return "$rc"
+}
+
+tauri_installers_bundles() {
+  local profile="$1"
+  case "$(uname -s)" in
+    Linux*)
+      if [[ "$profile" == "full" ]]; then
+        echo "appimage,deb,rpm"
+      else
+        echo "appimage,deb"
+      fi
+      ;;
+    Darwin*)
+      if [[ "$profile" == "full" ]]; then
+        echo "app,dmg"
+      else
+        echo "dmg"
+      fi
+      ;;
+    *)
+      if [[ "$profile" == "full" ]]; then
+        echo "nsis,msi"
+      else
+        echo "nsis"
+      fi
+      ;;
+  esac
+}
+
+tauri_bundles_include_appimage() {
+  local bundles_csv="$1"
+  case ",${bundles_csv}," in
+    *,appimage,*) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+ensure_tauri_appimage_prereqs() {
+  local bundles_csv="$1"
+  case "$(uname -s)" in
+    Linux*) ;;
+    *) return 0 ;;
+  esac
+
+  if ! tauri_bundles_include_appimage "$bundles_csv"; then
+    return 0
+  fi
+
+  if [[ ! -e /dev/fuse ]]; then
+    die "Bundle AppImage requer FUSE no Linux (/dev/fuse ausente). Use bundle sem appimage ou habilite FUSE (ex.: sudo modprobe fuse)."
+  fi
+
+  if ! command -v fusermount >/dev/null 2>&1 && ! command -v fusermount3 >/dev/null 2>&1; then
+    die "Bundle AppImage requer fusermount/fusermount3 no PATH. Instale suporte FUSE (ex.: pacote fuse2)."
+  fi
+}
+
+tauri_release_binary_path() {
+  case "$(uname -s)" in
+    Linux*|Darwin*) echo "$APP_DIR/src-tauri/target/release/pomodoroz_tauri" ;;
+    *) echo "$APP_DIR/src-tauri/target/release/pomodoroz_tauri.exe" ;;
+  esac
+}
+
 usage() {
   cat <<'EOF'
 Uso:
-  ./scripts/validar-tudo.sh [--skip-install] [--dev | --run-packed | --installers [--installers-full|--installers-slim] | --install-local | --quick-dev] [--log-none|--log-full|--log-full-cargo]
+  ./scripts/validar-tudo.sh [--skip-install] [--dev | --run-packed | --installers [--installers-full|--installers-slim] | --install-local | --quick-dev] [--dev-runtime electron|tauri | --dev-electron | --dev-tauri] [--log-none|--log-full|--log-full-cargo]
   ./scripts/validar-tudo.sh                  # menu interativo (quando TTY)
 
 Fluxo padrao:
@@ -71,17 +200,20 @@ Fluxo padrao:
   4) pnpm typecheck:renderer
   5) cargo fmt --check (src-tauri)
   6) cargo clippy -D warnings (src-tauri)
-  7) pnpm build + pnpm exec electron-builder --dir
+  7) build empacotado no runtime selecionado (electron-builder --dir ou tauri build --no-bundle)
 
 Opcoes:
   --skip-install   Nao roda pnpm install
-  --dev            Apos validar, inicia pnpm dev:app
+  --dev            Apos validar, inicia o runtime dev selecionado
   --run-packed     Apos validar, executa o binario empacotado local
   --installers     Apos validar, gera instaladores da plataforma atual
   --installers-full Perfil completo (targets padrao do projeto)
   --installers-slim Perfil enxuto (default)
   --install-local  Executa ./scripts/install.sh
-  --quick-dev      Fluxo rapido: lint + typecheck renderer + pnpm dev:app
+  --quick-dev      Fluxo rapido: lint + typecheck renderer + dev runtime
+  --dev-runtime    Runtime da execucao final: electron (default) ou tauri
+  --dev-electron   Atalho para --dev-runtime electron
+  --dev-tauri      Atalho para --dev-runtime tauri
   --log-none       Nao grava logs em arquivo (default)
   --log-full       Grava log geral em logs/validar-tudo-<timestamp>.log
   --log-full-cargo Grava log geral + logs separados do gate Rust (fmt/clippy)
@@ -138,10 +270,10 @@ show_menu() {
   cat <<'EOF'
 Menu de validacao:
 Escada de execucao (simples -> completo):
-- 1) Quick run (lint + typecheck renderer + dev:app).
+- 1) Quick run (lint + typecheck renderer + dev runtime).
 - 2) Preflight sem install.
 - 3) Preflight completo (com install).
-- 4) Preflight completo + Quick run (lint + dev:app).
+- 4) Preflight completo + Quick run (lint + dev runtime).
 - 5) (3) + empacotado.
 - 6) Instalar localmente.
 - 7) Gerar instaladores da plataforma atual.
@@ -242,6 +374,23 @@ while [[ $# -gt 0 ]]; do
       SKIP_INSTALL=1
       shift
       ;;
+    --dev-runtime)
+      shift
+      [[ $# -gt 0 ]] || die "Informe runtime apos --dev-runtime (electron|tauri)."
+      case "$1" in
+        electron|tauri) DEV_RUNTIME="$1" ;;
+        *) die "Runtime invalido para --dev-runtime: $1 (use electron|tauri)." ;;
+      esac
+      shift
+      ;;
+    --dev-electron)
+      DEV_RUNTIME="electron"
+      shift
+      ;;
+    --dev-tauri)
+      DEV_RUNTIME="tauri"
+      shift
+      ;;
     --log-none)
       LOG_MODE="none"
       shift
@@ -267,6 +416,9 @@ done
 if (( ORIGINAL_ARGC == 0 )) && [[ -t 0 ]]; then
   show_log_menu
   show_menu
+  if (( RUN_QUICK_DEV == 1 || RUN_DEV == 1 || RUN_PACKED == 1 || RUN_INSTALLERS == 1 || RUN_INSTALL_LOCAL == 1 )); then
+    show_runtime_menu
+  fi
 fi
 
 setup_logging
@@ -280,6 +432,9 @@ if (( RUN_INSTALL_LOCAL == 1 )) && (( RUN_DEV == 1 || RUN_PACKED == 1 || RUN_INS
 fi
 
 if (( RUN_INSTALL_LOCAL == 1 )); then
+  if [[ "$DEV_RUNTIME" == "tauri" ]]; then
+    die "Instalacao local automatica ainda nao suporta runtime tauri. Use a opcao 7 para gerar bundles Tauri e instale manualmente."
+  fi
   step "Instalacao local (install.sh)"
   exec "$SCRIPT_INSTALL"
 fi
@@ -321,9 +476,11 @@ if (( RUN_QUICK_DEV == 1 )); then
     cd "$APP_DIR" &&
       pnpm typecheck:renderer
   )
-  ensure_electron_runtime_for_dev
-  step "Quick run: dev:app"
-  exec bash -lc "cd \"$APP_DIR\" && pnpm dev:app"
+  ensure_runtime_for_mode
+  step "Quick run: dev ($(runtime_label))"
+  run_dev_runtime_allow_interrupt || die "Falha ao executar runtime dev ($DEV_RUNTIME) no quick run."
+  step "Quick run concluido"
+  exit 0
 fi
 
 step "Lint completo (ESLint renderer + TypeScript)"
@@ -363,50 +520,76 @@ if [[ -d "$APP_DIR/src-tauri" ]]; then
 fi
 
 if (( RUN_INSTALLERS == 1 )); then
-  case "$(uname -s)" in
-    Linux*)
-      if [[ "$INSTALLERS_PROFILE" == "full" ]]; then
-        step "Gerando instaladores Linux (full: AppImage+deb+rpm x64/arm64)"
+  if [[ "$DEV_RUNTIME" == "tauri" ]]; then
+    bundles=""
+    bundles="$(tauri_installers_bundles "$INSTALLERS_PROFILE")"
+    ensure_tauri_appimage_prereqs "$bundles"
+    step "Gerando instaladores Tauri (bundles: $bundles)"
+    ( cd "$APP_DIR" && pnpm tauri build --bundles "$bundles" )
+  else
+    case "$(uname -s)" in
+      Linux*)
+        if [[ "$INSTALLERS_PROFILE" == "full" ]]; then
+          step "Gerando instaladores Linux (full: AppImage+deb+rpm x64/arm64)"
+          ( cd "$APP_DIR" && pnpm build )
+          ( cd "$APP_DIR" && pnpm eb --linux --x64 --arm64 --publish=never )
+        else
+          step "Gerando instaladores Linux (slim: AppImage+deb x64/arm64 + rpm x64)"
+          ( cd "$APP_DIR" && pnpm build )
+          ( cd "$APP_DIR" && pnpm eb --linux AppImage deb --x64 --arm64 --publish=never )
+          ( cd "$APP_DIR" && pnpm eb --linux rpm --x64 --publish=never )
+        fi
+        ;;
+      Darwin*)
+        step "Gerando instaladores macOS (full/slim: --mac --publish=never)"
         ( cd "$APP_DIR" && pnpm build )
-        ( cd "$APP_DIR" && pnpm eb --linux --x64 --arm64 --publish=never )
-      else
-        step "Gerando instaladores Linux (slim: AppImage+deb x64/arm64 + rpm x64)"
+        ( cd "$APP_DIR" && pnpm eb --mac --publish=never )
+        ;;
+      *)
+        step "Gerando instaladores Windows (full/slim: --win --ia32 --x64 --publish=never)"
         ( cd "$APP_DIR" && pnpm build )
-        ( cd "$APP_DIR" && pnpm eb --linux AppImage deb --x64 --arm64 --publish=never )
-        ( cd "$APP_DIR" && pnpm eb --linux rpm --x64 --publish=never )
-      fi
-      ;;
-    Darwin*)
-      step "Gerando instaladores macOS (full/slim: --mac --publish=never)"
-      ( cd "$APP_DIR" && pnpm build )
-      ( cd "$APP_DIR" && pnpm eb --mac --publish=never )
-      ;;
-    *)
-      step "Gerando instaladores Windows (full/slim: --win --ia32 --x64 --publish=never)"
-      ( cd "$APP_DIR" && pnpm build )
-      ( cd "$APP_DIR" && pnpm eb --win --ia32 --x64 --publish=never )
-      ;;
-  esac
+        ( cd "$APP_DIR" && pnpm eb --win --ia32 --x64 --publish=never )
+        ;;
+    esac
+  fi
 else
-  step "Build empacotado (pnpm build + electron-builder --dir)"
-  ( cd "$APP_DIR" && pnpm build )
-  ( cd "$APP_DIR" && pnpm eb --dir )
+  if [[ "$DEV_RUNTIME" == "tauri" ]]; then
+    step "Build release Tauri sem bundle (pnpm tauri build --no-bundle)"
+    ( cd "$APP_DIR" && pnpm tauri build --no-bundle )
+  else
+    step "Build empacotado (pnpm build + electron-builder --dir)"
+    ( cd "$APP_DIR" && pnpm build )
+    ( cd "$APP_DIR" && pnpm eb --dir )
+  fi
 fi
 
 if (( RUN_DEV == 1 )); then
-  ensure_electron_runtime_for_dev
-  step "Iniciando app em modo dev (Electron + Vite)"
-  ( cd "$APP_DIR" && pnpm dev:app )
+  ensure_runtime_for_mode
+  step "Iniciando app em modo dev ($(runtime_label))"
+  run_dev_runtime_allow_interrupt || die "Falha ao executar runtime dev ($DEV_RUNTIME)."
 elif (( RUN_PACKED == 1 )); then
-  step "Executando binario empacotado local"
-  ( cd "$APP_DIR" && ./app/electron/dist/linux-unpacked/pomodoroz )
+  if [[ "$DEV_RUNTIME" == "tauri" ]]; then
+    tauri_bin=""
+    tauri_bin="$(tauri_release_binary_path)"
+    [[ -f "$tauri_bin" ]] || die "Binario Tauri release nao encontrado: $tauri_bin"
+    step "Executando binario Tauri local (release)"
+    ( cd "$APP_DIR" && "$tauri_bin" )
+  else
+    step "Executando binario empacotado local"
+    ( cd "$APP_DIR" && ./app/electron/dist/linux-unpacked/pomodoroz )
+  fi
 elif (( RUN_INSTALLERS == 1 )); then
   step "Instaladores gerados"
-  printf "Arquivos em: %s/app/electron/dist\n" "$APP_DIR"
+  if [[ "$DEV_RUNTIME" == "tauri" ]]; then
+    printf "Arquivos em: %s/src-tauri/target/release/bundle\n" "$APP_DIR"
+  else
+    printf "Arquivos em: %s/app/electron/dist\n" "$APP_DIR"
+  fi
 else
   step "Validacao concluida"
   printf "Sem execucao final. Para abrir o app:\n"
-  printf "  Dev: ./scripts/validar-tudo.sh --dev\n"
+  printf "  Dev (Electron): ./scripts/validar-tudo.sh --dev --dev-electron\n"
+  printf "  Dev (Tauri): ./scripts/validar-tudo.sh --dev --dev-tauri\n"
   printf "  Empacotado: ./scripts/validar-tudo.sh --run-packed\n"
 fi
 

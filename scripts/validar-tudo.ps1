@@ -9,6 +9,10 @@ param(
     [string]$InstallersProfile = "slim",
     [switch]$InstallLocal,
     [switch]$QuickDev,
+    [ValidateSet("electron", "tauri")]
+    [string]$DevRuntime = "electron",
+    [switch]$DevElectron,
+    [switch]$DevTauri,
     [ValidateSet("none", "full", "full-cargo")]
     [string]$LogMode = "none",
     [switch]$Help
@@ -86,6 +90,49 @@ function Ensure-ElectronRuntimeForDev {
     }
 }
 
+function Get-DevRuntimeLabel {
+    if ($DevRuntime -eq "tauri") {
+        return "Tauri"
+    }
+    return "Electron + Vite"
+}
+
+function Show-DevRuntimeMenu {
+    Write-Host "Runtime para modo dev:"
+    Write-Host "- 1) Electron + Vite (padrao atual)"
+    Write-Host "- 2) Tauri (pnpm tauri dev)"
+    Write-Host ""
+
+    $choice = Read-Host "Opcao de runtime [1-2]"
+    switch ($choice) {
+        "1" { $script:DevRuntime = "electron" }
+        "2" { $script:DevRuntime = "tauri" }
+        default { Die "Opcao de runtime invalida: $choice" }
+    }
+}
+
+function Ensure-DevRuntimeForMode {
+    switch ($DevRuntime) {
+        "electron" {
+            Ensure-ElectronRuntimeForDev
+            return
+        }
+        "tauri" {
+            $tauriDir = Join-Path $APP_DIR "src-tauri"
+            if (-not (Test-Path $tauriDir)) {
+                Die "src-tauri nao encontrado para dev runtime tauri."
+            }
+            if (-not (Get-Command cargo -ErrorAction SilentlyContinue)) {
+                Die "Cargo nao encontrado para dev runtime tauri."
+            }
+            return
+        }
+        default {
+            Die "Runtime dev invalido: $DevRuntime"
+        }
+    }
+}
+
 function Invoke-Pnpm {
     param(
         [Parameter(ValueFromRemainingArguments = $true)]
@@ -99,6 +146,84 @@ function Invoke-Pnpm {
     & node $PNPM_WRAPPER @Args
     if ($LASTEXITCODE -ne 0) {
         exit $LASTEXITCODE
+    }
+}
+
+function Invoke-PnpmAllowCtrlC {
+    param(
+        [Parameter(ValueFromRemainingArguments = $true)]
+        [string[]]$Args
+    )
+
+    if (-not (Test-Path $PNPM_WRAPPER)) {
+        Die "Wrapper pnpmw nao encontrado: $PNPM_WRAPPER"
+    }
+
+    try {
+        & node $PNPM_WRAPPER @Args
+        $exitCode = $LASTEXITCODE
+        if ($exitCode -eq 0 -or $exitCode -eq 130) {
+            if ($exitCode -eq 130) {
+                Write-Host "Execucao dev interrompida pelo usuario (Ctrl+C)." -ForegroundColor Yellow
+            }
+            return
+        }
+        exit $exitCode
+    } catch [System.Management.Automation.PipelineStoppedException] {
+        Write-Host "Execucao dev interrompida pelo usuario (Ctrl+C)." -ForegroundColor Yellow
+        return
+    }
+}
+
+function Invoke-DevRuntimeAllowCtrlC {
+    if ($DevRuntime -eq "tauri") {
+        Invoke-PnpmAllowCtrlC tauri dev
+        return
+    }
+    Invoke-PnpmAllowCtrlC dev:app
+}
+
+function Get-TauriInstallerBundles {
+    param(
+        [ValidateSet("slim", "full")]
+        [string]$Profile = "slim"
+    )
+
+    if ($IS_WINDOWS_OS) {
+        if ($Profile -eq "full") { return "nsis,msi" }
+        return "nsis"
+    }
+
+    if ((Get-Variable IsMacOS -ErrorAction SilentlyContinue) -and $IsMacOS) {
+        if ($Profile -eq "full") { return "app,dmg" }
+        return "dmg"
+    }
+
+    if ($Profile -eq "full") { return "appimage,deb,rpm" }
+    return "appimage,deb"
+}
+
+function Test-TauriAppImagePrerequisites {
+    param(
+        [string]$BundlesCsv
+    )
+
+    if (-not ((Get-Variable IsLinux -ErrorAction SilentlyContinue) -and $IsLinux)) {
+        return
+    }
+
+    if ("," + $BundlesCsv + "," -notmatch ",appimage,") {
+        return
+    }
+
+    if (-not (Test-Path "/dev/fuse")) {
+        Die "Bundle AppImage requer FUSE no Linux (/dev/fuse ausente). Use bundle sem appimage ou habilite FUSE (ex.: sudo modprobe fuse)."
+    }
+
+    $hasFusermount = $null -ne (Get-Command fusermount -ErrorAction SilentlyContinue)
+    $hasFusermount3 = $null -ne (Get-Command fusermount3 -ErrorAction SilentlyContinue)
+    if (-not $hasFusermount -and -not $hasFusermount3) {
+        Die "Bundle AppImage requer fusermount/fusermount3 no PATH. Instale suporte FUSE (ex.: pacote fuse2)."
     }
 }
 
@@ -159,7 +284,7 @@ function Invoke-ElectronBuilderViaScript {
 function Show-Usage {
 @"
 Uso:
-  ./scripts/validar-tudo.ps1 [-SkipInstall] [-Dev | -RunPacked | -BuildInstallers [-InstallersProfile slim|full] | -InstallLocal | -QuickDev] [-LogMode none|full|full-cargo]
+  ./scripts/validar-tudo.ps1 [-SkipInstall] [-Dev | -RunPacked | -BuildInstallers [-InstallersProfile slim|full] | -InstallLocal | -QuickDev] [-DevRuntime electron|tauri | -DevElectron | -DevTauri] [-LogMode none|full|full-cargo]
   ./scripts/validar-tudo.ps1    (menu interativo)
 
 Fluxo padrao:
@@ -169,16 +294,19 @@ Fluxo padrao:
   4) pnpm typecheck:renderer
   5) cargo fmt --check (src-tauri)
   6) cargo clippy -D warnings (src-tauri)
-  7) pnpm build + pnpm eb --dir
+  7) build empacotado no runtime selecionado (electron-builder --dir ou tauri build --no-bundle)
 
 Opcoes:
   -SkipInstall   Nao roda pnpm install
-  -Dev           Apos validar, inicia pnpm dev:app
+  -Dev           Apos validar, inicia o runtime dev selecionado
   -RunPacked     Apos validar, executa binario empacotado local
   -BuildInstallers  Apos validar, gera instaladores da plataforma atual
   -InstallersProfile  Perfil para -BuildInstallers: slim (default) ou full
   -InstallLocal  Executa ./scripts/install.ps1
-  -QuickDev      Fluxo rapido: lint + typecheck renderer + pnpm dev:app
+  -QuickDev      Fluxo rapido: lint + typecheck renderer + dev runtime
+  -DevRuntime    Runtime da execucao final: electron (default) ou tauri
+  -DevElectron   Atalho para -DevRuntime electron
+  -DevTauri      Atalho para -DevRuntime tauri
   -LogMode       Tipo de log: none (default), full, full-cargo
   -Help
 "@
@@ -249,10 +377,10 @@ function Show-LogSummary {
 function Show-ModeMenu {
     Write-Host "Menu de validacao:"
     Write-Host "Escada de execucao (simples -> completo):"
-    Write-Host "- 1) Quick run (lint + typecheck renderer + dev:app)."
+    Write-Host "- 1) Quick run (lint + typecheck renderer + dev runtime)."
     Write-Host "- 2) Preflight sem install."
     Write-Host "- 3) Preflight completo (com install)."
-    Write-Host "- 4) Preflight completo + Quick run (lint + dev:app)."
+    Write-Host "- 4) Preflight completo + Quick run (lint + dev runtime)."
     Write-Host "- 5) (3) + empacotado."
     Write-Host "- 6) Instalar localmente."
     Write-Host "- 7) Gerar instaladores da plataforma atual."
@@ -300,6 +428,13 @@ function Show-ModeMenu {
 }
 
 function Get-PackagedBinaryPath {
+    if ($DevRuntime -eq "tauri") {
+        if ($IS_WINDOWS_OS) {
+            return Join-Path $APP_DIR "src-tauri/target/release/pomodoroz_tauri.exe"
+        }
+        return Join-Path $APP_DIR "src-tauri/target/release/pomodoroz_tauri"
+    }
+
     if ($IS_WINDOWS_OS) {
         return Join-Path $APP_DIR "app/electron/dist/win-unpacked/Pomodoroz.exe"
     }
@@ -320,6 +455,19 @@ if ($Help) {
 if ($PSBoundParameters.Count -eq 0 -and [Environment]::UserInteractive) {
     Show-LogMenu
     Show-ModeMenu
+    if ($QuickDev -or $Dev -or $RunPacked -or $BuildInstallers -or $InstallLocal) {
+        Show-DevRuntimeMenu
+    }
+}
+
+if ($DevElectron -and $DevTauri) {
+    Die "-DevElectron e -DevTauri nao podem ser usados juntos."
+}
+if ($DevElectron) {
+    $DevRuntime = "electron"
+}
+if ($DevTauri) {
+    $DevRuntime = "tauri"
 }
 
 Initialize-Logging
@@ -341,6 +489,9 @@ if ($QuickDev -and ($Dev -or $RunPacked -or $BuildInstallers)) {
 }
 
 if ($InstallLocal) {
+    if ($DevRuntime -eq "tauri") {
+        Die "Instalacao local automatica ainda nao suporta runtime tauri. Use -BuildInstallers com runtime tauri e instale manualmente o bundle."
+    }
     Step "Instalacao local (install.ps1)"
     & $INSTALL_SCRIPT
     Show-LogSummary
@@ -395,11 +546,12 @@ if ($QuickDev) {
     Invoke-Pnpm typecheck:renderer
     Pop-Location
 
-    Ensure-ElectronRuntimeForDev
-    Step "Quick run: dev:app"
+    Ensure-DevRuntimeForMode
+    Step ("Quick run: dev ({0})" -f (Get-DevRuntimeLabel))
     Push-Location $APP_DIR
-    Invoke-Pnpm dev:app
+    Invoke-DevRuntimeAllowCtrlC
     Pop-Location
+    Step "Quick run concluido"
     Show-LogSummary
     Stop-ValidationTranscript
     exit 0
@@ -437,52 +589,68 @@ if (Test-Path $tauriDir) {
 }
 
 if ($BuildInstallers) {
-    if ($IS_WINDOWS_OS) {
-        Step ("Gerando instaladores Windows ({0}: --win --ia32 --x64 --publish=never)" -f $InstallersProfile)
+    if ($DevRuntime -eq "tauri") {
+        $bundles = Get-TauriInstallerBundles -Profile $InstallersProfile
+        Test-TauriAppImagePrerequisites -BundlesCsv $bundles
+        Step ("Gerando instaladores Tauri (bundles: {0})" -f $bundles)
         Push-Location $APP_DIR
-        Invoke-Pnpm build
+        Invoke-Pnpm tauri build --bundles $bundles
         Pop-Location
-        Invoke-ElectronBuilderViaScript --win --ia32 --x64 --publish=never
-    } elseif ((Get-Variable IsLinux -ErrorAction SilentlyContinue) -and $IsLinux) {
-        if ($InstallersProfile -eq "full") {
-            Step "Gerando instaladores Linux (full: AppImage+deb+rpm x64/arm64)"
-            Push-Location $APP_DIR
-            Invoke-Pnpm build
-            Pop-Location
-            Invoke-ElectronBuilderViaScript --linux --x64 --arm64 --publish=never
-        } else {
-            Step "Gerando instaladores Linux (slim: AppImage+deb x64/arm64 + rpm x64)"
-            Push-Location $APP_DIR
-            Invoke-Pnpm build
-            Pop-Location
-            Invoke-ElectronBuilderViaScript --linux AppImage deb --x64 --arm64 --publish=never
-            Invoke-ElectronBuilderViaScript --linux rpm --x64 --publish=never
-        }
-    } elseif ((Get-Variable IsMacOS -ErrorAction SilentlyContinue) -and $IsMacOS) {
-        Step ("Gerando instaladores macOS ({0}: --mac --publish=never)" -f $InstallersProfile)
-        Push-Location $APP_DIR
-        Invoke-Pnpm build
-        Pop-Location
-        Invoke-ElectronBuilderViaScript --mac --publish=never
     } else {
-        Step "Gerando instaladores (build)"
-        Push-Location $APP_DIR
-        Invoke-Pnpm build
-        Pop-Location
+        if ($IS_WINDOWS_OS) {
+            Step ("Gerando instaladores Windows ({0}: --win --ia32 --x64 --publish=never)" -f $InstallersProfile)
+            Push-Location $APP_DIR
+            Invoke-Pnpm build
+            Pop-Location
+            Invoke-ElectronBuilderViaScript --win --ia32 --x64 --publish=never
+        } elseif ((Get-Variable IsLinux -ErrorAction SilentlyContinue) -and $IsLinux) {
+            if ($InstallersProfile -eq "full") {
+                Step "Gerando instaladores Linux (full: AppImage+deb+rpm x64/arm64)"
+                Push-Location $APP_DIR
+                Invoke-Pnpm build
+                Pop-Location
+                Invoke-ElectronBuilderViaScript --linux --x64 --arm64 --publish=never
+            } else {
+                Step "Gerando instaladores Linux (slim: AppImage+deb x64/arm64 + rpm x64)"
+                Push-Location $APP_DIR
+                Invoke-Pnpm build
+                Pop-Location
+                Invoke-ElectronBuilderViaScript --linux AppImage deb --x64 --arm64 --publish=never
+                Invoke-ElectronBuilderViaScript --linux rpm --x64 --publish=never
+            }
+        } elseif ((Get-Variable IsMacOS -ErrorAction SilentlyContinue) -and $IsMacOS) {
+            Step ("Gerando instaladores macOS ({0}: --mac --publish=never)" -f $InstallersProfile)
+            Push-Location $APP_DIR
+            Invoke-Pnpm build
+            Pop-Location
+            Invoke-ElectronBuilderViaScript --mac --publish=never
+        } else {
+            Step "Gerando instaladores (build)"
+            Push-Location $APP_DIR
+            Invoke-Pnpm build
+            Pop-Location
+        }
     }
 } else {
-    Step "Build empacotado (pnpm build + electron-builder --dir)"
-    Push-Location $APP_DIR
-    Invoke-Pnpm build
-    Pop-Location
-    Invoke-ElectronBuilderViaScript --dir
+    if ($DevRuntime -eq "tauri") {
+        Step "Build release Tauri sem bundle (pnpm tauri build --no-bundle)"
+        Push-Location $APP_DIR
+        Invoke-Pnpm tauri build --no-bundle
+        Pop-Location
+    } else {
+        Step "Build empacotado (pnpm build + electron-builder --dir)"
+        Push-Location $APP_DIR
+        Invoke-Pnpm build
+        Pop-Location
+        Invoke-ElectronBuilderViaScript --dir
+    }
 }
 
 if ($Dev) {
-    Ensure-ElectronRuntimeForDev
-    Step "Iniciando app em modo dev (Electron + Vite)"
+    Ensure-DevRuntimeForMode
+    Step ("Iniciando app em modo dev ({0})" -f (Get-DevRuntimeLabel))
     Push-Location $APP_DIR
-    Invoke-Pnpm dev:app
+    Invoke-DevRuntimeAllowCtrlC
     Pop-Location
     Show-LogSummary
     Stop-ValidationTranscript
@@ -495,7 +663,11 @@ if ($RunPacked) {
         Die "Binario empacotado nao encontrado: $binaryPath"
     }
 
-    Step "Executando binario empacotado local"
+    if ($DevRuntime -eq "tauri") {
+        Step "Executando binario Tauri local (release)"
+    } else {
+        Step "Executando binario empacotado local"
+    }
     & $binaryPath
     Show-LogSummary
     Stop-ValidationTranscript
@@ -504,7 +676,11 @@ if ($RunPacked) {
 
 if ($BuildInstallers) {
     Step "Instaladores gerados"
-    Write-Host "Arquivos em: $APP_DIR/app/electron/dist"
+    if ($DevRuntime -eq "tauri") {
+        Write-Host "Arquivos em: $APP_DIR/src-tauri/target/release/bundle"
+    } else {
+        Write-Host "Arquivos em: $APP_DIR/app/electron/dist"
+    }
     Show-LogSummary
     Stop-ValidationTranscript
     exit 0
@@ -512,7 +688,8 @@ if ($BuildInstallers) {
 
 Step "Validacao concluida"
 Write-Host "Sem execucao final. Para abrir o app:"
-Write-Host "  Dev: ./scripts/validar-tudo.ps1 -Dev"
+Write-Host "  Dev (Electron): ./scripts/validar-tudo.ps1 -Dev -DevElectron"
+Write-Host "  Dev (Tauri): ./scripts/validar-tudo.ps1 -Dev -DevTauri"
 Write-Host "  Empacotado: ./scripts/validar-tudo.ps1 -RunPacked"
 Show-LogSummary
 Stop-ValidationTranscript
