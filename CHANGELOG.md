@@ -15,6 +15,7 @@
 - **Kickoff de flatten do renderer concluído com `src` no root** — código do frontend foi movido de `app/renderer/src` para `src`, com ajustes em `app/renderer/index.html`, `app/renderer/tsconfig.json`, `app/renderer/vite.config.ts` e scripts de `app/renderer/package.json` (lint/prebuild) para manter `pnpm lint` e `pnpm build` verdes durante a transição.
 - **Consolidação de dependências do renderer no manifesto raiz** — duplicações entre `package.json` (root) e `app/renderer/package.json` foram removidas do workspace do renderer (mantendo apenas dependências locais específicas), e `check-updates.sh/.ps1` passou a ler o inventário do bloco `[Renderer]` diretamente do manifesto raiz (`root/src`) durante a transição para estrutura flat.
 - **Fluxo operacional desacoplado de `@pomodoroz/shareables`** — `app/electron` passou a usar contrato IPC local (`app/electron/src/ipc.ts`), a dependência `workspace:*` foi removida de `app/electron/package.json`, e os scripts/workflow (`validar-tudo*`, `install*`, `check-updates*`, `release-autoupdate.yml`) deixaram de executar build/lint varrendo o workspace `app/shareables`.
+- **Workspace legado `app/shareables` removido do monorepo** — arquivos do pacote foram excluídos, `package.json`/`pnpm-workspace.yaml` passaram a listar apenas `app/electron` e `app/renderer`, e o lockfile foi regenerado sem link local para `@pomodoroz/shareables`.
 
 ## [26.4.18] - 2026-04-16
 

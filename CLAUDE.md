@@ -24,11 +24,11 @@ Pomodoroz is a cross-platform Pomodoro desktop app, forked from [Pomatez](https:
 <repo-root>/
 ├── AGENTS.md
 ├── CLAUDE.md
-├── package.json                 # Root workspace config (Lerna + pnpm workspaces)
+├── package.json                 # Root workspace config (pnpm workspaces)
+├── src/                         # React renderer source (flat at repo root)
 ├── app/
 │   ├── electron/                # Electron main process (entry: src/main.ts)
-│   ├── renderer/                # React renderer (Vite dev + build)
-│   └── shareables/              # @pomodoroz/shareables (shared IPC channel constants)
+│   └── renderer/                # React renderer shell (Vite dev + build)
 ├── docs/                        # Technical docs (migration, release ops, backlog)
 └── scripts/                     # Helper scripts (validation, install, version sync)
 ```
@@ -45,7 +45,6 @@ Pomodoroz is a cross-platform Pomodoro desktop app, forked from [Pomatez](https:
 - **@dnd-kit** — drag-and-drop
 - **i18next** — internationalization (en, pt, es, ja, zh)
 - **ESLint 9** + `@typescript-eslint 8` (flat config)
-- **Lerna 9** + Nx — monorepo orchestration
 - **pnpm** `10.x` — package manager
 - **Node.js** `v24` (see `.nvmrc`)
 
@@ -60,7 +59,7 @@ pnpm dev:app                 # Main dev flow (Electron + Vite renderer in parall
 pnpm dev:renderer            # Renderer only (Vite on localhost:3000)
 pnpm dev:main                # Electron main only (waits for renderer on port 3000)
 
-pnpm lint                    # Lint + typecheck: renderer + electron + shareables
+pnpm lint                    # Lint + typecheck: renderer + electron
 pnpm build                   # Build all workspaces
 pnpm build:dir               # Build unpacked Electron app (for smoke testing)
 pnpm format                  # Prettier across all files
@@ -96,18 +95,18 @@ pnpm build:dir
 
 ### Monorepo
 
-Three workspaces under `app/*`, orchestrated by Lerna. pnpm manages dependencies at the root. The `prebuild` script ensures `@pomodoroz/shareables` and the electron workspace are prepared before builds.
+Two workspaces under `app/` (`electron` and `renderer`). pnpm manages dependencies at the root.
 
 ### Renderer <-> Electron Bridge
 
-- **Connector abstraction**: `app/renderer/src/contexts/ConnectorContext.tsx` — provides a `useConnector()` hook for all renderer-to-native calls.
-- **Active connector**: `app/renderer/src/contexts/InvokeConnector.tsx` — Electron-specific implementation using `window.electron` (exposed by preload).
-- **IPC channel constants**: `app/shareables/src/index.ts` — shared between renderer and main process.
+- **Connector abstraction**: `src/contexts/ConnectorContext.tsx` — provides a `useConnector()` hook for all renderer-to-native calls.
+- **Active connector**: `src/contexts/InvokeConnector.tsx` — Electron-specific implementation using `window.electron` (exposed by preload).
+- **IPC contracts**: `src/ipc/index.ts` (renderer) and `app/electron/src/ipc.ts` (main/preload) — local typed channel map.
 - **Electron main handlers**: `app/electron/src/main.ts` — IPC handlers, window management, tray, and system integration.
 
 ### State Management
 
-Redux Toolkit slices in `app/renderer/src/store/`:
+Redux Toolkit slices in `src/store/`:
 
 | Slice            | Purpose                                               |
 | ---------------- | ----------------------------------------------------- |
@@ -126,7 +125,7 @@ Renderer persists state in `localStorage`. Electron uses `electron-store` for na
 
 - `sandbox: true` enabled on BrowserWindow
 - Preload script adapted for sandbox constraints
-- IPC channels typed via `@pomodoroz/shareables`
+- IPC channels typed via local IPC contracts (`src/ipc` and `app/electron/src/ipc.ts`)
 - Auto-updater active via GitHub Releases for Windows (NSIS) and Linux AppImage
 - Linux packaged without `APPIMAGE` keeps explicit updater skip by design
 

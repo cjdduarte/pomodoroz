@@ -177,9 +177,6 @@ importers:
 
   app/electron:
     dependencies:
-      '@pomodoroz/shareables':
-        specifier: workspace:*
-        version: link:../shareables
       electron-is-dev:
         specifier: ^3.0.1
         version: 3.0.1
@@ -235,8 +232,6 @@ importers:
       '@babel/core':
         specifier: ^7.29.0
         version: 7.29.0
-
-  app/shareables: {}
 
 packages:
 

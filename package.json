@@ -3,7 +3,8 @@
   "private": true,
   "version": "26.4.18",
   "workspaces": [
-    "app/*"
+    "app/electron",
+    "app/renderer"
   ],
   "scripts": {
     "prepare": "husky .husky",
