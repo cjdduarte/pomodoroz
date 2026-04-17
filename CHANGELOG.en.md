@@ -6,6 +6,13 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.4.20] - 2026-04-17
+
+### Fixed
+
+- **Release workflow installer builds (Windows/Linux) work again on CI** — `app/electron/package.json` no longer injects `npm_config_user_agent=traversal npm_execpath=traversal` into the `eb` script; in recent `electron-builder` versions those envs caused the packager to literally spawn a `traversal` binary to install subproject dependencies, breaking `pnpm eb --win nsis` and `pnpm eb --linux AppImage` with `spawn traversal ENOENT`.
+- **Release scripts now stage `src-tauri/Cargo.lock`** — `scripts/release.sh` and `scripts/release.ps1` now include `src-tauri/Cargo.lock` in the release commit; Cargo regenerates the lockfile with the new version during preflight (fmt/clippy), so without staging it the file stayed permanently marked as modified after each release.
+
 ## [26.4.19] - 2026-04-17
 
 ### Changed
