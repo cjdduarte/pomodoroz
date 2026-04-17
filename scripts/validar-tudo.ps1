@@ -204,7 +204,7 @@ function Get-TauriInstallerBundles {
 }
 
 function Test-TauriAppImagePrerequisites {
-    param(
+  param(
         [string]$BundlesCsv
     )
 
@@ -216,19 +216,76 @@ function Test-TauriAppImagePrerequisites {
         return $true
     }
 
-    if (-not (Test-Path "/dev/fuse")) {
-        Write-Host "Aviso: AppImage requer FUSE no Linux (/dev/fuse ausente). Pulando bundle appimage." -ForegroundColor Yellow
-        return $false
-    }
-
-    $hasFusermount = $null -ne (Get-Command fusermount -ErrorAction SilentlyContinue)
-    $hasFusermount3 = $null -ne (Get-Command fusermount3 -ErrorAction SilentlyContinue)
-    if (-not $hasFusermount -and -not $hasFusermount3) {
-        Write-Host "Aviso: AppImage requer fusermount/fusermount3 no PATH. Pulando bundle appimage." -ForegroundColor Yellow
-        return $false
-    }
-
     return $true
+}
+
+function Invoke-TauriAppImageBuild {
+    param(
+        [string[]]$ExtraArgs = @()
+    )
+
+    $hadNoStrip = Test-Path Env:NO_STRIP
+    $hadExtractAndRun = Test-Path Env:APPIMAGE_EXTRACT_AND_RUN
+    $hadPkgConfigPath = Test-Path Env:PKG_CONFIG_PATH
+    $oldNoStrip = $env:NO_STRIP
+    $oldExtractAndRun = $env:APPIMAGE_EXTRACT_AND_RUN
+    $oldPkgConfigPath = $env:PKG_CONFIG_PATH
+    $gdkPkgFixDir = $null
+
+    try {
+        $env:NO_STRIP = "1"
+        $env:APPIMAGE_EXTRACT_AND_RUN = "1"
+
+        if ((Get-Variable IsLinux -ErrorAction SilentlyContinue) -and $IsLinux -and (Get-Command pkgconf -ErrorAction SilentlyContinue)) {
+            $gdkBinaryDir = (& pkgconf --variable=gdk_pixbuf_binarydir gdk-pixbuf-2.0 2>$null)
+            $gdkBinaryVersion = (& pkgconf --variable=gdk_pixbuf_binary_version gdk-pixbuf-2.0 2>$null)
+            $gdkBinaryDir = if ($null -eq $gdkBinaryDir) { "" } else { $gdkBinaryDir.Trim() }
+            $gdkBinaryVersion = if ($null -eq $gdkBinaryVersion -or [string]::IsNullOrWhiteSpace($gdkBinaryVersion.Trim())) { "2.10.0" } else { $gdkBinaryVersion.Trim() }
+
+            if (-not [string]::IsNullOrWhiteSpace($gdkBinaryDir) -and -not (Test-Path $gdkBinaryDir)) {
+                if (-not (Get-Command gdk-pixbuf-query-loaders -ErrorAction SilentlyContinue)) {
+                    Die "gdk-pixbuf-query-loaders nao encontrado para workaround de AppImage."
+                }
+
+                $gdkPkgFixDir = Join-Path ([System.IO.Path]::GetTempPath()) ("pomodoroz-appimage-gdkpixbuf-" + [System.Guid]::NewGuid().ToString("N"))
+                $pkgconfigDir = Join-Path $gdkPkgFixDir "pkgconfig"
+                $gdkBinaryDirOverride = Join-Path (Join-Path $gdkPkgFixDir "gdk-pixbuf-2.0") $gdkBinaryVersion
+                $loadersDir = Join-Path $gdkBinaryDirOverride "loaders"
+                New-Item -ItemType Directory -Path $pkgconfigDir -Force | Out-Null
+                New-Item -ItemType Directory -Path $loadersDir -Force | Out-Null
+
+                $pcPath = Join-Path $pkgconfigDir "gdk-pixbuf-2.0.pc"
+                Copy-Item "/usr/lib/pkgconfig/gdk-pixbuf-2.0.pc" $pcPath -Force
+                (Get-Content $pcPath) `
+                    -replace '^gdk_pixbuf_binarydir=.*', "gdk_pixbuf_binarydir=$gdkBinaryDirOverride" `
+                    -replace '^gdk_pixbuf_moduledir=.*', 'gdk_pixbuf_moduledir=${gdk_pixbuf_binarydir}/loaders' `
+                    -replace '^gdk_pixbuf_cache_file=.*', 'gdk_pixbuf_cache_file=${gdk_pixbuf_binarydir}/loaders.cache' | Set-Content $pcPath
+                & gdk-pixbuf-query-loaders | Set-Content (Join-Path $gdkBinaryDirOverride "loaders.cache")
+
+                if ($hadPkgConfigPath -and -not [string]::IsNullOrWhiteSpace($oldPkgConfigPath)) {
+                    $env:PKG_CONFIG_PATH = "$pkgconfigDir:$oldPkgConfigPath"
+                } else {
+                    $env:PKG_CONFIG_PATH = $pkgconfigDir
+                }
+
+                Write-Host ("Info: AppImage usando workaround de gdk-pixbuf em {0}" -f $gdkBinaryDirOverride)
+            }
+        }
+
+        Push-Location $APP_DIR
+        try {
+            Invoke-Pnpm tauri build --bundles appimage @ExtraArgs
+        } finally {
+            Pop-Location
+        }
+    } finally {
+        if ($hadNoStrip) { $env:NO_STRIP = $oldNoStrip } else { Remove-Item Env:NO_STRIP -ErrorAction SilentlyContinue }
+        if ($hadExtractAndRun) { $env:APPIMAGE_EXTRACT_AND_RUN = $oldExtractAndRun } else { Remove-Item Env:APPIMAGE_EXTRACT_AND_RUN -ErrorAction SilentlyContinue }
+        if ($hadPkgConfigPath) { $env:PKG_CONFIG_PATH = $oldPkgConfigPath } else { Remove-Item Env:PKG_CONFIG_PATH -ErrorAction SilentlyContinue }
+        if ($null -ne $gdkPkgFixDir -and (Test-Path $gdkPkgFixDir)) {
+            Remove-Item -LiteralPath $gdkPkgFixDir -Recurse -Force -ErrorAction SilentlyContinue
+        }
+    }
 }
 
 function Invoke-Cargo {
@@ -610,14 +667,8 @@ if ($BuildInstallers) {
 
         if ($hasAppImage -and (Test-TauriAppImagePrerequisites -BundlesCsv $bundles)) {
             Step "Gerando instalador Tauri adicional (bundle: appimage)"
-            Push-Location $APP_DIR
-            & node $PNPM_WRAPPER tauri build --bundles appimage
-            $appImageExit = $LASTEXITCODE
-            Pop-Location
-
-            if ($appImageExit -ne 0) {
-                Write-Host "Aviso: Falha ao gerar AppImage com linuxdeploy. Bundles base (deb/rpm) podem ter sido gerados." -ForegroundColor Yellow
-            }
+            # Fluxo local de instaladores nao precisa gerar artefato de updater assinado.
+            Invoke-TauriAppImageBuild -ExtraArgs @("--config", '{"bundle":{"createUpdaterArtifacts":false}}')
         }
     } else {
         if ($IS_WINDOWS_OS) {

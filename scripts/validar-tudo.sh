@@ -179,16 +179,6 @@ tauri_appimage_prereqs_ok() {
     return 0
   fi
 
-  if [[ ! -e /dev/fuse ]]; then
-    printf "Aviso: AppImage requer FUSE no Linux (/dev/fuse ausente). Pulando bundle appimage.\n" >&2
-    return 1
-  fi
-
-  if ! command -v fusermount >/dev/null 2>&1 && ! command -v fusermount3 >/dev/null 2>&1; then
-    printf "Aviso: AppImage requer fusermount/fusermount3 no PATH. Pulando bundle appimage.\n" >&2
-    return 1
-  fi
-
   return 0
 }
 
@@ -197,6 +187,72 @@ tauri_release_binary_path() {
     Linux*|Darwin*) echo "$APP_DIR/src-tauri/target/release/pomodoroz_tauri" ;;
     *) echo "$APP_DIR/src-tauri/target/release/pomodoroz_tauri.exe" ;;
   esac
+}
+
+run_tauri_appimage_build() {
+  local extra_args=("$@")
+  local gdk_pkgfix_dir=""
+  local gdk_binary_dir=""
+  local gdk_binary_version=""
+  local old_no_strip="${NO_STRIP-__UNSET__}"
+  local old_extract_run="${APPIMAGE_EXTRACT_AND_RUN-__UNSET__}"
+  local old_pkg_config_path="${PKG_CONFIG_PATH-__UNSET__}"
+  local rc=0
+
+  export NO_STRIP=1
+  export APPIMAGE_EXTRACT_AND_RUN=1
+
+  if [[ "$(uname -s)" == "Linux" ]] && command -v pkgconf >/dev/null 2>&1; then
+    gdk_binary_dir="$(pkgconf --variable=gdk_pixbuf_binarydir gdk-pixbuf-2.0 2>/dev/null || true)"
+    gdk_binary_version="$(pkgconf --variable=gdk_pixbuf_binary_version gdk-pixbuf-2.0 2>/dev/null || true)"
+    if [[ -n "$gdk_binary_dir" && ! -d "$gdk_binary_dir" ]]; then
+      command -v gdk-pixbuf-query-loaders >/dev/null 2>&1 || die "gdk-pixbuf-query-loaders nao encontrado para workaround de AppImage."
+      gdk_pkgfix_dir="$(mktemp -d /tmp/pomodoroz-appimage-gdkpixbuf.XXXXXX)"
+      gdk_binary_version="${gdk_binary_version:-2.10.0}"
+      gdk_binary_dir="$gdk_pkgfix_dir/gdk-pixbuf-2.0/$gdk_binary_version"
+      mkdir -p "$gdk_pkgfix_dir/pkgconfig" "$gdk_binary_dir/loaders"
+      cp /usr/lib/pkgconfig/gdk-pixbuf-2.0.pc "$gdk_pkgfix_dir/pkgconfig/gdk-pixbuf-2.0.pc"
+      sed -i "s|^gdk_pixbuf_binarydir=.*|gdk_pixbuf_binarydir=$gdk_binary_dir|" "$gdk_pkgfix_dir/pkgconfig/gdk-pixbuf-2.0.pc"
+      sed -i 's|^gdk_pixbuf_moduledir=.*|gdk_pixbuf_moduledir=${gdk_pixbuf_binarydir}/loaders|' "$gdk_pkgfix_dir/pkgconfig/gdk-pixbuf-2.0.pc"
+      sed -i 's|^gdk_pixbuf_cache_file=.*|gdk_pixbuf_cache_file=${gdk_pixbuf_binarydir}/loaders.cache|' "$gdk_pkgfix_dir/pkgconfig/gdk-pixbuf-2.0.pc"
+      gdk-pixbuf-query-loaders >"$gdk_binary_dir/loaders.cache"
+      if [[ "$old_pkg_config_path" == "__UNSET__" ]]; then
+        export PKG_CONFIG_PATH="$gdk_pkgfix_dir/pkgconfig"
+      else
+        export PKG_CONFIG_PATH="$gdk_pkgfix_dir/pkgconfig:$old_pkg_config_path"
+      fi
+      printf "Info: AppImage usando workaround de gdk-pixbuf em %s\n" "$gdk_binary_dir"
+    fi
+  fi
+
+  (
+    cd "$APP_DIR" &&
+      pnpm tauri build --bundles appimage "${extra_args[@]}"
+  ) || rc=$?
+
+  if [[ "$old_no_strip" == "__UNSET__" ]]; then
+    unset NO_STRIP
+  else
+    export NO_STRIP="$old_no_strip"
+  fi
+
+  if [[ "$old_extract_run" == "__UNSET__" ]]; then
+    unset APPIMAGE_EXTRACT_AND_RUN
+  else
+    export APPIMAGE_EXTRACT_AND_RUN="$old_extract_run"
+  fi
+
+  if [[ "$old_pkg_config_path" == "__UNSET__" ]]; then
+    unset PKG_CONFIG_PATH
+  else
+    export PKG_CONFIG_PATH="$old_pkg_config_path"
+  fi
+
+  if [[ -n "$gdk_pkgfix_dir" && -d "$gdk_pkgfix_dir" ]]; then
+    rm -rf "$gdk_pkgfix_dir"
+  fi
+
+  return "$rc"
 }
 
 usage() {
@@ -548,9 +604,8 @@ if (( RUN_INSTALLERS == 1 )); then
     if tauri_bundles_include_appimage "$bundles"; then
       if tauri_appimage_prereqs_ok "$bundles"; then
         step "Gerando instalador Tauri adicional (bundle: appimage)"
-        if ! ( cd "$APP_DIR" && pnpm tauri build --bundles appimage ); then
-          printf "Aviso: Falha ao gerar AppImage com linuxdeploy. Bundles base (deb/rpm) podem ter sido gerados.\n" >&2
-        fi
+        # Fluxo local de instaladores nao precisa gerar artefato de updater assinado.
+        run_tauri_appimage_build --config '{"bundle":{"createUpdaterArtifacts":false}}' || die "Falha ao gerar AppImage Tauri."
       fi
     fi
   else
