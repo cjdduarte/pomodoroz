@@ -87,6 +87,8 @@ $DESKTOP_PATH_LOCAL = Join-Path $HOME ".local/share/applications/pomodoroz-local
 $ICON_PATH = Join-Path $HOME ".local/share/icons/hicolor/256x256/apps/pomodoroz.png"
 $APPIMAGE_PATH = Join-Path $INSTALL_ROOT "Pomodoroz.AppImage"
 $APPIMAGE_PREVIOUS_PATH = Join-Path $INSTALL_ROOT "Pomodoroz.AppImage.previous"
+$TAURI_BINARY_PATH = Join-Path $INSTALL_ROOT "pomodoroz_tauri"
+$TAURI_BINARY_PREVIOUS_PATH = Join-Path $INSTALL_ROOT "pomodoroz_tauri.previous"
 
 $USER_DATA_PATHS = @(
     (Join-Path $HOME ".config/pomodoroz"),
@@ -134,6 +136,8 @@ Remove-IfExists $DESKTOP_PATH_LOCAL
 Remove-IfExists $ICON_PATH
 Remove-IfExists $APPIMAGE_PATH
 Remove-IfExists $APPIMAGE_PREVIOUS_PATH
+Remove-IfExists $TAURI_BINARY_PATH
+Remove-IfExists $TAURI_BINARY_PREVIOUS_PATH
 
 if (Test-Path $INSTALL_ROOT) {
     try {

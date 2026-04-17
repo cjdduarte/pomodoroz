@@ -302,7 +302,7 @@ Opcoes:
   -RunPacked     Apos validar, executa binario empacotado local
   -BuildInstallers  Apos validar, gera instaladores da plataforma atual
   -InstallersProfile  Perfil para -BuildInstallers: slim (default) ou full
-  -InstallLocal  Executa ./scripts/install.ps1
+  -InstallLocal  Executa ./scripts/install.ps1 com runtime selecionado
   -QuickDev      Fluxo rapido: lint + typecheck renderer + dev runtime
   -DevRuntime    Runtime da execucao final: electron (default) ou tauri
   -DevElectron   Atalho para -DevRuntime electron
@@ -489,11 +489,8 @@ if ($QuickDev -and ($Dev -or $RunPacked -or $BuildInstallers)) {
 }
 
 if ($InstallLocal) {
-    if ($DevRuntime -eq "tauri") {
-        Die "Instalacao local automatica ainda nao suporta runtime tauri. Use -BuildInstallers com runtime tauri e instale manualmente o bundle."
-    }
-    Step "Instalacao local (install.ps1)"
-    & $INSTALL_SCRIPT
+    Step ("Instalacao local (install.ps1, runtime: {0})" -f $DevRuntime)
+    & $INSTALL_SCRIPT -Runtime $DevRuntime
     Show-LogSummary
     Stop-ValidationTranscript
     exit $LASTEXITCODE

@@ -2,7 +2,9 @@
 # Equivalente ao ./scripts/install.sh
 
 param(
-    [switch]$SkipBuild
+    [switch]$SkipBuild,
+    [ValidateSet("electron", "tauri")]
+    [string]$Runtime = "electron"
 )
 
 $ErrorActionPreference = "Stop"
@@ -49,6 +51,8 @@ $APP_DIR = $ROOT
 $INSTALL_ROOT = Join-Path $HOME ".local/opt/pomodoroz"
 $APPIMAGE_PATH = Join-Path $INSTALL_ROOT "Pomodoroz.AppImage"
 $APPIMAGE_PREVIOUS_PATH = Join-Path $INSTALL_ROOT "Pomodoroz.AppImage.previous"
+$TAURI_BINARY_PATH = Join-Path $INSTALL_ROOT "pomodoroz_tauri"
+$TAURI_BINARY_PREVIOUS_PATH = Join-Path $INSTALL_ROOT "pomodoroz_tauri.previous"
 $BIN_DIR = Join-Path $HOME ".local/bin"
 $BIN_PATH = Join-Path $BIN_DIR "pomodoroz"
 $DESKTOP_DIR = Join-Path $HOME ".local/share/applications"
@@ -80,63 +84,102 @@ if (-not (Test-Path (Join-Path $APP_DIR "node_modules"))) {
 }
 
 $archRaw = (& uname -m).Trim()
-$electronArchFlag = $null
-$appImageArchPattern = $null
+$binarySource = $null
+$launchTarget = $null
 
-switch ($archRaw) {
-    "x86_64" {
-        $electronArchFlag = "--x64"
-        $appImageArchPattern = "x86_64"
+switch ($Runtime) {
+    "electron" {
+        $electronArchFlag = $null
+        $appImageArchPattern = $null
+        switch ($archRaw) {
+            "x86_64" {
+                $electronArchFlag = "--x64"
+                $appImageArchPattern = "x86_64"
+            }
+            "aarch64" {
+                $electronArchFlag = "--arm64"
+                $appImageArchPattern = "arm64"
+            }
+            "arm64" {
+                $electronArchFlag = "--arm64"
+                $appImageArchPattern = "arm64"
+            }
+            default {
+                Die "Arquitetura nao suportada para build automatico: $archRaw"
+            }
+        }
+
+        if (-not $SkipBuild) {
+            Step "Lint completo (ESLint renderer + TypeScript)"
+            Push-Location $APP_DIR
+            pnpm lint
+            Pop-Location
+
+            Step "Build empacotado (build:dir)"
+            Push-Location $APP_DIR
+            pnpm build:dir
+            Pop-Location
+
+            Step "Gerando AppImage ($archRaw)"
+            Push-Location $APP_DIR
+            pnpm eb --linux AppImage $electronArchFlag --publish=never
+            Pop-Location
+        } else {
+            Step "Pulando pre-check/build (--SkipBuild)"
+        }
+
+        $distDir = Join-Path $APP_DIR "app/electron/dist"
+        if (-not (Test-Path $distDir)) {
+            Die "Diretorio de dist nao encontrado: $distDir"
+        }
+
+        $appImageCandidate = Get-LatestAppImageCandidate -Path $distDir -Filter "Pomodoroz-v*-linux-$appImageArchPattern.AppImage"
+        if (-not $appImageCandidate) {
+            $appImageCandidate = Get-LatestAppImageCandidate -Path $distDir -Filter "Pomodoroz-v*-linux-*.AppImage"
+        }
+
+        if (-not $appImageCandidate) {
+            Die "Nenhum AppImage encontrado em $distDir."
+        }
+
+        $binarySource = $appImageCandidate.FullName
     }
-    "aarch64" {
-        $electronArchFlag = "--arm64"
-        $appImageArchPattern = "arm64"
-    }
-    "arm64" {
-        $electronArchFlag = "--arm64"
-        $appImageArchPattern = "arm64"
+    "tauri" {
+        if (-not (Get-Command cargo -ErrorAction SilentlyContinue)) {
+            Die "Cargo nao encontrado para runtime tauri."
+        }
+
+        if (-not $SkipBuild) {
+            Step "Lint completo (ESLint renderer + TypeScript)"
+            Push-Location $APP_DIR
+            pnpm lint
+            Pop-Location
+
+            Step "Typecheck do renderer (TypeScript)"
+            Push-Location $APP_DIR
+            pnpm typecheck:renderer
+            Pop-Location
+
+            Step "Build release Tauri sem bundle (--no-bundle)"
+            Push-Location $APP_DIR
+            pnpm tauri build --no-bundle
+            Pop-Location
+        } else {
+            Step "Pulando pre-check/build (--SkipBuild)"
+        }
+
+        $binarySource = Join-Path $APP_DIR "src-tauri/target/release/pomodoroz_tauri"
+        if (-not (Test-Path $binarySource)) {
+            Die "Binario Tauri release nao encontrado: $binarySource"
+        }
     }
     default {
-        Die "Arquitetura nao suportada para build automatico: $archRaw"
+        Die "Runtime invalido: $Runtime"
     }
-}
-
-if (-not $SkipBuild) {
-    Step "Lint completo (ESLint renderer + TypeScript)"
-    Push-Location $APP_DIR
-    pnpm lint
-    Pop-Location
-
-    Step "Build empacotado (build:dir)"
-    Push-Location $APP_DIR
-    pnpm build:dir
-    Pop-Location
-
-    Step "Gerando AppImage ($archRaw)"
-    Push-Location $APP_DIR
-    pnpm eb --linux AppImage $electronArchFlag --publish=never
-    Pop-Location
-}
-else {
-    Step "Pulando pre-check/build (--SkipBuild)"
-}
-
-$distDir = Join-Path $APP_DIR "app/electron/dist"
-if (-not (Test-Path $distDir)) {
-    Die "Diretorio de dist nao encontrado: $distDir"
-}
-
-$appImageCandidate = Get-LatestAppImageCandidate -Path $distDir -Filter "Pomodoroz-v*-linux-$appImageArchPattern.AppImage"
-
-if (-not $appImageCandidate) {
-    $appImageCandidate = Get-LatestAppImageCandidate -Path $distDir -Filter "Pomodoroz-v*-linux-*.AppImage"
-}
-
-if (-not $appImageCandidate) {
-    Die "Nenhum AppImage encontrado em $distDir."
 }
 
 $iconCandidates = @(
+    (Join-Path $APP_DIR "src-tauri/icons/icon.png"),
     (Join-Path $APP_DIR "app/electron/build/assets/logo-dark256x256.png"),
     (Join-Path $APP_DIR "app/electron/src/assets/logo-dark256x256.png"),
     (Join-Path $APP_DIR "app/electron/src/assets/logo-dark@2x.png")
@@ -150,19 +193,43 @@ if (-not $iconSource) {
 Step "Instalando localmente (menu + icone)"
 New-Item -ItemType Directory -Force -Path $INSTALL_ROOT, $BIN_DIR, $DESKTOP_DIR, $ICON_DIR | Out-Null
 
-if (Test-Path $APPIMAGE_PATH) {
-    Copy-Item -Force $APPIMAGE_PATH $APPIMAGE_PREVIOUS_PATH
-    Write-Host "Backup do AppImage anterior salvo em: $APPIMAGE_PREVIOUS_PATH" -ForegroundColor Yellow
-}
+if ($Runtime -eq "electron") {
+    if (Test-Path $APPIMAGE_PATH) {
+        Copy-Item -Force $APPIMAGE_PATH $APPIMAGE_PREVIOUS_PATH
+        Write-Host "Backup do AppImage anterior salvo em: $APPIMAGE_PREVIOUS_PATH" -ForegroundColor Yellow
+    }
+    Copy-Item -Force $binarySource $APPIMAGE_PATH
+    chmod +x $APPIMAGE_PATH | Out-Null
+    $launchTarget = $APPIMAGE_PATH
 
-Copy-Item -Force $appImageCandidate.FullName $APPIMAGE_PATH
-chmod +x $APPIMAGE_PATH | Out-Null
+    if (Test-Path $TAURI_BINARY_PATH) {
+        Remove-Item -Force -LiteralPath $TAURI_BINARY_PATH
+    }
+    if (Test-Path $TAURI_BINARY_PREVIOUS_PATH) {
+        Remove-Item -Force -LiteralPath $TAURI_BINARY_PREVIOUS_PATH
+    }
+} else {
+    if (Test-Path $TAURI_BINARY_PATH) {
+        Copy-Item -Force $TAURI_BINARY_PATH $TAURI_BINARY_PREVIOUS_PATH
+        Write-Host "Backup do binario Tauri anterior salvo em: $TAURI_BINARY_PREVIOUS_PATH" -ForegroundColor Yellow
+    }
+    Copy-Item -Force $binarySource $TAURI_BINARY_PATH
+    chmod +x $TAURI_BINARY_PATH | Out-Null
+    $launchTarget = $TAURI_BINARY_PATH
+
+    if (Test-Path $APPIMAGE_PATH) {
+        Remove-Item -Force -LiteralPath $APPIMAGE_PATH
+    }
+    if (Test-Path $APPIMAGE_PREVIOUS_PATH) {
+        Remove-Item -Force -LiteralPath $APPIMAGE_PREVIOUS_PATH
+    }
+}
 
 Copy-Item -Force $iconSource $ICON_PATH
 
 $binScript = @"
 #!/usr/bin/env bash
-exec "$APPIMAGE_PATH" "`$@"
+exec "$launchTarget" "`$@"
 "@
 Set-Content -Path $BIN_PATH -Value $binScript -NoNewline
 chmod +x $BIN_PATH | Out-Null
@@ -194,9 +261,12 @@ if (Test-Path -LiteralPath $DESKTOP_PATH_LOCAL) {
     Remove-Item -Force -LiteralPath $DESKTOP_PATH_LOCAL
 }
 
+$runtimePrimaryPath = if ($Runtime -eq "electron") { $APPIMAGE_PATH } else { $TAURI_BINARY_PATH }
+$runtimeBackupPath = if ($Runtime -eq "electron") { $APPIMAGE_PREVIOUS_PATH } else { $TAURI_BINARY_PREVIOUS_PATH }
+
 @(
-    $APPIMAGE_PATH
-    $APPIMAGE_PREVIOUS_PATH
+    $runtimePrimaryPath
+    $runtimeBackupPath
     $BIN_PATH
     $DESKTOP_PATH
     $ICON_PATH
@@ -211,6 +281,7 @@ if (Get-Command gtk-update-icon-cache -ErrorAction SilentlyContinue) {
 }
 
 Step "Concluido"
+Write-Host "Runtime instalado: $Runtime"
 Write-Host "Atalho de menu: $DESKTOP_PATH"
 Write-Host "Execucao direta: $BIN_PATH"
 Write-Host "Desinstalar: ./scripts/uninstall.ps1"

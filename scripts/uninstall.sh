@@ -10,6 +10,8 @@ DESKTOP_PATH_LOCAL="${HOME}/.local/share/applications/pomodoroz-local.desktop"
 ICON_PATH="${HOME}/.local/share/icons/hicolor/256x256/apps/pomodoroz.png"
 APPIMAGE_PATH="${INSTALL_ROOT}/Pomodoroz.AppImage"
 APPIMAGE_PREVIOUS_PATH="${INSTALL_ROOT}/Pomodoroz.AppImage.previous"
+TAURI_BINARY_PATH="${INSTALL_ROOT}/pomodoroz_tauri"
+TAURI_BINARY_PREVIOUS_PATH="${INSTALL_ROOT}/pomodoroz_tauri.previous"
 
 USER_DATA_PATHS=(
   "${HOME}/.config/pomodoroz"
@@ -140,6 +142,8 @@ remove_path_if_exists "$DESKTOP_PATH_LOCAL"
 remove_path_if_exists "$ICON_PATH"
 remove_path_if_exists "$APPIMAGE_PATH"
 remove_path_if_exists "$APPIMAGE_PREVIOUS_PATH"
+remove_path_if_exists "$TAURI_BINARY_PATH"
+remove_path_if_exists "$TAURI_BINARY_PREVIOUS_PATH"
 
 if [[ -d "$INSTALL_ROOT" ]]; then
   rmdir "$INSTALL_ROOT" 2>/dev/null || true

@@ -209,7 +209,7 @@ Opcoes:
   --installers     Apos validar, gera instaladores da plataforma atual
   --installers-full Perfil completo (targets padrao do projeto)
   --installers-slim Perfil enxuto (default)
-  --install-local  Executa ./scripts/install.sh
+  --install-local  Executa ./scripts/install.sh com runtime selecionado
   --quick-dev      Fluxo rapido: lint + typecheck renderer + dev runtime
   --dev-runtime    Runtime da execucao final: electron (default) ou tauri
   --dev-electron   Atalho para --dev-runtime electron
@@ -432,11 +432,8 @@ if (( RUN_INSTALL_LOCAL == 1 )) && (( RUN_DEV == 1 || RUN_PACKED == 1 || RUN_INS
 fi
 
 if (( RUN_INSTALL_LOCAL == 1 )); then
-  if [[ "$DEV_RUNTIME" == "tauri" ]]; then
-    die "Instalacao local automatica ainda nao suporta runtime tauri. Use a opcao 7 para gerar bundles Tauri e instale manualmente."
-  fi
-  step "Instalacao local (install.sh)"
-  exec "$SCRIPT_INSTALL"
+  step "Instalacao local (install.sh, runtime: $DEV_RUNTIME)"
+  exec "$SCRIPT_INSTALL" --runtime "$DEV_RUNTIME"
 fi
 
 if (( RUN_QUICK_DEV == 1 )); then
