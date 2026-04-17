@@ -84,6 +84,8 @@ $MANIFEST_PATH = Join-Path $INSTALL_ROOT "install-manifest.txt"
 $BIN_PATH = Join-Path $HOME ".local/bin/pomodoroz"
 $DESKTOP_PATH = Join-Path $HOME ".local/share/applications/pomodoroz.desktop"
 $DESKTOP_PATH_LOCAL = Join-Path $HOME ".local/share/applications/pomodoroz-local.desktop"
+$AUTOSTART_PATH = Join-Path $HOME ".config/autostart/pomodoroz.desktop"
+$AUTOSTART_PATH_TAURI = Join-Path $HOME ".config/autostart/com.cjdduarte.pomodoroz.desktop"
 $ICON_PATH = Join-Path $HOME ".local/share/icons/hicolor/256x256/apps/pomodoroz.png"
 $APPIMAGE_PATH = Join-Path $INSTALL_ROOT "Pomodoroz.AppImage"
 $APPIMAGE_PREVIOUS_PATH = Join-Path $INSTALL_ROOT "Pomodoroz.AppImage.previous"
@@ -93,6 +95,7 @@ $TAURI_BINARY_PREVIOUS_PATH = Join-Path $INSTALL_ROOT "pomodoroz_tauri.previous"
 $USER_DATA_PATHS = @(
     (Join-Path $HOME ".config/pomodoroz"),
     (Join-Path $HOME ".cache/pomodoroz"),
+    (Join-Path $HOME ".local/share/pomodoroz"),
     (Join-Path $HOME ".config/com.cjdduarte.pomodoroz"),
     (Join-Path $HOME ".cache/com.cjdduarte.pomodoroz"),
     (Join-Path $HOME ".local/share/com.cjdduarte.pomodoroz")
@@ -133,6 +136,8 @@ if (Test-Path $MANIFEST_PATH) {
 Remove-IfExists $BIN_PATH
 Remove-IfExists $DESKTOP_PATH
 Remove-IfExists $DESKTOP_PATH_LOCAL
+Remove-IfExists $AUTOSTART_PATH
+Remove-IfExists $AUTOSTART_PATH_TAURI
 Remove-IfExists $ICON_PATH
 Remove-IfExists $APPIMAGE_PATH
 Remove-IfExists $APPIMAGE_PREVIOUS_PATH
