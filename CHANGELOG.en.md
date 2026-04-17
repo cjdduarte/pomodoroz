@@ -6,6 +6,12 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.4.19] - TBD
+
+### Changed
+
+- **Root scripts no longer depend on `lerna run` for daily operations** — `package.json` now uses `scripts/pnpmw.mjs` with `pnpm -r --filter` for `dev:*`, `build*`, `release*`, and `clean`, starting the Phase 3b kickoff (progressively removing Lerna/Nx coupling while keeping the current `app/*` structure for now).
+
 ## [26.4.18] - 2026-04-16
 
 ### Changed

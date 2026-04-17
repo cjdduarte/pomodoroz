@@ -6,6 +6,12 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.4.19] - A definir
+
+### Alterado
+
+- **Scripts raiz deixaram de depender de `lerna run` no fluxo operacional** — `package.json` passou a usar `scripts/pnpmw.mjs` com `pnpm -r --filter` para `dev:*`, `build*`, `release*` e `clean`, iniciando o kickoff da Fase 3b (remoção progressiva do acoplamento Lerna/Nx sem alterar ainda a estrutura `app/*`).
+
 ## [26.4.18] - 2026-04-16
 
 ### Alterado
