@@ -5,7 +5,7 @@ import { ErrorBoundary } from "components";
 import store from "store";
 import App from "./App";
 
-import "index.css";
+import "./index.css";
 import "./extensions";
 import "./i18n";
 

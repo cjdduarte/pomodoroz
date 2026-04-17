@@ -3,6 +3,10 @@ import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
 import { fileURLToPath, URL } from "node:url";
 
+const ROOT_SRC_DIR = fileURLToPath(
+  new URL("../../src", import.meta.url)
+);
+
 export default defineConfig({
   base: "./",
   plugins: [
@@ -23,7 +27,18 @@ export default defineConfig({
   resolve: {
     tsconfigPaths: true,
     alias: {
+      assets: `${ROOT_SRC_DIR}/assets`,
+      components: `${ROOT_SRC_DIR}/components`,
+      config: `${ROOT_SRC_DIR}/config.ts`,
+      contexts: `${ROOT_SRC_DIR}/contexts`,
+      hooks: `${ROOT_SRC_DIR}/hooks`,
+      i18n: `${ROOT_SRC_DIR}/i18n`,
+      ipc: `${ROOT_SRC_DIR}/ipc`,
+      routes: `${ROOT_SRC_DIR}/routes`,
+      store: `${ROOT_SRC_DIR}/store`,
+      styles: `${ROOT_SRC_DIR}/styles`,
       "styled-components/macro": "styled-components",
+      utils: `${ROOT_SRC_DIR}/utils`,
       "@pomodoroz/shareables": fileURLToPath(
         new URL("../shareables/src/index.ts", import.meta.url)
       ),
