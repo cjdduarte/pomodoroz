@@ -2,7 +2,7 @@
   "productName": "Pomodoroz",
   "appId": "com.cjdduarte.pomodoroz",
   "copyright": "Copyright © 2026 ${author}",
-  "afterSign": "app/electron/electron-builder/afterSign.js",
+  "afterSign": "./app/electron/electron-builder/afterSign.js",
   "publish": [
     {
       "provider": "github",
@@ -15,7 +15,7 @@
   "mac": {
     "artifactName": "Pomodoroz-v${version}-mac-${arch}.${ext}",
     "category": "public.app-category.productivity",
-    "icon": "app/electron/build/assets/logo-dark@2x.png"
+    "icon": "./build/assets/logo-dark@2x.png"
   },
   "win": {
     "target": [
@@ -26,14 +26,14 @@
         "target": "nsis"
       }
     ],
-    "icon": "app/electron/build/assets/logo-dark.ico"
+    "icon": "./build/assets/logo-dark.ico"
   },
   "portable": {
     "artifactName": "Pomodoroz-v${version}-win-${arch}-portable.${ext}"
   },
   "nsis": {
     "artifactName": "Pomodoroz-v${version}-win-${arch}-setup.${ext}",
-    "include": "app/electron/electron-builder/installer.nsh",
+    "include": "./electron-builder/installer.nsh",
     "shortcutName": "Pomodoroz",
     "uninstallDisplayName": "Pomodoroz",
     "createStartMenuShortcut": true,
@@ -42,7 +42,7 @@
   "linux": {
     "artifactName": "Pomodoroz-v${version}-linux-${arch}.${ext}",
     "target": ["AppImage", "deb", "rpm"],
-    "icon": "app/electron/build/assets/",
+    "icon": "./build/assets/",
     "category": "Utility"
   },
   "snap": {
