@@ -1,7 +1,7 @@
 {
   "name": "pomodoroz",
   "private": true,
-  "version": "26.4.19",
+  "version": "26.4.20",
   "license": "MIT",
   "main": "app/electron/build/main.js",
   "author": {

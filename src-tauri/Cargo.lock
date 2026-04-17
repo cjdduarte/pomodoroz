@@ -3233,7 +3233,7 @@ dependencies = [
 
 [[package]]
 name = "pomodoroz_tauri"
-version = "26.4.19"
+version = "26.4.20"
 dependencies = [
  "log",
  "rodio",
