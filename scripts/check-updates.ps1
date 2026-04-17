@@ -633,7 +633,6 @@ function Check-FrameworkInventory {
     Write-Host "    electron-store: $(Get-PackageJsonVersion $electronPkg 'electron-store')"
 
     Write-Host "  [Monorepo/Tooling]"
-    Write-Host "    lerna: $(Get-PackageJsonVersion $rootPkg 'lerna')"
     Write-Host "    typescript: $(Get-PackageJsonVersion $rootPkg 'typescript')"
     Write-Host "    prettier: $(Get-PackageJsonVersion $rootPkg 'prettier')"
 

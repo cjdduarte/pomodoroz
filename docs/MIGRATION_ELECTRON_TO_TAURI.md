@@ -369,7 +369,7 @@ Phase 2 operational validation snapshot (2026-04-16, Linux):
 - Progress snapshot (2026-04-16):
   - [x] Root operational scripts migrated from `lerna run` to `pnpm -r --filter` (`dev:*`, `build*`, `release*`, `clean`).
   - [ ] Folder flatten kickoff pending (`app/renderer/src` -> `src`) with config/import updates.
-  - [ ] Remove monorepo orchestration leftovers (`lerna.json`, root `lerna` dependency, Nx toggle in workspace config).
+  - [x] Remove monorepo orchestration leftovers (`lerna.json`, root `lerna` dependency, Nx toggle in workspace config).
 - Validation:
   - `pnpm dev` works
   - `pnpm build` works

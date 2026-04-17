@@ -751,7 +751,6 @@ check_framework_inventory() {
   echo "    electron-store: $(get_pkg_version "$electron_pkg" "electron-store")"
 
   echo "  [Monorepo/Tooling]"
-  echo "    lerna: $(get_pkg_version "$root_pkg" "lerna")"
   echo "    typescript: $(get_pkg_version "$root_pkg" "typescript")"
   echo "    prettier: $(get_pkg_version "$root_pkg" "prettier")"
 

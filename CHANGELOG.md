@@ -11,6 +11,7 @@
 ### Alterado
 
 - **Scripts raiz deixaram de depender de `lerna run` no fluxo operacional** — `package.json` passou a usar `scripts/pnpmw.mjs` com `pnpm -r --filter` para `dev:*`, `build*`, `release*` e `clean`, iniciando o kickoff da Fase 3b (remoção progressiva do acoplamento Lerna/Nx sem alterar ainda a estrutura `app/*`).
+- **Sobras de orquestração Lerna/Nx removidas do repositório** — `lerna.json` foi removido, o script/dependência `lerna` saiu do `package.json` raiz e o toggle `nx` foi retirado de `pnpm-workspace.yaml`, mantendo o build diário apenas com `pnpm`; o inventário do `check-updates` também deixou de listar `lerna` no bloco de tooling.
 
 ## [26.4.18] - 2026-04-16
 

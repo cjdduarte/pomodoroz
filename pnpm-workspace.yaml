@@ -3,5 +3,4 @@ packages:
 allowBuilds:
   electron: true
   electron-winstaller: true
-  nx: false
   unrs-resolver: false
