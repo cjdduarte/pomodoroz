@@ -147,6 +147,38 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Prepare AppImage environment (robust mode)
+        shell: bash
+        run: |
+          echo "NO_STRIP=1" >> "$GITHUB_ENV"
+          echo "APPIMAGE_EXTRACT_AND_RUN=1" >> "$GITHUB_ENV"
+
+          if command -v pkgconf >/dev/null 2>&1; then
+            GDK_BINARY_DIR="$(pkgconf --variable=gdk_pixbuf_binarydir gdk-pixbuf-2.0 2>/dev/null || true)"
+            GDK_BINARY_VERSION="$(pkgconf --variable=gdk_pixbuf_binary_version gdk-pixbuf-2.0 2>/dev/null || true)"
+            GDK_PC_PATH="$(pkgconf --path gdk-pixbuf-2.0 2>/dev/null || true)"
+
+            if [ -n "${GDK_BINARY_DIR}" ] && [ ! -d "${GDK_BINARY_DIR}" ] && [ -n "${GDK_PC_PATH}" ] && [ -f "${GDK_PC_PATH}" ]; then
+              FIX_DIR="$(mktemp -d /tmp/pomodoroz-gh-appimage-gdkpixbuf.XXXXXX)"
+              GDK_BINARY_VERSION="${GDK_BINARY_VERSION:-2.10.0}"
+              FIX_BINARY_DIR="${FIX_DIR}/gdk-pixbuf-2.0/${GDK_BINARY_VERSION}"
+
+              mkdir -p "${FIX_DIR}/pkgconfig" "${FIX_BINARY_DIR}/loaders"
+              cp "${GDK_PC_PATH}" "${FIX_DIR}/pkgconfig/gdk-pixbuf-2.0.pc"
+
+              sed -i "s|^gdk_pixbuf_binarydir=.*|gdk_pixbuf_binarydir=${FIX_BINARY_DIR}|" "${FIX_DIR}/pkgconfig/gdk-pixbuf-2.0.pc"
+              sed -i 's|^gdk_pixbuf_moduledir=.*|gdk_pixbuf_moduledir=${gdk_pixbuf_binarydir}/loaders|' "${FIX_DIR}/pkgconfig/gdk-pixbuf-2.0.pc"
+              sed -i 's|^gdk_pixbuf_cache_file=.*|gdk_pixbuf_cache_file=${gdk_pixbuf_binarydir}/loaders.cache|' "${FIX_DIR}/pkgconfig/gdk-pixbuf-2.0.pc"
+
+              if command -v gdk-pixbuf-query-loaders >/dev/null 2>&1; then
+                gdk-pixbuf-query-loaders > "${FIX_BINARY_DIR}/loaders.cache"
+              fi
+
+              echo "PKG_CONFIG_PATH=${FIX_DIR}/pkgconfig:${PKG_CONFIG_PATH:-}" >> "$GITHUB_ENV"
+              echo "AppImage workaround enabled: ${FIX_BINARY_DIR}"
+            fi
+          fi
+
       - name: Build Tauri AppImage (x64)
         run: pnpm tauri build --bundles appimage
 
