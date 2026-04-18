@@ -6,6 +6,13 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.4.26] - A definir
+
+### Alterado
+
+- **Pipeline de release Tauri endurecida contra falhas transitórias de rede no AppImage** — o job Linux em `.github/workflows/release-autoupdate.yml` agora tenta `pnpm tauri build --bundles appimage` até 3 vezes antes de falhar.
+- **Tempo de CI/release otimizado com cache de build Rust** — `Swatinem/rust-cache@v2` foi adicionado em `ci.yml` (job `tauri-rust-check`) e nos jobs Windows/Linux do `release-autoupdate.yml`.
+
 ## [26.4.25] - 2026-04-18
 
 ### Corrigido
