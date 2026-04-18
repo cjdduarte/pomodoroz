@@ -210,7 +210,25 @@ jobs:
     needs:
       - release-windows
       - release-linux
-    if: ${{ always() && ((github.event_name == 'push' && needs.release-windows.result == 'success' && needs.release-linux.result == 'success') || (github.event_name == 'workflow_dispatch' && ((github.event.inputs.target == 'all' && needs.release-windows.result == 'success' && needs.release-linux.result == 'success') || (github.event.inputs.target == 'windows' && needs.release-windows.result == 'success') || (github.event.inputs.target == 'linux' && needs.release-linux.result == 'success'))) }}
+    if: >-
+      ${{
+        always() &&
+        (
+          (github.event_name == 'push' &&
+            needs.release-windows.result == 'success' &&
+            needs.release-linux.result == 'success') ||
+          (github.event_name == 'workflow_dispatch' &&
+            (
+              (github.event.inputs.target == 'all' &&
+                needs.release-windows.result == 'success' &&
+                needs.release-linux.result == 'success') ||
+              (github.event.inputs.target == 'windows' &&
+                needs.release-windows.result == 'success') ||
+              (github.event.inputs.target == 'linux' &&
+                needs.release-linux.result == 'success')
+            ))
+        )
+      }}
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
