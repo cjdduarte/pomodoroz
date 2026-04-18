@@ -312,4 +312,4 @@ jobs:
       - name: Upload merged latest.json
         run: |
           TAG="${RELEASE_TAG}"
-          gh release upload "${TAG}" latest.json --clobber
+          gh release upload "${TAG}" latest.json --clobber --repo "${GITHUB_REPOSITORY}"
