@@ -136,14 +136,14 @@ pomodoroz/
 
 Current status is tracked here (not only in phase descriptions) so we can see exactly where work stopped and what is still pending before moving to the next phase.
 
-| Phase                             | Status      | Last update | Gate to advance                                                                                                                                                                                                                                     |
-| --------------------------------- | ----------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0 — Tauri Scaffold + Dual Runtime | Completed   | 2026-04-09  | Closed after Tauri + Electron dev validation and script verification                                                                                                                                                                                |
-| 1 — Connector Swap                | Completed   | 2026-04-10  | Closed after runtime + manual parity validation                                                                                                                                                                                                     |
-| 2 — Native Features               | Completed   | 2026-04-17  | Closed after 2f hardening (`downloadAndInstall` + restart command bridge), updater guardrail removal in Settings, and runtime validation (`pnpm lint`, `pnpm typecheck:renderer`, `cargo check`)                                                    |
-| 3a — Yarn to pnpm                 | Completed   | 2026-04-16  | Closed after lockfile/script/workflow migration and release workflow validation on GitHub Actions                                                                                                                                                   |
-| 3b — Flatten Structure            | Completed   | 2026-04-17  | Closed after root-driven flow consolidation, removal of workspace manifests, and removal of committed Electron packaging manifest (`app/electron/package.json`) with non-breaking ephemeral manifest generation during Electron build/release flows |
-| 4 — CI for Tauri                  | In progress | 2026-04-17  | `ci.yml` PR/push gates added (lint/typecheck/build:renderer/cargo check); release workflow migration from Electron (`release-autoupdate.yml`) to Tauri-native pipeline remains pending                                                              |
+| Phase                             | Status    | Last update | Gate to advance                                                                                                                                                                                  |
+| --------------------------------- | --------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 0 — Tauri Scaffold + Dual Runtime | Completed | 2026-04-09  | Closed after Tauri + Electron dev validation and script verification                                                                                                                             |
+| 1 — Connector Swap                | Completed | 2026-04-10  | Closed after runtime + manual parity validation                                                                                                                                                  |
+| 2 — Native Features               | Completed | 2026-04-17  | Closed after 2f hardening (`downloadAndInstall` + restart command bridge), updater guardrail removal in Settings, and runtime validation (`pnpm lint`, `pnpm typecheck:renderer`, `cargo check`) |
+| 3a — Yarn to pnpm                 | Completed | 2026-04-16  | Closed after lockfile/script/workflow migration and release workflow validation on GitHub Actions                                                                                                |
+| 3b — Flatten Structure            | Completed | 2026-04-17  | Closed after root-driven flow consolidation, workspace-manifest removal, and final deletion of Electron runtime/package structure                                                                |
+| 4 — CI for Tauri                  | Completed | 2026-04-17  | Closed after `ci.yml` gate activation and migration of `release-autoupdate.yml` to Tauri-native signed updater publication                                                                       |
 
 Phase 0 completion checklist (execution status):
 
@@ -156,7 +156,7 @@ Phase 0 completion checklist (execution status):
 - [x] Run/confirm script checklist impact for current phase (`scripts/` validation rule)
 
 Rule to move forward: only start Phase 1 after all Phase 0 checklist items above are checked.
-Current state: Phases 1, 2, 3a, and 3b are closed. Phase 2f now includes in-app install/restart on Tauri (`downloadAndInstall` + `restart_app` bridge command), and the temporary UI guardrail on `inAppAutoUpdate` was removed after hardening. Phase 4 has started with a new `ci.yml` gate and a tag-aware Tauri updater publish workflow (`release-tauri-updater.yml`), while full replacement of Electron release automation is still pending.
+Current state: Phases 1, 2, 3a, 3b, and 4 are closed. Phase 2f includes in-app install/restart on Tauri (`downloadAndInstall` + `restart_app` bridge command), and the temporary UI guardrail on `inAppAutoUpdate` has been removed after hardening. CI/release automation now runs on the Tauri-native path.
 
 Phase 1 progress checklist (execution status):
 
@@ -291,7 +291,7 @@ Phase 2f kickoff snapshot (2026-04-16):
 - [x] Native update detection now feeds existing renderer update state via `UPDATE_AVAILABLE` payload (version/body) without introducing direct component-level `invoke`.
 - [x] Temporary Tauri guardrail removed after hardening (`inAppAutoUpdate` toggle enabled again in Settings).
 - [x] Updater public key configured in `src-tauri/tauri.conf.json` and updater artifacts set to `v1Compatible` for `latest.json` generation.
-- [x] Manual GitHub Actions workflow added for signed Tauri updater assets upload by tag (`.github/workflows/release-tauri-updater.yml`).
+- [x] Signed Tauri updater release flow consolidated into `.github/workflows/release-autoupdate.yml` (tag + manual dispatch).
 - [x] Complete packaged install/restart flow (`downloadAndInstall` + relaunch strategy) via Tauri command bridge (`restart_app`) and runtime connector integration (`INSTALL_UPDATE`).
 
 Phase 2g kickoff snapshot (2026-04-14):
@@ -366,13 +366,13 @@ Phase 2 operational validation snapshot (2026-04-16, Linux):
   - Update all import paths
   - Consolidate to single `package.json`
 - Progress snapshot (2026-04-17):
-  - [x] Root operational scripts migrated away from workspace recursion to direct root commands (`build:renderer`, `build:electron`, `typecheck:renderer`, root `dev:app` orchestration via `scripts/dev-app.mjs`).
+  - [x] Root operational scripts migrated away from workspace recursion to direct root commands (`build:renderer`, `build:tauri`, `typecheck:renderer`, root `dev:app` on Tauri).
   - [x] Folder flatten kickoff completed (`app/renderer/src` -> `src`) with renderer config/script updates (`index.html`, `tsconfig`, `vite` aliases, lint/prebuild paths).
   - [x] Remove monorepo orchestration leftovers (`lerna.json`, root `lerna` dependency, Nx toggle in workspace config).
   - [x] Dependency consolidation applied (renderer duplicated deps removed from `app/renderer/package.json`, with root manifest as source of truth for relocated `src`).
   - [x] `pnpm-workspace.yaml` removed and wrappers/workflows migrated away from `pnpm --filter` workspace assumptions.
-  - [x] Electron builder metadata moved to root-managed config (`electron-builder.config.json`), with root `eb` script as source of truth.
-  - [x] Remove committed Electron packaging manifest (`app/electron/package.json`) with non-breaking build compatibility via ephemeral manifest generation during Electron packaging.
+  - [x] Electron runtime/package structure removed from the repository (`app/electron/` deleted).
+  - [x] Electron packaging path removed (`electron-builder.config.json`, wrapper scripts, and dedicated updater workflow removed) with release flow consolidated to Tauri.
 - Validation:
   - `pnpm dev` works
   - `pnpm build` works
@@ -387,16 +387,16 @@ Phase 2 operational validation snapshot (2026-04-16, Linux):
 
 - Goal: CI pipeline for the new stack.
 - Scope:
-  - `ci.yml`: lint + typecheck + test on PR
-  - `release.yml`: matrix build (ubuntu/macos/windows) with `tauri-apps/tauri-action`
+  - `ci.yml`: lint + typecheck + renderer build + Rust check on PR/push
+  - `release-autoupdate.yml`: Tauri signed updater release pipeline (Windows + Linux)
   - Node 24 LTS + pnpm with cache
   - Rust toolchain setup
 - Validation:
   - Pipeline passes on PR and push
-  - Release artifacts generated for all platforms
+  - Release assets and merged `latest.json` generated in tagged release flow
 - Exit criteria:
   - Gate failures block merge
-  - Release flow produces .dmg, .exe, .AppImage
+  - Release flow uploads signed Tauri updater artifacts for supported platforms
 - Rollback:
   - Revert workflow files
 
@@ -452,22 +452,18 @@ Include script validation as part of the phase's exit criteria.
 
 ### GitHub Actions
 
-Current state: PR/push gate now exists via `.github/workflows/ci.yml`
+Current state: PR/push gate is active via `.github/workflows/ci.yml`
 (`lint`, `typecheck:renderer`, `build:renderer`, `cargo check` on Linux).  
-Release automation is still Electron-first through `release-autoupdate.yml`,
-while `release-tauri-updater.yml` now supports both tag-triggered (`v*`) and
-manual runs for signed updater assets.
+Release automation is Tauri-native in `.github/workflows/release-autoupdate.yml`
+with signed updater assets and merged `latest.json`.
 
 Migration impact per phase:
 
-| Phase            | Action required                                                                          |
-| ---------------- | ---------------------------------------------------------------------------------------- |
-| 3a (pnpm)        | Update workflow: `yarn` commands to `pnpm`, cache strategy                               |
-| 3b (flatten)     | Update workflow: workspace paths, build commands                                         |
-| 4 (CI for Tauri) | `ci.yml` PR gate added; pending: rewrite release workflow with `tauri-apps/tauri-action` |
-
-The current `release-autoupdate.yml` is Electron-specific (uses `electron-builder`).
-It will be replaced entirely in Phase 4 with Tauri-native CI.
+| Phase            | Action required                                                                         |
+| ---------------- | --------------------------------------------------------------------------------------- |
+| 3a (pnpm)        | Update workflow: `yarn` commands to `pnpm`, cache strategy                              |
+| 3b (flatten)     | Update workflow: workspace paths, build commands                                        |
+| 4 (CI for Tauri) | Completed: `ci.yml` gate active and Tauri-native `release-autoupdate.yml` in production |
 
 ---
 
