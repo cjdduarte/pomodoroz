@@ -199,6 +199,10 @@ export const es = {
   updater: {
     heading: "Hay una actualización disponible",
     noUpdateBody: "No se encontró descripción de la actualización",
+    installAndRestart: "Instalar y reiniciar",
+    installingTitle: "Instalando actualización",
+    installingBody:
+      "La descarga de la actualización comenzó en la app. Pomodoroz se reiniciará al finalizar.",
     openingReleaseTitle: "Abriendo página de release",
     openingReleaseBody:
       "Tu navegador abrirá las notas de versión y el instalador más reciente.",

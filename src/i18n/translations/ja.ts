@@ -198,6 +198,10 @@ export const ja = {
   updater: {
     heading: "アップデートがあります",
     noUpdateBody: "アップデート内容が見つかりません",
+    installAndRestart: "インストールして再起動",
+    installingTitle: "アップデートをインストール中",
+    installingBody:
+      "アプリ内でアップデートのダウンロードを開始しました。完了後に Pomodoroz を再起動します。",
     openingReleaseTitle: "リリースページを開いています",
     openingReleaseBody:
       "ブラウザで最新のリリースノートとインストーラーを開きます。",

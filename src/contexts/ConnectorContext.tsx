@@ -1,5 +1,4 @@
 import React, { type PropsWithChildren } from "react";
-import { ElectronConnectorProvider } from "./connectors/ElectronConnector";
 import { TauriConnectorProvider } from "./connectors/TauriConnector";
 import {
   getRuntimeInvokeConnector,
@@ -29,9 +28,7 @@ export const ConnectorProvider = ({ children }: PropsWithChildren) => {
   );
 
   const runtime = getRuntimeKind();
-  if (runtime === "electron") {
-    Connector = ElectronConnectorProvider;
-  } else if (runtime === "tauri") {
+  if (runtime === "tauri") {
     Connector = TauriConnectorProvider;
   }
 

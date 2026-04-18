@@ -95,7 +95,7 @@ O objetivo do Pomodoroz não é "corrigir flexibilidade", e sim adicionar recurs
 
 - Entregas implementadas: [CHANGELOG.md](CHANGELOG.md)
 - Melhorias candidatas (não implementadas): [docs/PRODUCT_BACKLOG.md](docs/PRODUCT_BACKLOG.md)
-- Plano de migração (Electron para Tauri): [docs/MIGRATION_ELECTRON_TO_TAURI.md](docs/MIGRATION_ELECTRON_TO_TAURI.md)
+- Histórico de migração: [docs/MIGRATION_TO_TAURI.md](docs/MIGRATION_TO_TAURI.md)
 
 ## ✨ Funcionalidades
 
@@ -204,10 +204,10 @@ Baixe a versão mais recente na [página de Releases](https://github.com/cjdduar
 
 ```sh
 pnpm install
-pnpm build:dir    # Build desempacotado
-pnpm build:linux  # Linux (AppImage, deb, rpm)
-pnpm build:win    # Windows (portable + setup)
-pnpm build:mac    # macOS
+pnpm build:renderer
+pnpm tauri build --no-bundle
+pnpm tauri build --bundles appimage,deb,rpm
+pnpm tauri build --bundles nsis
 ```
 
 ## 🛠️ Desenvolvimento
@@ -220,21 +220,22 @@ pnpm build:mac    # macOS
 ### Comandos
 
 ```sh
-pnpm dev:app          # Electron + Vite renderer
+pnpm dev:app          # Tauri + Vite renderer
 pnpm dev:renderer     # Renderer only (Vite em localhost:3000)
-pnpm lint             # Lint/typecheck (renderer + electron)
-pnpm build:dir        # Build desempacotado
+pnpm lint             # Lint (renderer)
+pnpm typecheck:renderer
+pnpm tauri build --no-bundle
 ```
 
 ### Stack
 
-- Electron 41
+- Tauri 2
 - React 19 + Vite 8 + TypeScript 6
 - React Router 7 + Redux Toolkit 2
 - @dnd-kit (arrastar e soltar)
 - Styled Components
 - i18next
-- Scripts pnpm centralizados no root (shell do renderer em `app/renderer` e shell do Electron em `app/electron`)
+- Scripts pnpm centralizados no root, com shell do renderer em `app/renderer` e backend nativo em `src-tauri`
 
 ## 🤝 Contribuindo
 

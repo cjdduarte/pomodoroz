@@ -331,17 +331,6 @@ $releaseFiles = @(
     "CHANGELOG.en.md"
 )
 
-$optionalReleaseFiles = @(
-    "app/electron/package.json",
-    "app/renderer/package.json"
-)
-
-foreach ($optionalFile in $optionalReleaseFiles) {
-    if (Test-Path (Join-Path $ROOT $optionalFile)) {
-        $releaseFiles += $optionalFile
-    }
-}
-
 $gitAddArguments = @("-C", $ROOT, "add") + $releaseFiles
 Invoke-CommandChecked -FilePath git -Arguments $gitAddArguments
 

@@ -36,6 +36,7 @@ import {
   COMPACT_EXPAND,
   CONFIRM_RESET_FOCUS_TO_IDLE,
   EXPORT_TASKS_DIALOG,
+  INSTALL_UPDATE,
   IMPORT_TASKS_DIALOG,
   MINIMIZE_WINDOW,
   OPEN_RELEASE_PAGE,
@@ -87,6 +88,59 @@ const toInvokeArgs = (payload: unknown): Record<string, unknown> =>
   (payload ?? {}) as Record<string, unknown>;
 
 let updaterPolicySyncPromise: Promise<void> | null = null;
+let updaterInstallPromise: Promise<void> | null = null;
+
+type TauriUpdateHandle = NonNullable<
+  Awaited<ReturnType<typeof checkForUpdates>>
+>;
+
+const closeUpdateHandle = async (updateHandle: TauriUpdateHandle) => {
+  await updateHandle.close().catch((closeError: unknown) => {
+    console.warn(
+      "[TAURI Updater] Failed to close updater handle.",
+      closeError
+    );
+  });
+};
+
+const downloadInstallAndRestart = async (
+  updateHandle: TauriUpdateHandle,
+  source: "policy-sync" | "manual-action"
+) => {
+  try {
+    console.info(
+      `[TAURI Updater] Downloading and installing update (${source}).`
+    );
+    await updateHandle.downloadAndInstall();
+  } finally {
+    await closeUpdateHandle(updateHandle);
+  }
+
+  console.info("[TAURI Updater] Update installed. Restarting app.");
+  await invoke("restart_app");
+};
+
+const installTauriUpdateAndRestart = async () => {
+  if (updaterInstallPromise) {
+    return updaterInstallPromise;
+  }
+
+  updaterInstallPromise = (async () => {
+    const updateHandle = await checkForUpdates();
+    if (!updateHandle) {
+      console.info(
+        "[TAURI Updater] Install requested, but no update was found."
+      );
+      return;
+    }
+
+    await downloadInstallAndRestart(updateHandle, "manual-action");
+  })().finally(() => {
+    updaterInstallPromise = null;
+  });
+
+  return updaterInstallPromise;
+};
 
 const dataUrlToPngBytes = (dataUrl: string): number[] => {
   const separatorIndex = dataUrl.indexOf(",");
@@ -319,11 +373,9 @@ const syncTauriUpdatePolicy = async (
       );
 
       if (enableInAppAutoUpdate) {
-        // Mantemos modo notify-only no runtime Tauri até o hardening
-        // completo do pipeline de release nativo (assinatura/feed/restart).
-        console.info(
-          "[TAURI Updater] Update available with in-app auto update enabled. Install flow remains deferred to final hardening."
-        );
+        const installHandle = updateHandle;
+        updateHandle = null;
+        await downloadInstallAndRestart(installHandle, "policy-sync");
       }
     } catch (error) {
       console.warn(
@@ -331,12 +383,9 @@ const syncTauriUpdatePolicy = async (
         error
       );
     } finally {
-      await updateHandle?.close().catch((closeError: unknown) => {
-        console.warn(
-          "[TAURI Updater] Failed to close updater handle.",
-          closeError
-        );
-      });
+      if (updateHandle) {
+        await closeUpdateHandle(updateHandle);
+      }
       updaterPolicySyncPromise = null;
     }
   })();
@@ -430,6 +479,11 @@ const sendToTauri = async <C extends ToMainChannel>(
 
     case OPEN_RELEASE_PAGE: {
       await openExternalUrl(RELEASE_NOTES_LINK);
+      return;
+    }
+
+    case INSTALL_UPDATE: {
+      await installTauriUpdateAndRestart();
       return;
     }
 

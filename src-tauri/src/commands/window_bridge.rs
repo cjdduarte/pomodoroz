@@ -4,7 +4,7 @@ use std::{fs, io::Cursor, sync::Mutex, time::Duration};
 use tauri::{
     image::Image,
     menu::{MenuBuilder, MenuItemBuilder},
-    Emitter, LogicalSize, Manager, State, Theme, Window,
+    AppHandle, Emitter, LogicalSize, Manager, Runtime, State, Theme, Window,
 };
 
 const WINDOW_WIDTH: f64 = 340.0;
@@ -185,6 +185,11 @@ pub fn close_window(window: Window) -> Result<(), String> {
     // Um único caminho evita corridas de double-hide e reduz bugs de
     // input grab do webkit2gtk no Linux após restore.
     window.close().map_err(map_error)
+}
+
+#[tauri::command]
+pub fn restart_app<R: Runtime>(app: AppHandle<R>) -> Result<(), String> {
+    app.restart();
 }
 
 #[tauri::command(rename_all = "camelCase")]

@@ -1,9 +1,7 @@
-import isElectron from "is-electron";
 import type { InvokeConnector } from "../InvokeConnector";
-import { ElectronInvokeConnector } from "./ElectronInvokeConnector";
 import { TauriInvokeConnector } from "./TauriInvokeConnector";
 
-export type RuntimeKind = "electron" | "tauri" | "browser";
+export type RuntimeKind = "tauri" | "browser";
 
 export const isTauriRuntime = (): boolean => {
   if (typeof window === "undefined") {
@@ -20,10 +18,6 @@ export const isTauriRuntime = (): boolean => {
 };
 
 export const getRuntimeKind = (): RuntimeKind => {
-  if (isElectron()) {
-    return "electron";
-  }
-
   if (isTauriRuntime()) {
     return "tauri";
   }
@@ -35,8 +29,6 @@ export const getRuntimeInvokeConnector = ():
   | InvokeConnector
   | undefined => {
   switch (getRuntimeKind()) {
-    case "electron":
-      return ElectronInvokeConnector;
     case "tauri":
       return TauriInvokeConnector;
     default:

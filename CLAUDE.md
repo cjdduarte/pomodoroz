@@ -6,19 +6,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Pomodoroz is a cross-platform Pomodoro desktop app, forked from [Pomatez](https://github.com/zidoro/pomatez). Standalone desktop app with no server or cloud — all data is local.
 
-**Current runtime: Electron.** Migrating to Tauri — see `docs/MIGRATION_ELECTRON_TO_TAURI.md`.
+**Current runtime: Tauri.**
 
 ### Key Documents
 
-| Document                              | Purpose                                        |
-| ------------------------------------- | ---------------------------------------------- |
-| `AGENTS.md`                           | Agent operational rules                        |
-| `CHANGELOG.md` / `CHANGELOG.en.md`    | Implemented changes                            |
-| `docs/MIGRATION_ELECTRON_TO_TAURI.md` | Migration plan (Electron -> Tauri)             |
-| `docs/RELEASE_OPERATIONS.md`          | Release flow, auto-update, checklists          |
-| `docs/PRODUCT_BACKLOG.md`             | Future features (gamification, adaptive focus) |
+| Document                           | Purpose                                        |
+| ---------------------------------- | ---------------------------------------------- |
+| `AGENTS.md`                        | Agent operational rules                        |
+| `CHANGELOG.md` / `CHANGELOG.en.md` | Implemented changes                            |
+| `docs/MIGRATION_TO_TAURI.md`       | Migration history and execution tracker        |
+| `docs/RELEASE_OPERATIONS.md`       | Release flow, updater pipeline, validation     |
+| `docs/PRODUCT_BACKLOG.md`          | Future features (gamification, adaptive focus) |
 
-## Repository Layout (Current — Electron)
+## Repository Layout
 
 ```text
 <repo-root>/
@@ -27,15 +27,15 @@ Pomodoroz is a cross-platform Pomodoro desktop app, forked from [Pomatez](https:
 ├── package.json                 # Root operational manifest (pnpm scripts + deps)
 ├── src/                         # React renderer source (flat at repo root)
 ├── app/
-│   ├── electron/                # Electron main process (entry: src/main.ts)
 │   └── renderer/                # React renderer shell (Vite dev + build)
+├── src-tauri/                   # Tauri backend (Rust commands, tray, updater)
 ├── docs/                        # Technical docs (migration, release ops, backlog)
-└── scripts/                     # Helper scripts (validation, install, version sync)
+└── scripts/                     # Helper scripts (validation, install, release, version sync)
 ```
 
 ## Current Stack
 
-- **Electron** `41.x` — main process + preload (sandbox enabled)
+- **Tauri** `2.x` (Rust backend + native bundling)
 - **React** `19.x` with `createRoot`
 - **Vite** `8.x` — renderer dev server and build
 - **TypeScript** `6.0.x`
@@ -55,20 +55,14 @@ All commands run from the repo root:
 ```sh
 pnpm install
 
-pnpm dev:app                 # Main dev flow (Electron + Vite renderer in parallel)
+pnpm dev:app                 # Main dev flow (Tauri + Vite renderer)
 pnpm dev:renderer            # Renderer only (Vite on localhost:3000)
-pnpm dev:main                # Electron main only (waits for renderer on port 3000)
 
-pnpm lint                    # Lint + typecheck: renderer + electron
-pnpm build                   # Build renderer + electron
-pnpm build:dir               # Build unpacked Electron app (for smoke testing)
+pnpm lint                    # ESLint (renderer)
+pnpm typecheck:renderer      # Typecheck renderer
+pnpm build:renderer          # Build renderer assets
+pnpm tauri build --no-bundle # Build native release binary
 pnpm format                  # Prettier across all files
-
-# Platform-specific packaged builds
-pnpm build:win
-pnpm build:mac
-pnpm build:linux
-pnpm build:mwl               # All platforms
 
 # Release helper scripts (version + tag + push)
 pnpm release:tag -- 26.4.10
@@ -79,31 +73,20 @@ pnpm release:tag:ps -- -Version 26.4.10
 Validation wrapper scripts:
 
 ```sh
-./scripts/validar-tudo.sh              # Interactive menu
-./scripts/validar-tudo.sh --dev        # Quick dev validation
-./scripts/validar-tudo.sh --run-packed # Build + run packaged app
-```
-
-Smoke test a packaged build:
-
-```sh
-pnpm build:dir
-./app/electron/dist/linux-unpacked/pomodoroz
+./scripts/validar-tudo.sh                # Interactive menu
+./scripts/validar-tudo.sh --quick-dev    # Quick lint + typecheck + tauri dev
+./scripts/validar-tudo.sh --run-packed   # Build + run local Tauri release binary
+./scripts/validar-tudo.sh --installers   # Build platform installers
 ```
 
 ## Architecture
 
-### Package Layout
+### Renderer <-> Native Bridge
 
-Root package is the source of truth for dependencies and day-to-day scripts.  
-`app/electron` and `app/renderer` remain as runtime/build shells.
-
-### Renderer <-> Electron Bridge
-
-- **Connector abstraction**: `src/contexts/ConnectorContext.tsx` — provides a `useConnector()` hook for all renderer-to-native calls.
-- **Active connector**: `src/contexts/InvokeConnector.tsx` — Electron-specific implementation using `window.electron` (exposed by preload).
-- **IPC contracts**: `src/ipc/index.ts` (renderer) and `app/electron/src/ipc.ts` (main/preload) — local typed channel map.
-- **Electron main handlers**: `app/electron/src/main.ts` — IPC handlers, window management, tray, and system integration.
+- **Connector abstraction**: `src/contexts/ConnectorContext.tsx` — provides `useConnector()` for renderer-to-native calls.
+- **Runtime routing**: `src/contexts/connectors/runtimeInvokeConnector.ts` — resolves runtime and delegates to current connector implementation.
+- **Active native connector**: `src/contexts/connectors/TauriInvokeConnector.ts` — Tauri command/event adapter.
+- **Rust command bridge**: `src-tauri/src/commands/window_bridge.rs` + registrations in `src-tauri/src/lib.rs`.
 
 ### State Management
 
@@ -117,33 +100,31 @@ Redux Toolkit slices in `src/store/`:
 | `settings/`      | User preferences (theme, notifications, breaks, etc.) |
 | `statistics/`    | Focus/break/idle time tracking, per-task stats        |
 | `config/`        | App config (window state, first-run flags)            |
-| `update/`        | Auto-updater state                                    |
+| `update/`        | In-app updater state                                  |
 
-React contexts: connector (IPC bridge), theme, counter (timer display).
-Renderer persists state in `localStorage`. Electron uses `electron-store` for native settings.
+React contexts: connector bridge, theme, counter.
+State persistence is local (`localStorage` + native layer where applicable).
 
-### Electron Security
+### Security / Updater
 
-- `sandbox: true` enabled on BrowserWindow
-- Preload script adapted for sandbox constraints
-- IPC channels typed via local IPC contracts (`src/ipc` and `app/electron/src/ipc.ts`)
-- Auto-updater active via GitHub Releases for Windows (NSIS) and Linux AppImage
-- Linux packaged without `APPIMAGE` keeps explicit updater skip by design
+- Tauri capabilities are defined in `src-tauri/capabilities/`.
+- Updater plugin config lives in `src-tauri/tauri.conf.json` (`plugins.updater`).
+- Release updater artifacts are signed in CI and published to GitHub Releases.
 
 ## Known Non-Blocking Warnings
 
-- Wayland/DBus/KWin logs on Linux (environment-specific, harmless)
+- Wayland/DBus/KWin logs on Linux (environment-specific, generally harmless)
 - `@typescript-eslint` declares peer support `<6` while project uses TS 6 (non-blocking)
 - pnpm global install may require permission-aware setup (`PNPM_HOME` / user-local bin)
 
 ## Key Policies
 
-- **Updater**: Keep release feed on this fork (`cjdduarte/pomodoroz`). Do not point updater to original Pomatez feed.
-- **Documentation**: Log implemented changes in `CHANGELOG.md` and `CHANGELOG.en.md`. Track migration in `docs/MIGRATION_ELECTRON_TO_TAURI.md`. Track future features in `docs/PRODUCT_BACKLOG.md`.
-- **Release Notes Source of Truth**: GitHub Release title/notes are generated from `CHANGELOG.md` section `## [x.y.z]`. Always update both changelogs before tag/release.
-- **Changelog Fill Rule**: Never add new items to a published version. Keep the next version at the top as `A definir` (PT) / `TBD` (EN), set the date only on release day, and move subsequent work to the next version.
-- **Agent Release Prompt Rule**: Before suggesting `./scripts/release.sh` or `./scripts/release.ps1`, the agent must set `YYYY-MM-DD` in both changelog headers of the target version.
-- **Language**: Code in English. Logs/comments in Portuguese (PT-BR) where appropriate.
-- **Commits**: Commit messages and PR titles must be in English (Conventional Commits).
-- **AI Finalization Output**: At the end of each finalized implementation, suggest a ready-to-use Conventional Commit message in English.
-- **Dependencies**: Explain options and wait for confirmation before adding new libraries.
+- **Updater feed**: keep updater endpoints pointing to this fork (`cjdduarte/pomodoroz`).
+- **Documentation**: log implemented changes in `CHANGELOG.md` and `CHANGELOG.en.md`.
+- **Release Notes Source of Truth**: GitHub Release title/notes are generated from `CHANGELOG.md` section `## [x.y.z]`.
+- **Changelog Fill Rule**: never add new items to a published version; keep next version at top as `A definir` (PT) / `TBD` (EN), set date only on release day.
+- **Agent Release Prompt Rule**: before suggesting `./scripts/release.sh` or `./scripts/release.ps1`, the agent must set `YYYY-MM-DD` in both changelog headers of the target version.
+- **Language**: code in English; logs/comments in Portuguese (PT-BR) where appropriate.
+- **Commits**: commit messages and PR titles in English (Conventional Commits).
+- **AI Finalization Output**: after each finalized implementation, suggest a ready-to-use Conventional Commit message in English.
+- **Dependencies**: explain options and wait for confirmation before adding new libraries.

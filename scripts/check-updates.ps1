@@ -34,9 +34,9 @@ $script:CargoOutdatedLogFile = ""
 $script:CargoAuditLogFile = ""
 $script:TranscriptStarted = $false
 $CriticalExactPackages = @(
-    "electron",
     "typescript",
-    "@electron/notarize"
+    "@tauri-apps/cli",
+    "@tauri-apps/api"
 )
 
 function Print-Header {
@@ -589,11 +589,11 @@ function Check-StackVersions {
     Step "`n[2/5] Stack Atual do Projeto"
 
     $rootPkg = Join-Path $POMODOROZ "package.json"
-    $electron = Get-PackageJsonVersion -PackageJsonPath $rootPkg -DependencyName "electron"
+    $tauriCli = Get-PackageJsonVersion -PackageJsonPath $rootPkg -DependencyName "@tauri-apps/cli"
     $react = Get-PackageJsonVersion -PackageJsonPath $rootPkg -DependencyName "react"
     $typescript = Get-PackageJsonVersion -PackageJsonPath $rootPkg -DependencyName "typescript"
 
-    Write-Host "  Electron (root): $electron"
+    Write-Host "  Tauri CLI (root): $tauriCli"
     Write-Host "  React (root/src): $react"
     Write-Host "  TypeScript (root): $typescript"
 }
@@ -615,11 +615,11 @@ function Check-FrameworkInventory {
     Write-Host "    vite: $(Get-PackageJsonVersion $rootPkg 'vite')"
     Write-Host "    @vitejs/plugin-react: $(Get-PackageJsonVersion $rootPkg '@vitejs/plugin-react')"
 
-    Write-Host "  [Electron]"
-    Write-Host "    electron: $(Get-PackageJsonVersion $rootPkg 'electron')"
-    Write-Host "    electron-builder: $(Get-PackageJsonVersion $rootPkg 'electron-builder')"
-    Write-Host "    electron-updater: $(Get-PackageJsonVersion $rootPkg 'electron-updater')"
-    Write-Host "    electron-store: $(Get-PackageJsonVersion $rootPkg 'electron-store')"
+    Write-Host "  [Tauri]"
+    Write-Host "    @tauri-apps/cli: $(Get-PackageJsonVersion $rootPkg '@tauri-apps/cli')"
+    Write-Host "    @tauri-apps/api: $(Get-PackageJsonVersion $rootPkg '@tauri-apps/api')"
+    Write-Host "    @tauri-apps/plugin-updater: $(Get-PackageJsonVersion $rootPkg '@tauri-apps/plugin-updater')"
+    Write-Host "    @tauri-apps/plugin-dialog: $(Get-PackageJsonVersion $rootPkg '@tauri-apps/plugin-dialog')"
 
     Write-Host "  [Monorepo/Tooling]"
     Write-Host "    typescript: $(Get-PackageJsonVersion $rootPkg 'typescript')"
@@ -633,10 +633,10 @@ function Check-FrameworkInventory {
 
     Write-Host "  [Fluxo Atual]"
     Write-Host "    dev:app: $devAppScript"
-    if ($null -ne $rootJson -and $null -ne $rootJson.scripts -and $null -ne $rootJson.scripts.'dev:app:vite') {
-        Write-Host "    Vite no fluxo principal: ativo" -ForegroundColor Green
+    if ($null -ne $rootJson -and $null -ne $rootJson.scripts -and $null -ne $rootJson.scripts.tauri) {
+        Write-Host "    Runtime principal: Tauri" -ForegroundColor Green
     } else {
-        Write-Host "    Vite no fluxo principal: nao detectado" -ForegroundColor Yellow
+        Write-Host "    Runtime principal: nao detectado" -ForegroundColor Yellow
     }
 }
 
@@ -1056,7 +1056,7 @@ function Check-JsDependencies {
     Write-Host "`n[OK] Updates concluidos." -ForegroundColor Green
     Write-Host 'Recomendado:' -ForegroundColor Gray
     Write-Host ('  Set-Location "{0}"; pnpm build' -f $POMODOROZ) -ForegroundColor Gray
-    Write-Host ('  Set-Location "{0}"; pnpm dev:app' -f $POMODOROZ) -ForegroundColor Gray
+    Write-Host ('  Set-Location "{0}"; pnpm tauri dev' -f $POMODOROZ) -ForegroundColor Gray
 }
 
 function Test-CargoSubcommand {

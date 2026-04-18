@@ -4,7 +4,7 @@
 >
 > This document tracks product features that are **not yet implemented**.
 > For implemented changes, see `CHANGELOG.md` / `CHANGELOG.en.md`.
-> For migration planning, see `MIGRATION_ELECTRON_TO_TAURI.md`.
+> For migration planning, see `MIGRATION_TO_TAURI.md`.
 > For release operations, see `RELEASE_OPERATIONS.md`.
 
 ---

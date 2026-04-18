@@ -191,6 +191,10 @@ export const zh = {
   updater: {
     heading: "发现可用更新",
     noUpdateBody: "未找到更新说明",
+    installAndRestart: "安装并重启",
+    installingTitle: "正在安装更新",
+    installingBody:
+      "应用内已开始下载更新。完成后 Pomodoroz 将自动重启。",
     openingReleaseTitle: "正在打开发布页面",
     openingReleaseBody: "浏览器将打开最新的发布说明和安装程序。",
     openReleasePage: "打开发布页面",

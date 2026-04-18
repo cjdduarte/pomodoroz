@@ -1,31 +1,29 @@
 # Release Operations — Pomodoroz
 
-> Extracted from previous `TECHNICAL_DECISIONS_2026.md` (sections 6.5 and 6.6).
+> Operational guide for versioning, publishing, and validating Tauri releases.
 >
-> This document covers the operational release flow, auto-update behavior,
-> and platform-specific validation checklists.
->
-> For migration planning, see `MIGRATION_ELECTRON_TO_TAURI.md`.
+> For migration history, see `MIGRATION_TO_TAURI.md`.
 > For product backlog, see `PRODUCT_BACKLOG.md`.
 
 ---
 
 ## 1. Auto-Update Overview
 
-In-app auto-update is active for:
+In-app auto-update is currently active for:
 
-- **Windows**: NSIS installer (`latest.yml` + setup)
-- **Linux**: AppImage (`latest-linux.yml` + `.AppImage`)
+- **Windows**: NSIS bundle + signature (`.exe` + `.sig`)
+- **Linux**: AppImage + signature (`.AppImage` + `.sig`)
 
 Out of in-app auto-update scope:
 
-- Windows portable (distributed, but no in-app update flow)
-- Linux `deb`/`rpm`/AUR (update via distro package manager)
-- macOS (requires signing/notarization; not activated in this cycle)
-- Dev environment without config (intentional skip)
-- Linux packaged without `APPIMAGE` env var (intentional skip)
+- Linux `deb` / `rpm` (install/update via distro package manager)
+- macOS (not active in this cycle)
+- Dev environment without release artifacts
 
-Current status: **Completed** (release 26.4.9+).
+Updater metadata source:
+
+- `latest.json` (uploaded as a release asset)
+- Built/merged from signed Windows and Linux assets by `sync-latest-json` job
 
 ---
 
@@ -33,144 +31,108 @@ Current status: **Completed** (release 26.4.9+).
 
 ### Step 1 — Prepare Version
 
-1. Define target version (e.g., `26.4.16`).
-2. Update both changelogs for the target version section:
+1. Define target version (example: `26.4.24`).
+2. Update both changelogs for this version:
    - `CHANGELOG.md` (PT)
    - `CHANGELOG.en.md` (EN)
-3. Keep next version as `A definir` / `TBD` while unreleased; set final date only on release day.
-4. In AI-assisted flow, the agent must fill `YYYY-MM-DD` in both changelog headers for the target version before suggesting `./scripts/release.sh` or `./scripts/release.ps1`.
-5. Prepare commit/tag with dedicated script:
-   - Unix: `./scripts/release.sh <version>` (or `pnpm release:tag -- <version>`)
-   - PowerShell: `pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/release.ps1 -Version <version>`
-6. (Optional) dry run: `./scripts/release.sh --dry-run <version>` (or `pnpm release:tag:dry -- <version>`)
-7. Validate baseline:
-   - `pnpm lint`
-   - `pnpm build`
-   - `pnpm build:dir`
+3. Keep next version as `A definir` / `TBD`; set final date only on release day.
+4. In AI-assisted flow, the agent must set `YYYY-MM-DD` in both changelog headers before suggesting release scripts.
+5. Run release script:
+   - Unix: `./scripts/release.sh <version>`
+   - PowerShell: `./scripts/release.ps1 -Version <version>`
+6. Optional dry run:
+   - Unix: `./scripts/release.sh --dry-run <version>`
+   - PowerShell: `./scripts/release.ps1 -Version <version> -DryRun`
 
-### Step 2 — Publish Artifacts
+### Step 2 — CI Publish (Tag)
 
-1. Export token: `GH_TOKEN=<token>`
-2. Publish release:
-   - All targets: `pnpm release`
-   - Mac + Windows: `pnpm release:mw`
-   - Linux dedicated: run in Linux environment when needed
-3. `Release Auto Update` workflow syncs release title/notes from `CHANGELOG.md` section when triggered by `v*` tag.
-4. Confirm published release contains:
-   - Windows: NSIS installer + `latest.yml`
-   - Linux: `.AppImage` + `latest-linux.yml`
+1. Push tag `v<version>`.
+2. Workflow `.github/workflows/release-autoupdate.yml` runs:
+   - `release-windows` (build NSIS + upload signed updater assets)
+   - `release-linux` (build AppImage + upload signed updater assets)
+   - `sync-latest-json` (merge and upload `latest.json`)
+3. Workflow can also be started manually (`workflow_dispatch`) with target:
+   - `all`
+   - `windows`
+   - `linux`
 
-### Step 3 — Validate Client (E2E)
+Required repository secrets:
 
-1. Install previous version (N) in test environment.
-2. Open packaged app online.
-3. Verify `UPDATE_AVAILABLE` reaches UI.
-4. Trigger `Install Now` and confirm restart with new version (N+1).
+- `GH_TOKEN`
+- `TAURI_SIGNING_PRIVATE_KEY`
+- `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`
 
-**Mandatory rule**: next published version (N+1) is complete only after real E2E update
-test from latest public version (N). Minimum: Windows NSIS + Linux AppImage.
+### Step 3 — Validate Published Release
 
----
+Check GitHub release assets include:
 
-## 3. Behavior Matrix
-
-| Platform/Channel           | Expected behavior                                        |
-| -------------------------- | -------------------------------------------------------- |
-| Windows (NSIS)             | Check, download, notify, install with `quitAndInstall()` |
-| macOS                      | Out of scope for this activation cycle                   |
-| Linux AppImage             | Check update when `APPIMAGE` env is present              |
-| Linux without `APPIMAGE`   | No update check (intentional skip)                       |
-| Linux distro package (AUR) | Update via distro package manager                        |
-| Dev environment            | No update check (intentional skip)                       |
-
-### Manjaro Notes
-
-- AppImage binary: in-app update may work.
-- Distro package/AUR: in-app update is unsupported; use system package manager.
+- Windows installer (`*.exe`) and signature (`*.exe.sig`)
+- Linux AppImage (`*.AppImage`) and signature (`*.AppImage.sig`)
+- `latest.json`
 
 ---
 
-## 4. Code Signing and Notarization
+## 3. Local Validation Commands
 
-- **Windows**: without code signing, SmartScreen may show extra warning.
-- **macOS**: auto-update requires correct signing/notarization; not activated this cycle.
-- Project has `afterSign` notarization path conditioned by Apple key environment variables.
+Main local validation script:
 
----
+```sh
+./scripts/validar-tudo.sh
+```
 
-## 5. Download Policy
+Useful direct modes:
 
-- `electron-updater` keeps default behavior (`autoDownload` implicit).
-- UI treats `Install Now` as install step for already-downloaded update.
-- Windows NSIS hardening (2026-04-08): explicit `shortcutName` and shortcut creation in `nsis` block; `nsis.include` with `customInstall` recreates missing Start Menu shortcut after install/update.
+```sh
+./scripts/validar-tudo.sh --quick-dev
+./scripts/validar-tudo.sh --run-packed
+./scripts/validar-tudo.sh --installers
+./scripts/validar-tudo.sh --installers --installers-full
+```
 
-Future optional review: if manual bandwidth/download control is needed, evaluate
-`autoDownload = false` with explicit download action in renderer.
+Windows equivalent:
 
----
-
-## 6. Release Checklists
-
-### CH-00 — Mandatory Gate (N+1)
-
-- [ ] Install current public version (N) in clean environment
-- [ ] Publish N+1
-- [ ] Validate real app update N -> N+1 (not only local build)
-- [ ] Register result in N+1 CHANGELOG
-
-### CH-01 — Preparation and Local Validation
-
-- [ ] Define target version and update both changelogs
-- [ ] Confirm `release:tag`, `release`, and `release:mw` scripts exist and run (`pnpm`)
-- [ ] Execute baseline (`lint`, `build`, `build:dir`)
-
-### CH-02 — Feed Publishing
-
-- [ ] Configure `GH_TOKEN` in publishing environment
-- [ ] Publish release with `--publish always`
-- [ ] Confirm update metadata (Windows `latest.yml`, Linux `latest-linux.yml`)
-- [ ] Confirm binary upload (NSIS and AppImage)
-
-### CH-03 — Windows E2E Validation
-
-- [ ] Install version N
-- [ ] Publish N+1
-- [ ] Verify `UPDATE_AVAILABLE` reception
-- [ ] Execute `Install Now` and validate restart on N+1
-- [ ] Confirm `Pomodoroz` Start Menu entry (search + alphabetical list)
-- [ ] Confirm `.lnk` file in `%APPDATA%\Microsoft\Windows\Start Menu\Programs\`
-
-### CH-04 — Linux AppImage E2E Validation
-
-- [ ] Install version N via AppImage
-- [ ] Publish N+1 with `latest-linux.yml`
-- [ ] Validate check/download/install in AppImage
-- [ ] Register expected skip behavior outside AppImage
-
-### CH-05 — Closeout
-
-- [ ] Register result in CHANGELOG (activation and platform limits)
-- [ ] If regression occurs, apply rollback (section 7) and reopen issue
+```powershell
+./scripts/validar-tudo.ps1
+```
 
 ---
 
-## 7. Rollback
+## 4. Mandatory E2E Update Gate (N -> N+1)
 
-1. Stop publishing releases with automatic feed.
-2. Publish hotfix without promoting automatic updates, if needed.
-3. Keep clients on previous stable version while fixing pipeline/feed.
-4. Reopen issue in this document with root cause and next step.
+Every new public version must be validated from the previous public version:
+
+1. Install version **N** in clean environment.
+2. Publish **N+1**.
+3. Open app on N and trigger update check.
+4. Confirm update is detected and installed.
+5. Confirm app restarts on N+1.
+
+Minimum required E2E channels:
+
+- Windows NSIS
+- Linux AppImage
 
 ---
 
-## 8. Relation to Tauri Migration
+## 5. Behavior Matrix
 
-This document describes the **current** Electron-based release flow.
-When the Tauri migration reaches Phase 2f (auto-update) and Phase 4 (CI),
-this document should be updated to reflect:
+| Platform/Channel | Expected behavior                                |
+| ---------------- | ------------------------------------------------ |
+| Windows NSIS     | Check, notify, install, restart via updater flow |
+| Linux AppImage   | Check, notify, install, restart via updater flow |
+| Linux deb/rpm    | Update through package manager                   |
+| Dev runtime      | No release updater artifact installation path    |
 
-- `tauri-plugin-updater` replacing `electron-updater`
-- `tauri-apps/tauri-action` replacing `electron-builder` in CI
-- New platform artifacts (.dmg via Tauri, etc.)
+Manjaro note:
 
-Until then, the Electron flow described here remains authoritative.
+- AppImage channel supports in-app updater flow.
+- `deb`/`rpm` installs should follow package-manager update flow.
+
+---
+
+## 6. Rollback
+
+1. Stop publishing new updater artifacts.
+2. Publish hotfix version without promoting broken feed path.
+3. Keep users on last stable release while pipeline is corrected.
+4. Register root cause and corrective action in docs/changelog.

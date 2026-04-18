@@ -6,6 +6,17 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.4.24] - TBD
+
+### Changed
+
+- **Legacy Electron packaging manifest removed from the repository without breaking build/release** — committed `app/electron/package.json` was removed, and a new `scripts/electron-builder-wrapper.mjs` now creates/removes an ephemeral manifest during `electron-builder` executions (local scripts and release workflow), keeping compatibility with electron-builder two-package expectations.
+- **Electron packaging flow centralized in the root wrapper** — root `package.json` (`eb`) and `.github/workflows/release-autoupdate.yml` now run the dedicated wrapper (instead of calling `electron-builder` directly), preserving `traversal` dependency collection and removing operational coupling to a permanent `package.json` inside `app/electron`.
+- **Phase 3b marked as completed in the migration plan** — `docs/MIGRATION_ELECTRON_TO_TAURI.md` was updated to reflect flatten-stage closure with removal of remaining workspace manifests and gate unblocked to start Phase 4 (Tauri CI).
+- **Final hardening for Phase 2f (Tauri updater) completed** — `TauriInvokeConnector` now runs `downloadAndInstall` on `INSTALL_UPDATE` and restarts the app through a Rust `restart_app` command; the `In-app auto update` toggle is re-enabled for Tauri runtime, and the update screen now exposes a native “Install and restart” action with release-page fallback.
+- **Phase 4 kickoff with PR/push CI gate** — new workflow `.github/workflows/ci.yml` adds automated `pnpm lint`, `pnpm typecheck:renderer`, `pnpm build:renderer`, and Linux `cargo check`, establishing a quality gate while release migration to a full Tauri-native pipeline is still in progress.
+- **Tauri updater release workflow now supports tag-triggered runs (`v*`) in addition to manual dispatch** — `.github/workflows/release-tauri-updater.yml` now resolves `RELEASE_TAG` automatically on tag pushes, enabling signed updater asset publishing (`.exe`/`.AppImage` + `.sig` + `latest.json`) without relying only on `workflow_dispatch`.
+
 ## [26.4.23] - 2026-04-17
 
 ### Changed

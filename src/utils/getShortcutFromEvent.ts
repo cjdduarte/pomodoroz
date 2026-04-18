@@ -1,6 +1,6 @@
 import type { KeyboardEvent } from "react";
 
-const ELECTRON_MODIFIERS = Object.freeze({
+const SHORTCUT_MODIFIERS = Object.freeze({
   Control: "CmdOrCtrl",
   Alt: "Alt",
   Meta: "Meta",
@@ -27,10 +27,10 @@ export function getShortcutFromEvent(e: KeyboardEvent) {
   let shortcut = "";
 
   // Add modifiers to the shortcut
-  if (e.ctrlKey) shortcut += `${ELECTRON_MODIFIERS.Control}+`;
-  if (e.altKey) shortcut += `${ELECTRON_MODIFIERS.Alt}+`;
-  if (e.metaKey) shortcut += `${ELECTRON_MODIFIERS.Meta}+`;
-  if (e.shiftKey) shortcut += `${ELECTRON_MODIFIERS.Shift}+`;
+  if (e.ctrlKey) shortcut += `${SHORTCUT_MODIFIERS.Control}+`;
+  if (e.altKey) shortcut += `${SHORTCUT_MODIFIERS.Alt}+`;
+  if (e.metaKey) shortcut += `${SHORTCUT_MODIFIERS.Meta}+`;
+  if (e.shiftKey) shortcut += `${SHORTCUT_MODIFIERS.Shift}+`;
 
   // Accept only alphanumeric characters (for now)
   if (!key.match(/^[0-9a-z]$/)) return null;

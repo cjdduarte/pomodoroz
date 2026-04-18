@@ -2,13 +2,13 @@
 
 > Operational rules for AI agents working on this codebase.
 > For project overview, stack, and commands, see `CLAUDE.md`.
-> For migration plan, see `docs/MIGRATION_ELECTRON_TO_TAURI.md`.
+> For migration plan, see `docs/MIGRATION_TO_TAURI.md`.
 
 ---
 
 ## Scope
 
-- Platform: Electron desktop app (migrating to Tauri — see migration doc).
+- Platform: Tauri desktop app.
 - Architecture: standalone, no server, no cloud. All data is local.
 - Direction: incremental evolution with focus on stability, security, and predictability.
 
@@ -17,7 +17,7 @@
 ## Mission
 
 1. Preserve functional stability (timer, tasks, settings, tray, compact mode).
-2. Maintain security hardening (preload/IPC/sandbox/CSP).
+2. Maintain security hardening (Tauri commands/capabilities/CSP).
 3. Evolve dependencies in small, testable, reversible blocks.
 4. Keep cross-platform builds green (Windows, macOS, Linux).
 5. Log changes in CHANGELOG; track decisions in docs.
@@ -41,7 +41,7 @@
 | What                              | Where                                          |
 | --------------------------------- | ---------------------------------------------- |
 | Implemented changes               | `CHANGELOG.md` (PT) and `CHANGELOG.en.md` (EN) |
-| Migration plan                    | `docs/MIGRATION_ELECTRON_TO_TAURI.md`          |
+| Migration plan                    | `docs/MIGRATION_TO_TAURI.md`                   |
 | Release/update operations         | `docs/RELEASE_OPERATIONS.md`                   |
 | Product backlog (future features) | `docs/PRODUCT_BACKLOG.md`                      |
 | Agent operational rules           | This file (`AGENTS.md`)                        |

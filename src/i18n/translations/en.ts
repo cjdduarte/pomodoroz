@@ -198,6 +198,10 @@ export const en = {
   updater: {
     heading: "An update is available",
     noUpdateBody: "No update body found",
+    installAndRestart: "Install and restart",
+    installingTitle: "Installing update",
+    installingBody:
+      "The update download started in-app. Pomodoroz will restart when finished.",
     openingReleaseTitle: "Opening Release Page",
     openingReleaseBody:
       "Your browser will open the latest release notes and installer.",

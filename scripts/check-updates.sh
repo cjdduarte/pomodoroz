@@ -102,9 +102,9 @@ OUTDATED_CHECK_FAILED=0
 PNPM_VERSION_CURRENT=""
 PNPM_VERSION_LATEST=""
 CRITICAL_EXACT_PACKAGES=(
-  "electron"
   "typescript"
-  "@electron/notarize"
+  "@tauri-apps/cli"
+  "@tauri-apps/api"
 )
 
 print_header() {
@@ -701,14 +701,14 @@ check_stack_versions() {
     return
   fi
 
-  local electron_version react_version ts_version
+  local tauri_cli_version react_version ts_version
   local root_pkg
   root_pkg="$POMODOROZ_DIR/package.json"
-  electron_version="$(node -e "const p=require('$root_pkg'); console.log((p.devDependencies&&p.devDependencies.electron)||(p.dependencies&&p.dependencies.electron)||'n/a');" 2>/dev/null || true)"
+  tauri_cli_version="$(node -e "const p=require('$root_pkg'); console.log((p.devDependencies&&p.devDependencies['@tauri-apps/cli'])||(p.dependencies&&p.dependencies['@tauri-apps/cli'])||'n/a');" 2>/dev/null || true)"
   react_version="$(get_pkg_version "$root_pkg" "react")"
   ts_version="$(node -e "const p=require('$root_pkg'); console.log((p.devDependencies&&p.devDependencies.typescript)||'n/a');" 2>/dev/null || true)"
 
-  echo "  Electron (root): ${electron_version:-n/a}"
+  echo "  Tauri CLI (root): ${tauri_cli_version:-n/a}"
   echo "  React (root/src): ${react_version:-n/a}"
   echo "  TypeScript (root): ${ts_version:-n/a}"
 }
@@ -732,11 +732,11 @@ check_framework_inventory() {
   echo "    vite: $(get_pkg_version "$root_pkg" "vite")"
   echo "    @vitejs/plugin-react: $(get_pkg_version "$root_pkg" "@vitejs/plugin-react")"
 
-  echo "  [Electron]"
-  echo "    electron: $(get_pkg_version "$root_pkg" "electron")"
-  echo "    electron-builder: $(get_pkg_version "$root_pkg" "electron-builder")"
-  echo "    electron-updater: $(get_pkg_version "$root_pkg" "electron-updater")"
-  echo "    electron-store: $(get_pkg_version "$root_pkg" "electron-store")"
+  echo "  [Tauri]"
+  echo "    @tauri-apps/cli: $(get_pkg_version "$root_pkg" "@tauri-apps/cli")"
+  echo "    @tauri-apps/api: $(get_pkg_version "$root_pkg" "@tauri-apps/api")"
+  echo "    @tauri-apps/plugin-updater: $(get_pkg_version "$root_pkg" "@tauri-apps/plugin-updater")"
+  echo "    @tauri-apps/plugin-dialog: $(get_pkg_version "$root_pkg" "@tauri-apps/plugin-dialog")"
 
   echo "  [Monorepo/Tooling]"
   echo "    typescript: $(get_pkg_version "$root_pkg" "typescript")"
@@ -750,12 +750,12 @@ check_framework_inventory() {
   if node -e '
     const p = require(process.argv[1]);
     const scripts = p.scripts || {};
-    const hasViteRenderer = Object.prototype.hasOwnProperty.call(scripts, "dev:app:vite");
-    process.exit(hasViteRenderer ? 0 : 1);
+    const hasTauri = Object.prototype.hasOwnProperty.call(scripts, "tauri");
+    process.exit(hasTauri ? 0 : 1);
   ' "$root_pkg" 2>/dev/null; then
-    echo "    Vite no fluxo principal: ativo"
+    echo "    Runtime principal: Tauri"
   else
-    echo "    Vite no fluxo principal: nao detectado"
+    echo "    Runtime principal: nao detectado"
   fi
 }
 
@@ -903,7 +903,7 @@ run_updates_for_selected() {
     fi
 
     if [ "$mode" = "safe" ]; then
-      # Ex.: "electron": "41.0.3" (range fixa). Precisamos aplicar target explicito.
+      # Ex.: versao fixa sem prefixo semver (range fixa). Precisamos aplicar target explicito.
       # Quando current==wanted e latest!=current, aplicamos versao explicita.
       if [ "$current" = "$wanted" ] && [ "$latest" != "$current" ]; then
         echo "  -> [$ws] versao fixa detectada para $pkg"
@@ -1031,7 +1031,7 @@ check_js_dependencies() {
   echo "Recomendado:"
   echo "  cd \"$POMODOROZ_DIR\" && pnpm install"
   echo "  cd \"$POMODOROZ_DIR\" && pnpm build"
-  echo "  cd \"$POMODOROZ_DIR\" && pnpm dev:app"
+  echo "  cd \"$POMODOROZ_DIR\" && pnpm tauri dev"
 }
 
 cargo_subcommand_available() {

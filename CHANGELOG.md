@@ -6,6 +6,17 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.4.24] - A definir
+
+### Alterado
+
+- **Manifesto legado de empacotamento Electron removido do repositório sem quebrar build/release** — `app/electron/package.json` foi removido da árvore versionada, e o novo wrapper `scripts/electron-builder-wrapper.mjs` passou a gerar/remover um manifesto temporário durante execuções do `electron-builder` (scripts locais e workflow de release), mantendo compatibilidade com a estrutura de duas camadas exigida pela ferramenta.
+- **Fluxo de empacotamento Electron centralizado no wrapper raiz** — `package.json` (`eb`) e `.github/workflows/release-autoupdate.yml` agora executam o wrapper dedicado (em vez de chamar `electron-builder` direto), preservando o collector `traversal` e eliminando acoplamento operacional com um `package.json` permanente dentro de `app/electron`.
+- **Fase 3b marcada como concluída no plano de migração** — `docs/MIGRATION_ELECTRON_TO_TAURI.md` foi atualizado para refletir o fechamento da etapa de flatten com remoção dos manifests de workspace remanescentes e gate liberado para iniciar a Fase 4 (CI Tauri).
+- **Hardening final da Fase 2f (updater Tauri) concluído** — `TauriInvokeConnector` agora executa `downloadAndInstall` no canal `INSTALL_UPDATE` e reinicia o app via comando Rust `restart_app`; o toggle `In-app auto update` foi reabilitado em Ajustes para runtime Tauri, e a tela de update ganhou ação nativa de “Instalar e reiniciar” com fallback para abrir a página de release.
+- **Kickoff da Fase 4 com gate de CI em PR/push** — novo workflow `.github/workflows/ci.yml` adiciona validações automáticas de `pnpm lint`, `pnpm typecheck:renderer`, `pnpm build:renderer` e `cargo check` (Linux), formalizando a porta de qualidade enquanto a migração de release para pipeline Tauri ainda está em andamento.
+- **Workflow de updater Tauri preparado para rodar por tag (`v*`) além do modo manual** — `.github/workflows/release-tauri-updater.yml` agora resolve `RELEASE_TAG` automaticamente em push de tag, permitindo publicar assets assinados (`.exe`/`.AppImage` + `.sig` + `latest.json`) sem depender apenas de `workflow_dispatch`.
+
 ## [26.4.23] - 2026-04-17
 
 ### Alterado

@@ -95,7 +95,7 @@ Pomodoroz is not about "fixing flexibility"; it focuses on adding workflow featu
 
 - Implemented deliveries: [CHANGELOG.en.md](CHANGELOG.en.md)
 - Candidate improvements (not implemented yet): [docs/PRODUCT_BACKLOG.md](docs/PRODUCT_BACKLOG.md)
-- Migration plan (Electron to Tauri): [docs/MIGRATION_ELECTRON_TO_TAURI.md](docs/MIGRATION_ELECTRON_TO_TAURI.md)
+- Migration history: [docs/MIGRATION_TO_TAURI.md](docs/MIGRATION_TO_TAURI.md)
 
 ## ✨ Features
 
@@ -204,10 +204,10 @@ Download the latest version from the [Releases page](https://github.com/cjdduart
 
 ```sh
 pnpm install
-pnpm build:dir    # Unpacked build
-pnpm build:linux  # Linux (AppImage, deb, rpm)
-pnpm build:win    # Windows (portable + setup)
-pnpm build:mac    # macOS
+pnpm build:renderer
+pnpm tauri build --no-bundle
+pnpm tauri build --bundles appimage,deb,rpm
+pnpm tauri build --bundles nsis
 ```
 
 ## 🛠️ Development
@@ -220,21 +220,22 @@ pnpm build:mac    # macOS
 ### Commands
 
 ```sh
-pnpm dev:app          # Electron + Vite renderer
+pnpm dev:app          # Tauri + Vite renderer
 pnpm dev:renderer     # Renderer only (Vite on localhost:3000)
-pnpm lint             # Lint/typecheck (renderer + electron)
-pnpm build:dir        # Unpacked build
+pnpm lint             # Lint (renderer)
+pnpm typecheck:renderer
+pnpm tauri build --no-bundle
 ```
 
 ### Stack
 
-- Electron 41
+- Tauri 2
 - React 19 + Vite 8 + TypeScript 6
 - React Router 7 + Redux Toolkit 2
 - @dnd-kit (drag-and-drop)
 - Styled Components
 - i18next
-- Root-driven pnpm scripts (renderer shell kept under `app/renderer`, Electron shell under `app/electron`)
+- Root-driven pnpm scripts with renderer shell under `app/renderer` and native backend under `src-tauri`
 
 ## 🤝 Contributing
 

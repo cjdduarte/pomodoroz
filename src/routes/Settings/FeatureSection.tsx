@@ -23,7 +23,6 @@ import {
 } from "store";
 import { Toggler, TogglerProps, Collapse, Radio } from "components";
 import { ThemeContext } from "contexts";
-import { getRuntimeKind } from "contexts/connectors/runtimeInvokeConnector";
 
 import SettingSection from "./SettingSection";
 import { detectOS, requestDesktopNotificationPermission } from "utils";
@@ -36,7 +35,6 @@ const FeatureSection: React.FC = () => {
   const settings = useAppSelector((state) => state.settings);
 
   const dispatch = useAppDispatch();
-  const isTauriRuntime = getRuntimeKind() === "tauri";
 
   const { isDarkMode, toggleThemeAction } = useContext(ThemeContext);
 
@@ -205,7 +203,6 @@ const FeatureSection: React.FC = () => {
       id: "in-app-auto-update",
       label: t("settings.inAppAutoUpdate"),
       checked: settings.enableInAppAutoUpdate,
-      disabled: isTauriRuntime,
       onChange: useCallback(() => {
         dispatch(
           setEnableInAppAutoUpdate(!settings.enableInAppAutoUpdate)

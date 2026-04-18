@@ -24,11 +24,11 @@ Please use conventional commit messages in your PRs (or PR titles for squash mer
 
 ```sh
 pnpm install              # Install dependencies
-pnpm dev:app              # Electron + Vite renderer
+pnpm dev:app              # Tauri + Vite renderer
 pnpm dev:renderer         # Renderer only (Vite on localhost:3000)
-pnpm dev:main             # Electron main only
-pnpm lint                 # Lint + typecheck
-pnpm build:dir            # Unpacked build for smoke testing
+pnpm lint                 # Lint (renderer)
+pnpm typecheck:renderer   # Typecheck (renderer)
+pnpm tauri build --no-bundle  # Build release binary (no installer)
 ```
 
 Any IDE should work — it will pick up `package.json` in the root folder.
@@ -43,10 +43,8 @@ Any IDE should work — it will pick up `package.json` in the root folder.
 ## Building for Production
 
 ```sh
-pnpm build:win            # Windows (portable + setup)
-pnpm build:mac            # macOS
-pnpm build:linux          # Linux (AppImage, deb, rpm)
-pnpm build:mwl            # All platforms
+./scripts/validar-tudo.sh --installers            # Installers (Linux/macOS/Windows)
+./scripts/validar-tudo.sh --installers --installers-full
 ```
 
 ## Pre-Commit
@@ -63,7 +61,7 @@ To run the same checks manually: `pnpm exec lint-staged`.
 
 ## CI / Release
 
-- There is no CI pipeline on regular pushes/PRs yet (planned in migration Phase 4).
+- CI pipeline runs on push/PR (`.github/workflows/ci.yml`).
 - Release workflow (`release-autoupdate.yml`) runs on `v*` tags or manual dispatch, with Windows + Linux jobs.
 - See `docs/RELEASE_OPERATIONS.md` for the full release flow.
 

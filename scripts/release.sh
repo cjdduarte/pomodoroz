@@ -144,16 +144,6 @@ build_release_git_add_cmd() {
     "CHANGELOG.md"
     "CHANGELOG.en.md"
   )
-  local -a optional_files=(
-    "app/electron/package.json"
-    "app/renderer/package.json"
-  )
-  local file
-  for file in "${optional_files[@]}"; do
-    if [[ -f "$APP_DIR/$file" ]]; then
-      files+=("$file")
-    fi
-  done
 
   local cmd="cd \"$APP_DIR\" && git add"
   for file in "${files[@]}"; do

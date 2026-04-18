@@ -21,8 +21,6 @@ if (!targetVersion || !semverPattern.test(targetVersion)) {
 
 const packageFiles = [
   { path: "package.json", required: true },
-  { path: "app/electron/package.json", required: false },
-  { path: "app/renderer/package.json", required: false },
   { path: "src-tauri/tauri.conf.json", required: true },
 ];
 
