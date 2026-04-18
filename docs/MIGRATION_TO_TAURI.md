@@ -507,9 +507,9 @@ Components never call `invoke()` or store APIs directly.
 
 ---
 
-## 7. Standard Approval Checklist
+## 7. Standard Approval Checklist (Template)
 
-Apply to every migration phase/PR:
+Apply to every migration phase/PR (checklist template):
 
 - [ ] `lint` green
 - [ ] `build` green
@@ -534,18 +534,17 @@ Apply to every migration phase/PR:
 
 ---
 
-## 9. Pre-Migration Technical Debt
+## 9. Technical Debt Snapshot (Post-Migration Follow-up)
 
-Known issues inherited from the Electron codebase. These should be resolved
-before or during the migration, not carried forward silently.
+Known issues inherited from previous phases and follow-up items after migration closure.
 
-| Item                                                                      | Status | Notes                                           |
-| ------------------------------------------------------------------------- | ------ | ----------------------------------------------- |
-| `.env` hygiene (`app/renderer/.env` tracked)                              | Open   | Remove from version control, add `.env.example` |
-| CI pipeline for PRs (lint/build/test)                                     | Open   | Only release workflow exists today; add PR gate |
-| Custom shortcut TODO without persistence (`Shortcut.tsx`)                 | Open   | Shortcut config is not saved across restarts    |
-| Pending major updates: `eslint`/`@eslint/js` 10.x, `vite-plugin-svgr` 5.x | Open   | Evaluate compatibility during Phase 0           |
-| `check-updates.sh` `--full` report mode (audit + GH Actions versions)     | Open   | Planned but not implemented                     |
+| Item                                                                          | Status | Notes                                                                                |
+| ----------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------ |
+| `.env` hygiene (`app/renderer/.env` tracked)                                  | Open   | Remove from version control, add `.env.example`                                      |
+| CI pipeline for PRs (lint/build/test)                                         | Closed | `ci.yml` gate active (`lint`, `typecheck:renderer`, `build:renderer`, `cargo check`) |
+| Custom shortcut TODO without persistence (`Shortcut.tsx`)                     | Open   | Shortcut config is not saved across restarts                                         |
+| Major dependency updates (`eslint`/`@eslint/js` 10.x, `vite-plugin-svgr` 5.x) | Open   | Track and apply via `check-updates` flow in controlled batches                       |
+| `check-updates.sh` `--full` report mode (audit + GH Actions versions)         | Open   | Planned but not implemented                                                          |
 
 ---
 
