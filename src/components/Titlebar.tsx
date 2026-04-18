@@ -2,6 +2,7 @@ import React, { useContext, useCallback } from "react";
 import { TimerStatus } from "store/timer/types";
 import {
   StyledTitlebar,
+  StyledTitlebarDragRegion,
   StyledWindowActions,
   StyledCloseButton,
   StyledMinimizeButton,
@@ -27,8 +28,18 @@ type Props = {
 };
 
 const Titlebar: React.FC<Props> = ({ darkMode, timerType }) => {
-  const { onMinimizeCallback, onExitCallback } =
+  const { onMinimizeCallback, onExitCallback, onTitlebarDragStart } =
     useContext(ConnectorContext);
+
+  const onDragRegionMouseDown = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      if (event.button !== 0) {
+        return;
+      }
+      onTitlebarDragStart?.();
+    },
+    [onTitlebarDragStart]
+  );
 
   const getAppIcon = useCallback(() => {
     switch (timerType) {
@@ -45,12 +56,17 @@ const Titlebar: React.FC<Props> = ({ darkMode, timerType }) => {
 
   return (
     <StyledTitlebar>
-      <StyledMarkWrapper>
-        <StyledMarkLogo src={getAppIcon()} />
-        <StyledMarkName>
-          {APP_NAME} {Json.version && <span>v{Json.version}</span>}
-        </StyledMarkName>
-      </StyledMarkWrapper>
+      <StyledTitlebarDragRegion
+        data-tauri-drag-region
+        onMouseDown={onDragRegionMouseDown}
+      >
+        <StyledMarkWrapper>
+          <StyledMarkLogo src={getAppIcon()} />
+          <StyledMarkName>
+            {APP_NAME} {Json.version && <span>v{Json.version}</span>}
+          </StyledMarkName>
+        </StyledMarkWrapper>
+      </StyledTitlebarDragRegion>
 
       <StyledWindowActions>
         <StyledMinimizeButton onClick={onMinimizeCallback} />

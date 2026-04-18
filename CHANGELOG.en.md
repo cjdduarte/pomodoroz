@@ -6,6 +6,13 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.4.25] - 2026-04-18
+
+### Fixed
+
+- **Window dragging restored when disabling “Native Titlebar” on Tauri runtime** — the custom `Titlebar` now triggers native window drag (`start_window_drag`) on title-area `mousedown`, in addition to `data-tauri-drag-region`, while keeping window action buttons clickable outside that region.
+- **Immediate border/shadow refresh when toggling native titlebar** — `ThemeContext` no longer uses a static `useNativeTitlebar` reference, preventing stale visual state after the toggle.
+
 ## [26.4.24] - 2026-04-17
 
 ### Changed

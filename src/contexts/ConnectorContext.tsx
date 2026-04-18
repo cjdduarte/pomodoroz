@@ -8,6 +8,7 @@ import {
 export type ConnectorProps = {
   onMinimizeCallback?: () => void;
   onExitCallback?: () => void;
+  onTitlebarDragStart?: () => void;
   openExternalCallback?: () => void;
   connectorError?: string | null;
   dismissConnectorError?: () => void;

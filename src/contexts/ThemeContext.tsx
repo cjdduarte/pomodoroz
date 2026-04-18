@@ -1,8 +1,4 @@
-import React, {
-  type PropsWithChildren,
-  useEffect,
-  useRef,
-} from "react";
+import React, { type PropsWithChildren, useEffect } from "react";
 import { isPreferredDark } from "utils";
 import { GlobalStyles } from "styles";
 import { useAppDispatch, useAppSelector } from "hooks/storeHooks";
@@ -21,8 +17,6 @@ const ThemeProvider = ({ children }: PropsWithChildren) => {
   const settings = useAppSelector((state) => state.settings);
 
   const dispatch = useAppDispatch();
-
-  const useNativeTitlebar = useRef(settings.useNativeTitlebar);
 
   const toggleThemeAction = () => {
     dispatch(setEnableDarkTheme(!settings.enableDarkTheme));
@@ -52,7 +46,7 @@ const ThemeProvider = ({ children }: PropsWithChildren) => {
     >
       <GlobalStyles
         isDarkMode={settings.enableDarkTheme}
-        useNativeTitlebar={useNativeTitlebar.current}
+        useNativeTitlebar={settings.useNativeTitlebar}
       />
       {children}
     </ThemeContext.Provider>

@@ -5,7 +5,7 @@ use commands::window_bridge::{
     close_window, compact_collapse, compact_expand, minimize_window, play_notification_sound,
     read_text_file, restart_app, set_always_on_top, set_compact_mode, set_fullscreen_break,
     set_native_titlebar, set_tray_behavior, set_tray_copy, set_tray_icon, set_ui_theme,
-    show_window, write_text_file, TrayBehaviorState,
+    show_window, start_window_drag, write_text_file, TrayBehaviorState,
 };
 #[cfg(target_os = "linux")]
 use constants::WINDOW_RESTORED_EVENT;
@@ -235,6 +235,7 @@ pub fn run() {
             set_ui_theme,
             set_native_titlebar,
             show_window,
+            start_window_drag,
             minimize_window,
             close_window,
             restart_app,

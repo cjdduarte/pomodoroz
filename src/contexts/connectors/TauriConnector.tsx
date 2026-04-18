@@ -25,6 +25,7 @@ import {
   SET_IN_APP_AUTO_UPDATE,
   SET_NATIVE_TITLEBAR,
   SET_OPEN_AT_LOGIN,
+  START_WINDOW_DRAG,
   SET_TRAY_BEHAVIOR,
   SET_TRAY_COPY,
   SET_UI_THEME,
@@ -141,6 +142,10 @@ export const TauriConnectorProvider = ({
       closeToTray: settings.closeToTray,
     });
   }, [sendToMain, settings.closeToTray]);
+
+  const onTitlebarDragStart = useCallback(() => {
+    sendToMain(START_WINDOW_DRAG);
+  }, [sendToMain]);
 
   const openExternalCallback = useCallback(() => {
     sendToMain(OPEN_RELEASE_PAGE);
@@ -312,6 +317,7 @@ export const TauriConnectorProvider = ({
       value={{
         onMinimizeCallback,
         onExitCallback,
+        onTitlebarDragStart,
         openExternalCallback,
         connectorError,
         dismissConnectorError: clearConnectorError,

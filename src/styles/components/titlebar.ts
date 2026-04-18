@@ -33,11 +33,19 @@ export const StyledTitlebar = styled.div`
   height: 4rem;
 
   display: flex;
-  justify-content: space-between;
-  align-content: center;
+  align-items: center;
 
   -webkit-app-region: drag;
-  cursor: pointer;
+`;
+
+export const StyledTitlebarDragRegion = styled.div`
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  cursor: grab;
 `;
 
 export const StyledMarkWrapper = styled.div`

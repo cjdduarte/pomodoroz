@@ -47,6 +47,7 @@ import {
   SET_IN_APP_AUTO_UPDATE,
   SET_NATIVE_TITLEBAR,
   SET_OPEN_AT_LOGIN,
+  START_WINDOW_DRAG,
   SET_TRAY_BEHAVIOR,
   SET_TRAY_COPY,
   SET_UI_THEME,
@@ -461,6 +462,11 @@ const sendToTauri = async <C extends ToMainChannel>(
 
     case SHOW_WINDOW: {
       await invoke("show_window");
+      return;
+    }
+
+    case START_WINDOW_DRAG: {
+      await invoke("start_window_drag");
       return;
     }
 

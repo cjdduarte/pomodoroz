@@ -167,6 +167,11 @@ pub fn show_window(window: Window) -> Result<(), String> {
     window.set_focus().map_err(map_error)
 }
 
+#[tauri::command]
+pub fn start_window_drag(window: Window) -> Result<(), String> {
+    window.start_dragging().map_err(map_error)
+}
+
 #[tauri::command(rename_all = "camelCase")]
 pub fn minimize_window(window: Window, minimize_to_tray: bool) -> Result<(), String> {
     if minimize_to_tray && has_tray(&window) {

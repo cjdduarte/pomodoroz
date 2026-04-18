@@ -6,6 +6,13 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.4.25] - 2026-04-18
+
+### Corrigido
+
+- **Arraste da janela restaurado ao desativar “Barra de título nativa” no runtime Tauri** — a `Titlebar` custom agora dispara arraste nativo (`start_window_drag`) no `mousedown` da área de título, além da região `data-tauri-drag-region`, mantendo os botões de janela clicáveis fora dessa área.
+- **Aplicação imediata do estilo de borda/sombra ao alternar título nativo** — `ThemeContext` deixou de usar referência estática para `useNativeTitlebar`, evitando estado visual preso após o toggle.
+
 ## [26.4.24] - 2026-04-17
 
 ### Alterado

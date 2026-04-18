@@ -12,6 +12,7 @@ export const SET_UI_THEME = "SET_UI_THEME";
 export const MINIMIZE_WINDOW = "MINIMIZE_WINDOW";
 export const CLOSE_WINDOW = "CLOSE_WINDOW";
 export const SHOW_WINDOW = "SHOW_WINDOW";
+export const START_WINDOW_DRAG = "START_WINDOW_DRAG";
 export const UPDATE_AVAILABLE = "UPDATE_AVAILABLE";
 export const SET_IN_APP_AUTO_UPDATE = "SET_IN_APP_AUTO_UPDATE";
 export const OPEN_RELEASE_PAGE = "OPEN_RELEASE_PAGE";
@@ -41,6 +42,7 @@ export const TO_MAIN = [
   MINIMIZE_WINDOW,
   CLOSE_WINDOW,
   SHOW_WINDOW,
+  START_WINDOW_DRAG,
   SET_IN_APP_AUTO_UPDATE,
   OPEN_RELEASE_PAGE,
   INSTALL_UPDATE,
@@ -168,15 +170,17 @@ export type ToMainPayloadMap = {
                               ? [CloseWindowPayload]
                               : K extends typeof SHOW_WINDOW
                                 ? []
-                                : K extends typeof OPEN_RELEASE_PAGE
+                                : K extends typeof START_WINDOW_DRAG
                                   ? []
-                                  : K extends typeof INSTALL_UPDATE
+                                  : K extends typeof OPEN_RELEASE_PAGE
                                     ? []
-                                    : K extends typeof EXPORT_TASKS_DIALOG
-                                      ? [ExportTasksDialogPayload]
-                                      : K extends typeof IMPORT_TASKS_DIALOG
-                                        ? []
-                                        : never;
+                                    : K extends typeof INSTALL_UPDATE
+                                      ? []
+                                      : K extends typeof EXPORT_TASKS_DIALOG
+                                        ? [ExportTasksDialogPayload]
+                                        : K extends typeof IMPORT_TASKS_DIALOG
+                                          ? []
+                                          : never;
 };
 
 export type FromMainPayloadMap = {
