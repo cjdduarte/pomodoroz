@@ -1,6 +1,6 @@
 [package]
 name = "pomodoroz_tauri"
-version = "26.4.24"
+version = "26.4.25"
 description = "Pomodoroz desktop app (Tauri runtime scaffold)"
 authors = ["Carlos Duarte <cjdduarte@gmail.com>"]
 license = "MIT"
