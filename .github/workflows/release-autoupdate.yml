@@ -1,4 +1,4 @@
-name: Release Auto Update
+name: Release
 
 on:
   push:
