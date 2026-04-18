@@ -158,7 +158,21 @@ pub fn set_ui_theme(window: Window, is_dark_mode: bool) -> Result<(), String> {
 pub fn set_native_titlebar(window: Window, use_native_titlebar: bool) -> Result<(), String> {
     window
         .set_decorations(use_native_titlebar)
-        .map_err(map_error)
+        .map_err(map_error)?;
+
+    // Workaround Linux/webkit2gtk:
+    // alternar `set_decorations` pode deixar a superfície sem input grab
+    // em alguns ciclos on/off/on do título nativo. O toggle de resizable
+    // força renegociação da superfície e recupera clique nos controles.
+    #[cfg(target_os = "linux")]
+    {
+        let was_resizable = window.is_resizable().map_err(map_error)?;
+        window.set_resizable(!was_resizable).map_err(map_error)?;
+        window.set_resizable(was_resizable).map_err(map_error)?;
+        window.set_focus().map_err(map_error)?;
+    }
+
+    Ok(())
 }
 
 #[tauri::command]

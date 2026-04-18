@@ -15,6 +15,7 @@
 - **Legacy Electron/runtime residues cleaned from current operations** — removed the local `dist/linux-unpacked` artifact (not versioned), removed `-webkit-app-region` titlebar CSS rules, and dropped the unused global `window.isUserHaveSession` extension.
 - **Install documentation aligned with published release scope** — `README.md` and `README.pt-BR.md` now state that published release artifacts currently target Windows/Linux, while macOS remains source-build based.
 - **Legacy `styled-components/macro` usage removed from the renderer** — imports were migrated to `styled-components` across `src/`, the compatibility alias was removed from `app/renderer/vite.config.ts`, and `src/types/styled-components-macro.d.ts` was deleted.
+- **“Native Titlebar” toggle hardened to prevent `X` button click loss after repeated switches** — `titlebar.ts` now explicitly marks drag region (`drag`) and window controls (`no-drag`) again, and Rust `set_native_titlebar` now performs a defensive surface renegotiation on Linux after `set_decorations`.
 
 ## [26.4.25] - 2026-04-18
 

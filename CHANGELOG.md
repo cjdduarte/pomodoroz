@@ -15,6 +15,7 @@
 - **Limpeza de resíduos legados do runtime Electron e título custom** — remoção do artefato local `dist/linux-unpacked` (não versionado), remoção das regras CSS `-webkit-app-region` no titlebar e exclusão da extensão global `window.isUserHaveSession` sem consumidores no código atual.
 - **Documentação de instalação alinhada ao escopo real de publicação** — `README.md` e `README.pt-BR.md` agora deixam explícito que os artefatos publicados em Release cobrem Windows/Linux, mantendo macOS via build por código-fonte.
 - **Legado `styled-components/macro` removido do renderer** — imports foram migrados para `styled-components` em `src/`, o alias de compatibilidade foi removido de `app/renderer/vite.config.ts` e o shim `src/types/styled-components-macro.d.ts` foi excluído.
+- **Toggle de “Barra de título nativa” endurecido para evitar perda de clique no botão `X` após alternâncias** — `titlebar.ts` voltou a marcar área de arraste (`drag`) e controles de janela (`no-drag`) de forma explícita, e `set_native_titlebar` no Rust agora aplica renegociação defensiva de superfície no Linux após `set_decorations`.
 
 ## [26.4.25] - 2026-04-18
 

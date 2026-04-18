@@ -9,6 +9,7 @@ const TitlebarButton = css`
   background-color: transparent;
 
   position: relative;
+  -webkit-app-region: no-drag;
 
   /*
    * Workaround Linux/Tauri:
@@ -42,6 +43,7 @@ export const StyledTitlebarDragRegion = styled.div`
   display: flex;
   align-items: center;
   cursor: grab;
+  -webkit-app-region: drag;
 `;
 
 export const StyledMarkWrapper = styled.div`
