@@ -1,4 +1,4 @@
-import { css } from "styled-components/macro";
+import { css } from "styled-components";
 
 export const StyledScrollbar = css`
   &:hover::-webkit-scrollbar {

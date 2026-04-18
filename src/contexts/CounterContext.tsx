@@ -227,14 +227,6 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
     [t]
   );
 
-  window.isUserHaveSession = () => {
-    try {
-      return count < config.stayFocus * 60 || timer.round > 1;
-    } catch (_) {
-      return false;
-    }
-  };
-
   const activeTaskSelection = useMemo(
     () =>
       resolveActiveTaskSelection({

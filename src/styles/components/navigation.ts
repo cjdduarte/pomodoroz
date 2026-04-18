@@ -1,4 +1,4 @@
-import styled from "styled-components/macro";
+import styled from "styled-components";
 import { TimerStatus } from "store/timer/types";
 import { NavLink } from "react-router";
 import { themes } from "../themes";

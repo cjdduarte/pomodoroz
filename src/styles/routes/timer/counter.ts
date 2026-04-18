@@ -1,4 +1,4 @@
-import styled, { css } from "styled-components/macro";
+import styled, { css } from "styled-components";
 import type { CSSProperties } from "react";
 import { TimerStatus } from "store/timer/types";
 import { ProgressSVG } from "assets/icons";

@@ -1,4 +1,4 @@
-import styled, { css } from "styled-components/macro";
+import styled, { css } from "styled-components";
 import { themes } from "styles";
 
 const TitlebarButton = css`
@@ -9,8 +9,6 @@ const TitlebarButton = css`
   background-color: transparent;
 
   position: relative;
-
-  -webkit-app-region: no-drag;
 
   /*
    * Workaround Linux/Tauri:
@@ -34,8 +32,6 @@ export const StyledTitlebar = styled.div`
 
   display: flex;
   align-items: center;
-
-  -webkit-app-region: drag;
 `;
 
 export const StyledTitlebarDragRegion = styled.div`

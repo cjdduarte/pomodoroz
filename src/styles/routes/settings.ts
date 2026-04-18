@@ -1,4 +1,4 @@
-import styled from "styled-components/macro";
+import styled from "styled-components";
 import { themes } from "styles/themes";
 import { StyledScrollbar } from "styles/mixins";
 import { StyledButtonSecondary } from "styles";

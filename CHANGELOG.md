@@ -12,6 +12,9 @@
 
 - **Pipeline de release Tauri endurecida contra falhas transitórias de rede no AppImage** — o job Linux em `.github/workflows/release-autoupdate.yml` agora tenta `pnpm tauri build --bundles appimage` até 3 vezes antes de falhar.
 - **Tempo de CI/release otimizado com cache de build Rust** — `Swatinem/rust-cache@v2` foi adicionado em `ci.yml` (job `tauri-rust-check`) e nos jobs Windows/Linux do `release-autoupdate.yml`.
+- **Limpeza de resíduos legados do runtime Electron e título custom** — remoção do artefato local `dist/linux-unpacked` (não versionado), remoção das regras CSS `-webkit-app-region` no titlebar e exclusão da extensão global `window.isUserHaveSession` sem consumidores no código atual.
+- **Documentação de instalação alinhada ao escopo real de publicação** — `README.md` e `README.pt-BR.md` agora deixam explícito que os artefatos publicados em Release cobrem Windows/Linux, mantendo macOS via build por código-fonte.
+- **Legado `styled-components/macro` removido do renderer** — imports foram migrados para `styled-components` em `src/`, o alias de compatibilidade foi removido de `app/renderer/vite.config.ts` e o shim `src/types/styled-components-macro.d.ts` foi excluído.
 
 ## [26.4.25] - 2026-04-18
 

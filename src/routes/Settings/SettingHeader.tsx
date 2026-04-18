@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { restoreDefaultSettings } from "store";
 import { useAppDispatch } from "hooks/storeHooks";
-import styled from "styled-components/macro";
+import styled from "styled-components";
 
 import { Header } from "components";
 import { StyledHeaderButton } from "styles";

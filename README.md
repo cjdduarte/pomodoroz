@@ -185,7 +185,8 @@ Improvements informed by real feedback from users who deal with focus difficulti
 
 ## 💻 Installation
 
-Available for Windows, macOS, and Linux.
+Published release assets currently target Windows and Linux.
+macOS builds are currently source-based (`pnpm tauri build`).
 
 Download the latest version from the [Releases page](https://github.com/cjdduarte/pomodoroz/releases/latest).
 

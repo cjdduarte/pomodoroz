@@ -185,7 +185,8 @@ Melhorias pensadas a partir de feedback real de usuários que lidam com dificuld
 
 ## 💻 Instalação
 
-Disponível para Windows, macOS e Linux.
+Os artefatos publicados em Release atualmente cobrem Windows e Linux.
+Build para macOS está disponível via código-fonte (`pnpm tauri build`).
 
 Baixe a versão mais recente na [página de Releases](https://github.com/cjdduarte/pomodoroz/releases/latest).
 

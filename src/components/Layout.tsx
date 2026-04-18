@@ -4,7 +4,7 @@ import React, {
   useCallback,
   useState,
 } from "react";
-import styled from "styled-components/macro";
+import styled from "styled-components";
 import { useLocation, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import {

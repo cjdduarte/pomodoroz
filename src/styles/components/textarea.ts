@@ -1,4 +1,4 @@
-import styled from "styled-components/macro";
+import styled from "styled-components";
 import { StyledScrollbar } from "styles/mixins";
 
 export const StyledTextArea = styled.textarea`

@@ -18,7 +18,7 @@ import {
 } from "store";
 import { SVG } from "components";
 import { TimerStatus } from "store/timer/types";
-import styled from "styled-components/macro";
+import styled from "styled-components";
 import { themes } from "styles/themes";
 import type { TaskSelection } from "store";
 import type { TaskList, Task } from "store/tasks/types";

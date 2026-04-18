@@ -1,5 +1,5 @@
 import React from "react";
-import styled from "styled-components/macro";
+import styled from "styled-components";
 
 /**
  * This is very roughly positioned atm though adding divs around the nav items breaks the layout

@@ -40,7 +40,6 @@ export default defineConfig({
       routes: `${ROOT_SRC_DIR}/routes`,
       store: `${ROOT_SRC_DIR}/store`,
       styles: `${ROOT_SRC_DIR}/styles`,
-      "styled-components/macro": "styled-components",
       utils: `${ROOT_SRC_DIR}/utils`,
     },
   },

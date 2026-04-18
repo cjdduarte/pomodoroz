@@ -1,4 +1,4 @@
-import styled, { css } from "styled-components/macro";
+import styled, { css } from "styled-components";
 import { themes } from "styles/themes";
 
 const ButtonStyles = css`
