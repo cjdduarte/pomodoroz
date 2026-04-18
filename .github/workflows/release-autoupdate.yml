@@ -274,13 +274,27 @@ jobs:
 
           LATEST_JSON="$(jq -n --arg VERSION "${VERSION}" --arg PUB_DATE "${PUB_DATE}" '{ version: $VERSION, notes: "", pub_date: $PUB_DATE, platforms: {} }')"
 
-          WINDOWS_EXE="$(echo "${RELEASE_JSON}" | jq -r '[.assets[].name] as $names | .assets[] | select(.name | test("\\.exe$")) | select(($names | index(.name + ".sig")) != null) | .name' | head -n1)"
+          WINDOWS_EXE="$(echo "${RELEASE_JSON}" | jq -r '
+            [.assets[].name] as $names
+            | .assets[]
+            | . as $asset
+            | select($asset.name | test("\\.exe$"))
+            | select(($names | index($asset.name + ".sig")) != null)
+            | $asset.name
+          ' | head -n1)"
           if [ -n "${WINDOWS_EXE}" ] && [ "${WINDOWS_EXE}" != "null" ]; then
             add_platform "${WINDOWS_EXE}" "windows-x86_64"
             add_platform "${WINDOWS_EXE}" "windows-x86_64-nsis"
           fi
 
-          LINUX_APPIMAGE="$(echo "${RELEASE_JSON}" | jq -r '[.assets[].name] as $names | .assets[] | select(.name | test("\\.AppImage$")) | select(($names | index(.name + ".sig")) != null) | .name' | head -n1)"
+          LINUX_APPIMAGE="$(echo "${RELEASE_JSON}" | jq -r '
+            [.assets[].name] as $names
+            | .assets[]
+            | . as $asset
+            | select($asset.name | test("\\.AppImage$"))
+            | select(($names | index($asset.name + ".sig")) != null)
+            | $asset.name
+          ' | head -n1)"
           if [ -n "${LINUX_APPIMAGE}" ] && [ "${LINUX_APPIMAGE}" != "null" ]; then
             add_platform "${LINUX_APPIMAGE}" "linux-x86_64"
             add_platform "${LINUX_APPIMAGE}" "linux-x86_64-appimage"
