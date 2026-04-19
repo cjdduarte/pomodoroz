@@ -51,7 +51,8 @@ Updater metadata source:
    - `release-windows` (build NSIS + upload signed updater assets)
    - `release-linux` (build AppImage + upload signed updater assets)
    - `sync-latest-json` (merge and upload `latest.json`)
-3. Workflow can also be started manually (`workflow_dispatch`) with target:
+3. GitHub Release body is auto-filled from the matching section in `CHANGELOG.md` (`## [x.y.z] - ...`) and kept in sync on reruns.
+4. Workflow can also be started manually (`workflow_dispatch`) with target:
    - `all`
    - `windows`
    - `linux`

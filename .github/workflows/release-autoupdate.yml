@@ -82,13 +82,41 @@ jobs:
       - name: Build Tauri NSIS (x64)
         run: pnpm tauri build --bundles nsis
 
+      - name: Build release notes from CHANGELOG.md
+        shell: pwsh
+        run: |
+          $tag = "$env:RELEASE_TAG"
+          $version = $tag -replace '^v', ''
+          $content = Get-Content -Path "CHANGELOG.md" -Raw
+          $escapedVersion = [regex]::Escape($version)
+          $pattern = "(?ms)^## \[$escapedVersion\] - .*\r?\n(?<body>.*?)(?=^## \[|\z)"
+          $match = [regex]::Match($content, $pattern)
+
+          if (-not $match.Success) {
+            Write-Error "Missing changelog section for version [$version] in CHANGELOG.md."
+            exit 1
+          }
+
+          $notes = $match.Groups["body"].Value.Trim()
+          if ([string]::IsNullOrWhiteSpace($notes)) {
+            Write-Error "Changelog section [$version] in CHANGELOG.md is empty."
+            exit 1
+          }
+
+          $notesPath = Join-Path $env:RUNNER_TEMP "release-notes-$version.md"
+          Set-Content -Path $notesPath -Value $notes -Encoding utf8
+          "RELEASE_NOTES_FILE=$notesPath" >> $env:GITHUB_ENV
+
       - name: Ensure release exists
         shell: pwsh
         run: |
           $tag = "$env:RELEASE_TAG"
+          $notesFile = "$env:RELEASE_NOTES_FILE"
           gh release view $tag *> $null
           if ($LASTEXITCODE -ne 0) {
-            gh release create $tag --title $tag --notes ""
+            gh release create $tag --title $tag --notes-file $notesFile
+          } else {
+            gh release edit $tag --notes-file $notesFile
           }
 
       - name: Upload Tauri Windows updater assets
@@ -211,11 +239,33 @@ jobs:
           echo "AppImage build failed after 3 attempts."
           exit 1
 
+      - name: Build release notes from CHANGELOG.md
+        run: |
+          TAG="${RELEASE_TAG}"
+          VERSION="${TAG#v}"
+          NOTES_FILE="${RUNNER_TEMP}/release-notes-${VERSION}.md"
+
+          awk -v version="${VERSION}" '
+            $0 ~ ("^## \\[" version "\\] - ") { in_section=1; next }
+            in_section && $0 ~ /^## \[/ { exit }
+            in_section { print }
+          ' CHANGELOG.md > "${NOTES_FILE}"
+
+          if [ ! -s "${NOTES_FILE}" ]; then
+            echo "Missing or empty changelog section for version [${VERSION}] in CHANGELOG.md."
+            exit 1
+          fi
+
+          echo "RELEASE_NOTES_FILE=${NOTES_FILE}" >> "$GITHUB_ENV"
+
       - name: Ensure release exists
         run: |
           TAG="${RELEASE_TAG}"
+          NOTES_FILE="${RELEASE_NOTES_FILE}"
           if ! gh release view "${TAG}" >/dev/null 2>&1; then
-            gh release create "${TAG}" --title "${TAG}" --notes ""
+            gh release create "${TAG}" --title "${TAG}" --notes-file "${NOTES_FILE}"
+          else
+            gh release edit "${TAG}" --notes-file "${NOTES_FILE}"
           fi
 
       - name: Upload Tauri Linux updater assets

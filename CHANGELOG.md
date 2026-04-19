@@ -16,6 +16,7 @@
 - **Titlebar Tauri consolidada em uma única estratégia de arraste** — removidas as regras legadas `-webkit-app-region` em `titlebar.ts`, mantendo arraste por `data-tauri-drag-region` e `start_window_drag`.
 - **Ícone/tarefa no Linux alinhado entre launcher e janela ativa** — `favicon.ico` do renderer foi atualizado para o ícone oficial do app e os arquivos `.desktop` (instalação local + bundles `deb/rpm`) passaram a declarar `StartupWMClass/X-GNOME-WMClass` para reduzir duplicação/alternância de ícones no painel.
 - **`check-updates` alinhado ao escopo root-only** — ajustes de nomenclatura em Shell/PowerShell (`Workspace` -> `Escopo`, `Monorepo/Tooling` -> `Tooling`) sem alterar a lógica de atualização.
+- **Descrição da GitHub Release voltou a usar o changelog automaticamente** — o workflow `release-autoupdate.yml` agora extrai a seção da versão em `CHANGELOG.md` e aplica em `gh release create/edit`, evitando releases com corpo vazio ao publicar por tag/dispatch.
 - **Documentação consolidada em roadmap único de melhorias** — `docs/IMPROVEMENTS.md` passou a ser a referência de pendências (técnicas + produto), com `docs/MIGRATION_TO_TAURI.md` e `docs/PRODUCT_BACKLOG.md` mantidos como ponteiros de compatibilidade.
 
 ## [26.4.26] - 2026-04-19
