@@ -136,6 +136,8 @@ Icon=pomodoroz
 Terminal=false
 Categories=Utility;Productivity;
 StartupNotify=true
+StartupWMClass=pomodoroz_tauri
+X-GNOME-WMClass=pomodoroz_tauri
 "@
 Set-Content -Path $DESKTOP_PATH -Value $desktopFile -NoNewline
 
@@ -157,6 +159,12 @@ if (Get-Command update-desktop-database -ErrorAction SilentlyContinue) {
 
 if (Get-Command gtk-update-icon-cache -ErrorAction SilentlyContinue) {
     & gtk-update-icon-cache -f -q (Join-Path $HOME ".local/share/icons/hicolor") *> $null
+}
+
+if (Get-Command kbuildsycoca6 -ErrorAction SilentlyContinue) {
+    & kbuildsycoca6 *> $null
+} elseif (Get-Command kbuildsycoca5 -ErrorAction SilentlyContinue) {
+    & kbuildsycoca5 *> $null
 }
 
 Step "Concluido"

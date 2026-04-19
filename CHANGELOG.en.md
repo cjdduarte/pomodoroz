@@ -13,6 +13,8 @@
 - **Runtime consolidated as Tauri-only** — dual-runtime/browser branches were removed from `runtimeInvokeConnector`, `ConnectorContext`, and `Updater` action flow.
 - **Native utilities aligned to a single runtime** — `openExternalUrl` and `desktopNotification` now follow the Tauri-only path; `notificationAudio` keeps renderer-audio fallback only when native playback fails.
 - **Development bootstrap simplified** — `dev:renderer` script was removed from `package.json`; Tauri `beforeDevCommand` now runs Vite directly.
+- **Tauri titlebar drag path consolidated to a single strategy** — legacy `-webkit-app-region` rules were removed from `titlebar.ts`, keeping drag behavior via `data-tauri-drag-region` and `start_window_drag`.
+- **Linux taskbar icon alignment between launcher and active window** — renderer `favicon.ico` was updated to the official app icon, and `.desktop` entries (local install + `deb/rpm` bundles) now declare `StartupWMClass/X-GNOME-WMClass` to reduce duplicate/switching panel icons.
 - **`check-updates` wording aligned to root-only scope** — Shell/PowerShell labels were normalized (`Workspace` -> `Escopo`, `Monorepo/Tooling` -> `Tooling`) without changing update logic.
 - **Documentation consolidated into a single improvements roadmap** — `docs/IMPROVEMENTS.md` is now the pending-work reference (technical + product), while `docs/MIGRATION_TO_TAURI.md` and `docs/PRODUCT_BACKLOG.md` remain compatibility pointers.
 

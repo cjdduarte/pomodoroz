@@ -27,6 +27,14 @@
     "active": true,
     "createUpdaterArtifacts": "v1Compatible",
     "targets": "all",
+    "linux": {
+      "deb": {
+        "desktopTemplate": "packaging/linux/desktop-template.hbs"
+      },
+      "rpm": {
+        "desktopTemplate": "packaging/linux/desktop-template.hbs"
+      }
+    },
     "windows": {
       "nsis": {
         "startMenuFolder": "Pomodoroz"

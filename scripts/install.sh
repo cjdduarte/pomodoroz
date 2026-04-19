@@ -149,6 +149,8 @@ Icon=pomodoroz
 Terminal=false
 Categories=Utility;Productivity;
 StartupNotify=true
+StartupWMClass=pomodoroz_tauri
+X-GNOME-WMClass=pomodoroz_tauri
 EOF2
 
 # Cleanup de versoes anteriores que criavam alias local extra.
@@ -168,6 +170,12 @@ fi
 
 if command -v gtk-update-icon-cache >/dev/null 2>&1; then
   gtk-update-icon-cache -f -q "${HOME}/.local/share/icons/hicolor" >/dev/null 2>&1 || true
+fi
+
+if command -v kbuildsycoca6 >/dev/null 2>&1; then
+  kbuildsycoca6 >/dev/null 2>&1 || true
+elif command -v kbuildsycoca5 >/dev/null 2>&1; then
+  kbuildsycoca5 >/dev/null 2>&1 || true
 fi
 
 step "Concluido"

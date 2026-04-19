@@ -40,25 +40,41 @@ When an item is released:
 - Implemented in code and registered in changelog draft `26.4.27` (PT/EN):
   - Runtime consolidation to Tauri-only (connector/runtime fallback cleanup).
   - Utility flows aligned to Tauri-only (`openExternalUrl`, desktop notification, updater actions).
+  - Titlebar legacy CSS cleanup (`-webkit-app-region` removal) aligned with Tauri drag path.
+  - Linux panel/launcher icon alignment (`favicon` + `StartupWMClass` in `.desktop` paths).
   - `check-updates` wording aligned to root-only project narrative.
   - Documentation consolidation around `docs/IMPROVEMENTS.md`.
 - Pending to close this checkpoint:
   - Final release date for `26.4.27` in both changelogs.
   - Tag/publish flow execution via release script.
 
+### Next execution order (after 26.4.27)
+
+1. **Close release 26.4.27**
+   - Set final date in `CHANGELOG.md` and `CHANGELOG.en.md`.
+   - Run `./scripts/release.sh 26.4.27`.
+2. **Release 26.4.28 — Stability + consistency**
+   - Execute **A1** (titlebar CSS/changelog divergence).
+   - Execute **A2** (`.env` hygiene).
+3. **Release 26.4.29 — Quality gate**
+   - Execute **A6** (test strategy decision and implementation).
+   - Optionally include **A3** (shortcut persistence) if scope fits.
+4. **Next product cycle**
+   - Start **B1/B2/B3** together (presets, extend session, break suggestions).
+
 ---
 
 ## 2. Track A — Conversion Hardening (Tauri-only)
 
-| ID  | Item                                                                          | Status      | Priority | Notes                                              |
-| --- | ----------------------------------------------------------------------------- | ----------- | -------- | -------------------------------------------------- |
-| A0  | Consolidate runtime to Tauri-only and remove browser fallback branches        | In Progress | High     | Implemented in code, pending 26.4.27 release close |
-| A1  | Resolve titlebar legacy CSS/changelog divergence (`-webkit-app-region`)       | Open        | High     | Keep behavior stable and align public notes        |
-| A2  | `.env` hygiene (`app/renderer/.env` tracked)                                  | Open        | High     | Remove from VCS and provide `.env.example`         |
-| A3  | Persist custom shortcuts (`Shortcut.tsx` TODO)                                | Open        | Medium   | Avoid loss after restart                           |
-| A4  | Simplify `check-updates` to root-only narrative and flows                     | In Progress | Medium   | Implemented in code, pending 26.4.27 release close |
-| A5  | Controlled major updates (`eslint`/`@eslint/js` 10.x, `vite-plugin-svgr` 5.x) | Open        | Medium   | Execute in small validated batches                 |
-| A6  | Define automated test strategy (adopt baseline tests or remove idle stack)    | Open        | High     | Required for safer refactors                       |
+| ID  | Item                                                                          | Status      | Priority | Notes                                                |
+| --- | ----------------------------------------------------------------------------- | ----------- | -------- | ---------------------------------------------------- |
+| A0  | Consolidate runtime to Tauri-only and remove browser fallback branches        | In Progress | High     | Implemented in code, pending 26.4.27 release close   |
+| A1  | Resolve titlebar legacy CSS/changelog divergence (`-webkit-app-region`)       | In Progress | High     | Code aligned in 26.4.27 draft; pending release close |
+| A2  | `.env` hygiene (`app/renderer/.env` tracked)                                  | Open        | High     | Remove from VCS and provide `.env.example`           |
+| A3  | Persist custom shortcuts (`Shortcut.tsx` TODO)                                | Open        | Medium   | Avoid loss after restart                             |
+| A4  | Simplify `check-updates` to root-only narrative and flows                     | In Progress | Medium   | Implemented in code, pending 26.4.27 release close   |
+| A5  | Controlled major updates (`eslint`/`@eslint/js` 10.x, `vite-plugin-svgr` 5.x) | Open        | Medium   | Execute in small validated batches                   |
+| A6  | Define automated test strategy (adopt baseline tests or remove idle stack)    | Open        | High     | Required for safer refactors                         |
 
 ### A0 — Tauri-only runtime consolidation
 
@@ -78,10 +94,25 @@ When an item is released:
 
 ### A1 — Titlebar CSS/Changelog consistency
 
+Resolution status (code):
+
+- `CHANGELOG.md` / `CHANGELOG.en.md` for `26.4.26` state that `-webkit-app-region` rules were removed.
+- `26.4.27` draft now includes the corrective item and code has been aligned (legacy rules removed from `src/styles/components/titlebar.ts`).
+- Dragging remains on current Tauri runtime through:
+  - `data-tauri-drag-region` in `src/components/Titlebar.tsx`
+  - native command `start_window_drag` in `src-tauri/src/commands/window_bridge.rs`
+
+Impact:
+
+- Main issue was **public documentation inconsistency** (audit/release trust), not a known crash.
+- Keep this tracked until `26.4.27` is released and then mark as `Done`.
+
 - Scope checklist:
-  - [ ] Decide code direction (remove or retain `-webkit-app-region` rules).
+  - [x] Decide code direction (remove or retain `-webkit-app-region` rules).
+  - [x] Align code to selected direction (`-webkit-app-region` removed).
   - [ ] Validate titlebar interactions (drag/minimize/close) on Linux and Windows.
   - [ ] Record final decision in changelog for the next version.
+  - [ ] Mark as `Done` after release `26.4.27` is published.
 - Validation checklist:
   - [ ] `pnpm lint`
   - [ ] `pnpm typecheck:renderer`
