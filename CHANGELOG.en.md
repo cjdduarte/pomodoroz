@@ -6,6 +6,16 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.4.27] - TBD
+
+### Changed
+
+- **Runtime consolidated as Tauri-only** — dual-runtime/browser branches were removed from `runtimeInvokeConnector`, `ConnectorContext`, and `Updater` action flow.
+- **Native utilities aligned to a single runtime** — `openExternalUrl` and `desktopNotification` now follow the Tauri-only path; `notificationAudio` keeps renderer-audio fallback only when native playback fails.
+- **Development bootstrap simplified** — `dev:renderer` script was removed from `package.json`; Tauri `beforeDevCommand` now runs Vite directly.
+- **`check-updates` wording aligned to root-only scope** — Shell/PowerShell labels were normalized (`Workspace` -> `Escopo`, `Monorepo/Tooling` -> `Tooling`) without changing update logic.
+- **Documentation consolidated into a single improvements roadmap** — `docs/IMPROVEMENTS.md` is now the pending-work reference (technical + product), while `docs/MIGRATION_TO_TAURI.md` and `docs/PRODUCT_BACKLOG.md` remain compatibility pointers.
+
 ## [26.4.26] - 2026-04-19
 
 ### Changed

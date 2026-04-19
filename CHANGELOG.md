@@ -6,6 +6,16 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.4.27] - A definir
+
+### Alterado
+
+- **Runtime consolidado em Tauri-only** — removidos os ramos de runtime dual/browser em `runtimeInvokeConnector`, `ConnectorContext` e no fluxo de ações do `Updater`.
+- **Utilitários nativos alinhados ao runtime único** — `openExternalUrl` e `desktopNotification` agora seguem caminho Tauri-only; `notificationAudio` mantém fallback de áudio do renderer apenas em falha do áudio nativo.
+- **Bootstrap de desenvolvimento simplificado** — script `dev:renderer` removido do `package.json`; `beforeDevCommand` do Tauri passou a chamar o Vite diretamente.
+- **`check-updates` alinhado ao escopo root-only** — ajustes de nomenclatura em Shell/PowerShell (`Workspace` -> `Escopo`, `Monorepo/Tooling` -> `Tooling`) sem alterar a lógica de atualização.
+- **Documentação consolidada em roadmap único de melhorias** — `docs/IMPROVEMENTS.md` passou a ser a referência de pendências (técnicas + produto), com `docs/MIGRATION_TO_TAURI.md` e `docs/PRODUCT_BACKLOG.md` mantidos como ponteiros de compatibilidade.
+
 ## [26.4.26] - 2026-04-19
 
 ### Alterado

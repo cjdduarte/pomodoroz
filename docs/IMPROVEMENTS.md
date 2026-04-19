@@ -35,18 +35,46 @@ When an item is released:
 2. Add implementation details to `CHANGELOG.md` and `CHANGELOG.en.md`.
 3. Remove unnecessary detail from this roadmap in the next planning cycle.
 
+### Current checkpoint (2026-04-19)
+
+- Implemented in code and registered in changelog draft `26.4.27` (PT/EN):
+  - Runtime consolidation to Tauri-only (connector/runtime fallback cleanup).
+  - Utility flows aligned to Tauri-only (`openExternalUrl`, desktop notification, updater actions).
+  - `check-updates` wording aligned to root-only project narrative.
+  - Documentation consolidation around `docs/IMPROVEMENTS.md`.
+- Pending to close this checkpoint:
+  - Final release date for `26.4.27` in both changelogs.
+  - Tag/publish flow execution via release script.
+
 ---
 
 ## 2. Track A — Conversion Hardening (Tauri-only)
 
-| ID  | Item                                                                          | Status | Priority | Notes                                       |
-| --- | ----------------------------------------------------------------------------- | ------ | -------- | ------------------------------------------- |
-| A1  | Resolve titlebar legacy CSS/changelog divergence (`-webkit-app-region`)       | Open   | High     | Keep behavior stable and align public notes |
-| A2  | `.env` hygiene (`app/renderer/.env` tracked)                                  | Open   | High     | Remove from VCS and provide `.env.example`  |
-| A3  | Persist custom shortcuts (`Shortcut.tsx` TODO)                                | Open   | Medium   | Avoid loss after restart                    |
-| A4  | Simplify `check-updates` to root-only narrative and flows                     | Open   | Medium   | Remove workspace-era operational noise      |
-| A5  | Controlled major updates (`eslint`/`@eslint/js` 10.x, `vite-plugin-svgr` 5.x) | Open   | Medium   | Execute in small validated batches          |
-| A6  | Define automated test strategy (adopt baseline tests or remove idle stack)    | Open   | High     | Required for safer refactors                |
+| ID  | Item                                                                          | Status      | Priority | Notes                                              |
+| --- | ----------------------------------------------------------------------------- | ----------- | -------- | -------------------------------------------------- |
+| A0  | Consolidate runtime to Tauri-only and remove browser fallback branches        | In Progress | High     | Implemented in code, pending 26.4.27 release close |
+| A1  | Resolve titlebar legacy CSS/changelog divergence (`-webkit-app-region`)       | Open        | High     | Keep behavior stable and align public notes        |
+| A2  | `.env` hygiene (`app/renderer/.env` tracked)                                  | Open        | High     | Remove from VCS and provide `.env.example`         |
+| A3  | Persist custom shortcuts (`Shortcut.tsx` TODO)                                | Open        | Medium   | Avoid loss after restart                           |
+| A4  | Simplify `check-updates` to root-only narrative and flows                     | In Progress | Medium   | Implemented in code, pending 26.4.27 release close |
+| A5  | Controlled major updates (`eslint`/`@eslint/js` 10.x, `vite-plugin-svgr` 5.x) | Open        | Medium   | Execute in small validated batches                 |
+| A6  | Define automated test strategy (adopt baseline tests or remove idle stack)    | Open        | High     | Required for safer refactors                       |
+
+### A0 — Tauri-only runtime consolidation
+
+- Scope checklist:
+  - [x] Remove dual-runtime branch resolution and keep Tauri connector path as primary runtime.
+  - [x] Simplify updater action path to Tauri-native install/restart flow.
+  - [x] Remove renderer/browser fallback branches in utility wrappers where runtime is always Tauri.
+  - [x] Align docs references to the consolidated roadmap structure.
+  - [ ] Mark as `Done` after release `26.4.27` is published.
+- Validation checklist:
+  - [x] `pnpm lint`
+  - [x] `pnpm typecheck:renderer`
+  - [x] `pnpm build:renderer`
+  - [x] `cargo check --manifest-path src-tauri/Cargo.toml`
+- Suggested commit:
+  - `refactor(tauri): enforce tauri-only runtime and consolidate improvements roadmap`
 
 ### A1 — Titlebar CSS/Changelog consistency
 
@@ -87,12 +115,13 @@ When an item is released:
 ### A4 — `check-updates` simplification
 
 - Scope checklist:
-  - [ ] Remove obsolete workspace-centric wording where not needed.
-  - [ ] Keep current root-only behavior explicit.
-  - [ ] Preserve report/apply flows.
+  - [x] Remove obsolete workspace-centric wording where not needed.
+  - [x] Keep current root-only behavior explicit.
+  - [x] Preserve report/apply flows.
+  - [ ] Mark as `Done` after release `26.4.27` is published.
 - Validation checklist:
-  - [ ] `./scripts/check-updates.sh report`
-  - [ ] `./scripts/check-updates.ps1 report`
+  - [x] `./scripts/check-updates.sh report`
+  - [x] `./scripts/check-updates.ps1 report`
 - Suggested commit:
   - `refactor(scripts): simplify check-updates flow for root-only project layout`
 
