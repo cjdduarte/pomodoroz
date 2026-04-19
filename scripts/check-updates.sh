@@ -13,7 +13,7 @@
 #   - full: log geral + logs de cargo outdated/audit
 #
 # Modo interativo:
-#   - Lista dependencias JS/TS desatualizadas por workspace
+#   - Lista dependencias JS/TS desatualizadas por escopo (projeto raiz)
 #   - Permite selecionar updates seguros (patch/minor) e major separadamente
 #
 # Modo relatorio:
@@ -738,7 +738,7 @@ check_framework_inventory() {
   echo "    @tauri-apps/plugin-updater: $(get_pkg_version "$root_pkg" "@tauri-apps/plugin-updater")"
   echo "    @tauri-apps/plugin-dialog: $(get_pkg_version "$root_pkg" "@tauri-apps/plugin-dialog")"
 
-  echo "  [Monorepo/Tooling]"
+  echo "  [Tooling]"
   echo "    typescript: $(get_pkg_version "$root_pkg" "typescript")"
   echo "    prettier: $(get_pkg_version "$root_pkg" "prettier")"
 
@@ -869,7 +869,7 @@ if (rows.length > 0) {
 show_outdated_table() {
   if [ ${#OUTDATED_ROWS[@]} -eq 0 ]; then
     if [ "$OUTDATED_CHECK_FAILED" -eq 1 ]; then
-      echo "  ⚠ Resultado inconclusivo: houve falha ao consultar o registry em um ou mais workspaces."
+      echo "  ⚠ Resultado inconclusivo: houve falha ao consultar o registry em um ou mais escopos."
     else
       echo "  Nenhuma dependencia desatualizada encontrada."
     fi
@@ -877,7 +877,7 @@ show_outdated_table() {
   fi
 
   printf "  %-15s %-35s %-12s %-12s %-12s %-10s\n" \
-    "Workspace" "Pacote" "Atual" "Wanted" "Latest" "Tipo"
+    "Escopo" "Pacote" "Atual" "Wanted" "Latest" "Tipo"
   printf "  %-15s %-35s %-12s %-12s %-12s %-10s\n" \
     "---------" "------" "-----" "------" "------" "----"
 
@@ -898,7 +898,7 @@ run_updates_for_selected() {
     IFS=$'\t' read -r ws pkg current wanted latest ptype <<< "$row"
     ws_dir="$(workspace_dir_by_name "$ws" || true)"
     if [ -z "$ws_dir" ]; then
-      echo "  ⚠ Workspace desconhecido: $ws"
+      echo "  ⚠ Escopo desconhecido: $ws"
       continue
     fi
 
@@ -1314,7 +1314,7 @@ check_rust_dependencies() {
     CARGO_AUDIT_LOG_FILE="$audit_log"
   fi
 
-  echo "  - Workspace Rust: $tauri_dir"
+  echo "  - Escopo Rust: $tauri_dir"
 
   if [ "$MODE" = "report" ]; then
     if cargo_subcommand_available outdated; then

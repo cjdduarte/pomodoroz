@@ -10,13 +10,13 @@ Pomodoroz is a cross-platform Pomodoro desktop app, forked from [Pomatez](https:
 
 ### Key Documents
 
-| Document                           | Purpose                                        |
-| ---------------------------------- | ---------------------------------------------- |
-| `AGENTS.md`                        | Agent operational rules                        |
-| `CHANGELOG.md` / `CHANGELOG.en.md` | Implemented changes                            |
-| `docs/MIGRATION_TO_TAURI.md`       | Migration history and execution tracker        |
-| `docs/RELEASE_OPERATIONS.md`       | Release flow, updater pipeline, validation     |
-| `docs/PRODUCT_BACKLOG.md`          | Future features (gamification, adaptive focus) |
+| Document                           | Purpose                                            |
+| ---------------------------------- | -------------------------------------------------- |
+| `AGENTS.md`                        | Agent operational rules                            |
+| `CHANGELOG.md` / `CHANGELOG.en.md` | Implemented changes                                |
+| `docs/IMPROVEMENTS.md`             | Pending improvements roadmap (technical + product) |
+| `docs/MIGRATION_TO_TAURI.md`       | Migration closure reference                        |
+| `docs/RELEASE_OPERATIONS.md`       | Release flow, updater pipeline, validation         |
 
 ## Repository Layout
 
@@ -56,7 +56,6 @@ All commands run from the repo root:
 pnpm install
 
 pnpm dev:app                 # Main dev flow (Tauri + Vite renderer)
-pnpm dev:renderer            # Renderer only (Vite on localhost:3000)
 
 pnpm lint                    # ESLint (renderer)
 pnpm typecheck:renderer      # Typecheck renderer

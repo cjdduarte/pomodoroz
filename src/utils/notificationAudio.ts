@@ -1,5 +1,4 @@
 import { invoke } from "@tauri-apps/api/core";
-import { getRuntimeKind } from "contexts/connectors/runtimeInvokeConnector";
 
 type PlayNotificationAudioOptions = {
   delayMs?: number;
@@ -59,11 +58,6 @@ export const playNotificationAudio = async (
 ) => {
   const delayMs = options?.delayMs ?? 0;
 
-  if (getRuntimeKind() !== "tauri") {
-    playWithHtmlAudio(source, delayMs);
-    return;
-  }
-
   try {
     await playWithTauriAudio(source, delayMs);
   } catch (error) {
@@ -71,6 +65,8 @@ export const playNotificationAudio = async (
       "[TAURI Audio] Failed to play notification sound natively. Falling back to renderer audio.",
       error
     );
-    playWithHtmlAudio(source, delayMs);
+    if (typeof window !== "undefined") {
+      playWithHtmlAudio(source, delayMs);
+    }
   }
 };

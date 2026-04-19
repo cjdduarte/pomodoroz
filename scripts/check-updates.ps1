@@ -621,7 +621,7 @@ function Check-FrameworkInventory {
     Write-Host "    @tauri-apps/plugin-updater: $(Get-PackageJsonVersion $rootPkg '@tauri-apps/plugin-updater')"
     Write-Host "    @tauri-apps/plugin-dialog: $(Get-PackageJsonVersion $rootPkg '@tauri-apps/plugin-dialog')"
 
-    Write-Host "  [Monorepo/Tooling]"
+    Write-Host "  [Tooling]"
     Write-Host "    typescript: $(Get-PackageJsonVersion $rootPkg 'typescript')"
     Write-Host "    prettier: $(Get-PackageJsonVersion $rootPkg 'prettier')"
 
@@ -821,7 +821,7 @@ function Show-OutdatedTable {
 
     if (-not $Rows -or $Rows.Count -eq 0) {
         if ($script:OutdatedCheckFailed) {
-            Write-Host "  [WARN] Resultado inconclusivo: houve falha ao consultar o registry em um ou mais workspaces." -ForegroundColor Yellow
+            Write-Host "  [WARN] Resultado inconclusivo: houve falha ao consultar o registry em um ou mais escopos." -ForegroundColor Yellow
         } else {
             Write-Host "  Nenhuma dependencia desatualizada encontrada." -ForegroundColor Green
         }
@@ -831,7 +831,7 @@ function Show-OutdatedTable {
     $Rows |
         Sort-Object Workspace, Package |
         Format-Table `
-            @{ Label = "Workspace"; Expression = { $_.Workspace } }, `
+            @{ Label = "Escopo"; Expression = { $_.Workspace } }, `
             @{ Label = "Pacote"; Expression = { $_.Package } }, `
             @{ Label = "Atual"; Expression = { $_.Current } }, `
             @{ Label = "Wanted"; Expression = { $_.Wanted } }, `
@@ -954,7 +954,7 @@ function Invoke-WorkspaceUpdate {
     foreach ($row in $Rows) {
         $wsPath = ($Workspaces | Where-Object { $_.Name -eq $row.Workspace } | Select-Object -First 1).Path
         if (-not $wsPath) {
-            Write-Host "  [WARN] Workspace desconhecido: $($row.Workspace)" -ForegroundColor Yellow
+            Write-Host "  [WARN] Escopo desconhecido: $($row.Workspace)" -ForegroundColor Yellow
             continue
         }
 
@@ -1434,7 +1434,7 @@ function Check-RustDependencies {
         return
     }
 
-    Write-Host "  - Workspace Rust: $tauriDir"
+    Write-Host "  - Escopo Rust: $tauriDir"
     $writeCargoLogs = ($Mode -ne "report" -and $script:LogModeSelection -ne "none")
     $outdatedLog = ""
     $auditLog = ""

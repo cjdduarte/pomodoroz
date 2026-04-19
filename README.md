@@ -94,8 +94,8 @@ Pomodoroz is not about "fixing flexibility"; it focuses on adding workflow featu
 ### Evidence and history
 
 - Implemented deliveries: [CHANGELOG.en.md](CHANGELOG.en.md)
-- Candidate improvements (not implemented yet): [docs/PRODUCT_BACKLOG.md](docs/PRODUCT_BACKLOG.md)
-- Migration history: [docs/MIGRATION_TO_TAURI.md](docs/MIGRATION_TO_TAURI.md)
+- Pending improvements roadmap: [docs/IMPROVEMENTS.md](docs/IMPROVEMENTS.md)
+- Migration closure reference: [docs/MIGRATION_TO_TAURI.md](docs/MIGRATION_TO_TAURI.md)
 
 ## ✨ Features
 
@@ -177,7 +177,7 @@ Pomodoroz is not about "fixing flexibility"; it focuses on adding workflow featu
 
 ## 🚧 Coming Soon
 
-Improvements informed by real feedback from users who deal with focus difficulties and ADHD. See details at [docs/PRODUCT_BACKLOG.md](docs/PRODUCT_BACKLOG.md).
+Improvements informed by real feedback from users who deal with focus difficulties and ADHD. See details at [docs/IMPROVEMENTS.md](docs/IMPROVEMENTS.md).
 
 - **Cadence presets** — Just Start (5/1), Sprint (10/3), Classic (25/5), Flow (50/10).
 - **Extend session** — "+5 min" / "+10 min" when in hyperfocus, without breaking your flow.
@@ -222,7 +222,6 @@ pnpm tauri build --bundles nsis
 
 ```sh
 pnpm dev:app          # Tauri + Vite renderer
-pnpm dev:renderer     # Renderer only (Vite on localhost:3000)
 pnpm lint             # Lint (renderer)
 pnpm typecheck:renderer
 pnpm tauri build --no-bundle

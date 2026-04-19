@@ -2,8 +2,8 @@
 
 > Operational guide for versioning, publishing, and validating Tauri releases.
 >
-> For migration history, see `MIGRATION_TO_TAURI.md`.
-> For product backlog, see `PRODUCT_BACKLOG.md`.
+> For pending improvements roadmap, see `IMPROVEMENTS.md`.
+> For migration closure reference, see `MIGRATION_TO_TAURI.md`.
 
 ---
 

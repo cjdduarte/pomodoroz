@@ -2,7 +2,7 @@
 
 > Operational rules for AI agents working on this codebase.
 > For project overview, stack, and commands, see `CLAUDE.md`.
-> For migration plan, see `docs/MIGRATION_TO_TAURI.md`.
+> For pending improvements roadmap, see `docs/IMPROVEMENTS.md`.
 
 ---
 
@@ -38,14 +38,14 @@
 
 ## Documentation Policy
 
-| What                              | Where                                          |
-| --------------------------------- | ---------------------------------------------- |
-| Implemented changes               | `CHANGELOG.md` (PT) and `CHANGELOG.en.md` (EN) |
-| Migration plan                    | `docs/MIGRATION_TO_TAURI.md`                   |
-| Release/update operations         | `docs/RELEASE_OPERATIONS.md`                   |
-| Product backlog (future features) | `docs/PRODUCT_BACKLOG.md`                      |
-| Agent operational rules           | This file (`AGENTS.md`)                        |
-| Claude Code guide                 | `CLAUDE.md`                                    |
+| What                         | Where                                          |
+| ---------------------------- | ---------------------------------------------- |
+| Implemented changes          | `CHANGELOG.md` (PT) and `CHANGELOG.en.md` (EN) |
+| Pending improvements roadmap | `docs/IMPROVEMENTS.md`                         |
+| Migration closure reference  | `docs/MIGRATION_TO_TAURI.md`                   |
+| Release/update operations    | `docs/RELEASE_OPERATIONS.md`                   |
+| Agent operational rules      | This file (`AGENTS.md`)                        |
+| Claude Code guide            | `CLAUDE.md`                                    |
 
 Do not create loose specs/checklists for topics already covered in the documents above.
 

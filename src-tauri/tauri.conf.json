@@ -6,7 +6,7 @@
   "build": {
     "frontendDist": "../app/renderer/build",
     "devUrl": "http://localhost:3000",
-    "beforeDevCommand": "node ./scripts/pnpmw.mjs dev:renderer",
+    "beforeDevCommand": "node ./node_modules/vite/bin/vite.js --config app/renderer/vite.config.ts --host localhost --port 3000 --strictPort",
     "beforeBuildCommand": "node ./scripts/pnpmw.mjs build:renderer"
   },
   "app": {

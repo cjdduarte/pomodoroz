@@ -14,7 +14,6 @@ import {
 } from "../styles";
 import { getInvokeConnector } from "../contexts";
 import { INSTALL_UPDATE, OPEN_RELEASE_PAGE } from "ipc";
-import { getRuntimeKind } from "contexts/connectors/runtimeInvokeConnector";
 import {
   openExternalUrl,
   sanitizeMarkdownLinkUri,
@@ -114,7 +113,6 @@ const Updater: React.FC = () => {
   const { t } = useTranslation();
 
   const dispatch = useAppDispatch();
-  const isTauriRuntime = getRuntimeKind() === "tauri";
   const updateBody = React.useMemo(() => {
     const rawBody = update.updateBody?.trim();
     if (!rawBody) {
@@ -134,10 +132,6 @@ const Updater: React.FC = () => {
 
   const installUpdateAndRestart = React.useCallback(() => {
     const invokeConnector = getInvokeConnector();
-    if (!invokeConnector) {
-      return;
-    }
-
     void showDesktopNotification(t("updater.installingTitle"), {
       body: t("updater.installingBody"),
     });
@@ -177,20 +171,12 @@ const Updater: React.FC = () => {
 
       <ActionButtons>
         <StyledTaskForm>
-          {isTauriRuntime ? (
-            <StyledButtonPrimary onClick={installUpdateAndRestart}>
-              {t("updater.installAndRestart")}
-            </StyledButtonPrimary>
-          ) : (
-            <StyledButtonPrimary onClick={openReleasePage}>
-              {t("updater.openReleasePage")}
-            </StyledButtonPrimary>
-          )}
-          {isTauriRuntime && (
-            <StyledButtonNormal onClick={openReleasePage}>
-              {t("updater.openReleasePage")}
-            </StyledButtonNormal>
-          )}
+          <StyledButtonPrimary onClick={installUpdateAndRestart}>
+            {t("updater.installAndRestart")}
+          </StyledButtonPrimary>
+          <StyledButtonNormal onClick={openReleasePage}>
+            {t("updater.openReleasePage")}
+          </StyledButtonNormal>
           <StyledButtonNormal
             onClick={() => {
               dispatch(setUpdateVersion(""));

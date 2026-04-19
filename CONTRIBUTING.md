@@ -25,7 +25,6 @@ Please use conventional commit messages in your PRs (or PR titles for squash mer
 ```sh
 pnpm install              # Install dependencies
 pnpm dev:app              # Tauri + Vite renderer
-pnpm dev:renderer         # Renderer only (Vite on localhost:3000)
 pnpm lint                 # Lint (renderer)
 pnpm typecheck:renderer   # Typecheck (renderer)
 pnpm tauri build --no-bundle  # Build release binary (no installer)

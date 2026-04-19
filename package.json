@@ -14,7 +14,6 @@
     "prepare": "husky .husky",
     "commit": "git-cz",
     "build:renderer": "node ./node_modules/vite/bin/vite.js build --config app/renderer/vite.config.ts",
-    "dev:renderer": "node ./node_modules/vite/bin/vite.js --config app/renderer/vite.config.ts --host localhost --port 3000 --strictPort",
     "typecheck:renderer": "node ./node_modules/typescript/bin/tsc --noEmit -p app/renderer/tsconfig.json",
     "build:tauri": "node ./scripts/pnpmw.mjs tauri build --no-bundle",
     "lint:renderer": "node ./scripts/pnpmw.mjs exec eslint --config app/renderer/eslint.config.mjs \"src/**/*.{js,jsx,ts,tsx}\"",

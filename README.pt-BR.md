@@ -94,8 +94,8 @@ O objetivo do Pomodoroz não é "corrigir flexibilidade", e sim adicionar recurs
 ### Evidências e histórico
 
 - Entregas implementadas: [CHANGELOG.md](CHANGELOG.md)
-- Melhorias candidatas (não implementadas): [docs/PRODUCT_BACKLOG.md](docs/PRODUCT_BACKLOG.md)
-- Histórico de migração: [docs/MIGRATION_TO_TAURI.md](docs/MIGRATION_TO_TAURI.md)
+- Roadmap de melhorias pendentes: [docs/IMPROVEMENTS.md](docs/IMPROVEMENTS.md)
+- Referência de encerramento da migração: [docs/MIGRATION_TO_TAURI.md](docs/MIGRATION_TO_TAURI.md)
 
 ## ✨ Funcionalidades
 
@@ -177,7 +177,7 @@ O objetivo do Pomodoroz não é "corrigir flexibilidade", e sim adicionar recurs
 
 ## 🚧 Em desenvolvimento
 
-Melhorias pensadas a partir de feedback real de usuários que lidam com dificuldade de foco e TDAH. Veja detalhes em [docs/PRODUCT_BACKLOG.md](docs/PRODUCT_BACKLOG.md).
+Melhorias pensadas a partir de feedback real de usuários que lidam com dificuldade de foco e TDAH. Veja detalhes em [docs/IMPROVEMENTS.md](docs/IMPROVEMENTS.md).
 
 - **Presets de cadência** — Só começa (5/1), Sprint (10/3), Clássico (25/5), Flow (50/10).
 - **Estender sessão** — "+5 min" / "+10 min" quando estiver em hiperfoco, sem perder o ritmo.
@@ -222,7 +222,6 @@ pnpm tauri build --bundles nsis
 
 ```sh
 pnpm dev:app          # Tauri + Vite renderer
-pnpm dev:renderer     # Renderer only (Vite em localhost:3000)
 pnpm lint             # Lint (renderer)
 pnpm typecheck:renderer
 pnpm tauri build --no-bundle
