@@ -25,6 +25,7 @@
   },
   "bundle": {
     "active": true,
+    "category": "Utility",
     "createUpdaterArtifacts": "v1Compatible",
     "targets": "all",
     "linux": {

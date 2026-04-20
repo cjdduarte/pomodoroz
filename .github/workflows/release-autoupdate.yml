@@ -283,7 +283,7 @@ jobs:
           for attempt in 1 2 3; do
             LOG_FILE="/tmp/tauri-appimage-build-attempt-${attempt}.log"
             echo "AppImage build attempt ${attempt}/3"
-            if RUST_LOG=tauri_bundler=debug,tauri_cli=debug,ureq=warn,ureq_proto=warn pnpm tauri build --bundles appimage -v >"${LOG_FILE}" 2>&1; then
+            if pnpm tauri build --bundles appimage >"${LOG_FILE}" 2>&1; then
               echo "AppImage build succeeded (attempt ${attempt})."
               echo "Last 40 log lines:"
               tail -n 40 "${LOG_FILE}" || true
