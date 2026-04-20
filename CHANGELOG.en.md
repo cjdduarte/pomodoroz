@@ -26,6 +26,7 @@
 - **Quick run no-install flow is now explicit with early dependency guard** — `scripts/validar-tudo.ps1` and `scripts/validar-tudo.sh` now label option 1 as no-install and fail fast with a direct message when `node_modules` is missing under `--skip-install`.
 - **PowerShell version/release scripts are now resilient on Windows without global `pnpm`** — `scripts/version.ps1` and `scripts/release.ps1` now run package-manager commands through `node scripts/pnpmw.mjs`, removing hard dependency on a global `pnpm` binary in `PATH` and aligning behavior with wrappers already used by `validar-tudo.ps1` and `check-updates.ps1`.
 - **`uninstall.ps1` now supports Windows user-scope with mode parity** — the script now runs on Linux and Windows with the same standard + `-Purge`/`-Yes` flow; on Windows it removes common user install folders (`%LOCALAPPDATA%`), Start Menu/Desktop shortcuts, and, with `-Purge`, clears local data in `%APPDATA%`/`%LOCALAPPDATA%` for both `pomodoroz` and `com.cjdduarte.pomodoroz`.
+- **Windows release/installer build is now resilient to local executable locks** — `scripts/validar-tudo.ps1` now automatically terminates running instances of `src-tauri/target/release/pomodoroz_tauri.exe` before `tauri build`, avoiding `Access denied (os error 5)` when replacing the release binary.
 
 ## [26.4.28] - 2026-04-20
 

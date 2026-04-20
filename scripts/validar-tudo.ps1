@@ -347,6 +347,48 @@ function Get-ReleaseBinaryPath {
     return Join-Path $APP_DIR "src-tauri/target/release/pomodoroz_tauri"
 }
 
+function Stop-WindowsReleaseBinaryIfRunning {
+    if (-not $IS_WINDOWS_OS) {
+        return
+    }
+
+    $releaseBinaryPath = Get-ReleaseBinaryPath
+    if (-not (Test-Path $releaseBinaryPath)) {
+        return
+    }
+
+    $resolvedReleaseBinaryPath = (Resolve-Path -LiteralPath $releaseBinaryPath).Path
+    $runningReleaseProcessIds = @()
+
+    $processes = Get-CimInstance Win32_Process -Filter "Name = 'pomodoroz_tauri.exe'" -ErrorAction SilentlyContinue
+    foreach ($proc in $processes) {
+        $execPath = "$($proc.ExecutablePath)".Trim()
+        if ([string]::IsNullOrWhiteSpace($execPath)) {
+            continue
+        }
+
+        if ([string]::Equals($execPath, $resolvedReleaseBinaryPath, [System.StringComparison]::OrdinalIgnoreCase)) {
+            $runningReleaseProcessIds += [int]$proc.ProcessId
+        }
+    }
+
+    if ($runningReleaseProcessIds.Count -eq 0) {
+        return
+    }
+
+    Write-Host "Info: encerrando instancia(s) do binario release em execucao para evitar lock no build (Windows)." -ForegroundColor Yellow
+    foreach ($pid in ($runningReleaseProcessIds | Sort-Object -Unique)) {
+        try {
+            Stop-Process -Id $pid -Force -ErrorAction Stop
+            Write-Host "  Processo finalizado: PID $pid"
+        } catch {
+            Die "Nao foi possivel finalizar processo PID $pid que bloqueia o binario release."
+        }
+    }
+
+    Start-Sleep -Milliseconds 300
+}
+
 if ($Help) {
     Show-Usage
     Stop-ValidationTranscript
@@ -503,6 +545,7 @@ if (Test-Path $tauriDir) {
 }
 
 if ($BuildInstallers) {
+    Stop-WindowsReleaseBinaryIfRunning
     $bundles = Get-TauriInstallerBundles -Profile $InstallersProfile
     $bundleList = $bundles -split "," | ForEach-Object { $_.Trim() } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
     $baseBundles = ($bundleList | Where-Object { $_ -ne "appimage" }) -join ","
@@ -524,6 +567,7 @@ if ($BuildInstallers) {
         Invoke-TauriAppImageBuild -ExtraArgs @("--config", '{"bundle":{"createUpdaterArtifacts":false}}')
     }
 } else {
+    Stop-WindowsReleaseBinaryIfRunning
     Step "Build release Tauri sem bundle (pnpm tauri build --no-bundle)"
     Push-Location $APP_DIR
     Invoke-Pnpm tauri build --no-bundle
