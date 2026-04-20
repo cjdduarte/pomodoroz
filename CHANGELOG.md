@@ -12,6 +12,7 @@
 
 - **Atualização de dependências do projeto** — lote de manutenção aplicado em bibliotecas do ecossistema JS/TS, sem mudança funcional planejada.
 - **Higiene de ambiente do renderer simplificada** — removido `app/renderer/.env.example` e retirada a exceção `!.env.example` no `.gitignore`; o renderer não consome `SKIP_PREFLIGHT_CHECK`, `BROWSER` ou `CI` no runtime/build padrão, mantendo `.env` apenas como arquivo local opcional.
+- **A5 batch 3 concluído (`vite-plugin-svgr` 5.x)** — `vite-plugin-svgr` foi atualizado de `4.5.0` para `5.2.0`, preservando o contrato atual de ícones SVG (`ReactComponent` nomeado) e passando na validação completa (`pnpm lint`, `pnpm typecheck:renderer`, `pnpm build:renderer`, `cargo check --manifest-path src-tauri/Cargo.toml`).
 
 ## [26.4.28] - 2026-04-20
 
