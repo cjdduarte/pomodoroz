@@ -2,9 +2,12 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { ConfirmDialog } from "components";
+import { getInvokeConnector } from "contexts";
+import { COMPACT_COLLAPSE, COMPACT_EXPAND } from "ipc";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "hooks/storeHooks";
 import { resetAllDayColors, setTaskDayColor } from "store";
@@ -84,6 +87,9 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
   const showGridRandomButton = useAppSelector(
     (state) => state.settings.showGridRandomButton
   );
+  const compactModeEnabled = useAppSelector(
+    (state) => state.settings.compactMode
+  );
   const enableGridColorLoop = useAppSelector(
     (state) => state.settings.enableGridColorLoop
   );
@@ -92,6 +98,33 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
   );
   const [grouped, setGrouped] = useState<boolean>(getInitialGrouped);
   const [showResetDialog, setShowResetDialog] = useState(false);
+  const didExpandForResetDialogRef = useRef(false);
+
+  const maybeExpandCompactForDialog = useCallback(() => {
+    if (!compactModeEnabled) {
+      return;
+    }
+
+    if (window.innerHeight >= 260) {
+      return;
+    }
+
+    if (didExpandForResetDialogRef.current) {
+      return;
+    }
+
+    didExpandForResetDialogRef.current = true;
+    getInvokeConnector().send(COMPACT_EXPAND);
+  }, [compactModeEnabled]);
+
+  const collapseCompactAfterDialog = useCallback(() => {
+    if (!didExpandForResetDialogRef.current) {
+      return;
+    }
+
+    didExpandForResetDialogRef.current = false;
+    getInvokeConnector().send(COMPACT_COLLAPSE);
+  }, []);
 
   const activeTaskSelection = useMemo(
     () =>
@@ -124,6 +157,12 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
   useEffect(() => {
     saveToStorage(GRID_GROUPED_STORAGE_KEY, grouped);
   }, [grouped]);
+
+  useEffect(() => {
+    return () => {
+      collapseCompactAfterDialog();
+    };
+  }, [collapseCompactAfterDialog]);
 
   const gridItems = useMemo<GridItem[]>(() => {
     return tasks.flatMap((list): GridItem[] => {
@@ -224,17 +263,20 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
   );
 
   const handleReset = useCallback(() => {
+    maybeExpandCompactForDialog();
     setShowResetDialog(true);
-  }, []);
+  }, [maybeExpandCompactForDialog]);
 
   const onCancelReset = useCallback(() => {
+    collapseCompactAfterDialog();
     setShowResetDialog(false);
-  }, []);
+  }, [collapseCompactAfterDialog]);
 
   const onConfirmReset = useCallback(() => {
+    collapseCompactAfterDialog();
     setShowResetDialog(false);
     dispatch(resetAllDayColors());
-  }, [dispatch]);
+  }, [collapseCompactAfterDialog, dispatch]);
 
   const randomWhiteCandidates = useMemo(() => {
     return gridItems.filter(

@@ -33,13 +33,11 @@ const ConfirmDialogOverlay = styled.div`
 
 const ConfirmDialogCard = styled.section`
   width: min(40rem, 100%);
-  max-height: calc(100vh - 1.2rem);
   border-radius: 4px;
   border: 1px solid var(--color-border-primary);
   background-color: var(--color-bg-primary);
   box-shadow: 0 12px 34px -10px var(--color-shadow-primary);
   padding: 1.6rem;
-  overflow-y: auto;
 
   display: grid;
   row-gap: 1.2rem;

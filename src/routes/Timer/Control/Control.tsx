@@ -1,9 +1,12 @@
 import WarningBell from "assets/audios/warning-bell.wav";
 import { ConfirmDialog, SVG } from "components";
+import { getInvokeConnector } from "contexts";
+import { COMPACT_COLLAPSE, COMPACT_EXPAND } from "ipc";
 import React, {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { useTranslation } from "react-i18next";
@@ -63,6 +66,33 @@ const Control: React.FC<Props> = ({
   const [warn, setWarn] = useState(false);
   const [resetPromptStep, setResetPromptStep] =
     useState<ResetPromptStep>("hidden");
+  const didExpandForResetPromptRef = useRef(false);
+
+  const maybeExpandCompactForPrompt = useCallback(() => {
+    if (!settings.compactMode) {
+      return;
+    }
+
+    if (window.innerHeight >= 260) {
+      return;
+    }
+
+    if (didExpandForResetPromptRef.current) {
+      return;
+    }
+
+    didExpandForResetPromptRef.current = true;
+    getInvokeConnector().send(COMPACT_EXPAND);
+  }, [settings.compactMode]);
+
+  const collapseCompactAfterPrompt = useCallback(() => {
+    if (!didExpandForResetPromptRef.current) {
+      return;
+    }
+
+    didExpandForResetPromptRef.current = false;
+    getInvokeConnector().send(COMPACT_COLLAPSE);
+  }, []);
 
   const activateWarning = useCallback(() => {
     const warnSound = new Audio(WarningBell);
@@ -109,6 +139,7 @@ const Control: React.FC<Props> = ({
       return;
     }
 
+    maybeExpandCompactForPrompt();
     setResetPromptStep("confirmReset");
   }, [
     resetTimerAction,
@@ -116,29 +147,33 @@ const Control: React.FC<Props> = ({
     timer.playing,
     settings.enableStrictMode,
     shouldPromptFocusToIdleReset,
+    maybeExpandCompactForPrompt,
   ]);
 
   const onCancelResetPrompt = useCallback(() => {
+    collapseCompactAfterPrompt();
     setResetPromptStep("hidden");
-  }, []);
+  }, [collapseCompactAfterPrompt]);
 
   const onConfirmTimerReset = useCallback(() => {
     setResetPromptStep("confirmReclassify");
   }, []);
 
   const onConfirmReclassifyToIdle = useCallback(() => {
+    collapseCompactAfterPrompt();
     setResetPromptStep("hidden");
     resetTimerAction({
       reclassifyFocusToIdle: true,
     });
-  }, [resetTimerAction]);
+  }, [collapseCompactAfterPrompt, resetTimerAction]);
 
   const onDeclineReclassifyToIdle = useCallback(() => {
+    collapseCompactAfterPrompt();
     setResetPromptStep("hidden");
     resetTimerAction({
       reclassifyFocusToIdle: false,
     });
-  }, [resetTimerAction]);
+  }, [collapseCompactAfterPrompt, resetTimerAction]);
 
   const onPlayCallback = useCallback(() => {
     if (timer.playing && settings.enableStrictMode) {
@@ -259,6 +294,12 @@ const Control: React.FC<Props> = ({
 
     return () => clearTimeout(timeout);
   }, [warn]);
+
+  useEffect(() => {
+    return () => {
+      collapseCompactAfterPrompt();
+    };
+  }, [collapseCompactAfterPrompt]);
 
   const isResetPromptVisible = resetPromptStep !== "hidden";
   const resetPromptMessage =
