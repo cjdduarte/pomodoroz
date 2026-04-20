@@ -239,6 +239,14 @@ export const en = {
       s: "s",
     },
   },
+  dialogs: {
+    warningTitle: "Warning",
+    yesLabel: "Yes",
+    noLabel: "No",
+    resetNowMessage: "Do you want to reset now?",
+    reclassifyFocusToIdleMessage:
+      "Move the elapsed time of the current task to Idle?",
+  },
   units: {
     min: "min",
     mins: "mins",

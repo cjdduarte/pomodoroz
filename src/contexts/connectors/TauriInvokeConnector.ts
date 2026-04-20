@@ -5,17 +5,11 @@ import {
   enable as enableAutostart,
 } from "@tauri-apps/plugin-autostart";
 import {
-  ask as askDialog,
   open as openDialog,
   save as saveDialog,
 } from "@tauri-apps/plugin-dialog";
 import { check as checkForUpdates } from "@tauri-apps/plugin-updater";
-import {
-  detectSystemLanguage,
-  normalizeLanguageCode,
-} from "i18n/languages";
-import type { LanguageCode } from "store/settings/types";
-import { getFromStorage, openExternalUrl } from "utils";
+import { openExternalUrl } from "utils";
 import type {
   ExportTasksDialogPayload,
   FromMainChannel,
@@ -23,7 +17,6 @@ import type {
   InvokeMainChannel,
   InvokeMainPayloadMap,
   InvokeMainResponseMap,
-  ResetFocusToIdleDialogResult,
   SetInAppAutoUpdatePayload,
   ToMainChannel,
   ToMainPayloadMap,
@@ -35,7 +28,6 @@ import {
   CLOSE_WINDOW,
   COMPACT_COLLAPSE,
   COMPACT_EXPAND,
-  CONFIRM_RESET_FOCUS_TO_IDLE,
   EXPORT_TASKS_DIALOG,
   INSTALL_UPDATE,
   IMPORT_TASKS_DIALOG,
@@ -160,72 +152,6 @@ const dataUrlToPngBytes = (dataUrl: string): number[] => {
 
   return bytes;
 };
-
-type ResetDialogCopy = {
-  resetMessage: string;
-  reclassifyMessage: string;
-};
-
-const RESET_DIALOG_COPY: Record<LanguageCode, ResetDialogCopy> = {
-  en: {
-    resetMessage: "Do you want to reset now?",
-    reclassifyMessage:
-      "Move the elapsed time of the current task to Idle?",
-  },
-  es: {
-    resetMessage: "¿Quieres restablecerlo ahora?",
-    reclassifyMessage:
-      "¿Mover a Ocioso el tiempo transcurrido de la tarea actual?",
-  },
-  zh: {
-    resetMessage: "是否立即重置？",
-    reclassifyMessage: "是否将当前任务的已过时间转为空闲时间？",
-  },
-  ja: {
-    resetMessage: "今すぐリセットしますか？",
-    reclassifyMessage:
-      "現在のタスクの経過時間をアイドル時間へ移動しますか？",
-  },
-  pt: {
-    resetMessage: "Deseja resetar agora?",
-    reclassifyMessage:
-      "Mover o tempo decorrido desta tarefa atual para Ocioso?",
-  },
-};
-
-const resolvePreferredLanguage = (): LanguageCode => {
-  const storedLanguage = getFromStorage<{
-    settings?: { language?: string };
-  }>("state")?.settings?.language;
-
-  if (storedLanguage && storedLanguage !== "auto") {
-    return normalizeLanguageCode(storedLanguage);
-  }
-
-  return detectSystemLanguage();
-};
-
-const askResetFocusToIdle =
-  async (): Promise<ResetFocusToIdleDialogResult> => {
-    const language = resolvePreferredLanguage();
-    const copy = RESET_DIALOG_COPY[language];
-
-    const shouldResetNow = await askDialog(copy.resetMessage, {
-      kind: "warning",
-    });
-
-    if (!shouldResetNow) {
-      return "cancel";
-    }
-
-    const shouldReclassify = await askDialog(copy.reclassifyMessage, {
-      kind: "info",
-    });
-    if (shouldReclassify) {
-      return "yes";
-    }
-    return "no";
-  };
 
 const emitTasksExportResult = async (
   payload: TasksExportResultPayload
@@ -558,10 +484,6 @@ export const TauriInvokeConnector: InvokeConnector = {
     event: C,
     ..._payload: InvokeMainPayloadMap[C]
   ): Promise<InvokeMainResponseMap[C]> => {
-    if (event === CONFIRM_RESET_FOCUS_TO_IDLE) {
-      return (await askResetFocusToIdle()) as InvokeMainResponseMap[C];
-    }
-
     throw new Error(`[TAURI IPC] Unsupported invoke channel: ${event}`);
   },
 };

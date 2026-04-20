@@ -1,10 +1,5 @@
 import WarningBell from "assets/audios/warning-bell.wav";
-import {
-  CONFIRM_RESET_FOCUS_TO_IDLE,
-  type ResetFocusToIdleDialogResult,
-} from "ipc";
-import { SVG } from "components";
-import { getInvokeConnector } from "contexts";
+import { ConfirmDialog, SVG } from "components";
 import React, {
   useCallback,
   useEffect,
@@ -47,6 +42,8 @@ type Props = {
   shouldPromptFocusToIdleReset: boolean;
 };
 
+type ResetPromptStep = "hidden" | "confirmReset" | "confirmReclassify";
+
 const Control: React.FC<Props> = ({
   resetTimerAction,
   shouldPromptFocusToIdleReset,
@@ -64,6 +61,8 @@ const Control: React.FC<Props> = ({
   const dispatch = useAppDispatch();
 
   const [warn, setWarn] = useState(false);
+  const [resetPromptStep, setResetPromptStep] =
+    useState<ResetPromptStep>("hidden");
 
   const activateWarning = useCallback(() => {
     const warnSound = new Audio(WarningBell);
@@ -110,21 +109,7 @@ const Control: React.FC<Props> = ({
       return;
     }
 
-    const askAndReset = async () => {
-      const invokeConnector = getInvokeConnector();
-      const decision: ResetFocusToIdleDialogResult =
-        await invokeConnector.invoke(CONFIRM_RESET_FOCUS_TO_IDLE);
-
-      if (decision === "cancel") {
-        return;
-      }
-
-      resetTimerAction({
-        reclassifyFocusToIdle: decision === "yes",
-      });
-    };
-
-    void askAndReset();
+    setResetPromptStep("confirmReset");
   }, [
     resetTimerAction,
     activateWarning,
@@ -132,6 +117,28 @@ const Control: React.FC<Props> = ({
     settings.enableStrictMode,
     shouldPromptFocusToIdleReset,
   ]);
+
+  const onCancelResetPrompt = useCallback(() => {
+    setResetPromptStep("hidden");
+  }, []);
+
+  const onConfirmTimerReset = useCallback(() => {
+    setResetPromptStep("confirmReclassify");
+  }, []);
+
+  const onConfirmReclassifyToIdle = useCallback(() => {
+    setResetPromptStep("hidden");
+    resetTimerAction({
+      reclassifyFocusToIdle: true,
+    });
+  }, [resetTimerAction]);
+
+  const onDeclineReclassifyToIdle = useCallback(() => {
+    setResetPromptStep("hidden");
+    resetTimerAction({
+      reclassifyFocusToIdle: false,
+    });
+  }, [resetTimerAction]);
 
   const onPlayCallback = useCallback(() => {
     if (timer.playing && settings.enableStrictMode) {
@@ -253,37 +260,117 @@ const Control: React.FC<Props> = ({
     return () => clearTimeout(timeout);
   }, [warn]);
 
+  const isResetPromptVisible = resetPromptStep !== "hidden";
+  const resetPromptMessage =
+    resetPromptStep === "confirmReset"
+      ? t("dialogs.resetNowMessage")
+      : t("dialogs.reclassifyFocusToIdleMessage");
+  const onConfirmResetPrompt =
+    resetPromptStep === "confirmReset"
+      ? onConfirmTimerReset
+      : onConfirmReclassifyToIdle;
+  const onDismissResetPrompt =
+    resetPromptStep === "confirmReclassify"
+      ? onDeclineReclassifyToIdle
+      : onCancelResetPrompt;
+
   if (settings.compactMode) {
     return (
-      <StyledControl className="compact" type={timer.timerType}>
+      <>
+        <StyledControl className="compact" type={timer.timerType}>
+          <Sessions
+            timerType={timer.timerType}
+            round={timer.round}
+            sessionRounds={config.sessionRounds}
+            onClick={onResetSessionCallback}
+          />
+          <StyledControlSpacer className="test" />
+          <StyledControlMain compact={settings.compactMode}>
+            <ResetButton
+              className="compact"
+              onClick={onResetCallback}
+            />
+            <PlayButton
+              compact
+              playing={timer.playing}
+              onClick={onPlayCallback}
+            />
+            <SkipButton className="compact" onClick={onSkipAction} />
+          </StyledControlMain>
+          <StyledControlSpacer className="test" />
+          <StyledControlMain compact={settings.compactMode}>
+            <StatisticsButton
+              className="compact"
+              onClick={onOpenStatisticsCallback}
+              title={t("nav.statistics")}
+              aria-label={t("nav.statistics")}
+            />
+            <CompactModeButton onClick={onToggleCompactCallback} />
+          </StyledControlMain>
+          {settings.enableStrictMode && warn && (
+            <StyledCompactStrictOverlay>
+              <StyledStrictIndicator warn={warn}>
+                <SVG name="alert" />
+
+                <StyledStrictSnackbar warn={warn}>
+                  {strictModeNoticeParts ? (
+                    <>
+                      {strictModeNoticeParts.before}
+                      <span>{strictModeLabel}</span>
+                      {strictModeNoticeParts.after}
+                    </>
+                  ) : (
+                    strictModeNotice
+                  )}
+                </StyledStrictSnackbar>
+              </StyledStrictIndicator>
+            </StyledCompactStrictOverlay>
+          )}
+        </StyledControl>
+        <ConfirmDialog
+          open={isResetPromptVisible}
+          title={t("dialogs.warningTitle")}
+          message={resetPromptMessage}
+          cancelLabel={t("dialogs.noLabel")}
+          confirmLabel={t("dialogs.yesLabel")}
+          onCancel={onDismissResetPrompt}
+          onConfirm={onConfirmResetPrompt}
+        />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <StyledControl type={timer.timerType}>
         <Sessions
           timerType={timer.timerType}
           round={timer.round}
           sessionRounds={config.sessionRounds}
           onClick={onResetSessionCallback}
         />
-        <StyledControlSpacer className="test" />
-        <StyledControlMain compact={settings.compactMode}>
-          <ResetButton className="compact" onClick={onResetCallback} />
+
+        <StyledControlSpacer />
+        <StyledControlMain>
+          <ResetButton onClick={onResetCallback} />
           <PlayButton
-            compact
             playing={timer.playing}
             onClick={onPlayCallback}
           />
-          <SkipButton className="compact" onClick={onSkipAction} />
-        </StyledControlMain>
-        <StyledControlSpacer className="test" />
-        <StyledControlMain compact={settings.compactMode}>
-          <StatisticsButton
-            className="compact"
-            onClick={onOpenStatisticsCallback}
-            title={t("nav.statistics")}
-            aria-label={t("nav.statistics")}
+          <SkipButton onClick={onSkipAction} />
+          <VolumeButton
+            soundOn={settings.notificationSoundOn}
+            onClick={onNotifacationSoundCallback}
           />
-          <CompactModeButton onClick={onToggleCompactCallback} />
         </StyledControlMain>
-        {settings.enableStrictMode && warn && (
-          <StyledCompactStrictOverlay>
+
+        <StyledControlSpacer />
+        <StyledControlMain>
+          <CompactModeButton
+            flipped
+            onClick={onToggleCompactCallback}
+          />
+          {settings.enableStrictMode && (
             <StyledStrictIndicator warn={warn}>
               <SVG name="alert" />
 
@@ -299,54 +386,19 @@ const Control: React.FC<Props> = ({
                 )}
               </StyledStrictSnackbar>
             </StyledStrictIndicator>
-          </StyledCompactStrictOverlay>
-        )}
+          )}
+        </StyledControlMain>
       </StyledControl>
-    );
-  }
-
-  return (
-    <StyledControl type={timer.timerType}>
-      <Sessions
-        timerType={timer.timerType}
-        round={timer.round}
-        sessionRounds={config.sessionRounds}
-        onClick={onResetSessionCallback}
+      <ConfirmDialog
+        open={isResetPromptVisible}
+        title={t("dialogs.warningTitle")}
+        message={resetPromptMessage}
+        cancelLabel={t("dialogs.noLabel")}
+        confirmLabel={t("dialogs.yesLabel")}
+        onCancel={onDismissResetPrompt}
+        onConfirm={onConfirmResetPrompt}
       />
-
-      <StyledControlSpacer />
-      <StyledControlMain>
-        <ResetButton onClick={onResetCallback} />
-        <PlayButton playing={timer.playing} onClick={onPlayCallback} />
-        <SkipButton onClick={onSkipAction} />
-        <VolumeButton
-          soundOn={settings.notificationSoundOn}
-          onClick={onNotifacationSoundCallback}
-        />
-      </StyledControlMain>
-
-      <StyledControlSpacer />
-      <StyledControlMain>
-        <CompactModeButton flipped onClick={onToggleCompactCallback} />
-        {settings.enableStrictMode && (
-          <StyledStrictIndicator warn={warn}>
-            <SVG name="alert" />
-
-            <StyledStrictSnackbar warn={warn}>
-              {strictModeNoticeParts ? (
-                <>
-                  {strictModeNoticeParts.before}
-                  <span>{strictModeLabel}</span>
-                  {strictModeNoticeParts.after}
-                </>
-              ) : (
-                strictModeNotice
-              )}
-            </StyledStrictSnackbar>
-          </StyledStrictIndicator>
-        )}
-      </StyledControlMain>
-    </StyledControl>
+    </>
   );
 };
 

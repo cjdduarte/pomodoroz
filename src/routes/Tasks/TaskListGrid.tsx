@@ -4,7 +4,7 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { ask as askDialog } from "@tauri-apps/plugin-dialog";
+import { ConfirmDialog } from "components";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "hooks/storeHooks";
 import { resetAllDayColors, setTaskDayColor } from "store";
@@ -91,6 +91,7 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
     getInitialColumnsMode
   );
   const [grouped, setGrouped] = useState<boolean>(getInitialGrouped);
+  const [showResetDialog, setShowResetDialog] = useState(false);
 
   const activeTaskSelection = useMemo(
     () =>
@@ -222,17 +223,18 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
     [onSelectList]
   );
 
-  const handleReset = useCallback(async () => {
-    const hasConfirmed = await askDialog(t("grid.resetConfirm"), {
-      kind: "warning",
-    });
+  const handleReset = useCallback(() => {
+    setShowResetDialog(true);
+  }, []);
 
-    if (!hasConfirmed) {
-      return;
-    }
+  const onCancelReset = useCallback(() => {
+    setShowResetDialog(false);
+  }, []);
 
+  const onConfirmReset = useCallback(() => {
+    setShowResetDialog(false);
     dispatch(resetAllDayColors());
-  }, [dispatch, t]);
+  }, [dispatch]);
 
   const randomWhiteCandidates = useMemo(() => {
     return gridItems.filter(
@@ -514,6 +516,15 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
           {t("grid.remaining")}: {stats.remaining}
         </StyledGridStats>
       </StyledGridFooter>
+      <ConfirmDialog
+        open={showResetDialog}
+        title={t("dialogs.warningTitle")}
+        message={t("grid.resetConfirm")}
+        cancelLabel={t("dialogs.noLabel")}
+        confirmLabel={t("dialogs.yesLabel")}
+        onCancel={onCancelReset}
+        onConfirm={onConfirmReset}
+      />
     </StyledGridWrapper>
   );
 };

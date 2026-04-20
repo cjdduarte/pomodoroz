@@ -239,6 +239,14 @@ export const pt = {
       s: "s",
     },
   },
+  dialogs: {
+    warningTitle: "Atenção",
+    yesLabel: "Sim",
+    noLabel: "Não",
+    resetNowMessage: "Deseja resetar agora?",
+    reclassifyFocusToIdleMessage:
+      "Mover o tempo decorrido desta tarefa atual para Ocioso?",
+  },
   units: {
     min: "min",
     mins: "mins",

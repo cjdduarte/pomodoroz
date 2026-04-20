@@ -23,8 +23,6 @@ export const EXPORT_TASKS_DIALOG = "EXPORT_TASKS_DIALOG";
 export const IMPORT_TASKS_DIALOG = "IMPORT_TASKS_DIALOG";
 export const TASKS_EXPORT_RESULT = "TASKS_EXPORT_RESULT";
 export const TASKS_IMPORT_RESULT = "TASKS_IMPORT_RESULT";
-export const CONFIRM_RESET_FOCUS_TO_IDLE =
-  "CONFIRM_RESET_FOCUS_TO_IDLE";
 export const WINDOW_RESTORED_EVENT = "pomodoroz://window-restored";
 
 export const TO_MAIN = [
@@ -58,7 +56,7 @@ export const FROM_MAIN = [
   TASKS_IMPORT_RESULT,
 ] as const;
 
-export const INVOKE_MAIN = [CONFIRM_RESET_FOCUS_TO_IDLE] as const;
+export const INVOKE_MAIN = [] as const;
 
 export type ToMainChannel = (typeof TO_MAIN)[number];
 export type FromMainChannel = (typeof FROM_MAIN)[number];
@@ -137,8 +135,6 @@ export type TasksImportResultPayload = {
   error?: string;
 };
 
-export type ResetFocusToIdleDialogResult = "yes" | "no" | "cancel";
-
 export type ToMainPayloadMap = {
   [K in ToMainChannel]: K extends typeof SET_ALWAYS_ON_TOP
     ? [SetAlwaysOnTopPayload]
@@ -198,15 +194,11 @@ export type FromMainPayloadMap = {
 };
 
 export type InvokeMainPayloadMap = {
-  [K in InvokeMainChannel]: K extends typeof CONFIRM_RESET_FOCUS_TO_IDLE
-    ? []
-    : never;
+  [K in InvokeMainChannel]: never;
 };
 
 export type InvokeMainResponseMap = {
-  [K in InvokeMainChannel]: K extends typeof CONFIRM_RESET_FOCUS_TO_IDLE
-    ? ResetFocusToIdleDialogResult
-    : never;
+  [K in InvokeMainChannel]: never;
 };
 
 export const RELEASE_NOTES_LINK =

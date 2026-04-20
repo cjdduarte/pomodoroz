@@ -230,6 +230,14 @@ export const zh = {
       s: "秒",
     },
   },
+  dialogs: {
+    warningTitle: "注意",
+    yesLabel: "是",
+    noLabel: "否",
+    resetNowMessage: "是否立即重置？",
+    reclassifyFocusToIdleMessage:
+      "是否将当前任务的已过时间转为空闲时间？",
+  },
   units: {
     min: "分钟",
     mins: "分钟",

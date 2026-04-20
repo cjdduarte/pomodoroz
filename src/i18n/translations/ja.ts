@@ -238,6 +238,14 @@ export const ja = {
       s: "秒",
     },
   },
+  dialogs: {
+    warningTitle: "注意",
+    yesLabel: "はい",
+    noLabel: "いいえ",
+    resetNowMessage: "今すぐリセットしますか？",
+    reclassifyFocusToIdleMessage:
+      "現在のタスクの経過時間をアイドル時間へ移動しますか？",
+  },
   units: {
     min: "分",
     mins: "分",

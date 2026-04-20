@@ -240,6 +240,14 @@ export const es = {
       s: "s",
     },
   },
+  dialogs: {
+    warningTitle: "Atención",
+    yesLabel: "Sí",
+    noLabel: "No",
+    resetNowMessage: "¿Quieres restablecerlo ahora?",
+    reclassifyFocusToIdleMessage:
+      "¿Mover a Ocioso el tiempo transcurrido de la tarea actual?",
+  },
   units: {
     min: "min",
     mins: "mins",
