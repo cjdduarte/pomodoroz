@@ -11,6 +11,7 @@
 ### Changed
 
 - **Project dependency updates** — a maintenance batch was applied across JS/TS ecosystem libraries, with no planned functional behavior change.
+- **TypeScript lint dependencies updated (`@typescript-eslint/*` 8.59.0)** — `@typescript-eslint/eslint-plugin` and `@typescript-eslint/parser` were upgraded to `8.59.0`, with lockfile refresh.
 - **Renderer env hygiene simplified** — `app/renderer/.env.example` was removed and the `!.env.example` exception was dropped from `.gitignore`; the renderer does not consume `SKIP_PREFLIGHT_CHECK`, `BROWSER`, or `CI` in the default runtime/build path, keeping `.env` as optional local-only config.
 - **A5 batch 2 completed (`eslint`/`@eslint/js` 10.x + `eslint-react`)** — lint was migrated to `@eslint-react/eslint-plugin` (`recommended-typescript` with compatibility-oriented overrides), `eslint` was upgraded to `10.2.1` and `@eslint/js` to `10.0.1`; `eslint-plugin-react` and `eslint-plugin-react-hooks` were removed, and the lint directive in `Portal.tsx` was updated to the new plugin rule namespace.
 - **A5 batch 3 completed (`vite-plugin-svgr` 5.x)** — `vite-plugin-svgr` was upgraded from `4.5.0` to `5.2.0`, keeping the current SVG icon contract (`ReactComponent` named export) and passing full validation (`pnpm lint`, `pnpm typecheck:renderer`, `pnpm build:renderer`, `cargo check --manifest-path src-tauri/Cargo.toml`).
@@ -18,6 +19,7 @@
 - **Tauri runtime consistency fixes after technical audit** — `onSelectAutoUpdatePolicy` in `Layout` no longer uses inverted condition logic for auto-update sync, redundant non-null connector checks were removed (`Layout`, `Updater`, `Control`, `CompactTaskDisplay`, `CounterContext`, `TaskTransferSection`), orphan utility exports (`isBrowser`, `isObjectEmpty`) were removed from the `utils` barrel, Rust `restart_app` now uses a non-misleading no-return signature, reset confirmation flows (timer and task grid) moved to an internal React modal (instead of `@tauri-apps/plugin-dialog`), and the legacy `runtimeInvokeConnector` layer was removed.
 - **Reset confirmations are now standardized with in-app modal UI to avoid Linux/GTK duplication** — reset prompts now render through the app `Portal` with i18n-controlled title/message (pt/en/es/ja/zh), eliminating duplicated text behavior from native dialogs; in compact mode, the app temporarily expands the window when needed to avoid modal clipping and collapses again after close.
 - **Release operations guide updated for explicit preflight bypass usage** — `docs/RELEASE_OPERATIONS.md` now documents `--skip-validate`/`-SkipValidate` as emergency-only and requires `POMODOROZ_RELEASE_SKIP_VALIDATE_ACK=1` in non-interactive runs.
+- **`validar-tudo.ps1` Windows compatibility fixed for `:` interpolation** — `PKG_CONFIG_PATH` assignment moved from direct string interpolation to safe formatting (`"{0}:{1}" -f ...`), preventing PowerShell `ParserError` (`InvalidVariableReferenceWithDrive`).
 
 ## [26.4.28] - 2026-04-20
 

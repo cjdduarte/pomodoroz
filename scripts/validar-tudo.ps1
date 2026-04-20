@@ -167,7 +167,7 @@ function Invoke-TauriAppImageBuild {
                 & gdk-pixbuf-query-loaders | Set-Content (Join-Path $gdkBinaryDirOverride "loaders.cache")
 
                 if ($hadPkgConfigPath -and -not [string]::IsNullOrWhiteSpace($oldPkgConfigPath)) {
-                    $env:PKG_CONFIG_PATH = "$pkgconfigDir:$oldPkgConfigPath"
+                    $env:PKG_CONFIG_PATH = "{0}:{1}" -f $pkgconfigDir, $oldPkgConfigPath
                 } else {
                     $env:PKG_CONFIG_PATH = $pkgconfigDir
                 }

@@ -11,6 +11,7 @@
 ### Alterado
 
 - **Atualização de dependências do projeto** — lote de manutenção aplicado em bibliotecas do ecossistema JS/TS, sem mudança funcional planejada.
+- **Dependências de lint TypeScript atualizadas (`@typescript-eslint/*` 8.59.0)** — `@typescript-eslint/eslint-plugin` e `@typescript-eslint/parser` foram atualizados para `8.59.0`, com lockfile regenerado.
 - **Higiene de ambiente do renderer simplificada** — removido `app/renderer/.env.example` e retirada a exceção `!.env.example` no `.gitignore`; o renderer não consome `SKIP_PREFLIGHT_CHECK`, `BROWSER` ou `CI` no runtime/build padrão, mantendo `.env` apenas como arquivo local opcional.
 - **A5 batch 2 concluído (`eslint`/`@eslint/js` 10.x + `eslint-react`)** — lint migrou para `@eslint-react/eslint-plugin` (`recommended-typescript` com ajustes de compatibilidade), `eslint` foi atualizado para `10.2.1` e `@eslint/js` para `10.0.1`; `eslint-plugin-react` e `eslint-plugin-react-hooks` foram removidos do projeto, com atualização da diretiva de lint em `Portal.tsx` para as regras do novo plugin.
 - **A5 batch 3 concluído (`vite-plugin-svgr` 5.x)** — `vite-plugin-svgr` foi atualizado de `4.5.0` para `5.2.0`, preservando o contrato atual de ícones SVG (`ReactComponent` nomeado) e passando na validação completa (`pnpm lint`, `pnpm typecheck:renderer`, `pnpm build:renderer`, `cargo check --manifest-path src-tauri/Cargo.toml`).
@@ -18,6 +19,7 @@
 - **Correções de consistência após auditoria técnica do runtime Tauri** — `onSelectAutoUpdatePolicy` em `Layout` deixou de usar a condição invertida para sync de auto-update, checks redundantes de conector não-nulo foram removidos (`Layout`, `Updater`, `Control`, `CompactTaskDisplay`, `CounterContext`, `TaskTransferSection`), utilitários órfãos (`isBrowser`, `isObjectEmpty`) saíram do barrel `utils`, o comando Rust `restart_app` passou a ter assinatura sem retorno enganoso, os fluxos de confirmação de reset (timer e grid) migraram para modal interno React (sem `@tauri-apps/plugin-dialog`), e a camada legada `runtimeInvokeConnector` foi removida.
 - **Confirmações de reset padronizadas com modal do app para evitar duplicação no Linux/GTK** — os prompts de reset agora renderizam no `Portal` do app com título/mensagem controlados pelo i18n (pt/en/es/ja/zh), eliminando repetição visual de texto do diálogo nativo; em modo compacto, o app expande a janela temporariamente quando necessário para evitar corte do modal e recolhe ao fechar.
 - **Guia operacional de release atualizado com bypass explícito de preflight** — `docs/RELEASE_OPERATIONS.md` agora documenta `--skip-validate`/`-SkipValidate` com aviso de uso emergencial e requisito de `POMODOROZ_RELEASE_SKIP_VALIDATE_ACK=1` em modo não interativo.
+- **Compatibilidade do `validar-tudo.ps1` no Windows corrigida para interpolação com `:`** — o ajuste do `PKG_CONFIG_PATH` passou de interpolação direta de string para formatação segura (`"{0}:{1}" -f ...`), evitando `ParserError` em PowerShell (`InvalidVariableReferenceWithDrive`).
 
 ## [26.4.28] - 2026-04-20
 
