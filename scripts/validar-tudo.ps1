@@ -398,9 +398,6 @@ try {
     Die "Node nao encontrado."
 }
 
-if (-not (Get-Command pnpm -ErrorAction SilentlyContinue)) {
-    Die "pnpm nao encontrado."
-}
 if (-not (Get-Command cargo -ErrorAction SilentlyContinue)) {
     Die "Cargo nao encontrado."
 }

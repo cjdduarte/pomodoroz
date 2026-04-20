@@ -20,6 +20,7 @@
 - **Reset confirmations are now standardized with in-app modal UI to avoid Linux/GTK duplication** — reset prompts now render through the app `Portal` with i18n-controlled title/message (pt/en/es/ja/zh), eliminating duplicated text behavior from native dialogs; in compact mode, the app temporarily expands the window when needed to avoid modal clipping and collapses again after close.
 - **Release operations guide updated for explicit preflight bypass usage** — `docs/RELEASE_OPERATIONS.md` now documents `--skip-validate`/`-SkipValidate` as emergency-only and requires `POMODOROZ_RELEASE_SKIP_VALIDATE_ACK=1` in non-interactive runs.
 - **`validar-tudo.ps1` Windows compatibility fixed for `:` interpolation** — `PKG_CONFIG_PATH` assignment moved from direct string interpolation to safe formatting (`"{0}:{1}" -f ...`), preventing PowerShell `ParserError` (`InvalidVariableReferenceWithDrive`).
+- **Windows quick run no longer requires global `pnpm` in PATH** — `scripts/validar-tudo.ps1` removed the `Get-Command pnpm` gate and now validates/runs package commands only through `scripts/pnpmw.mjs` (`node + corepack`), fixing the early failure in the interactive menu flow.
 
 ## [26.4.28] - 2026-04-20
 

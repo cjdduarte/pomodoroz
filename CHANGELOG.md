@@ -20,6 +20,7 @@
 - **Confirmações de reset padronizadas com modal do app para evitar duplicação no Linux/GTK** — os prompts de reset agora renderizam no `Portal` do app com título/mensagem controlados pelo i18n (pt/en/es/ja/zh), eliminando repetição visual de texto do diálogo nativo; em modo compacto, o app expande a janela temporariamente quando necessário para evitar corte do modal e recolhe ao fechar.
 - **Guia operacional de release atualizado com bypass explícito de preflight** — `docs/RELEASE_OPERATIONS.md` agora documenta `--skip-validate`/`-SkipValidate` com aviso de uso emergencial e requisito de `POMODOROZ_RELEASE_SKIP_VALIDATE_ACK=1` em modo não interativo.
 - **Compatibilidade do `validar-tudo.ps1` no Windows corrigida para interpolação com `:`** — o ajuste do `PKG_CONFIG_PATH` passou de interpolação direta de string para formatação segura (`"{0}:{1}" -f ...`), evitando `ParserError` em PowerShell (`InvalidVariableReferenceWithDrive`).
+- **Quick run no Windows não depende mais de `pnpm` global no PATH** — `scripts/validar-tudo.ps1` removeu o gate `Get-Command pnpm` e passou a validar/executar comandos de pacote apenas via `scripts/pnpmw.mjs` (`node + corepack`), corrigindo falha precoce no menu interativo.
 
 ## [26.4.28] - 2026-04-20
 
