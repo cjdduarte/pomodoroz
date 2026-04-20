@@ -17,22 +17,29 @@ const ConfirmDialogOverlay = styled.div`
   position: fixed;
   inset: 0;
   z-index: 2100;
-  padding: 1.6rem;
+  padding: clamp(0.6rem, 3vh, 1.6rem);
 
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow-y: auto;
 
   background-color: rgba(0, 0, 0, 0.28);
+
+  @media (max-height: 360px) {
+    align-items: flex-start;
+  }
 `;
 
 const ConfirmDialogCard = styled.section`
   width: min(40rem, 100%);
+  max-height: calc(100vh - 1.2rem);
   border-radius: 4px;
   border: 1px solid var(--color-border-primary);
   background-color: var(--color-bg-primary);
   box-shadow: 0 12px 34px -10px var(--color-shadow-primary);
   padding: 1.6rem;
+  overflow-y: auto;
 
   display: grid;
   row-gap: 1.2rem;
@@ -51,6 +58,20 @@ const ConfirmDialogCard = styled.section`
     line-height: 1.4;
     text-align: center;
   }
+
+  @media (max-height: 360px) {
+    padding: 1rem;
+    row-gap: 0.8rem;
+
+    & > h3 {
+      font-size: 1.3rem;
+    }
+
+    & > p {
+      font-size: 1.2rem;
+      line-height: 1.3;
+    }
+  }
 `;
 
 const ConfirmDialogActions = styled.div`
@@ -67,6 +88,11 @@ const ConfirmDialogCancelButton = styled(StyledButtonNormal)`
   line-height: 1.2;
   text-align: center;
   padding: 0.7rem 0.9rem;
+
+  @media (max-height: 360px) {
+    min-height: 2.8rem;
+    padding: 0.5rem 0.7rem;
+  }
 `;
 
 const ConfirmDialogConfirmButton = styled(StyledButtonPrimary)`
@@ -77,6 +103,11 @@ const ConfirmDialogConfirmButton = styled(StyledButtonPrimary)`
   line-height: 1.2;
   text-align: center;
   padding: 0.7rem 0.9rem;
+
+  @media (max-height: 360px) {
+    min-height: 2.8rem;
+    padding: 0.5rem 0.7rem;
+  }
 `;
 
 const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
