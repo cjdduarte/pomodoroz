@@ -12,6 +12,7 @@
 
 - **Project dependency updates** — a maintenance batch was applied across JS/TS ecosystem libraries, with no planned functional behavior change.
 - **Renderer env hygiene simplified** — `app/renderer/.env.example` was removed and the `!.env.example` exception was dropped from `.gitignore`; the renderer does not consume `SKIP_PREFLIGHT_CHECK`, `BROWSER`, or `CI` in the default runtime/build path, keeping `.env` as optional local-only config.
+- **A5 batch 2 completed (`eslint`/`@eslint/js` 10.x + `eslint-react`)** — lint was migrated to `@eslint-react/eslint-plugin` (`recommended-typescript` with compatibility-oriented overrides), `eslint` was upgraded to `10.2.1` and `@eslint/js` to `10.0.1`; `eslint-plugin-react` and `eslint-plugin-react-hooks` were removed, and the lint directive in `Portal.tsx` was updated to the new plugin rule namespace.
 - **A5 batch 3 completed (`vite-plugin-svgr` 5.x)** — `vite-plugin-svgr` was upgraded from `4.5.0` to `5.2.0`, keeping the current SVG icon contract (`ReactComponent` named export) and passing full validation (`pnpm lint`, `pnpm typecheck:renderer`, `pnpm build:renderer`, `cargo check --manifest-path src-tauri/Cargo.toml`).
 
 ## [26.4.28] - 2026-04-20

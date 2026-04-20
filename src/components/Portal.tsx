@@ -1,4 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @eslint-react/exhaustive-deps */
 import React, { useState, useRef, useEffect } from "react";
 import ReactDOM from "react-dom";
 

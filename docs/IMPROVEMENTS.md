@@ -45,45 +45,31 @@ When an item is released:
 - Current planning baseline:
   - Next open version headers already prepared in changelog (`26.4.29` as `A definir` / `TBD`).
   - `A2` env hygiene completed (renderer `.env` untracked, no committed `.env.example` required by default).
-  - `A5` dependency modernization now has batch 3 completed (`vite-plugin-svgr@5.2.0`) with full validation.
-  - Next update is `A5` batch 2 planning/execution (`eslint`/`@eslint/js` 10.x), guided by ESLint 10 migration docs and `eslint-react` references.
-  - `A5` batch 2 still requires explicit decision on path (`eslint-plugin-react` wait vs `eslint-react` migration) before implementation.
+  - `A5` dependency modernization major batches are now completed (`eslint`/`@eslint/js` 10.x with `eslint-react`, and `vite-plugin-svgr@5.2.0`) with full validation.
   - `A6` intentionally deferred by product decision (no test-track changes now).
 
 ### Next execution order (after 26.4.28)
 
-1. **A5 — Next update: batch 2 (`eslint`/`@eslint/js` 10.x)**
-   - Why change now:
-     - Current React lint plugin blocks ESLint 10 adoption in this project.
-     - Candidate migration path is `eslint-react`, which supports ESLint 10.
-   - Use these references as baseline for migration path definition and execution:
-     - https://eslint.org/docs/latest/use/migrate-to-10.0.0
-     - https://github.com/Rel1cx/eslint-react
-   - Also consult plugin repositories for both sides:
-     - Current plugin (`eslint-plugin-react`): https://github.com/jsx-eslint/eslint-plugin-react
-     - Candidate plugin (`eslint-react`): https://github.com/Rel1cx/eslint-react
-   - Decide path before implementation (`eslint-plugin-react` compatibility wait vs controlled migration to `eslint-react`).
-   - Re-run full validation after the selected path is applied.
-2. **A3 — Shortcut persistence**
+1. **A3 — Shortcut persistence**
    - Persist customizable shortcuts and restore on boot.
-3. **Product cycle (B1 -> B2 -> B3)**
+2. **Product cycle (B1 -> B2 -> B3)**
    - Cadence presets, session extension, break suggestion prompts.
-4. **A6 revisit gate**
+3. **A6 revisit gate**
    - Revisit test strategy only after items above are stabilized.
 
 ---
 
 ## 2. Track A — Conversion Hardening (Tauri-only)
 
-| ID  | Item                                                                          | Status      | Priority | Notes                                         |
-| --- | ----------------------------------------------------------------------------- | ----------- | -------- | --------------------------------------------- |
-| A0  | Consolidate runtime to Tauri-only and remove browser fallback branches        | Done        | High     | Released in 26.4.28                           |
-| A1  | Resolve titlebar legacy CSS/changelog divergence (`-webkit-app-region`)       | Done        | High     | Released in 26.4.28                           |
-| A2  | `.env` hygiene (`app/renderer/.env` tracked)                                  | Done        | High     | Completed and registered in 26.4.29 draft     |
-| A3  | Persist custom shortcuts (`Shortcut.tsx` TODO)                                | Open        | Medium   | Avoid loss after restart                      |
-| A4  | Simplify `check-updates` to root-only narrative and flows                     | Done        | Medium   | Released in 26.4.28                           |
-| A5  | Controlled major updates (`eslint`/`@eslint/js` 10.x, `vite-plugin-svgr` 5.x) | In Progress | Medium   | Batches 1/3 applied; batch 2 blocked upstream |
-| A6  | Define automated test strategy (adopt baseline tests or remove idle stack)    | Blocked     | High     | Deferred by decision (no tests changes now)   |
+| ID  | Item                                                                          | Status  | Priority | Notes                                       |
+| --- | ----------------------------------------------------------------------------- | ------- | -------- | ------------------------------------------- |
+| A0  | Consolidate runtime to Tauri-only and remove browser fallback branches        | Done    | High     | Released in 26.4.28                         |
+| A1  | Resolve titlebar legacy CSS/changelog divergence (`-webkit-app-region`)       | Done    | High     | Released in 26.4.28                         |
+| A2  | `.env` hygiene (`app/renderer/.env` tracked)                                  | Done    | High     | Completed and registered in 26.4.29 draft   |
+| A3  | Persist custom shortcuts (`Shortcut.tsx` TODO)                                | Open    | Medium   | Avoid loss after restart                    |
+| A4  | Simplify `check-updates` to root-only narrative and flows                     | Done    | Medium   | Released in 26.4.28                         |
+| A5  | Controlled major updates (`eslint`/`@eslint/js` 10.x, `vite-plugin-svgr` 5.x) | Done    | Medium   | Batches 1/2/3 completed in 26.4.29 draft    |
+| A6  | Define automated test strategy (adopt baseline tests or remove idle stack)    | Blocked | High     | Deferred by decision (no tests changes now) |
 
 ### A0 — Tauri-only runtime consolidation
 
@@ -171,20 +157,24 @@ Impact:
 - Scope checklist:
   - [x] Split updates into independent batches.
   - [x] Apply batch 1 (`uuid@14` + safe JS/TS updates from `check-updates`).
-  - [ ] Define batch 2 strategy from references (ESLint 10 migration guide + `eslint-react`) and choose implementation path.
-  - [ ] Apply batch 2 (`eslint` / `@eslint/js` 10.x) with full validation after path approval.
+  - [x] Define batch 2 strategy from references (ESLint 10 migration guide + `eslint-react`) and choose implementation path.
+  - [x] Apply batch 2 (`eslint` / `@eslint/js` 10.x) with full validation after path approval.
   - [x] Apply batch 3 (`vite-plugin-svgr` 5.x) with full validation.
-  - [x] Register completed batch 3 in changelog.
+  - [x] Register completed batches 2 and 3 in changelog.
 - Validation checklist:
   - [x] `pnpm lint` (batch 1)
   - [x] `pnpm typecheck:renderer` (batch 1)
   - [x] `pnpm build:renderer` (batch 1)
   - [x] `cargo check --manifest-path src-tauri/Cargo.toml` (batch 1)
+  - [x] `pnpm lint` (batch 2)
+  - [x] `pnpm typecheck:renderer` (batch 2)
+  - [x] `pnpm build:renderer` (batch 2)
+  - [x] `cargo check --manifest-path src-tauri/Cargo.toml` (batch 2)
   - [x] `pnpm lint` (batch 3)
   - [x] `pnpm typecheck:renderer` (batch 3)
   - [x] `pnpm build:renderer` (batch 3)
   - [x] `cargo check --manifest-path src-tauri/Cargo.toml` (batch 3)
-- Batch 2 references:
+- Batch 2 references used during implementation:
   - Current plugin repository (`eslint-plugin-react`): https://github.com/jsx-eslint/eslint-plugin-react
   - Candidate plugin repository (`eslint-react`): https://github.com/Rel1cx/eslint-react
   - ESLint official migration guide: https://eslint.org/docs/latest/use/migrate-to-10.0.0
@@ -192,7 +182,7 @@ Impact:
   - `eslint-plugin-react` ESLint 10 tracking issue (current blocker context): https://github.com/jsx-eslint/eslint-plugin-react/issues/3977
   - `eslint-plugin-react` package compatibility (`peerDependencies`): https://www.npmjs.com/package/eslint-plugin-react
 - Suggested commit:
-  - `chore(deps): apply controlled major updates batch`
+  - `chore(lint): migrate to eslint-react and upgrade eslint to v10`
 
 ### A6 — Test strategy decision
 

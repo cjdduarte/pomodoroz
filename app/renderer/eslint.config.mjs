@@ -2,10 +2,9 @@ import js from "@eslint/js";
 import tsPlugin from "@typescript-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
 import globals from "globals";
-import reactPlugin from "eslint-plugin-react";
-import reactHooksPlugin from "eslint-plugin-react-hooks";
+import eslintReact from "@eslint-react/eslint-plugin";
 
-const reactRules = reactPlugin.configs.recommended.rules;
+const reactRecommendedTsConfig = eslintReact.configs["recommended-typescript"];
 const tsRecommendedRules = tsPlugin.configs.recommended.rules;
 
 export default [
@@ -28,23 +27,18 @@ export default [
         ...globals.node,
       },
     },
-    plugins: {
-      react: reactPlugin,
-      "react-hooks": reactHooksPlugin,
-    },
-    settings: {
-      react: {
-        version: "detect",
-      },
-    },
+    ...reactRecommendedTsConfig,
     rules: {
-      ...reactRules,
-      "react-hooks/rules-of-hooks": "error",
-      "react-hooks/exhaustive-deps": "warn",
-      "react/react-in-jsx-scope": "off",
-      "react/prop-types": "off",
-      "react/display-name": "off",
-      "react/no-children-prop": "off",
+      ...reactRecommendedTsConfig.rules,
+      "@eslint-react/jsx-no-children-prop": "off",
+      "@eslint-react/naming-convention-ref-name": "off",
+      "@eslint-react/no-context-provider": "off",
+      "@eslint-react/no-unnecessary-use-prefix": "off",
+      "@eslint-react/no-use-context": "off",
+      "@eslint-react/purity": "off",
+      "@eslint-react/set-state-in-effect": "off",
+      "@eslint-react/web-api-no-leaked-event-listener": "off",
+      "@eslint-react/web-api-no-leaked-timeout": "off",
       "no-prototype-builtins": "off",
     },
   },
