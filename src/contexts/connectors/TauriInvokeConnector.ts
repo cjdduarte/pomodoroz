@@ -5,6 +5,7 @@ import {
   enable as enableAutostart,
 } from "@tauri-apps/plugin-autostart";
 import {
+  ask as askDialog,
   open as openDialog,
   save as saveDialog,
 } from "@tauri-apps/plugin-dialog";
@@ -216,25 +217,52 @@ const resolvePreferredLanguage = (): LanguageCode => {
   return detectSystemLanguage();
 };
 
-const askResetFocusToIdle = (): ResetFocusToIdleDialogResult => {
-  const language = resolvePreferredLanguage();
-  const copy = RESET_DIALOG_COPY[language];
-  const shouldResetNow = window.confirm(
-    `${copy.resetTitle}\n\n${copy.resetMessage}`
-  );
+const askResetFocusToIdle =
+  async (): Promise<ResetFocusToIdleDialogResult> => {
+    const language = resolvePreferredLanguage();
+    const copy = RESET_DIALOG_COPY[language];
 
-  if (!shouldResetNow) {
-    return "cancel";
-  }
+    try {
+      const shouldResetNow = await askDialog(copy.resetMessage, {
+        title: copy.resetTitle,
+        kind: "warning",
+      });
 
-  const shouldReclassify = window.confirm(
-    `${copy.reclassifyTitle}\n\n${copy.reclassifyMessage}`
-  );
-  if (shouldReclassify) {
-    return "yes";
-  }
-  return "no";
-};
+      if (!shouldResetNow) {
+        return "cancel";
+      }
+
+      const shouldReclassify = await askDialog(copy.reclassifyMessage, {
+        title: copy.reclassifyTitle,
+        kind: "info",
+      });
+      if (shouldReclassify) {
+        return "yes";
+      }
+      return "no";
+    } catch (error: unknown) {
+      console.warn(
+        "[TAURI IPC] Failed to open native reset confirmation dialog. Falling back to window.confirm.",
+        error
+      );
+
+      const shouldResetNow = window.confirm(
+        `${copy.resetTitle}\n\n${copy.resetMessage}`
+      );
+
+      if (!shouldResetNow) {
+        return "cancel";
+      }
+
+      const shouldReclassify = window.confirm(
+        `${copy.reclassifyTitle}\n\n${copy.reclassifyMessage}`
+      );
+      if (shouldReclassify) {
+        return "yes";
+      }
+      return "no";
+    }
+  };
 
 const emitTasksExportResult = async (
   payload: TasksExportResultPayload
@@ -568,7 +596,7 @@ export const TauriInvokeConnector: InvokeConnector = {
     ..._payload: InvokeMainPayloadMap[C]
   ): Promise<InvokeMainResponseMap[C]> => {
     if (event === CONFIRM_RESET_FOCUS_TO_IDLE) {
-      return askResetFocusToIdle() as InvokeMainResponseMap[C];
+      return (await askResetFocusToIdle()) as InvokeMainResponseMap[C];
     }
 
     throw new Error(`[TAURI IPC] Unsupported invoke channel: ${event}`);

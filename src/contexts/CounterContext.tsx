@@ -34,7 +34,7 @@ import thirtySecondsLeftWav from "assets/audios/thirty-seconds-left.wav";
 import { useAppDispatch, useAppSelector } from "hooks/storeHooks";
 import { TimerStatus } from "store/timer/types";
 import { FULLSCREEN_BREAK_ENTERED, FULLSCREEN_BREAK_EXITED } from "ipc";
-import { getRuntimeInvokeConnector } from "./connectors/runtimeInvokeConnector";
+import { TauriInvokeConnector } from "./connectors/TauriInvokeConnector";
 
 type CounterProps = {
   count: number;
@@ -845,16 +845,14 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
   ]);
 
   useEffect(() => {
-    const invokeConnector = getRuntimeInvokeConnector();
-
-    const cleanupEntered = invokeConnector.receive(
+    const cleanupEntered = TauriInvokeConnector.receive(
       FULLSCREEN_BREAK_ENTERED,
       () => {
         setShouldFullscreen(true);
       }
     );
 
-    const cleanupExited = invokeConnector.receive(
+    const cleanupExited = TauriInvokeConnector.receive(
       FULLSCREEN_BREAK_EXITED,
       () => {
         setShouldRequestFullscreen(false);

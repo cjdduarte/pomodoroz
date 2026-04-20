@@ -1,6 +1,6 @@
 import React, { type PropsWithChildren } from "react";
 import { TauriConnectorProvider } from "./connectors/TauriConnector";
-import { getRuntimeInvokeConnector } from "./connectors/runtimeInvokeConnector";
+import { TauriInvokeConnector } from "./connectors/TauriInvokeConnector";
 
 export type ConnectorProps = {
   onMinimizeCallback?: () => void;
@@ -14,7 +14,7 @@ export type ConnectorProps = {
 export const ConnectorContext = React.createContext<ConnectorProps>({});
 
 export function getInvokeConnector() {
-  return getRuntimeInvokeConnector();
+  return TauriInvokeConnector;
 }
 
 export const ConnectorProvider = ({ children }: PropsWithChildren) => {
