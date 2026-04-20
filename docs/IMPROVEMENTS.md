@@ -44,39 +44,36 @@ When an item is released:
   - Linux release pipeline/AppImage hardening and `sync-latest-json` alignment.
 - Current planning baseline:
   - Next open version headers already prepared in changelog (`26.4.29` as `A definir` / `TBD`).
+  - `A2` env hygiene completed (renderer `.env` untracked, no committed `.env.example` required by default).
   - `A5` dependency modernization started in controlled batches (`uuid@14` and safe updates).
   - `A6` intentionally deferred by product decision (no test-track changes now).
 
 ### Next execution order (after 26.4.28)
 
-1. **A2 — `.env` hygiene (next implementation target)**
-   - Stop tracking `app/renderer/.env`.
-   - Add `app/renderer/.env.example`.
-   - Align setup docs with the new pattern.
-2. **A5 — Controlled major dependency batches**
+1. **A5 — Controlled major dependency batches**
    - Batch 2: `eslint`/`@eslint/js` 10.x.
    - Batch 3: `vite-plugin-svgr` 5.x.
    - Validate and register each batch in changelog.
-3. **A3 — Shortcut persistence**
+2. **A3 — Shortcut persistence**
    - Persist customizable shortcuts and restore on boot.
-4. **Product cycle (B1 -> B2 -> B3)**
+3. **Product cycle (B1 -> B2 -> B3)**
    - Cadence presets, session extension, break suggestion prompts.
-5. **A6 revisit gate**
+4. **A6 revisit gate**
    - Revisit test strategy only after items above are stabilized.
 
 ---
 
 ## 2. Track A — Conversion Hardening (Tauri-only)
 
-| ID  | Item                                                                          | Status      | Priority | Notes                                               |
-| --- | ----------------------------------------------------------------------------- | ----------- | -------- | --------------------------------------------------- |
-| A0  | Consolidate runtime to Tauri-only and remove browser fallback branches        | Done        | High     | Released in 26.4.28                                 |
-| A1  | Resolve titlebar legacy CSS/changelog divergence (`-webkit-app-region`)       | Done        | High     | Released in 26.4.28                                 |
-| A2  | `.env` hygiene (`app/renderer/.env` tracked)                                  | In Progress | High     | Implemented in code; pending changelog registration |
-| A3  | Persist custom shortcuts (`Shortcut.tsx` TODO)                                | Open        | Medium   | Avoid loss after restart                            |
-| A4  | Simplify `check-updates` to root-only narrative and flows                     | Done        | Medium   | Released in 26.4.28                                 |
-| A5  | Controlled major updates (`eslint`/`@eslint/js` 10.x, `vite-plugin-svgr` 5.x) | In Progress | Medium   | Batch 1 applied; major batches pending              |
-| A6  | Define automated test strategy (adopt baseline tests or remove idle stack)    | Blocked     | High     | Deferred by decision (no tests changes now)         |
+| ID  | Item                                                                          | Status      | Priority | Notes                                       |
+| --- | ----------------------------------------------------------------------------- | ----------- | -------- | ------------------------------------------- |
+| A0  | Consolidate runtime to Tauri-only and remove browser fallback branches        | Done        | High     | Released in 26.4.28                         |
+| A1  | Resolve titlebar legacy CSS/changelog divergence (`-webkit-app-region`)       | Done        | High     | Released in 26.4.28                         |
+| A2  | `.env` hygiene (`app/renderer/.env` tracked)                                  | Done        | High     | Completed and registered in 26.4.29 draft   |
+| A3  | Persist custom shortcuts (`Shortcut.tsx` TODO)                                | Open        | Medium   | Avoid loss after restart                    |
+| A4  | Simplify `check-updates` to root-only narrative and flows                     | Done        | Medium   | Released in 26.4.28                         |
+| A5  | Controlled major updates (`eslint`/`@eslint/js` 10.x, `vite-plugin-svgr` 5.x) | In Progress | Medium   | Batch 1 applied; major batches pending      |
+| A6  | Define automated test strategy (adopt baseline tests or remove idle stack)    | Blocked     | High     | Deferred by decision (no tests changes now) |
 
 ### A0 — Tauri-only runtime consolidation
 
@@ -127,13 +124,13 @@ Impact:
 
 - Scope checklist:
   - [x] Stop tracking `app/renderer/.env`.
-  - [x] Add `app/renderer/.env.example` with safe placeholders.
-  - [x] Update setup docs.
-  - [ ] Register this change in changelog on next release.
+  - [x] Remove committed `app/renderer/.env.example` pattern.
+  - [x] Update setup docs to keep renderer `.env` as local-only optional file.
+  - [x] Register this change in changelog on next release.
 - Validation checklist:
   - [x] `git status --short` no longer includes a tracked renderer `.env`.
 - Suggested commit:
-  - `chore(config): untrack renderer env file and add env example`
+  - `chore(config): untrack renderer env and keep local-only usage`
 
 ### A3 — Shortcut persistence
 
