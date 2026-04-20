@@ -26,6 +26,7 @@ $script:LogTimestamp = ""
 $script:GeneralLogFile = ""
 $script:CargoFmtLogFile = ""
 $script:CargoClippyLogFile = ""
+$script:CargoCheckLogFile = ""
 $script:TranscriptStarted = $false
 
 function Step($message) {
@@ -204,7 +205,8 @@ Fluxo padrao:
   4) pnpm typecheck:renderer
   5) cargo fmt --check (src-tauri)
   6) cargo clippy -D warnings (src-tauri)
-  7) build release tauri sem bundle (pnpm tauri build --no-bundle)
+  7) cargo check (src-tauri)
+  8) build release tauri sem bundle (pnpm tauri build --no-bundle)
 
 Opcoes:
   -SkipInstall   Nao roda pnpm install
@@ -223,7 +225,7 @@ function Show-LogMenu {
     Write-Host "Tipo de log:"
     Write-Host "- 1) Sem log em arquivo."
     Write-Host "- 2) Log geral da execucao (validar-tudo-<timestamp>.log)."
-    Write-Host "- 3) Log geral + logs separados do Rust gate (fmt/clippy)."
+    Write-Host "- 3) Log geral + logs separados do Rust gate (fmt/clippy/check)."
     Write-Host ""
 
     $choice = Read-Host "Opcao de log [1-3]"
@@ -251,6 +253,7 @@ function Initialize-Logging {
     if ($script:LogModeSelection -eq "full-cargo") {
         $script:CargoFmtLogFile = Join-Path $logsDir "validar-tudo-cargo-fmt-$($script:LogTimestamp).log"
         $script:CargoClippyLogFile = Join-Path $logsDir "validar-tudo-cargo-clippy-$($script:LogTimestamp).log"
+        $script:CargoCheckLogFile = Join-Path $logsDir "validar-tudo-cargo-check-$($script:LogTimestamp).log"
     }
 
     try {
@@ -265,6 +268,7 @@ function Initialize-Logging {
     if ($script:LogModeSelection -eq "full-cargo") {
         Write-Host "Log cargo fmt: $($script:CargoFmtLogFile)"
         Write-Host "Log cargo clippy: $($script:CargoClippyLogFile)"
+        Write-Host "Log cargo check: $($script:CargoCheckLogFile)"
     }
 }
 
@@ -278,6 +282,7 @@ function Show-LogSummary {
     if ($script:LogModeSelection -eq "full-cargo") {
         Write-Host "Log cargo fmt: $($script:CargoFmtLogFile)"
         Write-Host "Log cargo clippy: $($script:CargoClippyLogFile)"
+        Write-Host "Log cargo check: $($script:CargoCheckLogFile)"
     }
 }
 
@@ -456,7 +461,7 @@ Pop-Location
 
 $tauriDir = Join-Path $APP_DIR "src-tauri"
 if (Test-Path $tauriDir) {
-    Step "Rust quality gate (fmt + clippy)"
+    Step "Rust quality gate (fmt + clippy + check)"
     Push-Location $tauriDir
     if ($script:LogModeSelection -eq "full-cargo") {
         & cargo fmt --all -- --check *>&1 | Tee-Object -FilePath $script:CargoFmtLogFile
@@ -467,12 +472,20 @@ if (Test-Path $tauriDir) {
         if ($LASTEXITCODE -ne 0) {
             exit $LASTEXITCODE
         }
+        & cargo check --all-targets --all-features *>&1 | Tee-Object -FilePath $script:CargoCheckLogFile
+        if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+        }
     } else {
         & cargo fmt --all -- --check
         if ($LASTEXITCODE -ne 0) {
             exit $LASTEXITCODE
         }
         & cargo clippy --all-targets --all-features -- -D warnings
+        if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+        }
+        & cargo check --all-targets --all-features
         if ($LASTEXITCODE -ne 0) {
             exit $LASTEXITCODE
         }

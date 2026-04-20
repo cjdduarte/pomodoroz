@@ -68,7 +68,7 @@ Sem parametros em terminal interativo, abre menu de modo:
 
 Opcoes:
   -DryRun        Mostra as acoes sem executar mudancas
-  -SkipValidate  Pula preflight local
+  -SkipValidate  Pula preflight local (requer confirmacao explicita)
   -NoPush        Nao faz push de branch/tag
   -h, --help     Mostra esta ajuda
 "@
@@ -202,6 +202,33 @@ function Invoke-CommandChecked {
     }
 }
 
+function Confirm-SkipValidateIfNeeded {
+    if (-not $SkipValidate) {
+        return
+    }
+
+    Write-Host "ATENCAO: -SkipValidate pula o preflight local (lint/typecheck/build/gates Rust)." -ForegroundColor Yellow
+
+    if ($DryRun) {
+        Write-Host "Dry-run ativo: seguindo sem preflight."
+        return
+    }
+
+    if ($env:POMODOROZ_RELEASE_SKIP_VALIDATE_ACK -eq "1") {
+        Write-Host "Confirmacao recebida via ambiente (POMODOROZ_RELEASE_SKIP_VALIDATE_ACK=1)."
+        return
+    }
+
+    if (-not [Environment]::UserInteractive) {
+        Fail "-SkipValidate em modo nao interativo requer POMODOROZ_RELEASE_SKIP_VALIDATE_ACK=1."
+    }
+
+    $confirmSkip = Read-Host "Digite SKIP para confirmar release sem preflight"
+    if ($confirmSkip -cne "SKIP") {
+        Fail "Release cancelado: preflight nao foi explicitamente dispensado."
+    }
+}
+
 if ($Version -eq "-h" -or $Version -eq "--help") {
     Show-Usage
     exit 0
@@ -313,6 +340,8 @@ if ($enDate -notmatch "^\d{4}-\d{2}-\d{2}$") {
 if ($ptDate -ne $enDate) {
     Fail "Datas divergentes entre CHANGELOG.md ($ptDate) e CHANGELOG.en.md ($enDate) para [$targetVersion]."
 }
+
+Confirm-SkipValidateIfNeeded
 
 if (-not $SkipValidate) {
     Step "Preflight local (validar-tudo --skip-install)"

@@ -103,10 +103,38 @@ Fluxo:
 
 Opcoes:
   --dry-run        Mostra as acoes sem executar mudancas
-  --skip-validate  Pula preflight local
+  --skip-validate  Pula preflight local (requer confirmacao explicita)
   --no-push        Nao faz push de branch/tag
   -h, --help       Mostra esta ajuda
 EOF
+}
+
+confirm_skip_validate_if_needed() {
+  if (( SKIP_VALIDATE == 0 )); then
+    return
+  fi
+
+  echo "ATENCAO: --skip-validate pula o preflight local (lint/typecheck/build/gates Rust)."
+
+  if (( DRY_RUN == 1 )); then
+    echo "Dry-run ativo: seguindo sem preflight."
+    return
+  fi
+
+  if [[ "${POMODOROZ_RELEASE_SKIP_VALIDATE_ACK:-0}" == "1" ]]; then
+    echo "Confirmacao recebida via ambiente (POMODOROZ_RELEASE_SKIP_VALIDATE_ACK=1)."
+    return
+  fi
+
+  if [[ ! -t 0 ]]; then
+    die "--skip-validate em modo nao interativo requer POMODOROZ_RELEASE_SKIP_VALIDATE_ACK=1."
+  fi
+
+  local confirm_skip=""
+  read -r -p "Digite SKIP para confirmar release sem preflight: " confirm_skip
+  if [[ "$confirm_skip" != "SKIP" ]]; then
+    die "Release cancelado: preflight nao foi explicitamente dispensado."
+  fi
 }
 
 normalize_version() {
@@ -294,6 +322,8 @@ fi
 if [[ "$pt_date" != "$en_date" ]]; then
   die "Datas divergentes entre CHANGELOG.md ($pt_date) e CHANGELOG.en.md ($en_date) para [$TARGET_VERSION]."
 fi
+
+confirm_skip_validate_if_needed
 
 if (( SKIP_VALIDATE == 0 )); then
   step "Preflight local (validar-tudo --skip-install)"

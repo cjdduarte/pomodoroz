@@ -17,6 +17,7 @@ LOG_TIMESTAMP=""
 GENERAL_LOG_FILE=""
 CARGO_FMT_LOG_FILE=""
 CARGO_CLIPPY_LOG_FILE=""
+CARGO_CHECK_LOG_FILE=""
 ORIGINAL_ARGC=$#
 
 step() {
@@ -183,7 +184,8 @@ Fluxo padrao:
   4) pnpm typecheck:renderer
   5) cargo fmt --check (src-tauri)
   6) cargo clippy -D warnings (src-tauri)
-  7) build release tauri sem bundle (pnpm tauri build --no-bundle)
+  7) cargo check (src-tauri)
+  8) build release tauri sem bundle (pnpm tauri build --no-bundle)
 
 Opcoes:
   --skip-install   Nao roda pnpm install
@@ -196,7 +198,7 @@ Opcoes:
   --quick-dev      Fluxo rapido: lint + typecheck renderer + tauri dev
   --log-none       Nao grava logs em arquivo (default)
   --log-full       Grava log geral em logs/validar-tudo-<timestamp>.log
-  --log-full-cargo Grava log geral + logs separados do gate Rust (fmt/clippy)
+  --log-full-cargo Grava log geral + logs separados do gate Rust (fmt/clippy/check)
   -h, --help       Mostra esta ajuda
 EOF2
 }
@@ -206,7 +208,7 @@ show_log_menu() {
 Tipo de log:
 - 1) Sem log em arquivo.
 - 2) Log geral da execucao (validar-tudo-<timestamp>.log).
-- 3) Log geral + logs separados do Rust gate (fmt/clippy).
+- 3) Log geral + logs separados do Rust gate (fmt/clippy/check).
 EOF2
   local log_choice=""
   if ! read -r -p "Opcao de log [1-3]: " log_choice; then
@@ -235,6 +237,7 @@ setup_logging() {
   if [[ "$LOG_MODE" == "full-cargo" ]]; then
     CARGO_FMT_LOG_FILE="$logs_dir/validar-tudo-cargo-fmt-$LOG_TIMESTAMP.log"
     CARGO_CLIPPY_LOG_FILE="$logs_dir/validar-tudo-cargo-clippy-$LOG_TIMESTAMP.log"
+    CARGO_CHECK_LOG_FILE="$logs_dir/validar-tudo-cargo-check-$LOG_TIMESTAMP.log"
   fi
 
   exec > >(tee -a "$GENERAL_LOG_FILE") 2>&1
@@ -243,6 +246,7 @@ setup_logging() {
   if [[ "$LOG_MODE" == "full-cargo" ]]; then
     printf "Log cargo fmt: %s\n" "$CARGO_FMT_LOG_FILE"
     printf "Log cargo clippy: %s\n" "$CARGO_CLIPPY_LOG_FILE"
+    printf "Log cargo check: %s\n" "$CARGO_CHECK_LOG_FILE"
   fi
 }
 
@@ -449,7 +453,7 @@ step "Typecheck do renderer (TypeScript)"
 )
 
 if [[ -d "$APP_DIR/src-tauri" ]]; then
-  step "Rust quality gate (fmt + clippy)"
+  step "Rust quality gate (fmt + clippy + check)"
   if [[ "$LOG_MODE" == "full-cargo" ]]; then
     (
       cd "$APP_DIR/src-tauri" &&
@@ -459,6 +463,10 @@ if [[ -d "$APP_DIR/src-tauri" ]]; then
       cd "$APP_DIR/src-tauri" &&
         cargo clippy --all-targets --all-features -- -D warnings 2>&1 | tee "$CARGO_CLIPPY_LOG_FILE"
     )
+    (
+      cd "$APP_DIR/src-tauri" &&
+        cargo check --all-targets --all-features 2>&1 | tee "$CARGO_CHECK_LOG_FILE"
+    )
   else
     (
       cd "$APP_DIR/src-tauri" &&
@@ -467,6 +475,10 @@ if [[ -d "$APP_DIR/src-tauri" ]]; then
     (
       cd "$APP_DIR/src-tauri" &&
         cargo clippy --all-targets --all-features -- -D warnings
+    )
+    (
+      cd "$APP_DIR/src-tauri" &&
+        cargo check --all-targets --all-features
     )
   fi
 fi
@@ -532,5 +544,6 @@ if [[ "$LOG_MODE" != "none" ]]; then
   if [[ "$LOG_MODE" == "full-cargo" ]]; then
     printf "Log cargo fmt: %s\n" "$CARGO_FMT_LOG_FILE"
     printf "Log cargo clippy: %s\n" "$CARGO_CLIPPY_LOG_FILE"
+    printf "Log cargo check: %s\n" "$CARGO_CHECK_LOG_FILE"
   fi
 fi
