@@ -22,6 +22,12 @@
   <img src="assets/grid-preview.svg" alt="Pomodoroz - Study Rotation Grid Preview" width="220">
 </p>
 
+<p align="center">
+  <img src="assets/gridA.png" alt="Pomodoroz - Grid Preview A" width="220">
+  &nbsp;&nbsp;
+  <img src="assets/grid1B.png" alt="Pomodoroz - Grid Preview B" width="220">
+</p>
+
 <p align="center"><sub>Grid preview uses generic labels from <code>pomodoroz-tasks-2026-04-20.json</code> (Subject 1-5, Task 1-16).</sub></p>
 
 <p align="center">
