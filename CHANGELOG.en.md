@@ -18,6 +18,7 @@
 - **`check-updates` wording aligned to root-only scope** — Shell/PowerShell labels were normalized (`Workspace` -> `Escopo`, `Monorepo/Tooling` -> `Tooling`) without changing update logic.
 - **GitHub Release notes are now auto-populated from changelog again** — `release-autoupdate.yml` now extracts the target version section from `CHANGELOG.md` and applies it through `gh release create/edit`, preventing empty release bodies on tag/dispatch publish paths.
 - **Linux release pipeline pinned to a deterministic environment (no dependency fallback)** — `release-linux` now runs on `ubuntu-24.04` with explicit `libfuse2t64` installation for AppImage (`linuxdeploy`) packaging, removing conditional package-selection logic.
+- **Linux AppImage pipeline hardened with explicit `linuxdeploy` gtk/gstreamer dependencies** — the release job now installs runtime/tooling GStreamer packages and `binutils`, and raises `tauri build` verbosity (`-vv`) to improve packaging-failure diagnostics.
 - **Documentation consolidated into a single improvements roadmap** — `docs/IMPROVEMENTS.md` is now the pending-work reference (technical + product), while `docs/MIGRATION_TO_TAURI.md` and `docs/PRODUCT_BACKLOG.md` remain compatibility pointers.
 
 ## [26.4.26] - 2026-04-19

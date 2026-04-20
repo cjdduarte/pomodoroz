@@ -192,7 +192,21 @@ jobs:
       - name: Install Linux dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libasound2-dev libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev patchelf desktop-file-utils libfuse2t64
+          sudo apt-get install -y \
+            libasound2-dev \
+            libwebkit2gtk-4.1-dev \
+            libgtk-3-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            patchelf \
+            desktop-file-utils \
+            libfuse2t64 \
+            gstreamer1.0-tools \
+            gstreamer1.0-plugins-base \
+            gstreamer1.0-plugins-good \
+            libgstreamer1.0-0 \
+            libgstreamer-plugins-base1.0-0 \
+            binutils
 
       - name: Validate required secrets
         run: |
@@ -250,13 +264,15 @@ jobs:
           for attempt in 1 2 3; do
             LOG_FILE="/tmp/tauri-appimage-build-attempt-${attempt}.log"
             echo "AppImage build attempt ${attempt}/3"
-            if pnpm tauri build --bundles appimage 2>&1 | tee "${LOG_FILE}"; then
+            if pnpm tauri build --bundles appimage -vv 2>&1 | tee "${LOG_FILE}"; then
               exit 0
             fi
 
             echo "AppImage build failed (attempt ${attempt})."
-            echo "Last 120 log lines:"
-            tail -n 120 "${LOG_FILE}" || true
+            echo "Last 200 log lines:"
+            tail -n 200 "${LOG_FILE}" || true
+            echo "Filtered linuxdeploy/appimage error lines:"
+            grep -Eni "linuxdeploy|appimage|error|failed|what\\(\\)|subprocess" "${LOG_FILE}" | tail -n 120 || true
 
             if [ "${attempt}" -lt 3 ]; then
               echo "AppImage build failed (attempt ${attempt}); retrying in 20s..."
