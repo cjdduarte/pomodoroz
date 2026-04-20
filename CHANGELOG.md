@@ -27,6 +27,7 @@
 - **Scripts PowerShell de versionamento/release ficaram resilientes a Windows sem `pnpm` global** — `scripts/version.ps1` e `scripts/release.ps1` agora executam `pnpm` via `node scripts/pnpmw.mjs`, removendo dependência do binário `pnpm` no `PATH` e alinhando o comportamento aos wrappers já usados em `validar-tudo.ps1` e `check-updates.ps1`.
 - **`uninstall.ps1` ganhou suporte Windows user-scope com paridade funcional de modo** — o script agora roda em Linux e Windows, mantendo modo padrão + `-Purge`/`-Yes`; no Windows remove diretórios de instalação por usuário (`%LOCALAPPDATA%`), atalhos comuns (Start Menu/Desktop) e, em `-Purge`, limpa dados locais em `%APPDATA%`/`%LOCALAPPDATA%` para `pomodoroz` e `com.cjdduarte.pomodoroz`.
 - **Build de release/instaladores no Windows ficou resiliente a lock do executável local** — `scripts/validar-tudo.ps1` agora encerra automaticamente instâncias em execução de `src-tauri/target/release/pomodoroz_tauri.exe` antes de `tauri build`, evitando falha `Acesso negado (os error 5)` ao sobrescrever o binário.
+- **Geração local de instaladores não exige mais chave privada de assinatura do updater** — `scripts/validar-tudo.sh` e `scripts/validar-tudo.ps1` agora forçam `bundle.createUpdaterArtifacts=false` para todos os bundles locais de instalador, evitando falha por ausência de `TAURI_SIGNING_PRIVATE_KEY` fora do pipeline oficial de release.
 
 ## [26.4.28] - 2026-04-20
 

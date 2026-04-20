@@ -494,17 +494,10 @@ if (( RUN_INSTALLERS == 1 )); then
 
   if [[ -n "$bundles_without_appimage" ]]; then
     step "Gerando instaladores Tauri (bundles base: $bundles_without_appimage)"
-    if [[ "$(uname -s)" == "Linux" ]] && tauri_bundles_include_appimage "$bundles"; then
-      (
-        cd "$APP_DIR" &&
-          pnpm tauri build --bundles "$bundles_without_appimage" --config '{"bundle":{"createUpdaterArtifacts":false}}'
-      )
-    else
-      (
-        cd "$APP_DIR" &&
-          pnpm tauri build --bundles "$bundles_without_appimage"
-      )
-    fi
+    (
+      cd "$APP_DIR" &&
+        pnpm tauri build --bundles "$bundles_without_appimage" --config '{"bundle":{"createUpdaterArtifacts":false}}'
+    )
   fi
 
   if tauri_bundles_include_appimage "$bundles"; then
