@@ -6,6 +6,15 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.4.28] - 2026-04-20
+
+### Changed
+
+- **Linux release pipeline pinned to a deterministic environment (no dependency fallback)** — `release-linux` now runs on `ubuntu-24.04` with explicit `libfuse2t64` installation for AppImage (`linuxdeploy`) packaging, removing conditional package-selection logic.
+- **Linux AppImage pipeline hardened with explicit `linuxdeploy` gtk/gstreamer dependencies** — the release job now installs runtime/tooling GStreamer packages and `binutils`, with per-attempt logs and filtered tails for failure diagnostics without output flooding.
+- **AppImage packaging aligned with freedesktop `.desktop` validation** — Linux category is now pinned to `Utility` (`tauri.conf.json`, bundle desktop template, and install scripts), removing `Productivity` as a non-registered category in `appimagetool`.
+- **`sync-latest-json` aligned with `createUpdaterArtifacts: "v1Compatible"`** — platform merge now recognizes compressed updater artifacts (`.exe.zip` and `.AppImage.tar.gz`, with fallback to `.exe`/`.AppImage`) and release uploads now include those formats.
+
 ## [26.4.27] - 2026-04-20
 
 ### Changed
@@ -17,10 +26,6 @@
 - **Linux taskbar icon alignment between launcher and active window** — renderer `favicon.ico` was updated to the official app icon, and `.desktop` entries (local install + `deb/rpm` bundles) now declare `StartupWMClass/X-GNOME-WMClass` to reduce duplicate/switching panel icons.
 - **`check-updates` wording aligned to root-only scope** — Shell/PowerShell labels were normalized (`Workspace` -> `Escopo`, `Monorepo/Tooling` -> `Tooling`) without changing update logic.
 - **GitHub Release notes are now auto-populated from changelog again** — `release-autoupdate.yml` now extracts the target version section from `CHANGELOG.md` and applies it through `gh release create/edit`, preventing empty release bodies on tag/dispatch publish paths.
-- **Linux release pipeline pinned to a deterministic environment (no dependency fallback)** — `release-linux` now runs on `ubuntu-24.04` with explicit `libfuse2t64` installation for AppImage (`linuxdeploy`) packaging, removing conditional package-selection logic.
-- **Linux AppImage pipeline hardened with explicit `linuxdeploy` gtk/gstreamer dependencies** — the release job now installs runtime/tooling GStreamer packages and `binutils`, with per-attempt logs and filtered tails for failure diagnostics without output flooding.
-- **AppImage packaging aligned with freedesktop `.desktop` validation** — Linux category is now pinned to `Utility` (`tauri.conf.json`, bundle desktop template, and install scripts), removing `Productivity` as a non-registered category in `appimagetool`.
-- **`sync-latest-json` aligned with `createUpdaterArtifacts: "v1Compatible"`** — platform merge now recognizes compressed updater artifacts (`.exe.zip` and `.AppImage.tar.gz`, with fallback to `.exe`/`.AppImage`) and release uploads now include those formats.
 - **Documentation consolidated into a single improvements roadmap** — `docs/IMPROVEMENTS.md` is now the pending-work reference (technical + product), while `docs/MIGRATION_TO_TAURI.md` and `docs/PRODUCT_BACKLOG.md` remain compatibility pointers.
 
 ## [26.4.26] - 2026-04-19
