@@ -202,6 +202,15 @@ function Invoke-CommandChecked {
     }
 }
 
+function Invoke-PnpmChecked {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string[]]$Arguments
+    )
+
+    Invoke-CommandChecked -FilePath node -Arguments (@($script:PnpmWrapper) + $Arguments)
+}
+
 function Confirm-SkipValidateIfNeeded {
     if (-not $SkipValidate) {
         return
@@ -240,6 +249,7 @@ if ($showModeMenu -and [Environment]::UserInteractive) {
 }
 
 $ROOT = Split-Path -Parent $PSScriptRoot
+$script:PnpmWrapper = Join-Path $ROOT "scripts/pnpmw.mjs"
 Refresh-LocalTags -RepoRoot $ROOT
 $SUGGESTED_VERSION = Get-SuggestedVersion -RepoRoot $ROOT
 $versionFromPrompt = $false
@@ -284,8 +294,12 @@ if ($versionFromPrompt -and [Environment]::UserInteractive) {
 }
 
 Ensure-Command git
-Ensure-Command pnpm
+Ensure-Command node
 Ensure-Command rg
+
+if (-not (Test-Path $script:PnpmWrapper)) {
+    Fail "Wrapper pnpmw nao encontrado: $script:PnpmWrapper"
+}
 
 $currentBranch = (& git -C $ROOT branch --show-current).Trim()
 if ([string]::IsNullOrWhiteSpace($currentBranch)) {
@@ -315,7 +329,7 @@ if ($LASTEXITCODE -eq 0) {
 }
 
 Step "Sincronizando versao para $targetVersion"
-Invoke-CommandChecked -FilePath pnpm -Arguments @("version:sync", $targetVersion)
+Invoke-PnpmChecked -Arguments @("version:sync", $targetVersion)
 
 Step "Validando entradas de changelog para $targetVersion"
 $escapedVersion = [regex]::Escape($targetVersion)

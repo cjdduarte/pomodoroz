@@ -24,6 +24,7 @@
 - **Diagnóstico de `pnpmw/corepack` melhorado no PowerShell** — `scripts/validar-tudo.ps1` agora exibe detalhes reais quando `node scripts/pnpmw.mjs --version` falha e não encerra com falso negativo quando o comando retorna sucesso sem versão no stdout.
 - **`pnpmw.mjs` não mascara mais falhas de comando como “pnpm não encontrado”** — o wrapper agora propaga o código de saída do primeiro candidato executável (ex.: erro real de `pnpm exec eslint`) e só tenta fallback quando o binário está realmente indisponível (`ENOENT`).
 - **Fluxo Quick run sem install ficou explícito e com validação antecipada de dependências** — `scripts/validar-tudo.ps1` e `scripts/validar-tudo.sh` agora informam no menu que a opção 1 não instala dependências e encerram cedo com mensagem direta quando `node_modules` está ausente em `--skip-install`.
+- **Scripts PowerShell de versionamento/release ficaram resilientes a Windows sem `pnpm` global** — `scripts/version.ps1` e `scripts/release.ps1` agora executam `pnpm` via `node scripts/pnpmw.mjs`, removendo dependência do binário `pnpm` no `PATH` e alinhando o comportamento aos wrappers já usados em `validar-tudo.ps1` e `check-updates.ps1`.
 
 ## [26.4.28] - 2026-04-20
 

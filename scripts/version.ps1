@@ -5,28 +5,26 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-function Resolve-PackageManager {
-    if (-not (Get-Command pnpm -ErrorAction SilentlyContinue)) {
-        throw "pnpm nao encontrado."
-    }
-    return "pnpm"
-}
-
-function Invoke-PackageManager {
+function Invoke-Pnpm {
     param(
-        [Parameter(Mandatory = $true)]
-        [string]$PackageManager,
         [Parameter(Mandatory = $true)]
         [string[]]$Arguments
     )
 
-    & pnpm @Arguments
+    if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
+        throw "node nao encontrado."
+    }
+    if (-not (Test-Path $script:PnpmWrapper)) {
+        throw "Wrapper pnpmw nao encontrado: $script:PnpmWrapper"
+    }
+
+    & node $script:PnpmWrapper @Arguments
 
     if (-not $?) {
-        throw "Falha ao executar $PackageManager $($Arguments -join ' ')"
+        throw "Falha ao executar pnpmw $($Arguments -join ' ')"
     }
     if ($LASTEXITCODE -ne $null -and $LASTEXITCODE -ne 0) {
-        throw "Falha ao executar $PackageManager $($Arguments -join ' ')"
+        throw "Falha ao executar pnpmw $($Arguments -join ' ')"
     }
 }
 
@@ -132,6 +130,7 @@ function Get-SuggestedVersion {
 
 $ROOT = Split-Path -Parent $PSScriptRoot
 $APP_DIR = $ROOT
+$script:PnpmWrapper = Join-Path $ROOT "scripts/pnpmw.mjs"
 $SUGGESTED_VERSION = Get-SuggestedVersion -RepoRoot $ROOT
 $versionFromPrompt = $false
 
@@ -156,9 +155,8 @@ if ([string]::IsNullOrWhiteSpace($Version)) {
 
 $rawVersion = $Version
 $Version = Normalize-Version -RawVersion $rawVersion
-$packageManager = Resolve-PackageManager
 
-$command = "$packageManager version:sync $Version"
+$command = "node ./scripts/pnpmw.mjs version:sync $Version"
 Write-Host "Versao sugerida (data + tags locais): $SUGGESTED_VERSION"
 if ($rawVersion -ne $Version) {
     Write-Host "Versao normalizada: $rawVersion -> $Version"
@@ -182,5 +180,5 @@ if ($versionFromPrompt) {
 }
 
 Push-Location $APP_DIR
-Invoke-PackageManager -PackageManager $packageManager -Arguments @("version:sync", $Version)
+Invoke-Pnpm -Arguments @("version:sync", $Version)
 Pop-Location

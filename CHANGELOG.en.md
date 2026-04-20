@@ -24,6 +24,7 @@
 - **PowerShell `pnpmw/corepack` diagnostics improved** — `scripts/validar-tudo.ps1` now prints real details when `node scripts/pnpmw.mjs --version` fails and no longer hard-fails on false negatives when the command succeeds without a version line in stdout.
 - **`pnpmw.mjs` no longer masks command failures as “pnpm not found”** — the wrapper now propagates the exit code of the first runnable candidate (for example, real `pnpm exec eslint` failures) and only falls back when the binary is truly unavailable (`ENOENT`).
 - **Quick run no-install flow is now explicit with early dependency guard** — `scripts/validar-tudo.ps1` and `scripts/validar-tudo.sh` now label option 1 as no-install and fail fast with a direct message when `node_modules` is missing under `--skip-install`.
+- **PowerShell version/release scripts are now resilient on Windows without global `pnpm`** — `scripts/version.ps1` and `scripts/release.ps1` now run package-manager commands through `node scripts/pnpmw.mjs`, removing hard dependency on a global `pnpm` binary in `PATH` and aligning behavior with wrappers already used by `validar-tudo.ps1` and `check-updates.ps1`.
 
 ## [26.4.28] - 2026-04-20
 
