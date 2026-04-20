@@ -21,6 +21,7 @@
 - **Guia operacional de release atualizado com bypass explícito de preflight** — `docs/RELEASE_OPERATIONS.md` agora documenta `--skip-validate`/`-SkipValidate` com aviso de uso emergencial e requisito de `POMODOROZ_RELEASE_SKIP_VALIDATE_ACK=1` em modo não interativo.
 - **Compatibilidade do `validar-tudo.ps1` no Windows corrigida para interpolação com `:`** — o ajuste do `PKG_CONFIG_PATH` passou de interpolação direta de string para formatação segura (`"{0}:{1}" -f ...`), evitando `ParserError` em PowerShell (`InvalidVariableReferenceWithDrive`).
 - **Quick run no Windows não depende mais de `pnpm` global no PATH** — `scripts/validar-tudo.ps1` removeu o gate `Get-Command pnpm` e passou a validar/executar comandos de pacote apenas via `scripts/pnpmw.mjs` (`node + corepack`), corrigindo falha precoce no menu interativo.
+- **Diagnóstico de `pnpmw/corepack` melhorado no PowerShell** — `scripts/validar-tudo.ps1` agora exibe detalhes reais quando `node scripts/pnpmw.mjs --version` falha e não encerra com falso negativo quando o comando retorna sucesso sem versão no stdout.
 
 ## [26.4.28] - 2026-04-20
 

@@ -405,15 +405,23 @@ if (-not (Get-Command cargo -ErrorAction SilentlyContinue)) {
 if (-not (Test-Path $PNPM_WRAPPER)) {
     Die "Wrapper pnpmw nao encontrado: $PNPM_WRAPPER"
 }
-$pnpmVersionRaw = (& node $PNPM_WRAPPER --version | Select-Object -First 1)
-if ($null -eq $pnpmVersionRaw) {
-    $pnpmVersionRaw = ""
+$pnpmVersionOutput = & node $PNPM_WRAPPER --version 2>&1
+$pnpmVersionExitCode = $LASTEXITCODE
+$pnpmVersion = (($pnpmVersionOutput | Select-Object -First 1) -as [string]).Trim()
+
+if ($pnpmVersionExitCode -ne 0) {
+    $pnpmErrorDetails = ($pnpmVersionOutput | Out-String).Trim()
+    if ([string]::IsNullOrWhiteSpace($pnpmErrorDetails)) {
+        Die "Nao foi possivel obter versao do pnpm via pnpmw/corepack."
+    }
+    Die "Nao foi possivel obter versao do pnpm via pnpmw/corepack. Detalhes: $pnpmErrorDetails"
 }
-$pnpmVersion = "$pnpmVersionRaw".Trim()
-if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($pnpmVersion)) {
-    Die "Nao foi possivel obter versao do pnpm via pnpmw/corepack."
+
+if ([string]::IsNullOrWhiteSpace($pnpmVersion)) {
+    Write-Host "pnpm (via pnpmw/corepack)" -ForegroundColor Green
+} else {
+    Write-Host "pnpm $pnpmVersion" -ForegroundColor Green
 }
-Write-Host "pnpm $pnpmVersion" -ForegroundColor Green
 
 if (-not $SkipInstall) {
     Step "Sincronizando dependencias (pnpm install)"
