@@ -15,17 +15,15 @@
 </p>
 
 <p align="center">
-  <img src="assets/timerA.png" alt="Pomodoroz - Light Theme" width="220">
+  <img src="assets/timerA.png" alt="Pomodoroz - Light Theme" width="340">
   &nbsp;&nbsp;
-  <img src="assets/timerB.png" alt="Pomodoroz - Dark Theme" width="220">
-  &nbsp;&nbsp;
-  <img src="assets/grid-preview.svg" alt="Pomodoroz - Study Rotation Grid Preview" width="220">
+  <img src="assets/timerB.png" alt="Pomodoroz - Dark Theme" width="340">
 </p>
 
 <p align="center">
-  <img src="assets/gridA.png" alt="Pomodoroz - Grid Preview A" width="220">
+  <img src="assets/gridA.png" alt="Pomodoroz - Grid Preview A" width="340">
   &nbsp;&nbsp;
-  <img src="assets/grid1B.png" alt="Pomodoroz - Grid Preview B" width="220">
+  <img src="assets/gridB.png" alt="Pomodoroz - Grid Preview B" width="340">
 </p>
 
 <p align="center"><sub>Grid preview uses generic labels from <code>pomodoroz-tasks-2026-04-20.json</code> (Subject 1-5, Task 1-16).</sub></p>
