@@ -477,9 +477,6 @@ const CompactTaskDisplay: React.FC = () => {
   const sendCompactResizeEvent = useCallback(
     (channel: typeof COMPACT_EXPAND | typeof COMPACT_COLLAPSE) => {
       const invokeConnector = getInvokeConnector();
-      if (!invokeConnector) {
-        return;
-      }
 
       try {
         invokeConnector.send(channel);

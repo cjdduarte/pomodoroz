@@ -115,11 +115,9 @@ const Control: React.FC<Props> = ({
 
       try {
         const invokeConnector = getInvokeConnector();
-        if (invokeConnector) {
-          decision = await invokeConnector.invoke(
-            CONFIRM_RESET_FOCUS_TO_IDLE
-          );
-        }
+        decision = await invokeConnector.invoke(
+          CONFIRM_RESET_FOCUS_TO_IDLE
+        );
       } catch (error) {
         console.warn(
           "There was a problem showing the native reset confirmation",

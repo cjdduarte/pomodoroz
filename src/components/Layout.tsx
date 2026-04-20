@@ -21,13 +21,11 @@ import {
   ThemeContext,
   ConnectorContext,
   CounterContext,
-  getInvokeConnector,
 } from "contexts";
 import { TimerStatus } from "store/timer/types";
 import { useAppDispatch, useAppSelector } from "hooks/storeHooks";
 import { isFreshInstallProfile, setEnableInAppAutoUpdate } from "store";
 import { getFromStorage, saveToStorage } from "utils";
-import { SET_IN_APP_AUTO_UPDATE } from "ipc";
 
 const AUTO_UPDATE_POLICY_PROMPT_SEEN_KEY =
   "auto-update-policy-prompt-seen";
@@ -187,17 +185,12 @@ const Layout: React.FC<Props> = ({ children }) => {
 
   const onSelectAutoUpdatePolicy = useCallback(
     (enableInAppAutoUpdate: boolean) => {
-      if (settings.enableInAppAutoUpdate === enableInAppAutoUpdate) {
-        getInvokeConnector()?.send(SET_IN_APP_AUTO_UPDATE, {
-          enableInAppAutoUpdate,
-        });
-      }
       dispatch(setEnableInAppAutoUpdate(enableInAppAutoUpdate));
       saveToStorage(AUTO_UPDATE_POLICY_PROMPT_SEEN_KEY, true);
       saveToStorage(AUTO_UPDATE_POLICY_PROMPT_PENDING_KEY, false);
       setShowFirstRunAutoUpdatePrompt(false);
     },
-    [dispatch, settings.enableInAppAutoUpdate]
+    [dispatch]
   );
 
   return (

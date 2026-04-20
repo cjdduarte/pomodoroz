@@ -136,10 +136,6 @@ const TaskTransferSection: React.FC = () => {
     useState<PendingImport | null>(null);
   const invokeConnector = getInvokeConnector();
 
-  const hasNativeIpc =
-    typeof invokeConnector?.send === "function" &&
-    typeof invokeConnector?.receive === "function";
-
   const pendingSummary = useMemo(() => {
     if (!pendingImport) return "";
     return t("settings.taskTransfer.pendingSummary", {
@@ -153,40 +149,24 @@ const TaskTransferSection: React.FC = () => {
   }, [pendingImport, t]);
 
   const onExport = useCallback(() => {
-    if (!hasNativeIpc) {
-      setNotice({
-        tone: "error",
-        message: t("settings.taskTransfer.desktopOnly"),
-      });
-      return;
-    }
-
     const transferFile = buildTasksTransferFile(taskLists);
     const content = JSON.stringify(transferFile, null, 2);
 
     setPendingImport(null);
     setNotice(null);
     setIsExporting(true);
-    invokeConnector?.send(EXPORT_TASKS_DIALOG, {
+    invokeConnector.send(EXPORT_TASKS_DIALOG, {
       suggestedFileName: createSuggestedFileName(),
       content,
     });
-  }, [hasNativeIpc, invokeConnector, t, taskLists]);
+  }, [invokeConnector, taskLists]);
 
   const onImport = useCallback(() => {
-    if (!hasNativeIpc) {
-      setNotice({
-        tone: "error",
-        message: t("settings.taskTransfer.desktopOnly"),
-      });
-      return;
-    }
-
     setNotice(null);
     setPendingImport(null);
     setIsImporting(true);
-    invokeConnector?.send(IMPORT_TASKS_DIALOG);
-  }, [hasNativeIpc, invokeConnector, t]);
+    invokeConnector.send(IMPORT_TASKS_DIALOG);
+  }, [invokeConnector]);
 
   const applyImport = useCallback(
     (mode: "merge" | "replace") => {
@@ -220,12 +200,9 @@ const TaskTransferSection: React.FC = () => {
   );
 
   useEffect(() => {
-    if (!hasNativeIpc) {
-      return;
-    }
-
-    const cleanupExport =
-      invokeConnector?.receive(TASKS_EXPORT_RESULT, (payload) => {
+    const cleanupExport = invokeConnector.receive(
+      TASKS_EXPORT_RESULT,
+      (payload) => {
         setIsExporting(false);
 
         if (payload.canceled) {
@@ -253,10 +230,12 @@ const TaskTransferSection: React.FC = () => {
               })
             : t("settings.taskTransfer.exportSuccess"),
         });
-      }) ?? (() => undefined);
+      }
+    );
 
-    const cleanupImport =
-      invokeConnector?.receive(TASKS_IMPORT_RESULT, (payload) => {
+    const cleanupImport = invokeConnector.receive(
+      TASKS_IMPORT_RESULT,
+      (payload) => {
         setIsImporting(false);
 
         if (payload.canceled) {
@@ -301,25 +280,24 @@ const TaskTransferSection: React.FC = () => {
           tone: "info",
           message: t("settings.taskTransfer.importReady"),
         });
-      }) ?? (() => undefined);
+      }
+    );
 
     return () => {
       cleanupExport();
       cleanupImport();
     };
-  }, [hasNativeIpc, invokeConnector, t]);
+  }, [invokeConnector, t]);
 
   return (
     <SettingSection heading={t("settings.taskTransfer.heading")}>
       <StyledTaskTransferDescription>
-        {hasNativeIpc
-          ? t("settings.taskTransfer.description")
-          : t("settings.taskTransfer.desktopOnly")}
+        {t("settings.taskTransfer.description")}
       </StyledTaskTransferDescription>
 
       <StyledTaskTransferActions>
         <StyledTaskTransferButton
-          disabled={!hasNativeIpc || isExporting || isImporting}
+          disabled={isExporting || isImporting}
           onClick={onExport}
         >
           {isExporting
@@ -327,7 +305,7 @@ const TaskTransferSection: React.FC = () => {
             : t("settings.taskTransfer.export")}
         </StyledTaskTransferButton>
         <StyledTaskTransferButton
-          disabled={!hasNativeIpc || isExporting || isImporting}
+          disabled={isExporting || isImporting}
           onClick={onImport}
         >
           {isImporting

@@ -125,7 +125,7 @@ const Updater: React.FC = () => {
     void showDesktopNotification(t("updater.openingReleaseTitle"), {
       body: t("updater.openingReleaseBody"),
     });
-    invokeConnector?.send(OPEN_RELEASE_PAGE);
+    invokeConnector.send(OPEN_RELEASE_PAGE);
     dispatch(setUpdateVersion(""));
     dispatch(setUpdateBody(""));
   }, [dispatch, t]);

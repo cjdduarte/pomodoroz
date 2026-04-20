@@ -846,7 +846,6 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
 
   useEffect(() => {
     const invokeConnector = getRuntimeInvokeConnector();
-    if (!invokeConnector) return;
 
     const cleanupEntered = invokeConnector.receive(
       FULLSCREEN_BREAK_ENTERED,

@@ -207,7 +207,7 @@ pub fn close_window(window: Window) -> Result<(), String> {
 }
 
 #[tauri::command]
-pub fn restart_app<R: Runtime>(app: AppHandle<R>) -> Result<(), String> {
+pub fn restart_app<R: Runtime>(app: AppHandle<R>) {
     app.restart();
 }
 

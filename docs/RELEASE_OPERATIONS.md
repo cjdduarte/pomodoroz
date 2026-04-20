@@ -43,6 +43,10 @@ Updater metadata source:
 6. Optional dry run:
    - Unix: `./scripts/release.sh --dry-run <version>`
    - PowerShell: `./scripts/release.ps1 -Version <version> -DryRun`
+7. Optional emergency bypass (use only when preflight has already been validated externally):
+   - Unix: `./scripts/release.sh --skip-validate <version>`
+   - PowerShell: `./scripts/release.ps1 -Version <version> -SkipValidate`
+   - Non-interactive runs require explicit ack: `POMODOROZ_RELEASE_SKIP_VALIDATE_ACK=1`
 
 ### Step 2 — CI Publish (Tag)
 
