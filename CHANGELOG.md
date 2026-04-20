@@ -19,6 +19,7 @@
 - **Descrição da GitHub Release voltou a usar o changelog automaticamente** — o workflow `release-autoupdate.yml` agora extrai a seção da versão em `CHANGELOG.md` e aplica em `gh release create/edit`, evitando releases com corpo vazio ao publicar por tag/dispatch.
 - **Pipeline Linux de release fixada em ambiente determinístico (sem fallback de dependência)** — o job `release-linux` foi fixado em `ubuntu-24.04` com instalação explícita de `libfuse2t64` para o empacotamento AppImage (`linuxdeploy`), removendo seleção condicional de pacotes.
 - **Pipeline Linux de AppImage reforçada com dependências explícitas do `linuxdeploy` (gtk/gstreamer)** — o job de release passou a instalar pacotes de runtime/ferramentas de GStreamer e `binutils`, além de elevar verbosidade do `tauri build` (`-vv`) para facilitar diagnóstico em falhas de empacotamento.
+- **`sync-latest-json` alinhado ao modo `createUpdaterArtifacts: "v1Compatible"`** — o merge de plataformas agora reconhece artefatos compactados do updater (`.exe.zip` e `.AppImage.tar.gz`, com fallback para `.exe`/`.AppImage`) e os uploads de release incluem esses formatos.
 - **Documentação consolidada em roadmap único de melhorias** — `docs/IMPROVEMENTS.md` passou a ser a referência de pendências (técnicas + produto), com `docs/MIGRATION_TO_TAURI.md` e `docs/PRODUCT_BACKLOG.md` mantidos como ponteiros de compatibilidade.
 
 ## [26.4.26] - 2026-04-19

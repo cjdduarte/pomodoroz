@@ -146,7 +146,7 @@ jobs:
         run: |
           $tag = "$env:RELEASE_TAG"
           $files = Get-ChildItem -Path "src-tauri/target/release/bundle" -Recurse -File |
-            Where-Object { $_.Extension -in @(".exe", ".sig") } |
+            Where-Object { $_.Extension -in @(".exe", ".sig", ".zip") } |
             ForEach-Object { $_.FullName }
 
           if (-not $files -or $files.Count -eq 0) {
@@ -334,7 +334,7 @@ jobs:
       - name: Upload Tauri Linux updater assets
         run: |
           TAG="${RELEASE_TAG}"
-          mapfile -t FILES < <(find src-tauri/target/release/bundle -type f \( -name "*.AppImage" -o -name "*.sig" \))
+          mapfile -t FILES < <(find src-tauri/target/release/bundle -type f \( -name "*.AppImage" -o -name "*.AppImage.tar.gz" -o -name "*.sig" \))
           if [ "${#FILES[@]}" -eq 0 ]; then
             echo "No Tauri Linux assets found under src-tauri/target/release/bundle."
             exit 1
@@ -386,6 +386,9 @@ jobs:
           DOWNLOAD_BASE="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}"
           PUB_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 
+          echo "Release assets found for ${TAG}:"
+          echo "${RELEASE_JSON}" | jq -r '.assets[].name' | sed 's/^/ - /'
+
           add_platform() {
             local asset_name="$1"
             local platform_key="$2"
@@ -411,30 +414,50 @@ jobs:
 
           LATEST_JSON="$(jq -n --arg VERSION "${VERSION}" --arg PUB_DATE "${PUB_DATE}" '{ version: $VERSION, notes: "", pub_date: $PUB_DATE, platforms: {} }')"
 
-          WINDOWS_EXE="$(echo "${RELEASE_JSON}" | jq -r '
+          WINDOWS_UPDATER="$(echo "${RELEASE_JSON}" | jq -r '
             [.assets[].name] as $names
             | .assets[]
             | . as $asset
-            | select($asset.name | test("\\.exe$"))
+            | select($asset.name | test("\\.exe\\.zip$"))
             | select(($names | index($asset.name + ".sig")) != null)
             | $asset.name
           ' | head -n1)"
-          if [ -n "${WINDOWS_EXE}" ] && [ "${WINDOWS_EXE}" != "null" ]; then
-            add_platform "${WINDOWS_EXE}" "windows-x86_64"
-            add_platform "${WINDOWS_EXE}" "windows-x86_64-nsis"
+          if [ -z "${WINDOWS_UPDATER}" ] || [ "${WINDOWS_UPDATER}" = "null" ]; then
+            WINDOWS_UPDATER="$(echo "${RELEASE_JSON}" | jq -r '
+              [.assets[].name] as $names
+              | .assets[]
+              | . as $asset
+              | select($asset.name | test("\\.exe$"))
+              | select(($names | index($asset.name + ".sig")) != null)
+              | $asset.name
+            ' | head -n1)"
+          fi
+          if [ -n "${WINDOWS_UPDATER}" ] && [ "${WINDOWS_UPDATER}" != "null" ]; then
+            add_platform "${WINDOWS_UPDATER}" "windows-x86_64"
+            add_platform "${WINDOWS_UPDATER}" "windows-x86_64-nsis"
           fi
 
-          LINUX_APPIMAGE="$(echo "${RELEASE_JSON}" | jq -r '
+          LINUX_UPDATER="$(echo "${RELEASE_JSON}" | jq -r '
             [.assets[].name] as $names
             | .assets[]
             | . as $asset
-            | select($asset.name | test("\\.AppImage$"))
+            | select($asset.name | test("\\.AppImage\\.tar\\.gz$"))
             | select(($names | index($asset.name + ".sig")) != null)
             | $asset.name
           ' | head -n1)"
-          if [ -n "${LINUX_APPIMAGE}" ] && [ "${LINUX_APPIMAGE}" != "null" ]; then
-            add_platform "${LINUX_APPIMAGE}" "linux-x86_64"
-            add_platform "${LINUX_APPIMAGE}" "linux-x86_64-appimage"
+          if [ -z "${LINUX_UPDATER}" ] || [ "${LINUX_UPDATER}" = "null" ]; then
+            LINUX_UPDATER="$(echo "${RELEASE_JSON}" | jq -r '
+              [.assets[].name] as $names
+              | .assets[]
+              | . as $asset
+              | select($asset.name | test("\\.AppImage$"))
+              | select(($names | index($asset.name + ".sig")) != null)
+              | $asset.name
+            ' | head -n1)"
+          fi
+          if [ -n "${LINUX_UPDATER}" ] && [ "${LINUX_UPDATER}" != "null" ]; then
+            add_platform "${LINUX_UPDATER}" "linux-x86_64"
+            add_platform "${LINUX_UPDATER}" "linux-x86_64-appimage"
           fi
 
           PLATFORM_COUNT="$(echo "${LATEST_JSON}" | jq '.platforms | length')"

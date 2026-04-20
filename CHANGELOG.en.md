@@ -19,6 +19,7 @@
 - **GitHub Release notes are now auto-populated from changelog again** — `release-autoupdate.yml` now extracts the target version section from `CHANGELOG.md` and applies it through `gh release create/edit`, preventing empty release bodies on tag/dispatch publish paths.
 - **Linux release pipeline pinned to a deterministic environment (no dependency fallback)** — `release-linux` now runs on `ubuntu-24.04` with explicit `libfuse2t64` installation for AppImage (`linuxdeploy`) packaging, removing conditional package-selection logic.
 - **Linux AppImage pipeline hardened with explicit `linuxdeploy` gtk/gstreamer dependencies** — the release job now installs runtime/tooling GStreamer packages and `binutils`, and raises `tauri build` verbosity (`-vv`) to improve packaging-failure diagnostics.
+- **`sync-latest-json` aligned with `createUpdaterArtifacts: "v1Compatible"`** — platform merge now recognizes compressed updater artifacts (`.exe.zip` and `.AppImage.tar.gz`, with fallback to `.exe`/`.AppImage`) and release uploads now include those formats.
 - **Documentation consolidated into a single improvements roadmap** — `docs/IMPROVEMENTS.md` is now the pending-work reference (technical + product), while `docs/MIGRATION_TO_TAURI.md` and `docs/PRODUCT_BACKLOG.md` remain compatibility pointers.
 
 ## [26.4.26] - 2026-04-19
