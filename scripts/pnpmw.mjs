@@ -29,14 +29,28 @@ function commandAvailable(command, probeArgs = ["--version"]) {
 function executeOrExit(command, commandArgs) {
   const result = runCommand(command, commandArgs);
   if (result.error) {
-    return false;
+    if (result.error.code === "ENOENT") {
+      return false;
+    }
+    console.error(
+      `ERRO: falha ao executar comando candidato (${command}): ${result.error.message}`
+    );
+    process.exit(1);
   }
 
-  if (result.status === 0) {
-    process.exit(0);
+  if (typeof result.status === "number") {
+    process.exit(result.status);
   }
 
-  return false;
+  if (result.signal) {
+    console.error(
+      `ERRO: processo encerrado por sinal (${result.signal}) ao executar ${command}.`
+    );
+    process.exit(1);
+  }
+
+  console.error(`ERRO: execucao sem status de saida ao executar ${command}.`);
+  process.exit(1);
 }
 
 function quoteForCmd(argument) {

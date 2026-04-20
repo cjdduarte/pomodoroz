@@ -254,7 +254,7 @@ show_menu() {
   cat <<'EOF2'
 Menu de validacao:
 Escada de execucao (simples -> completo):
-- 1) Quick run (lint + typecheck renderer + tauri dev).
+- 1) Quick run sem install (lint + typecheck renderer + tauri dev).
 - 2) Preflight sem install.
 - 3) Preflight completo (com install).
 - 4) Preflight completo + Quick run (lint + tauri dev).
@@ -263,7 +263,7 @@ Escada de execucao (simples -> completo):
 - 7) Gerar instaladores da plataforma atual.
 EOF2
   echo "Escolha o fluxo:"
-  echo "  1) Quick run"
+  echo "  1) Quick run (sem install)"
   echo "  2) Preflight sem install"
   echo "  3) Preflight completo"
   echo "  4) Preflight completo + Quick run"
@@ -424,6 +424,9 @@ if (( SKIP_INSTALL == 0 )); then
   step "Sincronizando dependencias (pnpm install)"
   ( cd "$APP_DIR" && pnpm install )
 else
+  if [[ ! -d "$APP_DIR/node_modules" ]]; then
+    die "node_modules ausente com --skip-install/quick run. Rode a opcao 3 (Preflight completo) primeiro, ou execute: node ./scripts/pnpmw.mjs install"
+  fi
   step "Pulando pnpm install (--skip-install)"
 fi
 

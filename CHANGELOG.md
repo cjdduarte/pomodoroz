@@ -22,6 +22,8 @@
 - **Compatibilidade do `validar-tudo.ps1` no Windows corrigida para interpolação com `:`** — o ajuste do `PKG_CONFIG_PATH` passou de interpolação direta de string para formatação segura (`"{0}:{1}" -f ...`), evitando `ParserError` em PowerShell (`InvalidVariableReferenceWithDrive`).
 - **Quick run no Windows não depende mais de `pnpm` global no PATH** — `scripts/validar-tudo.ps1` removeu o gate `Get-Command pnpm` e passou a validar/executar comandos de pacote apenas via `scripts/pnpmw.mjs` (`node + corepack`), corrigindo falha precoce no menu interativo.
 - **Diagnóstico de `pnpmw/corepack` melhorado no PowerShell** — `scripts/validar-tudo.ps1` agora exibe detalhes reais quando `node scripts/pnpmw.mjs --version` falha e não encerra com falso negativo quando o comando retorna sucesso sem versão no stdout.
+- **`pnpmw.mjs` não mascara mais falhas de comando como “pnpm não encontrado”** — o wrapper agora propaga o código de saída do primeiro candidato executável (ex.: erro real de `pnpm exec eslint`) e só tenta fallback quando o binário está realmente indisponível (`ENOENT`).
+- **Fluxo Quick run sem install ficou explícito e com validação antecipada de dependências** — `scripts/validar-tudo.ps1` e `scripts/validar-tudo.sh` agora informam no menu que a opção 1 não instala dependências e encerram cedo com mensagem direta quando `node_modules` está ausente em `--skip-install`.
 
 ## [26.4.28] - 2026-04-20
 

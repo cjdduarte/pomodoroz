@@ -22,6 +22,8 @@
 - **`validar-tudo.ps1` Windows compatibility fixed for `:` interpolation** — `PKG_CONFIG_PATH` assignment moved from direct string interpolation to safe formatting (`"{0}:{1}" -f ...`), preventing PowerShell `ParserError` (`InvalidVariableReferenceWithDrive`).
 - **Windows quick run no longer requires global `pnpm` in PATH** — `scripts/validar-tudo.ps1` removed the `Get-Command pnpm` gate and now validates/runs package commands only through `scripts/pnpmw.mjs` (`node + corepack`), fixing the early failure in the interactive menu flow.
 - **PowerShell `pnpmw/corepack` diagnostics improved** — `scripts/validar-tudo.ps1` now prints real details when `node scripts/pnpmw.mjs --version` fails and no longer hard-fails on false negatives when the command succeeds without a version line in stdout.
+- **`pnpmw.mjs` no longer masks command failures as “pnpm not found”** — the wrapper now propagates the exit code of the first runnable candidate (for example, real `pnpm exec eslint` failures) and only falls back when the binary is truly unavailable (`ENOENT`).
+- **Quick run no-install flow is now explicit with early dependency guard** — `scripts/validar-tudo.ps1` and `scripts/validar-tudo.sh` now label option 1 as no-install and fail fast with a direct message when `node_modules` is missing under `--skip-install`.
 
 ## [26.4.28] - 2026-04-20
 

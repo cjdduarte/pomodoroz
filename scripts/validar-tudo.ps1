@@ -289,7 +289,7 @@ function Show-LogSummary {
 function Show-ModeMenu {
     Write-Host "Menu de validacao:"
     Write-Host "Escada de execucao (simples -> completo):"
-    Write-Host "- 1) Quick run (lint + typecheck renderer + tauri dev)."
+    Write-Host "- 1) Quick run sem install (lint + typecheck renderer + tauri dev)."
     Write-Host "- 2) Preflight sem install."
     Write-Host "- 3) Preflight completo (com install)."
     Write-Host "- 4) Preflight completo + Quick run (lint + tauri dev)."
@@ -298,7 +298,7 @@ function Show-ModeMenu {
     Write-Host "- 7) Gerar instaladores da plataforma atual."
     Write-Host ""
     Write-Host "Escolha o fluxo:"
-    Write-Host "  1) Quick run"
+    Write-Host "  1) Quick run (sem install)"
     Write-Host "  2) Preflight sem install"
     Write-Host "  3) Preflight completo"
     Write-Host "  4) Preflight completo + Quick run"
@@ -429,6 +429,10 @@ if (-not $SkipInstall) {
     Invoke-Pnpm install
     Pop-Location
 } else {
+    $nodeModulesDir = Join-Path $APP_DIR "node_modules"
+    if (-not (Test-Path $nodeModulesDir)) {
+        Die "node_modules ausente com -SkipInstall/Quick run. Rode a opcao 3 (Preflight completo) primeiro, ou execute: node ./scripts/pnpmw.mjs install"
+    }
     Step "Pulando pnpm install (-SkipInstall)"
 }
 
