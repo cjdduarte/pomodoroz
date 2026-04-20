@@ -6,6 +6,13 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.4.29] - A definir
+
+### Alterado
+
+- **Atualização de dependências do projeto** — lote de manutenção aplicado em bibliotecas do ecossistema JS/TS, sem mudança funcional planejada.
+- **Higiene de ambiente do renderer simplificada** — removido `app/renderer/.env.example` e retirada a exceção `!.env.example` no `.gitignore`; o renderer não consome `SKIP_PREFLIGHT_CHECK`, `BROWSER` ou `CI` no runtime/build padrão, mantendo `.env` apenas como arquivo local opcional.
+
 ## [26.4.28] - 2026-04-20
 
 ### Alterado

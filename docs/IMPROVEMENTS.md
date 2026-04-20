@@ -12,7 +12,7 @@
 This roadmap has two tracks:
 
 - **Track A — Conversion Hardening (Tauri-only)**: technical consolidation after migration.
-- **Track B — Product Features**: user-facing features not implemented yet.
+- **Track B — Product Features**: user-facing features pending or partially implemented.
 
 ### Status values
 
@@ -35,46 +35,48 @@ When an item is released:
 2. Add implementation details to `CHANGELOG.md` and `CHANGELOG.en.md`.
 3. Remove unnecessary detail from this roadmap in the next planning cycle.
 
-### Current checkpoint (2026-04-19)
+### Current checkpoint (2026-04-20)
 
-- Implemented in code and registered in changelog draft `26.4.27` (PT/EN):
-  - Runtime consolidation to Tauri-only (connector/runtime fallback cleanup).
-  - Utility flows aligned to Tauri-only (`openExternalUrl`, desktop notification, updater actions).
-  - Titlebar legacy CSS cleanup (`-webkit-app-region` removal) aligned with Tauri drag path.
-  - Linux panel/launcher icon alignment (`favicon` + `StartupWMClass` in `.desktop` paths).
-  - `check-updates` wording aligned to root-only project narrative.
-  - Documentation consolidation around `docs/IMPROVEMENTS.md`.
-- Pending to close this checkpoint:
-  - Final release date for `26.4.27` in both changelogs.
-  - Tag/publish flow execution via release script.
+- Released in `26.4.28` (PT/EN changelogs):
+  - `A0` runtime consolidation to Tauri-only.
+  - `A1` titlebar legacy CSS/changelog consistency (`-webkit-app-region`).
+  - `A4` `check-updates` simplification to root-only narrative.
+  - Linux release pipeline/AppImage hardening and `sync-latest-json` alignment.
+- Current planning baseline:
+  - Next open version headers already prepared in changelog (`26.4.29` as `A definir` / `TBD`).
+  - `A5` dependency modernization started in controlled batches (`uuid@14` and safe updates).
+  - `A6` intentionally deferred by product decision (no test-track changes now).
 
-### Next execution order (after 26.4.27)
+### Next execution order (after 26.4.28)
 
-1. **Close release 26.4.27**
-   - Set final date in `CHANGELOG.md` and `CHANGELOG.en.md`.
-   - Run `./scripts/release.sh 26.4.27`.
-2. **Release 26.4.28 — Stability + consistency**
-   - Execute **A1** (titlebar CSS/changelog divergence).
-   - Execute **A2** (`.env` hygiene).
-3. **Release 26.4.29 — Quality gate**
-   - Execute **A6** (test strategy decision and implementation).
-   - Optionally include **A3** (shortcut persistence) if scope fits.
-4. **Next product cycle**
-   - Start **B1/B2/B3** together (presets, extend session, break suggestions).
+1. **A2 — `.env` hygiene (next implementation target)**
+   - Stop tracking `app/renderer/.env`.
+   - Add `app/renderer/.env.example`.
+   - Align setup docs with the new pattern.
+2. **A5 — Controlled major dependency batches**
+   - Batch 2: `eslint`/`@eslint/js` 10.x.
+   - Batch 3: `vite-plugin-svgr` 5.x.
+   - Validate and register each batch in changelog.
+3. **A3 — Shortcut persistence**
+   - Persist customizable shortcuts and restore on boot.
+4. **Product cycle (B1 -> B2 -> B3)**
+   - Cadence presets, session extension, break suggestion prompts.
+5. **A6 revisit gate**
+   - Revisit test strategy only after items above are stabilized.
 
 ---
 
 ## 2. Track A — Conversion Hardening (Tauri-only)
 
-| ID  | Item                                                                          | Status      | Priority | Notes                                                |
-| --- | ----------------------------------------------------------------------------- | ----------- | -------- | ---------------------------------------------------- |
-| A0  | Consolidate runtime to Tauri-only and remove browser fallback branches        | In Progress | High     | Implemented in code, pending 26.4.27 release close   |
-| A1  | Resolve titlebar legacy CSS/changelog divergence (`-webkit-app-region`)       | In Progress | High     | Code aligned in 26.4.27 draft; pending release close |
-| A2  | `.env` hygiene (`app/renderer/.env` tracked)                                  | Open        | High     | Remove from VCS and provide `.env.example`           |
-| A3  | Persist custom shortcuts (`Shortcut.tsx` TODO)                                | Open        | Medium   | Avoid loss after restart                             |
-| A4  | Simplify `check-updates` to root-only narrative and flows                     | In Progress | Medium   | Implemented in code, pending 26.4.27 release close   |
-| A5  | Controlled major updates (`eslint`/`@eslint/js` 10.x, `vite-plugin-svgr` 5.x) | Open        | Medium   | Execute in small validated batches                   |
-| A6  | Define automated test strategy (adopt baseline tests or remove idle stack)    | Open        | High     | Required for safer refactors                         |
+| ID  | Item                                                                          | Status      | Priority | Notes                                               |
+| --- | ----------------------------------------------------------------------------- | ----------- | -------- | --------------------------------------------------- |
+| A0  | Consolidate runtime to Tauri-only and remove browser fallback branches        | Done        | High     | Released in 26.4.28                                 |
+| A1  | Resolve titlebar legacy CSS/changelog divergence (`-webkit-app-region`)       | Done        | High     | Released in 26.4.28                                 |
+| A2  | `.env` hygiene (`app/renderer/.env` tracked)                                  | In Progress | High     | Implemented in code; pending changelog registration |
+| A3  | Persist custom shortcuts (`Shortcut.tsx` TODO)                                | Open        | Medium   | Avoid loss after restart                            |
+| A4  | Simplify `check-updates` to root-only narrative and flows                     | Done        | Medium   | Released in 26.4.28                                 |
+| A5  | Controlled major updates (`eslint`/`@eslint/js` 10.x, `vite-plugin-svgr` 5.x) | In Progress | Medium   | Batch 1 applied; major batches pending              |
+| A6  | Define automated test strategy (adopt baseline tests or remove idle stack)    | Blocked     | High     | Deferred by decision (no tests changes now)         |
 
 ### A0 — Tauri-only runtime consolidation
 
@@ -83,7 +85,7 @@ When an item is released:
   - [x] Simplify updater action path to Tauri-native install/restart flow.
   - [x] Remove renderer/browser fallback branches in utility wrappers where runtime is always Tauri.
   - [x] Align docs references to the consolidated roadmap structure.
-  - [ ] Mark as `Done` after release `26.4.27` is published.
+  - [x] Mark as `Done` after release `26.4.28` publication.
 - Validation checklist:
   - [x] `pnpm lint`
   - [x] `pnpm typecheck:renderer`
@@ -96,8 +98,8 @@ When an item is released:
 
 Resolution status (code):
 
-- `CHANGELOG.md` / `CHANGELOG.en.md` for `26.4.26` state that `-webkit-app-region` rules were removed.
-- `26.4.27` draft now includes the corrective item and code has been aligned (legacy rules removed from `src/styles/components/titlebar.ts`).
+- `CHANGELOG.md` / `CHANGELOG.en.md` for `26.4.26` stated that `-webkit-app-region` rules were removed.
+- Release `26.4.28` carried the corrective entry and code is aligned (legacy rules removed from `src/styles/components/titlebar.ts`).
 - Dragging remains on current Tauri runtime through:
   - `data-tauri-drag-region` in `src/components/Titlebar.tsx`
   - native command `start_window_drag` in `src-tauri/src/commands/window_bridge.rs`
@@ -105,30 +107,31 @@ Resolution status (code):
 Impact:
 
 - Main issue was **public documentation inconsistency** (audit/release trust), not a known crash.
-- Keep this tracked until `26.4.27` is released and then mark as `Done`.
+- Marked as `Done` after `26.4.28` publication.
 
 - Scope checklist:
   - [x] Decide code direction (remove or retain `-webkit-app-region` rules).
   - [x] Align code to selected direction (`-webkit-app-region` removed).
-  - [ ] Validate titlebar interactions (drag/minimize/close) on Linux and Windows.
-  - [ ] Record final decision in changelog for the next version.
-  - [ ] Mark as `Done` after release `26.4.27` is published.
+  - [x] Validate titlebar interactions (drag/minimize/close) on Linux and Windows.
+  - [x] Record final decision in changelog for the next version.
+  - [x] Mark as `Done` after release `26.4.28` publication.
 - Validation checklist:
-  - [ ] `pnpm lint`
-  - [ ] `pnpm typecheck:renderer`
-  - [ ] `pnpm build:renderer`
-  - [ ] `cargo check --manifest-path src-tauri/Cargo.toml`
+  - [x] `pnpm lint`
+  - [x] `pnpm typecheck:renderer`
+  - [x] `pnpm build:renderer`
+  - [x] `cargo check --manifest-path src-tauri/Cargo.toml`
 - Suggested commit:
   - `fix(titlebar): align legacy drag css with tauri behavior and release notes`
 
 ### A2 — `.env` hygiene
 
 - Scope checklist:
-  - [ ] Stop tracking `app/renderer/.env`.
-  - [ ] Add `app/renderer/.env.example` with safe placeholders.
-  - [ ] Update setup docs.
+  - [x] Stop tracking `app/renderer/.env`.
+  - [x] Add `app/renderer/.env.example` with safe placeholders.
+  - [x] Update setup docs.
+  - [ ] Register this change in changelog on next release.
 - Validation checklist:
-  - [ ] `git status --short` shows no sensitive env values staged.
+  - [x] `git status --short` no longer includes a tracked renderer `.env`.
 - Suggested commit:
   - `chore(config): untrack renderer env file and add env example`
 
@@ -149,7 +152,7 @@ Impact:
   - [x] Remove obsolete workspace-centric wording where not needed.
   - [x] Keep current root-only behavior explicit.
   - [x] Preserve report/apply flows.
-  - [ ] Mark as `Done` after release `26.4.27` is published.
+  - [x] Mark as `Done` after release `26.4.28` publication.
 - Validation checklist:
   - [x] `./scripts/check-updates.sh report`
   - [x] `./scripts/check-updates.ps1 report`
@@ -159,21 +162,29 @@ Impact:
 ### A5 — Major dependency updates
 
 - Scope checklist:
-  - [ ] Split updates into independent batches.
-  - [ ] Run full validation per batch.
-  - [ ] Register each batch in changelog.
+  - [x] Split updates into independent batches.
+  - [x] Apply batch 1 (`uuid@14` + safe JS/TS updates from `check-updates`).
+  - [ ] Apply batch 2 (`eslint` / `@eslint/js` 10.x) with full validation.
+  - [ ] Apply batch 3 (`vite-plugin-svgr` 5.x) with full validation.
+  - [ ] Register each completed batch in changelog.
 - Validation checklist:
-  - [ ] `pnpm lint`
-  - [ ] `pnpm typecheck:renderer`
-  - [ ] `pnpm build:renderer`
-  - [ ] `cargo check --manifest-path src-tauri/Cargo.toml`
+  - [x] `pnpm lint` (batch 1)
+  - [x] `pnpm typecheck:renderer` (batch 1)
+  - [x] `pnpm build:renderer` (batch 1)
+  - [x] `cargo check --manifest-path src-tauri/Cargo.toml` (batch 1)
 - Suggested commit:
   - `chore(deps): apply controlled major updates batch`
 
 ### A6 — Test strategy decision
 
+Decision checkpoint:
+
+- Current decision is to **defer** test-strategy changes for now.
+- Keep this item `Blocked` until the team chooses one path (`adopt-tests` or `remove-test-stack`).
+
 - Scope checklist:
-  - [ ] Decide path: `adopt-tests` or `remove-test-stack`.
+  - [x] Decide current cycle policy: defer test-strategy work.
+  - [ ] Decide final path: `adopt-tests` or `remove-test-stack`.
   - [ ] If adopt: create baseline smoke tests + CI job.
   - [ ] If remove: clean Jest/Babel test deps and scripts.
 - Validation checklist:
@@ -185,17 +196,22 @@ Impact:
 
 ## 3. Track B — Product Features
 
-| ID  | Feature                                  | Status | Priority | Effort |
-| --- | ---------------------------------------- | ------ | -------- | ------ |
-| B1  | Cadence presets (5/1, 10/3, 25/5, 50/10) | Open   | High     | Low    |
-| B2  | Extend session (+5 / +10)                | Open   | High     | Medium |
-| B3  | Break suggestion prompts                 | Open   | High     | Low    |
-| B4  | Global play/pause hotkey                 | Open   | Medium   | Low    |
-| B5  | Cadence insights in statistics           | Open   | Medium   | Medium |
-| B6  | Motivational completion messages         | Open   | Medium   | Low    |
-| B7  | Reverse Pomodoro mode                    | Open   | Low      | Medium |
-| B8  | Ambient sounds                           | Open   | Low      | High   |
-| B9  | No-judgment mode                         | Open   | Low      | Low    |
+| ID  | Feature                                  | Status      | Priority | Effort |
+| --- | ---------------------------------------- | ----------- | -------- | ------ |
+| B1  | Cadence presets (5/1, 10/3, 25/5, 50/10) | In Progress | High     | Low    |
+| B2  | Extend session (+5 / +10)                | Open        | High     | Medium |
+| B3  | Break suggestion prompts                 | Open        | High     | Low    |
+| B4  | Global play/pause hotkey                 | In Progress | Medium   | Low    |
+| B5  | Cadence insights in statistics           | Open        | Medium   | Medium |
+| B6  | Motivational completion messages         | Open        | Medium   | Low    |
+| B7  | Reverse Pomodoro mode                    | Open        | Low      | Medium |
+| B8  | Ambient sounds                           | Open        | Low      | High   |
+| B9  | No-judgment mode                         | Open        | Low      | Low    |
+
+Current product baseline:
+
+- Manual cadence configuration already exists via config sliders (`stayFocus`, `shortBreak`, `longBreak`, `sessionRounds`).
+- Global shortcuts already exist for hide/show app (`Alt+Shift+H` / `Alt+Shift+S`); play/pause is still pending.
 
 ### B1/B2/B3 (next cycle)
 

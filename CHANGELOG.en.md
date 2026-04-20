@@ -6,6 +6,13 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.4.29] - TBD
+
+### Changed
+
+- **Project dependency updates** — a maintenance batch was applied across JS/TS ecosystem libraries, with no planned functional behavior change.
+- **Renderer env hygiene simplified** — `app/renderer/.env.example` was removed and the `!.env.example` exception was dropped from `.gitignore`; the renderer does not consume `SKIP_PREFLIGHT_CHECK`, `BROWSER`, or `CI` in the default runtime/build path, keeping `.env` as optional local-only config.
+
 ## [26.4.28] - 2026-04-20
 
 ### Changed

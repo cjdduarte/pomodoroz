@@ -32,6 +32,11 @@ pnpm tauri build --no-bundle  # Build release binary (no installer)
 
 Any IDE should work — it will pick up `package.json` in the root folder.
 
+### Renderer env file
+
+- `app/renderer/.env` should remain local-only and must not be committed.
+- The renderer does not require a committed `.env` file by default.
+
 ### Validation Scripts
 
 ```sh
