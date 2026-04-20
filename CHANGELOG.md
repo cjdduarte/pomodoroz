@@ -28,6 +28,7 @@
 - **`uninstall.ps1` ganhou suporte Windows user-scope com paridade funcional de modo** — o script agora roda em Linux e Windows, mantendo modo padrão + `-Purge`/`-Yes`; no Windows remove diretórios de instalação por usuário (`%LOCALAPPDATA%`), atalhos comuns (Start Menu/Desktop) e, em `-Purge`, limpa dados locais em `%APPDATA%`/`%LOCALAPPDATA%` para `pomodoroz` e `com.cjdduarte.pomodoroz`.
 - **Build de release/instaladores no Windows ficou resiliente a lock do executável local** — `scripts/validar-tudo.ps1` agora encerra automaticamente instâncias em execução de `src-tauri/target/release/pomodoroz_tauri.exe` antes de `tauri build`, evitando falha `Acesso negado (os error 5)` ao sobrescrever o binário.
 - **Geração local de instaladores não exige mais chave privada de assinatura do updater** — `scripts/validar-tudo.sh` e `scripts/validar-tudo.ps1` agora forçam `bundle.createUpdaterArtifacts=false` para todos os bundles locais de instalador, evitando falha por ausência de `TAURI_SIGNING_PRIVATE_KEY` fora do pipeline oficial de release.
+- **Override local de config do Tauri em PowerShell ficou compatível com parsing JSON no Windows** — `scripts/validar-tudo.ps1` passou a usar arquivo temporário (`src-tauri/.tauri-local-no-updater.json`) no `--config` durante geração de instaladores, evitando erro de parse (`key must be a string`) causado por quoting inline no `tauri build`.
 
 ## [26.4.28] - 2026-04-20
 

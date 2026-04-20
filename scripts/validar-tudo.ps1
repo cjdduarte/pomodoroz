@@ -550,17 +550,23 @@ if ($BuildInstallers) {
     $bundleList = $bundles -split "," | ForEach-Object { $_.Trim() } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
     $baseBundles = ($bundleList | Where-Object { $_ -ne "appimage" }) -join ","
     $hasAppImage = $bundleList -contains "appimage"
+    $localTauriConfigOverridePath = Join-Path $APP_DIR "src-tauri/.tauri-local-no-updater.json"
 
-    if (-not [string]::IsNullOrWhiteSpace($baseBundles)) {
-        Step ("Gerando instaladores Tauri (bundles base: {0})" -f $baseBundles)
-        Push-Location $APP_DIR
-        Invoke-Pnpm tauri build --bundles $baseBundles --config '{"bundle":{"createUpdaterArtifacts":false}}'
-        Pop-Location
-    }
+    Set-Content -LiteralPath $localTauriConfigOverridePath -Value '{"bundle":{"createUpdaterArtifacts":false}}' -NoNewline -Encoding utf8
+    try {
+        if (-not [string]::IsNullOrWhiteSpace($baseBundles)) {
+            Step ("Gerando instaladores Tauri (bundles base: {0})" -f $baseBundles)
+            Push-Location $APP_DIR
+            Invoke-Pnpm tauri build --bundles $baseBundles --config $localTauriConfigOverridePath
+            Pop-Location
+        }
 
-    if ($hasAppImage) {
-        Step "Gerando instalador Tauri adicional (bundle: appimage)"
-        Invoke-TauriAppImageBuild -ExtraArgs @("--config", '{"bundle":{"createUpdaterArtifacts":false}}')
+        if ($hasAppImage) {
+            Step "Gerando instalador Tauri adicional (bundle: appimage)"
+            Invoke-TauriAppImageBuild -ExtraArgs @("--config", $localTauriConfigOverridePath)
+        }
+    } finally {
+        Remove-Item -LiteralPath $localTauriConfigOverridePath -Force -ErrorAction SilentlyContinue
     }
 } else {
     Stop-WindowsReleaseBinaryIfRunning
