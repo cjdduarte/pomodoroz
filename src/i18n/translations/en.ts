@@ -239,9 +239,6 @@ export const en = {
       s: "s",
     },
   },
-  dialogs: {
-    warningTitle: "Warning",
-  },
   units: {
     min: "min",
     mins: "mins",

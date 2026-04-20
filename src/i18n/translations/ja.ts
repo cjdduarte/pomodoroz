@@ -238,9 +238,6 @@ export const ja = {
       s: "秒",
     },
   },
-  dialogs: {
-    warningTitle: "注意",
-  },
   units: {
     min: "分",
     mins: "分",

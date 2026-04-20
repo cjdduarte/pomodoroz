@@ -162,37 +162,31 @@ const dataUrlToPngBytes = (dataUrl: string): number[] => {
 };
 
 type ResetDialogCopy = {
-  dialogTitle: string;
   resetMessage: string;
   reclassifyMessage: string;
 };
 
 const RESET_DIALOG_COPY: Record<LanguageCode, ResetDialogCopy> = {
   en: {
-    dialogTitle: "Warning",
     resetMessage: "Do you want to reset now?",
     reclassifyMessage:
       "Move the elapsed time of the current task to Idle?",
   },
   es: {
-    dialogTitle: "Atención",
     resetMessage: "¿Quieres restablecerlo ahora?",
     reclassifyMessage:
       "¿Mover a Ocioso el tiempo transcurrido de la tarea actual?",
   },
   zh: {
-    dialogTitle: "注意",
     resetMessage: "是否立即重置？",
     reclassifyMessage: "是否将当前任务的已过时间转为空闲时间？",
   },
   ja: {
-    dialogTitle: "注意",
     resetMessage: "今すぐリセットしますか？",
     reclassifyMessage:
       "現在のタスクの経過時間をアイドル時間へ移動しますか？",
   },
   pt: {
-    dialogTitle: "Atenção",
     resetMessage: "Deseja resetar agora?",
     reclassifyMessage:
       "Mover o tempo decorrido desta tarefa atual para Ocioso?",
@@ -217,7 +211,6 @@ const askResetFocusToIdle =
     const copy = RESET_DIALOG_COPY[language];
 
     const shouldResetNow = await askDialog(copy.resetMessage, {
-      title: copy.dialogTitle,
       kind: "warning",
     });
 
@@ -226,7 +219,6 @@ const askResetFocusToIdle =
     }
 
     const shouldReclassify = await askDialog(copy.reclassifyMessage, {
-      title: copy.dialogTitle,
       kind: "info",
     });
     if (shouldReclassify) {
