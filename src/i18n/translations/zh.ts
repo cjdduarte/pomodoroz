@@ -230,6 +230,9 @@ export const zh = {
       s: "秒",
     },
   },
+  dialogs: {
+    warningTitle: "注意",
+  },
   units: {
     min: "分钟",
     mins: "分钟",

@@ -224,6 +224,7 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
 
   const handleReset = useCallback(async () => {
     const hasConfirmed = await askDialog(t("grid.resetConfirm"), {
+      title: t("dialogs.warningTitle"),
       kind: "warning",
     });
 

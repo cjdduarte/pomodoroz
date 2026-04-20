@@ -162,44 +162,38 @@ const dataUrlToPngBytes = (dataUrl: string): number[] => {
 };
 
 type ResetDialogCopy = {
-  resetTitle: string;
+  dialogTitle: string;
   resetMessage: string;
-  reclassifyTitle: string;
   reclassifyMessage: string;
 };
 
 const RESET_DIALOG_COPY: Record<LanguageCode, ResetDialogCopy> = {
   en: {
-    resetTitle: "Reset current timer?",
+    dialogTitle: "Warning",
     resetMessage: "Do you want to reset now?",
-    reclassifyTitle: "Allocate elapsed focus time to Idle?",
     reclassifyMessage:
       "Move the elapsed time of the current task to Idle?",
   },
   es: {
-    resetTitle: "¿Restablecer el temporizador actual?",
+    dialogTitle: "Atención",
     resetMessage: "¿Quieres restablecerlo ahora?",
-    reclassifyTitle: "¿Asignar el tiempo transcurrido a Ocioso?",
     reclassifyMessage:
       "¿Mover a Ocioso el tiempo transcurrido de la tarea actual?",
   },
   zh: {
-    resetTitle: "重置当前计时器？",
+    dialogTitle: "注意",
     resetMessage: "是否立即重置？",
-    reclassifyTitle: "将已过专注时间分配为空闲？",
     reclassifyMessage: "是否将当前任务的已过时间转为空闲时间？",
   },
   ja: {
-    resetTitle: "現在のタイマーをリセットしますか？",
+    dialogTitle: "注意",
     resetMessage: "今すぐリセットしますか？",
-    reclassifyTitle: "経過した集中時間をアイドルに振り替えますか？",
     reclassifyMessage:
       "現在のタスクの経過時間をアイドル時間へ移動しますか？",
   },
   pt: {
-    resetTitle: "Resetar o timer atual?",
+    dialogTitle: "Atenção",
     resetMessage: "Deseja resetar agora?",
-    reclassifyTitle: "Alocar tempo decorrido em Ocioso?",
     reclassifyMessage:
       "Mover o tempo decorrido desta tarefa atual para Ocioso?",
   },
@@ -223,7 +217,7 @@ const askResetFocusToIdle =
     const copy = RESET_DIALOG_COPY[language];
 
     const shouldResetNow = await askDialog(copy.resetMessage, {
-      title: copy.resetTitle,
+      title: copy.dialogTitle,
       kind: "warning",
     });
 
@@ -232,7 +226,7 @@ const askResetFocusToIdle =
     }
 
     const shouldReclassify = await askDialog(copy.reclassifyMessage, {
-      title: copy.reclassifyTitle,
+      title: copy.dialogTitle,
       kind: "info",
     });
     if (shouldReclassify) {

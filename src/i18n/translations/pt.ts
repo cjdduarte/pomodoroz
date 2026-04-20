@@ -239,6 +239,9 @@ export const pt = {
       s: "s",
     },
   },
+  dialogs: {
+    warningTitle: "Atenção",
+  },
   units: {
     min: "min",
     mins: "mins",

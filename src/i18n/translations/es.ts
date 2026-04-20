@@ -240,6 +240,9 @@ export const es = {
       s: "s",
     },
   },
+  dialogs: {
+    warningTitle: "Atención",
+  },
   units: {
     min: "min",
     mins: "mins",
