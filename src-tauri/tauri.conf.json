@@ -28,6 +28,9 @@
     "createUpdaterArtifacts": "v1Compatible",
     "targets": "all",
     "linux": {
+      "appimage": {
+        "bundleMediaFramework": false
+      },
       "deb": {
         "desktopTemplate": "packaging/linux/desktop-template.hbs"
       },

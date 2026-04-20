@@ -206,7 +206,9 @@ jobs:
             gstreamer1.0-plugins-good \
             libgstreamer1.0-0 \
             libgstreamer-plugins-base1.0-0 \
-            binutils
+            binutils \
+            squashfs-tools \
+            zsync
 
       - name: Validate required secrets
         run: |
@@ -258,13 +260,29 @@ jobs:
             fi
           fi
 
+      - name: Probe AppImage toolchain binaries
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/pomodoroz-appimage-tools
+          cd /tmp/pomodoroz-appimage-tools
+
+          curl -fsSL -o linuxdeploy-x86_64.AppImage \
+            https://github.com/tauri-apps/binary-releases/releases/download/linuxdeploy/linuxdeploy-x86_64.AppImage
+          curl -fsSL -o linuxdeploy-plugin-appimage-x86_64.AppImage \
+            https://github.com/linuxdeploy/linuxdeploy-plugin-appimage/releases/download/continuous/linuxdeploy-plugin-appimage-x86_64.AppImage
+
+          chmod +x linuxdeploy-x86_64.AppImage linuxdeploy-plugin-appimage-x86_64.AppImage
+
+          APPIMAGE_EXTRACT_AND_RUN=1 ./linuxdeploy-x86_64.AppImage --version
+          APPIMAGE_EXTRACT_AND_RUN=1 ./linuxdeploy-plugin-appimage-x86_64.AppImage --version
+
       - name: Build Tauri AppImage (x64)
         run: |
           set -o pipefail
           for attempt in 1 2 3; do
             LOG_FILE="/tmp/tauri-appimage-build-attempt-${attempt}.log"
             echo "AppImage build attempt ${attempt}/3"
-            if pnpm tauri build --bundles appimage -vv 2>&1 | tee "${LOG_FILE}"; then
+            if RUST_LOG=tauri_bundler=trace,tauri_cli=debug pnpm tauri build --bundles appimage -vv 2>&1 | tee "${LOG_FILE}"; then
               exit 0
             fi
 
