@@ -274,7 +274,8 @@ jobs:
           chmod +x linuxdeploy-x86_64.AppImage linuxdeploy-plugin-appimage-x86_64.AppImage
 
           APPIMAGE_EXTRACT_AND_RUN=1 ./linuxdeploy-x86_64.AppImage --version
-          APPIMAGE_EXTRACT_AND_RUN=1 ./linuxdeploy-plugin-appimage-x86_64.AppImage --version
+          APPIMAGE_EXTRACT_AND_RUN=1 ./linuxdeploy-plugin-appimage-x86_64.AppImage --plugin-type
+          APPIMAGE_EXTRACT_AND_RUN=1 ./linuxdeploy-plugin-appimage-x86_64.AppImage --plugin-api-version
 
       - name: Build Tauri AppImage (x64)
         run: |
