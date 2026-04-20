@@ -26,8 +26,6 @@
   <img src="assets/gridB.png" alt="Pomodoroz - Grid Preview B" width="340">
 </p>
 
-<p align="center"><sub>Grid preview uses generic labels from <code>pomodoroz-tasks-2026-04-20.json</code> (Subject 1-5, Task 1-16).</sub></p>
-
 <p align="center">
   <br>
   <a href="#-about">About</a>
