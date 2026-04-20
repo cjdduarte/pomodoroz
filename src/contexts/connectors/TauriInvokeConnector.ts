@@ -14,9 +14,6 @@ import type {
   ExportTasksDialogPayload,
   FromMainChannel,
   FromMainPayloadMap,
-  InvokeMainChannel,
-  InvokeMainPayloadMap,
-  InvokeMainResponseMap,
   SetInAppAutoUpdatePayload,
   ToMainChannel,
   ToMainPayloadMap,
@@ -478,12 +475,5 @@ export const TauriInvokeConnector: InvokeConnector = {
         unlisten();
       }
     };
-  },
-
-  invoke: async <C extends InvokeMainChannel>(
-    event: C,
-    ..._payload: InvokeMainPayloadMap[C]
-  ): Promise<InvokeMainResponseMap[C]> => {
-    throw new Error(`[TAURI IPC] Unsupported invoke channel: ${event}`);
   },
 };

@@ -6,6 +6,14 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.4.30] - TBD
+
+### Changed
+
+- **IPC contract simplified after Tauri-only consolidation** — removed `INVOKE_MAIN` channel/types and dropped the `invoke` method from `InvokeConnector`, eliminating a dead path with no renderer consumers.
+- **Compact-window auto-expand for dialogs consolidated in a shared hook** — duplicated temporary expand/collapse logic (`Control` and `TaskListGrid`) was centralized in `useCompactAutoExpand`, reducing flow drift and avoiding unintended collapse when compact mode is turned off while a prompt is open.
+- **`ConfirmDialog` focus accessibility strengthened** — added `Tab`/`Shift+Tab` focus trap, initial auto-focus on cancel when opening, `aria-describedby` for message semantics, and focus restoration to the triggering element on close.
+
 ## [26.4.29] - 2026-04-20
 
 ### Changed

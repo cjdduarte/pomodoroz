@@ -1,4 +1,4 @@
-import React, { useEffect, useId } from "react";
+import React, { useEffect, useId, useRef } from "react";
 import styled from "styled-components";
 import { StyledButtonNormal, StyledButtonPrimary } from "styles";
 import Portal from "./Portal";
@@ -118,21 +118,86 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   onCancel,
 }) => {
   const titleId = useId();
+  const messageId = useId();
+  const cancelButtonRef = useRef<HTMLButtonElement | null>(null);
+  const confirmButtonRef = useRef<HTMLButtonElement | null>(null);
+  const previousFocusedElementRef = useRef<HTMLElement | null>(null);
+  const onCancelRef = useRef(onCancel);
+
+  useEffect(() => {
+    onCancelRef.current = onCancel;
+  }, [onCancel]);
 
   useEffect(() => {
     if (!open) {
       return;
     }
 
+    previousFocusedElementRef.current =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+
+    const focusTargetRequest = window.requestAnimationFrame(() => {
+      cancelButtonRef.current?.focus();
+    });
+
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        onCancel();
+        event.preventDefault();
+        onCancelRef.current();
+        return;
       }
+
+      if (event.key !== "Tab") {
+        return;
+      }
+
+      const focusableButtons = [
+        cancelButtonRef.current,
+        confirmButtonRef.current,
+      ].filter(
+        (element): element is HTMLButtonElement =>
+          element !== null && !element.disabled
+      );
+
+      if (!focusableButtons.length) {
+        event.preventDefault();
+        return;
+      }
+
+      const activeElement = document.activeElement;
+      const activeIndex = focusableButtons.findIndex(
+        (element) => element === activeElement
+      );
+
+      let nextIndex = 0;
+      if (event.shiftKey) {
+        nextIndex =
+          activeIndex <= 0
+            ? focusableButtons.length - 1
+            : activeIndex - 1;
+      } else if (activeIndex >= 0) {
+        nextIndex = (activeIndex + 1) % focusableButtons.length;
+      }
+
+      event.preventDefault();
+      focusableButtons[nextIndex]?.focus();
     };
 
     document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
-  }, [open, onCancel]);
+    return () => {
+      window.cancelAnimationFrame(focusTargetRequest);
+      document.removeEventListener("keydown", onKeyDown);
+
+      const previousFocusedElement = previousFocusedElementRef.current;
+      previousFocusedElementRef.current = null;
+
+      if (previousFocusedElement?.isConnected) {
+        previousFocusedElement.focus();
+      }
+    };
+  }, [open]);
 
   if (!open) {
     return null;
@@ -144,6 +209,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
+        aria-describedby={messageId}
         onMouseDown={(event) => {
           if (event.target === event.currentTarget) {
             onCancel();
@@ -152,12 +218,18 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
       >
         <ConfirmDialogCard>
           <h3 id={titleId}>{title}</h3>
-          <p>{message}</p>
+          <p id={messageId}>{message}</p>
           <ConfirmDialogActions>
-            <ConfirmDialogCancelButton onClick={onCancel}>
+            <ConfirmDialogCancelButton
+              ref={cancelButtonRef}
+              onClick={onCancel}
+            >
               {cancelLabel}
             </ConfirmDialogCancelButton>
-            <ConfirmDialogConfirmButton onClick={onConfirm}>
+            <ConfirmDialogConfirmButton
+              ref={confirmButtonRef}
+              onClick={onConfirm}
+            >
               {confirmLabel}
             </ConfirmDialogConfirmButton>
           </ConfirmDialogActions>

@@ -56,11 +56,8 @@ export const FROM_MAIN = [
   TASKS_IMPORT_RESULT,
 ] as const;
 
-export const INVOKE_MAIN = [] as const;
-
 export type ToMainChannel = (typeof TO_MAIN)[number];
 export type FromMainChannel = (typeof FROM_MAIN)[number];
-export type InvokeMainChannel = (typeof INVOKE_MAIN)[number];
 
 export type SetAlwaysOnTopPayload = {
   alwaysOnTop: boolean;
@@ -191,14 +188,6 @@ export type FromMainPayloadMap = {
           : K extends typeof TASKS_IMPORT_RESULT
             ? [TasksImportResultPayload]
             : never;
-};
-
-export type InvokeMainPayloadMap = {
-  [K in InvokeMainChannel]: never;
-};
-
-export type InvokeMainResponseMap = {
-  [K in InvokeMainChannel]: never;
 };
 
 export const RELEASE_NOTES_LINK =
