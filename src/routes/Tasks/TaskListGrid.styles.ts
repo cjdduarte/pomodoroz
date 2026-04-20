@@ -292,7 +292,7 @@ export const StyledGridColumnsLabel = styled.label`
 
 export const StyledGridColumnsSelect = styled.select`
   min-width: 4.4rem;
-  padding: 0.2rem 0.45rem;
+  padding: 0.2rem 1.4rem 0.2rem 0.45rem;
   border: 1px solid var(--color-border-primary);
   border-radius: 3px;
   background-color: var(--color-bg-primary);
@@ -300,6 +300,32 @@ export const StyledGridColumnsSelect = styled.select`
   font-size: 0.95rem;
   cursor: pointer;
   transition: ${themes.transition};
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image:
+    linear-gradient(
+      45deg,
+      transparent 50%,
+      var(--color-disabled-text) 50%
+    ),
+    linear-gradient(
+      135deg,
+      var(--color-disabled-text) 50%,
+      transparent 50%
+    );
+  background-position:
+    calc(100% - 0.75rem) calc(50% - 0.09rem),
+    calc(100% - 0.5rem) calc(50% - 0.09rem);
+  background-size:
+    0.25rem 0.25rem,
+    0.25rem 0.25rem;
+  background-repeat: no-repeat;
+
+  option {
+    color: var(--color-body-text);
+    background-color: var(--color-bg-primary);
+  }
 
   &:hover {
     border-color: var(--color-primary);

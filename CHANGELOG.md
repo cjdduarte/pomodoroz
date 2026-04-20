@@ -6,13 +6,14 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
-## [26.4.30] - 2026-04-21
+## [26.4.30] - A definir
 
 ### Alterado
 
 - **Contrato IPC simplificado após consolidação Tauri-only** — remoção dos tipos/canais `INVOKE_MAIN` e do método `invoke` do `InvokeConnector`, eliminando caminho morto sem consumidores no renderer.
 - **Auto-expand de janela compacta para diálogos consolidado em hook compartilhado** — a lógica duplicada de expansão/recolhimento temporário (`Control` e `TaskListGrid`) foi centralizada em `useCompactAutoExpand`, reduzindo drift entre fluxos e evitando recolhimento indevido quando o modo compacto é desligado durante o prompt.
 - **`ConfirmDialog` com acessibilidade de foco reforçada** — adicionado trap de `Tab`/`Shift+Tab`, auto-focus inicial no botão de cancelar ao abrir, `aria-describedby` para mensagem e restauração de foco ao elemento acionador no fechamento.
+- **Seletor de colunas do grid no modo escuro corrigido** — o dropdown `Colunas` no `TaskListGrid` passou a usar reset de aparência nativa (`appearance: none`) e seta customizada em CSS para evitar fundo branco e manter consistência visual no dark theme.
 
 ## [26.4.29] - 2026-04-20
 
