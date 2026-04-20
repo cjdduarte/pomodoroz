@@ -111,19 +111,9 @@ const Control: React.FC<Props> = ({
     }
 
     const askAndReset = async () => {
-      let decision: ResetFocusToIdleDialogResult = "no";
-
-      try {
-        const invokeConnector = getInvokeConnector();
-        decision = await invokeConnector.invoke(
-          CONFIRM_RESET_FOCUS_TO_IDLE
-        );
-      } catch (error) {
-        console.warn(
-          "There was a problem showing the native reset confirmation",
-          error
-        );
-      }
+      const invokeConnector = getInvokeConnector();
+      const decision: ResetFocusToIdleDialogResult =
+        await invokeConnector.invoke(CONFIRM_RESET_FOCUS_TO_IDLE);
 
       if (decision === "cancel") {
         return;

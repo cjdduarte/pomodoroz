@@ -4,6 +4,7 @@ import React, {
   useMemo,
   useState,
 } from "react";
+import { ask as askDialog } from "@tauri-apps/plugin-dialog";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "hooks/storeHooks";
 import { resetAllDayColors, setTaskDayColor } from "store";
@@ -221,8 +222,11 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
     [onSelectList]
   );
 
-  const handleReset = useCallback(() => {
-    const hasConfirmed = window.confirm(t("grid.resetConfirm"));
+  const handleReset = useCallback(async () => {
+    const hasConfirmed = await askDialog(t("grid.resetConfirm"), {
+      kind: "warning",
+    });
+
     if (!hasConfirmed) {
       return;
     }

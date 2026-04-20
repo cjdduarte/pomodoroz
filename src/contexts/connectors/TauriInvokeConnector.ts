@@ -222,46 +222,23 @@ const askResetFocusToIdle =
     const language = resolvePreferredLanguage();
     const copy = RESET_DIALOG_COPY[language];
 
-    try {
-      const shouldResetNow = await askDialog(copy.resetMessage, {
-        title: copy.resetTitle,
-        kind: "warning",
-      });
+    const shouldResetNow = await askDialog(copy.resetMessage, {
+      title: copy.resetTitle,
+      kind: "warning",
+    });
 
-      if (!shouldResetNow) {
-        return "cancel";
-      }
-
-      const shouldReclassify = await askDialog(copy.reclassifyMessage, {
-        title: copy.reclassifyTitle,
-        kind: "info",
-      });
-      if (shouldReclassify) {
-        return "yes";
-      }
-      return "no";
-    } catch (error: unknown) {
-      console.warn(
-        "[TAURI IPC] Failed to open native reset confirmation dialog. Falling back to window.confirm.",
-        error
-      );
-
-      const shouldResetNow = window.confirm(
-        `${copy.resetTitle}\n\n${copy.resetMessage}`
-      );
-
-      if (!shouldResetNow) {
-        return "cancel";
-      }
-
-      const shouldReclassify = window.confirm(
-        `${copy.reclassifyTitle}\n\n${copy.reclassifyMessage}`
-      );
-      if (shouldReclassify) {
-        return "yes";
-      }
-      return "no";
+    if (!shouldResetNow) {
+      return "cancel";
     }
+
+    const shouldReclassify = await askDialog(copy.reclassifyMessage, {
+      title: copy.reclassifyTitle,
+      kind: "info",
+    });
+    if (shouldReclassify) {
+      return "yes";
+    }
+    return "no";
   };
 
 const emitTasksExportResult = async (
