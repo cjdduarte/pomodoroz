@@ -87,17 +87,39 @@ jobs:
         run: |
           $tag = "$env:RELEASE_TAG"
           $version = $tag -replace '^v', ''
-          $content = Get-Content -Path "CHANGELOG.md" -Raw
           $escapedVersion = [regex]::Escape($version)
-          $pattern = "(?ms)^## \[$escapedVersion\] - .*\r?\n(?<body>.*?)(?=^## \[|\z)"
-          $match = [regex]::Match($content, $pattern)
+          $versionHeaderPattern = "^## \[$escapedVersion\] - "
+          $capture = $false
+          $done = $false
+          $bodyLines = New-Object System.Collections.Generic.List[string]
 
-          if (-not $match.Success) {
+          Get-Content -Path "CHANGELOG.md" | ForEach-Object {
+            if ($done) {
+              return
+            }
+
+            $line = $_
+            if (-not $capture) {
+              if ($line -match $versionHeaderPattern) {
+                $capture = $true
+              }
+              return
+            }
+
+            if ($line -match '^## \[') {
+              $done = $true
+              return
+            }
+
+            $bodyLines.Add($line)
+          }
+
+          if (-not $capture) {
             Write-Error "Missing changelog section for version [$version] in CHANGELOG.md."
             exit 1
           }
 
-          $notes = $match.Groups["body"].Value.Trim()
+          $notes = ($bodyLines -join [Environment]::NewLine).Trim()
           if ([string]::IsNullOrWhiteSpace($notes)) {
             Write-Error "Changelog section [$version] in CHANGELOG.md is empty."
             exit 1
