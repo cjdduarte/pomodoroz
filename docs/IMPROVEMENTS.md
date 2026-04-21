@@ -70,6 +70,7 @@ When an item is released:
 | A4  | Simplify `check-updates` to root-only narrative and flows                     | Done    | Medium   | Released in 26.4.28                         |
 | A5  | Controlled major updates (`eslint`/`@eslint/js` 10.x, `vite-plugin-svgr` 5.x) | Done    | Medium   | Batches 1/2/3 completed in 26.4.29 draft    |
 | A6  | Define automated test strategy (adopt baseline tests or remove idle stack)    | Blocked | High     | Deferred by decision (no tests changes now) |
+| A7  | Replace renderer `package.json` imports with injected app version metadata    | Open    | Medium   | Avoid shipping full manifest in UI bundles  |
 
 ### A0 — Tauri-only runtime consolidation
 
@@ -200,6 +201,18 @@ Decision checkpoint:
   - [ ] CI reflects the chosen strategy.
 - Suggested commit:
   - `chore(testing): define and apply project test strategy`
+
+### A7 — Renderer version source hardening
+
+- Scope checklist:
+  - [ ] Remove direct `package.json` imports from renderer components.
+  - [ ] Inject app version through build-time env (`import.meta.env`) or dedicated runtime bridge.
+  - [ ] Keep titlebar/settings version display behavior unchanged.
+- Validation checklist:
+  - [ ] `pnpm build:renderer`
+  - [ ] Confirm output bundles do not include full root package manifest object.
+- Suggested commit:
+  - `refactor(renderer): replace package-json imports with injected app version`
 
 ---
 

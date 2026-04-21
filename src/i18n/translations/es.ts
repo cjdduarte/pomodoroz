@@ -15,6 +15,13 @@ export const es = {
     longBreak: "Pausa larga",
     sessionRounds: "Rondas de sesión",
     specialBreaks: "Pausas especiales",
+    specialBreakSetterTitle: "Configurar pausa especial",
+    specialBreakSetterDescription:
+      "Configura tu pausa especial según tu rutina diaria.",
+    specialBreakFromLabel: "desde",
+    specialBreakToLabel: "hasta",
+    specialBreakDurationLabel: "Duración",
+    specialBreakInvalidDuration: "no es una duración válida.",
   },
   timer: {
     stayFocused: "Mantente enfocado",

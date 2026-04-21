@@ -4,7 +4,7 @@ import { useAppSelector, useAppDispatch } from "hooks/storeHooks";
 import {
   setStayFocus,
   setSessionRounds,
-  setShorBreak,
+  setShortBreak,
   setLongBreak,
 } from "store";
 import { StyledConfigSliderSection } from "styles";
@@ -42,7 +42,7 @@ const SliderSection: React.FC = () => {
       maxValue: 60,
       value: shortBreak,
       handleConfigChange: useCallback(
-        (value) => dispatch(setShorBreak(value)),
+        (value) => dispatch(setShortBreak(value)),
         [dispatch]
       ),
     },

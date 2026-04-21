@@ -207,17 +207,51 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
   const previousTimerTypeRef = useRef(timer.timerType);
   const trackingSegmentRef = useRef<TrackingSegment | null>(null);
   const pendingCycleCompletionRef = useRef(false);
+  const breakTransitionTimeoutRef = useRef<ReturnType<
+    typeof setTimeout
+  > | null>(null);
 
-  const setTimerDuration = useCallback((time: number) => {
-    setDuration(time * 60);
-    setCount(time * 60);
-    setLastCountTime(Date.now());
-    setHasNotified30Seconds(false);
-    if (time > 1) {
-      setHasNotified60Seconds(false);
+  const clearBreakTransitionTimeout = useCallback(() => {
+    if (breakTransitionTimeoutRef.current === null) {
+      return;
     }
-    setHasNotifiedBreak(false);
+
+    clearTimeout(breakTransitionTimeoutRef.current);
+    breakTransitionTimeoutRef.current = null;
   }, []);
+
+  const queueBreakTransition = useCallback(
+    (callback: () => void, delayMs: number) => {
+      clearBreakTransitionTimeout();
+
+      breakTransitionTimeoutRef.current = setTimeout(() => {
+        breakTransitionTimeoutRef.current = null;
+        callback();
+      }, delayMs);
+    },
+    [clearBreakTransitionTimeout]
+  );
+
+  const setTimerDuration = useCallback(
+    (time: number) => {
+      clearBreakTransitionTimeout();
+      setDuration(time * 60);
+      setCount(time * 60);
+      setLastCountTime(Date.now());
+      setHasNotified30Seconds(false);
+      if (time > 1) {
+        setHasNotified60Seconds(false);
+      }
+      setHasNotifiedBreak(false);
+    },
+    [clearBreakTransitionTimeout]
+  );
+
+  useEffect(() => {
+    return () => {
+      clearBreakTransitionTimeout();
+    };
+  }, [clearBreakTransitionTimeout]);
 
   const getMinuteLabel = useCallback(
     (value: number) =>
@@ -623,19 +657,11 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
     if (settings.notificationType === "extra") {
       if (count <= 60 && count > 0 && !hasNotified60Seconds) {
         setHasNotified60Seconds(true);
-        if (timer.timerType === TimerStatus.SHORT_BREAK) {
-          notification(
-            t("timer.notif60SecondsLeftTitle"),
-            { body: t("timer.notifPrepareFocusBody") },
-            settings.enableVoiceAssistance && sixtySecondsLeftWav
-          );
-        } else if (timer.timerType === TimerStatus.LONG_BREAK) {
-          notification(
-            t("timer.notif60SecondsLeftTitle"),
-            { body: t("timer.notifPrepareFocusBody") },
-            settings.enableVoiceAssistance && sixtySecondsLeftWav
-          );
-        } else if (timer.timerType === TimerStatus.SPECIAL_BREAK) {
+        if (
+          timer.timerType === TimerStatus.SHORT_BREAK ||
+          timer.timerType === TimerStatus.LONG_BREAK ||
+          timer.timerType === TimerStatus.SPECIAL_BREAK
+        ) {
           notification(
             t("timer.notif60SecondsLeftTitle"),
             { body: t("timer.notifPrepareFocusBody") },
@@ -670,7 +696,7 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
             ? TimerStatus.LONG_BREAK
             : TimerStatus.SHORT_BREAK;
 
-          setTimeout(
+          queueBreakTransition(
             () => {
               const breakNotificationBody =
                 nextBreakDuration <= 0
@@ -717,7 +743,7 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
         }
 
         case TimerStatus.SHORT_BREAK:
-          setTimeout(
+          queueBreakTransition(
             () => {
               notification(
                 t("timer.notifBreakFinishedTitle"),
@@ -742,7 +768,7 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
           break;
 
         case TimerStatus.LONG_BREAK:
-          setTimeout(
+          queueBreakTransition(
             () => {
               notification(
                 t("timer.notifBreakFinishedTitle"),
@@ -767,7 +793,7 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
           break;
 
         case TimerStatus.SPECIAL_BREAK:
-          setTimeout(() => {
+          queueBreakTransition(() => {
             notification(
               t("timer.notifBreakFinishedTitle"),
               {
@@ -804,6 +830,7 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
     settings.autoStartWorkTime,
     settings.enableVoiceAssistance,
     setTimerDuration,
+    queueBreakTransition,
     hasNotified30Seconds,
     hasNotified60Seconds,
     hasNotifiedBreak,

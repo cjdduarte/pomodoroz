@@ -17,8 +17,9 @@ export const useRippleEffect =
     if (current) Object.assign(current.style, buttonStyles);
 
     if (current) {
-      let x = e.pageX - current.offsetLeft;
-      let y = e.pageY - current.offsetTop;
+      const rect = current.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
 
       const rippleEl = document.createElement("span");
 

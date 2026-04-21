@@ -147,6 +147,10 @@ const SpecialField: React.FC<Props> = ({
   }, [values.fromTime, values.toTime]);
 
   useEffect(() => {
+    if (!showSetter) {
+      return;
+    }
+
     function registerEscape(e: KeyboardEvent) {
       if (e.code === "Escape") {
         setShowSetter(false);
@@ -156,7 +160,7 @@ const SpecialField: React.FC<Props> = ({
     document.addEventListener("keydown", registerEscape);
     return () =>
       document.removeEventListener("keydown", registerEscape);
-  }, []);
+  }, [showSetter]);
 
   return (
     <>
@@ -204,29 +208,28 @@ const SpecialField: React.FC<Props> = ({
           </StyledDetailCloseButton>
 
           <header>
-            <h3>Special Break Setter</h3>
-            <p>
-              Set your special break according to your daily routine.
-            </p>
+            <h3>{t("config.specialBreakSetterTitle")}</h3>
+            <p>{t("config.specialBreakSetterDescription")}</p>
           </header>
 
           <StyledSpecialBreakSetterSection>
             <Time
-              label="from"
+              label={t("config.specialBreakFromLabel")}
               name="fromTime"
               value={values.fromTime}
               onChange={getValues}
               error={errors.fromTime}
             />
             <Time
-              label="to"
+              label={t("config.specialBreakToLabel")}
               name="toTime"
               value={values.toTime}
               onChange={getValues}
               error={errors.toTime}
             />
             <StyledSpecialBreakDuration>
-              Duration:&nbsp;
+              {t("config.specialBreakDurationLabel")}
+              :&nbsp;
               {!values.duration ? (
                 ""
               ) : (values.duration || 0) < 5 && errors.duration ? (
@@ -235,7 +238,8 @@ const SpecialField: React.FC<Props> = ({
                   {values.duration === 1
                     ? t("units.min")
                     : t("units.mins")}
-                  &nbsp;is not a valid duration.
+                  &nbsp;
+                  {t("config.specialBreakInvalidDuration")}
                 </StyledSpecialBreakDurationSpan>
               ) : (
                 <StyledSpecialBreakDurationSpan>
@@ -251,7 +255,9 @@ const SpecialField: React.FC<Props> = ({
           </StyledSpecialBreakSetterSection>
 
           <StyledSpecialBreakAction>
-            <StyledButtonNormal type="submit">Save</StyledButtonNormal>
+            <StyledButtonNormal type="submit">
+              {t("tasks.save")}
+            </StyledButtonNormal>
           </StyledSpecialBreakAction>
         </StyledSpecialBreakSetter>
       )}

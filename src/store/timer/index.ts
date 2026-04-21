@@ -21,19 +21,10 @@ const timerSlice = createSlice({
     skipTimer(state, action: TimerPayload<"timerType">) {
       state.timerType = action.payload;
     },
-
-    restartTimer() {
-      return defaultTimer;
-    },
   },
 });
 
-export const {
-  setPlay,
-  setTimerType,
-  setRound,
-  skipTimer,
-  restartTimer,
-} = timerSlice.actions;
+export const { setPlay, setTimerType, setRound, skipTimer } =
+  timerSlice.actions;
 
 export default timerSlice.reducer;

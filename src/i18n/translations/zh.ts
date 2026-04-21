@@ -15,6 +15,12 @@ export const zh = {
     longBreak: "长休息",
     sessionRounds: "循环次数",
     specialBreaks: "特殊休息",
+    specialBreakSetterTitle: "特殊休息设置",
+    specialBreakSetterDescription: "根据你的日常节奏设置特殊休息。",
+    specialBreakFromLabel: "从",
+    specialBreakToLabel: "到",
+    specialBreakDurationLabel: "时长",
+    specialBreakInvalidDuration: "不是有效的时长。",
   },
   timer: {
     stayFocused: "专注",

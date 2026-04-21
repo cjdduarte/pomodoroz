@@ -15,6 +15,13 @@ export const ja = {
     longBreak: "長い休憩",
     sessionRounds: "セッション回数",
     specialBreaks: "特別休憩",
+    specialBreakSetterTitle: "特別休憩の設定",
+    specialBreakSetterDescription:
+      "日々のルーティンに合わせて特別休憩を設定します。",
+    specialBreakFromLabel: "開始",
+    specialBreakToLabel: "終了",
+    specialBreakDurationLabel: "時間",
+    specialBreakInvalidDuration: "は有効な時間ではありません。",
   },
   timer: {
     stayFocused: "集中",

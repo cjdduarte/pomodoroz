@@ -42,16 +42,40 @@ if (!getFromStorage(STATISTICS_STORAGE_KEY)) {
   saveToStorage(STATISTICS_STORAGE_KEY, store.getState().statistics);
 }
 
-store.subscribe(
-  debounce(() => {
-    saveToStorage("state", {
-      config: store.getState().config,
-      settings: store.getState().settings,
-      taskSelection: store.getState().taskSelection,
-      tasks: store.getState().tasks.present,
-    });
-    saveToStorage(STATISTICS_STORAGE_KEY, store.getState().statistics);
-  }, 1000)
-);
+const persistRootState = () => {
+  saveToStorage("state", {
+    config: store.getState().config,
+    settings: store.getState().settings,
+    taskSelection: store.getState().taskSelection,
+    tasks: store.getState().tasks.present,
+  });
+  saveToStorage(STATISTICS_STORAGE_KEY, store.getState().statistics);
+};
+
+const debouncedPersistRootState = debounce(persistRootState, 1000);
+
+store.subscribe(() => {
+  debouncedPersistRootState();
+});
+
+const flushPersistRootState = () => {
+  debouncedPersistRootState.flush();
+};
+
+if (typeof window !== "undefined") {
+  const flushOnPageLifecycleEvent = () => {
+    flushPersistRootState();
+  };
+
+  const onVisibilityChange = () => {
+    if (document.visibilityState === "hidden") {
+      flushOnPageLifecycleEvent();
+    }
+  };
+
+  window.addEventListener("beforeunload", flushOnPageLifecycleEvent);
+  window.addEventListener("pagehide", flushOnPageLifecycleEvent);
+  document.addEventListener("visibilitychange", onVisibilityChange);
+}
 
 export default store;

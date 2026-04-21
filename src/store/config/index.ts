@@ -16,7 +16,7 @@ const configSlice = createSlice({
       state.stayFocus = action.payload;
     },
 
-    setShorBreak(state, action: ConfigPayload<"shortBreak">) {
+    setShortBreak(state, action: ConfigPayload<"shortBreak">) {
       state.shortBreak = action.payload;
     },
 
@@ -68,7 +68,7 @@ export const {
   setLongBreak,
   setSecondSpecialBreak,
   setSessionRounds,
-  setShorBreak,
+  setShortBreak,
   setStayFocus,
   setThirdSpecialBreak,
   setFirstSpecialBreak,

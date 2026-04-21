@@ -1,6 +1,6 @@
 use crate::constants::{MAIN_TRAY_ID, TRAY_MENU_QUIT_ID, TRAY_MENU_RESTORE_ID};
 use rodio::{play, DeviceSinkBuilder};
-use std::{fs, io::Cursor, sync::Mutex, time::Duration};
+use std::{fs, io::Cursor, path::PathBuf, sync::Mutex, time::Duration};
 use tauri::{
     image::Image,
     menu::{MenuBuilder, MenuItemBuilder},
@@ -14,6 +14,7 @@ const WINDOW_FRAME_HEIGHT_FRAMELESS: f64 = 490.0;
 const WINDOW_COMPACT_BASE_HEIGHT: f64 = 100.0;
 const WINDOW_COMPACT_TITLEBAR_COMPENSATION: f64 = 40.0;
 const WINDOW_COMPACT_GRID_HEIGHT: f64 = 320.0;
+const MAX_IMPORT_FILE_BYTES: u64 = 5 * 1024 * 1024;
 
 const EVENT_FULLSCREEN_BREAK_ENTERED: &str = "FULLSCREEN_BREAK_ENTERED";
 const EVENT_FULLSCREEN_BREAK_EXITED: &str = "FULLSCREEN_BREAK_EXITED";
@@ -218,7 +219,26 @@ pub fn write_text_file(file_path: String, content: String) -> Result<(), String>
 
 #[tauri::command(rename_all = "camelCase")]
 pub fn read_text_file(file_path: String) -> Result<String, String> {
-    fs::read_to_string(file_path).map_err(map_error)
+    let path = PathBuf::from(file_path);
+
+    let extension = path
+        .extension()
+        .and_then(|value| value.to_str())
+        .map(|value| value.to_ascii_lowercase());
+    if extension.as_deref() != Some("json") {
+        return Err("Only .json files are allowed.".to_string());
+    }
+
+    let metadata = fs::metadata(&path).map_err(map_error)?;
+    if !metadata.is_file() {
+        return Err("Selected path is not a file.".to_string());
+    }
+
+    if metadata.len() > MAX_IMPORT_FILE_BYTES {
+        return Err("Selected file is too large.".to_string());
+    }
+
+    fs::read_to_string(path).map_err(map_error)
 }
 
 #[tauri::command(rename_all = "camelCase")]

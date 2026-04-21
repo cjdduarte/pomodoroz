@@ -15,6 +15,13 @@ export const en = {
     longBreak: "Long break",
     sessionRounds: "Session rounds",
     specialBreaks: "Special Breaks",
+    specialBreakSetterTitle: "Special Break Setter",
+    specialBreakSetterDescription:
+      "Set your special break according to your daily routine.",
+    specialBreakFromLabel: "from",
+    specialBreakToLabel: "to",
+    specialBreakDurationLabel: "Duration",
+    specialBreakInvalidDuration: "is not a valid duration.",
   },
   timer: {
     stayFocused: "Stay Focused",
