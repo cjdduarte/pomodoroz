@@ -54,6 +54,21 @@
 **Pomatez already supports flexible session timing** (it is not locked to 25/5).  
 Pomodoroz is not about "fixing flexibility"; it focuses on adding workflow features for common friction points: starting tasks, choosing what to do next, staying aware of time, and making breaks actually restorative.
 
+### Pomatez vs Pomodoroz (quick comparison)
+
+| Area                    | Pomatez (original)                                                                        | Pomodoroz (this fork)                                                                                 |
+| ----------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Runtime architecture    | Mixed workspace (`app/electron` + `app/tauri`) with legacy Electron scripts still present | Tauri-only runtime with dedicated `src-tauri/` and no Electron runtime path                           |
+| Frontend base           | React 16                                                                                  | React 19                                                                                              |
+| Tauri baseline          | Tauri 2 (alpha)                                                                           | Tauri `2.10.x` with explicit capabilities and pinned plugins                                          |
+| Main navigation         | Task list, Config, Timer, Settings                                                        | Adds **Statistics** route (period filters, breakdowns, and history cleanup)                           |
+| Task flow               | List-first task management                                                                | Adds **Study Rotation Grid** (list/grid toggle, daily color cycle, Draw button, right-click to Timer) |
+| Task-list import/export | No dedicated flow (data stays only in internal local storage)                             | Adds **JSON import/export for task lists/cards** with validation and merge/replace modes              |
+| Time awareness          | Notification levels                                                                       | Adds custom notification sound selection + optional idle tracking on focus reset                      |
+| Languages               | en/es/ja/zh                                                                               | Adds pt-BR (`pt`) and keeps existing languages                                                        |
+
+> Comparison date: 2026-04-21.
+
 ### Quick Start (suggested presets)
 
 - **Just Start** — 5 min focus / 1 min break
@@ -90,7 +105,7 @@ Pomodoroz is not about "fixing flexibility"; it focuses on adding workflow featu
 
 **Quality of life**
 
-- **JSON task import/export** (validation + merge/replace).
+- **JSON import/export for task lists and tasks** (validation + merge/replace).
 - **Enhanced compact mode** with expandable grid and actions menu.
 - **Custom notification sounds**.
 - **Right-click task selection** integrated with Timer flow.

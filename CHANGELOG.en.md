@@ -22,6 +22,7 @@
 - **Orphan `restartTimer` action removed from the `timer` slice** — dead renderer path was removed to reduce misuse surface.
 - **Tauri `read_text_file` command hardened for task import flow** — file reads now enforce `.json` extension, reject non-file paths, and cap payload size (5 MB).
 - **Technical roadmap updated with explicit renderer-versioning follow-up** — `docs/IMPROVEMENTS.md` now includes item `A7` to migrate UI version display away from `package.json` bundle dependency in a future cycle.
+- **EN/PT READMEs now include an objective Pomatez vs Pomodoroz comparison** — added a compact table section outlining architecture, stack, and feature differences.
 
 ## [26.4.30] - 2026-04-20
 

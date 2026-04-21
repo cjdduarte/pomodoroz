@@ -22,6 +22,7 @@
 - **Action órfã `restartTimer` removida do slice `timer`** — caminho sem consumidores no renderer foi eliminado para reduzir superfície de uso indevido.
 - **Comando Tauri `read_text_file` endurecido para import de tarefas** — leitura agora valida extensão `.json`, recusa caminhos não-arquivo e limita tamanho do payload (5 MB).
 - **Roadmap técnico atualizado com pendência explícita para versionamento no renderer** — `docs/IMPROVEMENTS.md` recebeu o item `A7` para migrar exibição de versão e remover dependência de `package.json` no bundle da UI em ciclo futuro.
+- **README EN/PT ganhou comparação objetiva entre Pomatez original e Pomodoroz** — adicionada seção "Pomatez vs Pomodoroz" com diferenças de arquitetura, stack e funcionalidades em formato de tabela compacta.
 
 ## [26.4.30] - 2026-04-20
 
