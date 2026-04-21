@@ -138,6 +138,8 @@ export const en = {
     languageChinese: "Chinese",
     languageJapanese: "Japanese",
     languagePortuguese: "Portuguese (Brazil)",
+    languageGerman: "German",
+    languageFrench: "French",
     alertHeading: "Hi 👋,",
     alertBody:
       "If you like the app, consider giving it a ⭐ on GitHub and/or buying me a ☕.",

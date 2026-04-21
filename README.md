@@ -69,7 +69,6 @@ Pomodoroz is not about "fixing flexibility"; it focuses on adding workflow featu
 | Grid footer (current status) | none                                                                                      | Shows total, visited, and remaining counters                                                                  |
 | Task-list import/export      | No dedicated flow (data stays only in internal local storage)                             | Adds **JSON import/export for task lists/cards** with validation and merge/replace modes                      |
 | Idle counting                | none                                                                                      | Report includes idle time by period + optional focus-to-idle reclassification on reset                        |
-| Time awareness               | Notification levels                                                                       | Adds custom notification sound selection + optional idle tracking on focus reset                              |
 | Languages                    | en/es/ja/zh                                                                               | Adds pt-BR (`pt`)                                                                                             |
 
 > Comparison date: 2026-04-21.

@@ -9,6 +9,8 @@ export const supportedLanguages: Array<{
   { code: "zh", label: "Chinese / 中文" },
   { code: "ja", label: "Japanese / 日本語" },
   { code: "pt", label: "Portuguese (Brazil) / Português (Brasil)" },
+  { code: "de", label: "German / Deutsch" },
+  { code: "fr", label: "French / Français" },
 ];
 
 export const fallbackLanguage: LanguageCode = "en";

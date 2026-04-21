@@ -139,6 +139,8 @@ export const es = {
     languageChinese: "Chino",
     languageJapanese: "Japonés",
     languagePortuguese: "Portugués (Brasil)",
+    languageGerman: "Alemán",
+    languageFrench: "Francés",
     alertHeading: "Hola,",
     alertBody:
       "Si te gusta la app, considera darle una ⭐ en GitHub y/o invitarme a un ☕.",

@@ -40,7 +40,9 @@ const isLanguageOption = (
     value === "es" ||
     value === "zh" ||
     value === "ja" ||
-    value === "pt"
+    value === "pt" ||
+    value === "de" ||
+    value === "fr"
   );
 };
 

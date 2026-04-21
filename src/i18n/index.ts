@@ -12,6 +12,8 @@ import { es } from "./translations/es";
 import { zh } from "./translations/zh";
 import { ja } from "./translations/ja";
 import { pt } from "./translations/pt";
+import { de } from "./translations/de";
+import { fr } from "./translations/fr";
 
 const resources = {
   en: { translation: en },
@@ -19,6 +21,8 @@ const resources = {
   zh: { translation: zh },
   ja: { translation: ja },
   pt: { translation: pt },
+  de: { translation: de },
+  fr: { translation: fr },
 };
 
 const storedState = getFromStorage<{

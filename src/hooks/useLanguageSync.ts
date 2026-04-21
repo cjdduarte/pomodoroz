@@ -6,6 +6,16 @@ import {
   normalizeLanguageCode,
 } from "i18n/languages";
 
+const syncLanguageToDom = (language: string) => {
+  if (typeof document === "undefined") {
+    return;
+  }
+
+  if (document.documentElement.lang !== language) {
+    document.documentElement.lang = language;
+  }
+};
+
 const useLanguageSync = () => {
   const language = useAppSelector((state) => state.settings.language);
 
@@ -18,6 +28,8 @@ const useLanguageSync = () => {
     if (i18n.language !== resolvedLanguage) {
       i18n.changeLanguage(resolvedLanguage);
     }
+
+    syncLanguageToDom(resolvedLanguage);
   }, [language]);
 
   useEffect(() => {
@@ -31,6 +43,8 @@ const useLanguageSync = () => {
       if (i18n.language !== resolvedLanguage) {
         i18n.changeLanguage(resolvedLanguage);
       }
+
+      syncLanguageToDom(resolvedLanguage);
     };
 
     window.addEventListener("languagechange", handleLanguageChange);

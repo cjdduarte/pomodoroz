@@ -23,6 +23,9 @@
 - **Comando Tauri `read_text_file` endurecido para import de tarefas** — leitura agora valida extensão `.json`, recusa caminhos não-arquivo e limita tamanho do payload (5 MB).
 - **Roadmap técnico atualizado com pendência explícita para versionamento no renderer** — `docs/IMPROVEMENTS.md` recebeu o item `A7` para migrar exibição de versão e remover dependência de `package.json` no bundle da UI em ciclo futuro.
 - **README EN/PT ganhou comparação objetiva entre Pomatez original e Pomodoroz** — adicionada seção "Pomatez vs Pomodoroz" com diferenças de arquitetura, stack e funcionalidades em formato de tabela compacta.
+- **Cobertura de idiomas ampliada para Alemão e Francês (`de`/`fr`)** — `LanguageCode`, validação de settings, `supportedLanguages`, recursos do i18n e novas traduções completas foram atualizados para suportar os dois idiomas no renderer.
+- **Localização da bandeja no Tauri alinhada aos novos idiomas já no bootstrap nativo** — `TRAY_COPY_BY_LANGUAGE` foi expandido no renderer e o fallback inicial em Rust (`resolve_tray_copy`) passou a reconhecer `es/zh/ja/pt/de/fr` (com fallback seguro para `en`).
+- **Guia operacional para adicionar novos idiomas foi documentado** — novo `docs/LANGUAGE_EXPANSION_GUIDE.md` lista arquivos obrigatórios, checklist de implementação e validação pós-implantação.
 
 ## [26.4.30] - 2026-04-20
 

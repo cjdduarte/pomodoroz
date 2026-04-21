@@ -25,7 +25,14 @@ export type SettingTypes = {
   language: LanguageOption;
 };
 
-export type LanguageCode = "en" | "es" | "zh" | "ja" | "pt";
+export type LanguageCode =
+  | "en"
+  | "es"
+  | "zh"
+  | "ja"
+  | "pt"
+  | "de"
+  | "fr";
 
 export type LanguageOption = "auto" | LanguageCode;
 

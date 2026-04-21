@@ -82,6 +82,16 @@ const TRAY_COPY_BY_LANGUAGE: Record<LanguageCode, TrayCopy> = {
     quitLabel: "Sair",
     tooltip: "Pomodoroz",
   },
+  de: {
+    restoreLabel: "Pomodoroz wiederherstellen",
+    quitLabel: "Beenden",
+    tooltip: "Pomodoroz",
+  },
+  fr: {
+    restoreLabel: "Restaurer Pomodoroz",
+    quitLabel: "Quitter",
+    tooltip: "Pomodoroz",
+  },
 };
 
 const resolveTrayLanguage = (language: string): LanguageCode => {

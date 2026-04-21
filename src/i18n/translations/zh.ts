@@ -134,6 +134,8 @@ export const zh = {
     languageChinese: "中文",
     languageJapanese: "日语",
     languagePortuguese: "葡萄牙语（巴西）",
+    languageGerman: "德语",
+    languageFrench: "法语",
     alertHeading: "你好 👋,",
     alertBody:
       "如果你喜欢这个应用，欢迎在 GitHub 点个⭐，和/或请我喝杯☕。",

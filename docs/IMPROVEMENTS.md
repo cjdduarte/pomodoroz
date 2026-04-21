@@ -61,16 +61,17 @@ When an item is released:
 
 ## 2. Track A — Conversion Hardening (Tauri-only)
 
-| ID  | Item                                                                          | Status  | Priority | Notes                                       |
-| --- | ----------------------------------------------------------------------------- | ------- | -------- | ------------------------------------------- |
-| A0  | Consolidate runtime to Tauri-only and remove browser fallback branches        | Done    | High     | Released in 26.4.28                         |
-| A1  | Resolve titlebar legacy CSS/changelog divergence (`-webkit-app-region`)       | Done    | High     | Released in 26.4.28                         |
-| A2  | `.env` hygiene (`app/renderer/.env` tracked)                                  | Done    | High     | Completed and registered in 26.4.29 draft   |
-| A3  | Persist custom shortcuts (`Shortcut.tsx` TODO)                                | Open    | Medium   | Avoid loss after restart                    |
-| A4  | Simplify `check-updates` to root-only narrative and flows                     | Done    | Medium   | Released in 26.4.28                         |
-| A5  | Controlled major updates (`eslint`/`@eslint/js` 10.x, `vite-plugin-svgr` 5.x) | Done    | Medium   | Batches 1/2/3 completed in 26.4.29 draft    |
-| A6  | Define automated test strategy (adopt baseline tests or remove idle stack)    | Blocked | High     | Deferred by decision (no tests changes now) |
-| A7  | Replace renderer `package.json` imports with injected app version metadata    | Open    | Medium   | Avoid shipping full manifest in UI bundles  |
+| ID  | Item                                                                          | Status      | Priority | Notes                                       |
+| --- | ----------------------------------------------------------------------------- | ----------- | -------- | ------------------------------------------- |
+| A0  | Consolidate runtime to Tauri-only and remove browser fallback branches        | Done        | High     | Released in 26.4.28                         |
+| A1  | Resolve titlebar legacy CSS/changelog divergence (`-webkit-app-region`)       | Done        | High     | Released in 26.4.28                         |
+| A2  | `.env` hygiene (`app/renderer/.env` tracked)                                  | Done        | High     | Completed and registered in 26.4.29 draft   |
+| A3  | Persist custom shortcuts (`Shortcut.tsx` TODO)                                | Open        | Medium   | Avoid loss after restart                    |
+| A4  | Simplify `check-updates` to root-only narrative and flows                     | Done        | Medium   | Released in 26.4.28                         |
+| A5  | Controlled major updates (`eslint`/`@eslint/js` 10.x, `vite-plugin-svgr` 5.x) | Done        | Medium   | Batches 1/2/3 completed in 26.4.29 draft    |
+| A6  | Define automated test strategy (adopt baseline tests or remove idle stack)    | Blocked     | High     | Deferred by decision (no tests changes now) |
+| A7  | Replace renderer `package.json` imports with injected app version metadata    | Open        | Medium   | Avoid shipping full manifest in UI bundles  |
+| A8  | Expand i18n language coverage (`de`/`fr`) with tray/startup parity            | In Progress | High     | Keep renderer + native tray locale in sync  |
 
 ### A0 — Tauri-only runtime consolidation
 
@@ -214,6 +215,26 @@ Decision checkpoint:
 - Suggested commit:
   - `refactor(renderer): replace package-json imports with injected app version`
 
+### A8 — i18n language expansion hardening (`de`/`fr`)
+
+- Scope checklist:
+  - [x] Extend language contract (`LanguageCode` and settings validation).
+  - [x] Register `de`/`fr` in renderer i18n resources and language selector source.
+  - [x] Add translation files with full key parity against `en`.
+  - [x] Extend tray copy mapping in renderer (`TRAY_COPY_BY_LANGUAGE`).
+  - [x] Extend Rust startup tray locale mapping (`resolve_tray_copy`).
+  - [x] Add maintenance guide for future language additions in `docs/`.
+- Validation checklist:
+  - [ ] Manual: switch to `de` and `fr` in Settings and verify full UI copy.
+  - [ ] Manual: set language to `auto` and validate locale detection behavior.
+  - [ ] Manual: launch app with OS locale `de_*` and `fr_*`; verify tray startup labels.
+  - [ ] Manual: confirm tray labels remain aligned after renderer sync.
+  - [x] `pnpm typecheck:renderer`
+  - [x] `pnpm build:renderer`
+  - [x] `cargo check --manifest-path src-tauri/Cargo.toml`
+- Suggested commit:
+  - `feat(i18n): add de/fr locales and align tray startup localization`
+
 ---
 
 ## 3. Track B — Product Features
@@ -243,7 +264,7 @@ Current product baseline:
   - [ ] Implement rotating break suggestion copy.
 - Validation checklist:
   - [ ] Manual E2E: timer start -> focus end -> extend -> break flow.
-  - [ ] Verify i18n keys in `en/pt/es/ja/zh`.
+  - [ ] Verify i18n keys in `en/pt/es/ja/zh/de/fr`.
 - Suggested commit:
   - `feat(timer): add cadence presets, session extension, and break suggestions`
 

@@ -87,24 +87,56 @@ fn resolve_linux_tray_temp_dir() -> PathBuf {
 }
 
 fn resolve_tray_copy() -> TrayCopy {
-    let locale = ["LC_ALL", "LC_MESSAGES", "LANG"]
+    let raw_locale = ["LC_ALL", "LC_MESSAGES", "LANG"]
         .iter()
         .find_map(|key| std::env::var(key).ok())
         .unwrap_or_default()
         .to_lowercase();
 
-    if locale.starts_with("pt") {
-        TrayCopy {
+    let language = raw_locale
+        .split(['.', '@'])
+        .next()
+        .unwrap_or_default()
+        .split(['-', '_'])
+        .next()
+        .unwrap_or_default();
+
+    match language {
+        "pt" => TrayCopy {
             restore_label: "Restaurar Pomodoroz",
             quit_label: "Sair",
             tooltip: "Pomodoroz",
-        }
-    } else {
-        TrayCopy {
+        },
+        "es" => TrayCopy {
+            restore_label: "Restaurar Pomodoroz",
+            quit_label: "Salir",
+            tooltip: "Pomodoroz",
+        },
+        "zh" => TrayCopy {
+            restore_label: "还原 Pomodoroz",
+            quit_label: "退出",
+            tooltip: "Pomodoroz",
+        },
+        "ja" => TrayCopy {
+            restore_label: "Pomodoroz を復元",
+            quit_label: "終了",
+            tooltip: "Pomodoroz",
+        },
+        "de" => TrayCopy {
+            restore_label: "Pomodoroz wiederherstellen",
+            quit_label: "Beenden",
+            tooltip: "Pomodoroz",
+        },
+        "fr" => TrayCopy {
+            restore_label: "Restaurer Pomodoroz",
+            quit_label: "Quitter",
+            tooltip: "Pomodoroz",
+        },
+        _ => TrayCopy {
             restore_label: "Restore Pomodoroz",
             quit_label: "Quit",
             tooltip: "Pomodoroz",
-        }
+        },
     }
 }
 

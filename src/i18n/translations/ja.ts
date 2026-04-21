@@ -138,6 +138,8 @@ export const ja = {
     languageChinese: "中国語",
     languageJapanese: "日本語",
     languagePortuguese: "ポルトガル語（ブラジル）",
+    languageGerman: "ドイツ語",
+    languageFrench: "フランス語",
     alertHeading: "こんにちは 👋,",
     alertBody:
       "このアプリが気に入ったら、GitHubで⭐を付けてくれるか、☕をごちそうしてくれると嬉しいです。",

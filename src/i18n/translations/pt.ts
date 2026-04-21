@@ -138,6 +138,8 @@ export const pt = {
     languageChinese: "Chinês",
     languageJapanese: "Japonês",
     languagePortuguese: "Português (Brasil)",
+    languageGerman: "Alemão",
+    languageFrench: "Francês",
     alertHeading: "Olá 👋,",
     alertBody:
       "Se curtir o app, considere dar uma ⭐ no GitHub e/ou me pagar um ☕.",
