@@ -333,26 +333,26 @@ Invoke-PnpmChecked -Arguments @("version:sync", $targetVersion)
 
 Step "Validando entradas de changelog para $targetVersion"
 $escapedVersion = [regex]::Escape($targetVersion)
-$ptMatch = Select-String -Path (Join-Path $ROOT "CHANGELOG.md") -Pattern "^## \[$escapedVersion\] - (.+)$" | Select-Object -First 1
+$ptMatch = Select-String -Path (Join-Path $ROOT "CHANGELOG.pt.md") -Pattern "^## \[$escapedVersion\] - (.+)$" | Select-Object -First 1
 if (-not $ptMatch) {
-    Fail "CHANGELOG.md sem cabecalho de versao com data para [$targetVersion]. Esperado: ## [$targetVersion] - YYYY-MM-DD"
+    Fail "CHANGELOG.pt.md sem cabecalho de versao com data para [$targetVersion]. Esperado: ## [$targetVersion] - YYYY-MM-DD"
 }
-$enMatch = Select-String -Path (Join-Path $ROOT "CHANGELOG.en.md") -Pattern "^## \[$escapedVersion\] - (.+)$" | Select-Object -First 1
+$enMatch = Select-String -Path (Join-Path $ROOT "CHANGELOG.md") -Pattern "^## \[$escapedVersion\] - (.+)$" | Select-Object -First 1
 if (-not $enMatch) {
-    Fail "CHANGELOG.en.md sem cabecalho de versao com data para [$targetVersion]. Esperado: ## [$targetVersion] - YYYY-MM-DD"
+    Fail "CHANGELOG.md sem cabecalho de versao com data para [$targetVersion]. Esperado: ## [$targetVersion] - YYYY-MM-DD"
 }
 
 $ptDate = $ptMatch.Matches[0].Groups[1].Value.Trim()
 $enDate = $enMatch.Matches[0].Groups[1].Value.Trim()
 
 if ($ptDate -notmatch "^\d{4}-\d{2}-\d{2}$") {
-    Fail "CHANGELOG.md para [$targetVersion] precisa de data final no formato YYYY-MM-DD. Atual: '$ptDate'"
+    Fail "CHANGELOG.pt.md para [$targetVersion] precisa de data final no formato YYYY-MM-DD. Atual: '$ptDate'"
 }
 if ($enDate -notmatch "^\d{4}-\d{2}-\d{2}$") {
-    Fail "CHANGELOG.en.md para [$targetVersion] precisa de data final no formato YYYY-MM-DD. Atual: '$enDate'"
+    Fail "CHANGELOG.md para [$targetVersion] precisa de data final no formato YYYY-MM-DD. Atual: '$enDate'"
 }
 if ($ptDate -ne $enDate) {
-    Fail "Datas divergentes entre CHANGELOG.md ($ptDate) e CHANGELOG.en.md ($enDate) para [$targetVersion]."
+    Fail "Datas divergentes entre CHANGELOG.pt.md ($ptDate) e CHANGELOG.md ($enDate) para [$targetVersion]."
 }
 
 Confirm-SkipValidateIfNeeded
@@ -371,7 +371,7 @@ $releaseFiles = @(
     "src-tauri/Cargo.toml",
     "src-tauri/Cargo.lock",
     "CHANGELOG.md",
-    "CHANGELOG.en.md"
+    "CHANGELOG.pt.md"
 )
 
 $gitAddArguments = @("-C", $ROOT, "add") + $releaseFiles

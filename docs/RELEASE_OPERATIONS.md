@@ -33,8 +33,8 @@ Updater metadata source:
 
 1. Define target version (example: `26.4.24`).
 2. Update both changelogs for this version:
-   - `CHANGELOG.md` (PT)
-   - `CHANGELOG.en.md` (EN)
+   - `CHANGELOG.md` (EN)
+   - `CHANGELOG.pt.md` (PT)
 3. Keep next version as `A definir` / `TBD`; set final date only on release day.
 4. In AI-assisted flow, the agent must set `YYYY-MM-DD` in both changelog headers before suggesting release scripts.
 5. Run release script:
@@ -55,7 +55,7 @@ Updater metadata source:
    - `release-windows` (build NSIS + upload signed updater assets)
    - `release-linux` (build AppImage + upload signed updater assets)
    - `sync-latest-json` (merge and upload `latest.json`)
-3. GitHub Release body is auto-filled from the matching section in `CHANGELOG.md` (`## [x.y.z] - ...`) and kept in sync on reruns.
+3. GitHub Release body is auto-filled from the matching section in `CHANGELOG.md` (EN, `## [x.y.z] - ...`) and kept in sync on reruns.
 4. Workflow can also be started manually (`workflow_dispatch`) with target:
    - `all`
    - `windows`

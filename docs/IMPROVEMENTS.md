@@ -2,7 +2,7 @@
 
 > Single source of truth for **pending improvements**.
 >
-> Implemented changes belong in `CHANGELOG.md` / `CHANGELOG.en.md`.
+> Implemented changes belong in `CHANGELOG.md` / `CHANGELOG.pt.md`.
 > Release procedures belong in `RELEASE_OPERATIONS.md`.
 
 ---
@@ -32,7 +32,7 @@ For each item, use this structure:
 When an item is released:
 
 1. Mark it `Done` here.
-2. Add implementation details to `CHANGELOG.md` and `CHANGELOG.en.md`.
+2. Add implementation details to `CHANGELOG.md` and `CHANGELOG.pt.md`.
 3. Remove unnecessary detail from this roadmap in the next planning cycle.
 
 ### Current checkpoint (2026-04-20)
@@ -93,7 +93,7 @@ When an item is released:
 
 Resolution status (code):
 
-- `CHANGELOG.md` / `CHANGELOG.en.md` for `26.4.26` stated that `-webkit-app-region` rules were removed.
+- `CHANGELOG.md` / `CHANGELOG.pt.md` for `26.4.26` stated that `-webkit-app-region` rules were removed.
 - Release `26.4.28` carried the corrective entry and code is aligned (legacy rules removed from `src/styles/components/titlebar.ts`).
 - Dragging remains on current Tauri runtime through:
   - `data-tauri-drag-region` in `src/components/Titlebar.tsx`

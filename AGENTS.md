@@ -40,7 +40,7 @@
 
 | What                         | Where                                          |
 | ---------------------------- | ---------------------------------------------- |
-| Implemented changes          | `CHANGELOG.md` (PT) and `CHANGELOG.en.md` (EN) |
+| Implemented changes          | `CHANGELOG.md` (EN) and `CHANGELOG.pt.md` (PT) |
 | Pending improvements roadmap | `docs/IMPROVEMENTS.md`                         |
 | Migration closure reference  | `docs/MIGRATION_TO_TAURI.md`                   |
 | Release/update operations    | `docs/RELEASE_OPERATIONS.md`                   |
@@ -52,7 +52,7 @@ Do not create loose specs/checklists for topics already covered in the documents
 ### Changelog Rules
 
 1. Source of truth for GitHub Release notes: `CHANGELOG.md` section `## [x.y.z]`.
-2. Before creating a tag/release, update both `CHANGELOG.md` and `CHANGELOG.en.md`.
+2. Before creating a tag/release, update both `CHANGELOG.md` and `CHANGELOG.pt.md`.
 3. Never edit items of an already-published version; new changes go in the next version.
 4. Keep the next version at the top as `A definir` (PT) / `TBD` (EN); set date only on release day.
 5. Do not create tag `v*` without a valid entry in both changelogs.

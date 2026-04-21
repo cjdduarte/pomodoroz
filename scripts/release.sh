@@ -170,7 +170,7 @@ build_release_git_add_cmd() {
     "src-tauri/Cargo.toml"
     "src-tauri/Cargo.lock"
     "CHANGELOG.md"
-    "CHANGELOG.en.md"
+    "CHANGELOG.pt.md"
   )
 
   local cmd="cd \"$APP_DIR\" && git add"
@@ -299,28 +299,28 @@ run_cmd "cd \"$APP_DIR\" && pnpm version:sync \"$TARGET_VERSION\""
 
 step "Validando entradas de changelog para $TARGET_VERSION"
 pt_date="$(
-  rg -m1 "^## \\[$TARGET_VERSION\\] - " "$APP_DIR/CHANGELOG.md" \
+  rg -m1 "^## \\[$TARGET_VERSION\\] - " "$APP_DIR/CHANGELOG.pt.md" \
     | sed -E "s/^## \\[$TARGET_VERSION\\] - //"
 )"
 en_date="$(
-  rg -m1 "^## \\[$TARGET_VERSION\\] - " "$APP_DIR/CHANGELOG.en.md" \
+  rg -m1 "^## \\[$TARGET_VERSION\\] - " "$APP_DIR/CHANGELOG.md" \
     | sed -E "s/^## \\[$TARGET_VERSION\\] - //"
 )"
 
 if [[ -z "$pt_date" ]]; then
-  die "CHANGELOG.md sem cabecalho de versao com data para [$TARGET_VERSION]. Esperado: ## [$TARGET_VERSION] - YYYY-MM-DD"
+  die "CHANGELOG.pt.md sem cabecalho de versao com data para [$TARGET_VERSION]. Esperado: ## [$TARGET_VERSION] - YYYY-MM-DD"
 fi
 if [[ -z "$en_date" ]]; then
-  die "CHANGELOG.en.md sem cabecalho de versao com data para [$TARGET_VERSION]. Esperado: ## [$TARGET_VERSION] - YYYY-MM-DD"
+  die "CHANGELOG.md sem cabecalho de versao com data para [$TARGET_VERSION]. Esperado: ## [$TARGET_VERSION] - YYYY-MM-DD"
 fi
 if ! [[ "$pt_date" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
-  die "CHANGELOG.md para [$TARGET_VERSION] precisa de data final no formato YYYY-MM-DD. Atual: '$pt_date'"
+  die "CHANGELOG.pt.md para [$TARGET_VERSION] precisa de data final no formato YYYY-MM-DD. Atual: '$pt_date'"
 fi
 if ! [[ "$en_date" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
-  die "CHANGELOG.en.md para [$TARGET_VERSION] precisa de data final no formato YYYY-MM-DD. Atual: '$en_date'"
+  die "CHANGELOG.md para [$TARGET_VERSION] precisa de data final no formato YYYY-MM-DD. Atual: '$en_date'"
 fi
 if [[ "$pt_date" != "$en_date" ]]; then
-  die "Datas divergentes entre CHANGELOG.md ($pt_date) e CHANGELOG.en.md ($en_date) para [$TARGET_VERSION]."
+  die "Datas divergentes entre CHANGELOG.pt.md ($pt_date) e CHANGELOG.md ($en_date) para [$TARGET_VERSION]."
 fi
 
 confirm_skip_validate_if_needed

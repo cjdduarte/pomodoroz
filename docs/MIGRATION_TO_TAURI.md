@@ -5,7 +5,7 @@ The Electron-to-Tauri migration is closed.
 Current state:
 
 - Runtime: **Tauri-only**.
-- Implemented history: `CHANGELOG.md` / `CHANGELOG.en.md`.
+- Implemented history: `CHANGELOG.md` / `CHANGELOG.pt.md`.
 - Pending improvements (technical + product): `docs/IMPROVEMENTS.md`.
 - Release operations: `docs/RELEASE_OPERATIONS.md`.
 - Next execution order after `26.4.27`: `docs/IMPROVEMENTS.md` section **"Next execution order (after 26.4.27)"**.

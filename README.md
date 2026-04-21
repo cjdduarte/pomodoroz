@@ -69,7 +69,7 @@ Pomodoroz is not about "fixing flexibility"; it focuses on adding workflow featu
 | Grid footer (current status) | none                                                                                      | Shows total, visited, and remaining counters                                                                  |
 | Task-list import/export      | No dedicated flow (data stays only in internal local storage)                             | Adds **JSON import/export for task lists/cards** with validation and merge/replace modes                      |
 | Idle counting                | none                                                                                      | Report includes idle time by period + optional focus-to-idle reclassification on reset                        |
-| Languages                    | en/es/ja/zh                                                                               | Adds pt-BR (`pt`)                                                                                             |
+| Languages                    | English (`en`), Spanish (`es`), Japanese (`ja`), Chinese (`zh`)                           | Adds Portuguese (Brazil) (`pt`), German (`de`), and French (`fr`)                                             |
 
 > Comparison date: 2026-04-21.
 
@@ -118,7 +118,7 @@ Pomodoroz is not about "fixing flexibility"; it focuses on adding workflow featu
 
 ### Evidence and history
 
-- Implemented deliveries: [CHANGELOG.en.md](CHANGELOG.en.md)
+- Implemented deliveries: [CHANGELOG.md](CHANGELOG.md)
 - Pending improvements roadmap: [docs/IMPROVEMENTS.md](docs/IMPROVEMENTS.md)
 - Migration closure reference: [docs/MIGRATION_TO_TAURI.md](docs/MIGRATION_TO_TAURI.md)
 

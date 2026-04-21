@@ -13,7 +13,7 @@ Pomodoroz is a cross-platform Pomodoro desktop app, forked from [Pomatez](https:
 | Document                           | Purpose                                            |
 | ---------------------------------- | -------------------------------------------------- |
 | `AGENTS.md`                        | Agent operational rules                            |
-| `CHANGELOG.md` / `CHANGELOG.en.md` | Implemented changes                                |
+| `CHANGELOG.md` / `CHANGELOG.pt.md` | Implemented changes                                |
 | `docs/IMPROVEMENTS.md`             | Pending improvements roadmap (technical + product) |
 | `docs/MIGRATION_TO_TAURI.md`       | Migration closure reference                        |
 | `docs/RELEASE_OPERATIONS.md`       | Release flow, updater pipeline, validation         |
@@ -119,7 +119,7 @@ State persistence is local (`localStorage` + native layer where applicable).
 ## Key Policies
 
 - **Updater feed**: keep updater endpoints pointing to this fork (`cjdduarte/pomodoroz`).
-- **Documentation**: log implemented changes in `CHANGELOG.md` and `CHANGELOG.en.md`.
+- **Documentation**: log implemented changes in `CHANGELOG.md` and `CHANGELOG.pt.md`.
 - **Release Notes Source of Truth**: GitHub Release title/notes are generated from `CHANGELOG.md` section `## [x.y.z]`.
 - **Changelog Fill Rule**: never add new items to a published version; keep next version at top as `A definir` (PT) / `TBD` (EN), set date only on release day.
 - **Agent Release Prompt Rule**: before suggesting `./scripts/release.sh` or `./scripts/release.ps1`, the agent must set `YYYY-MM-DD` in both changelog headers of the target version.

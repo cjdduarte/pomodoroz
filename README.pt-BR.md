@@ -69,7 +69,7 @@ O objetivo do Pomodoroz não é "corrigir flexibilidade", e sim adicionar recurs
 | Rodapé da grade (status atual)  | Não                                                                                            | Mostra contadores de total, visitadas e restantes                                                                 |
 | Importação/Exportação de listas | Sem fluxo dedicado (dados ficam apenas no armazenamento local interno)                         | Adiciona **importação/exportação JSON de listas/cartões** com validação e modos merge/substituição                |
 | Contagem de ociosidade          | Não                                                                                            | Relatório inclui tempo ocioso por período + opção de mover foco para Ocioso no reset                              |
-| Idiomas                         | en/es/ja/zh                                                                                    | Adiciona pt-BR (`pt`)                                                                                             |
+| Idiomas                         | Inglês (`en`), Espanhol (`es`), Japonês (`ja`), Chinês (`zh`)                                  | Adiciona Português (Brasil) (`pt`), Alemão (`de`) e Francês (`fr`)                                                |
 
 > Data da comparação: 2026-04-21.
 
@@ -118,7 +118,7 @@ O objetivo do Pomodoroz não é "corrigir flexibilidade", e sim adicionar recurs
 
 ### Evidências e histórico
 
-- Entregas implementadas: [CHANGELOG.md](CHANGELOG.md)
+- Entregas implementadas: [CHANGELOG.pt.md](CHANGELOG.pt.md)
 - Roadmap de melhorias pendentes: [docs/IMPROVEMENTS.md](docs/IMPROVEMENTS.md)
 - Referência de encerramento da migração: [docs/MIGRATION_TO_TAURI.md](docs/MIGRATION_TO_TAURI.md)
 
