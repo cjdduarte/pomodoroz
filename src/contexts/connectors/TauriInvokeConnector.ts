@@ -80,10 +80,33 @@ const toInvokeArgs = (payload: unknown): Record<string, unknown> =>
 
 let updaterPolicySyncPromise: Promise<void> | null = null;
 let updaterInstallPromise: Promise<void> | null = null;
+let updaterChannelSupportPromise: Promise<boolean> | null = null;
 
 type TauriUpdateHandle = NonNullable<
   Awaited<ReturnType<typeof checkForUpdates>>
 >;
+
+const isUpdaterChannelSupported = async (): Promise<boolean> => {
+  if (updaterChannelSupportPromise) {
+    return updaterChannelSupportPromise;
+  }
+
+  updaterChannelSupportPromise = invoke<boolean>(
+    "is_updater_channel_supported"
+  )
+    .catch((error: unknown) => {
+      console.warn(
+        "[TAURI Updater] Failed to determine updater channel support.",
+        error
+      );
+      return false;
+    })
+    .finally(() => {
+      updaterChannelSupportPromise = null;
+    });
+
+  return updaterChannelSupportPromise;
+};
 
 const closeUpdateHandle = async (updateHandle: TauriUpdateHandle) => {
   await updateHandle.close().catch((closeError: unknown) => {
@@ -117,6 +140,15 @@ const installTauriUpdateAndRestart = async () => {
   }
 
   updaterInstallPromise = (async () => {
+    const channelSupported = await isUpdaterChannelSupported();
+    if (!channelSupported) {
+      console.info(
+        "[TAURI Updater] Current runtime channel does not support in-app installer flow."
+      );
+      await openExternalUrl(RELEASE_NOTES_LINK);
+      return;
+    }
+
     const updateHandle = await checkForUpdates();
     if (!updateHandle) {
       console.info(
@@ -269,6 +301,14 @@ const syncTauriUpdatePolicy = async (
   }
 
   updaterPolicySyncPromise = (async () => {
+    const channelSupported = await isUpdaterChannelSupported();
+    if (!channelSupported) {
+      console.info(
+        "[TAURI Updater] Skipping policy sync: updater installer flow is not supported for the current runtime channel."
+      );
+      return;
+    }
+
     let updateHandle: Awaited<ReturnType<typeof checkForUpdates>> =
       null;
 

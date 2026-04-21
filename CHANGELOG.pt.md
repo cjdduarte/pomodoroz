@@ -6,6 +6,17 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.4.32] - A definir
+
+### Corrigido
+
+- **Updater in-app agora bloqueia o fluxo de instalador em canais de runtime não suportados** — instalações locais Linux geradas com `--no-bundle` não tentam mais `downloadAndInstall`; ações de update passam a cair para abertura da página de release quando o tipo de bundle em execução não suporta substituição por instalador.
+
+### Alterado
+
+- **Suporte de canal do updater passou a ser verificado explicitamente na ponte nativa** — novo comando `is_updater_channel_supported` foi adicionado e registrado no invoke handler do Tauri para alinhar o comportamento de update ao tipo de pacote em execução.
+- **Scripts de instalação local passaram a explicitar limitação do canal de updater** — `scripts/install.sh` e `scripts/install.ps1` agora informam que instalações locais `--no-bundle` não executam instalação automática de update in-app.
+
 ## [26.4.31] - 2026-04-21
 
 ### Corrigido

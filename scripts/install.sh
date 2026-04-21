@@ -42,6 +42,11 @@ Fluxo (Tauri-only):
   5) cria atalho de menu em ~/.local/share/applications/pomodoroz.desktop
   6) instala icone local em ~/.local/share/icons/hicolor/256x256/apps/pomodoroz.png
 
+Nota sobre updater in-app:
+  - Esta instalacao local usa binario `--no-bundle`.
+  - O fluxo de instalacao automatica via updater in-app fica desativado
+    neste canal; ao solicitar update, o app abre a pagina de release.
+
 Com --skip-build:
   - instala binario ja existente em src-tauri/target/release/
 
@@ -183,3 +188,4 @@ printf "Runtime instalado: tauri\n"
 printf "Atalho de menu: %s\n" "$DESKTOP_PATH"
 printf "Execucao direta: %s\n" "$BIN_PATH"
 printf "Desinstalar: ./scripts/uninstall.sh\n"
+printf "Nota: canal local (--no-bundle) nao instala update in-app automaticamente.\n"

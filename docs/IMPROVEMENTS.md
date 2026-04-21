@@ -52,9 +52,11 @@ When an item is released:
 
 1. **A3 — Shortcut persistence**
    - Persist customizable shortcuts and restore on boot.
-2. **Product cycle (B1 -> B2 -> B3)**
+2. **A9 — Locale source unification decision gate**
+   - Decide whether to unify auto-language source with a single locale bridge.
+3. **Product cycle (B1 -> B2 -> B3)**
    - Cadence presets, session extension, break suggestion prompts.
-3. **A6 revisit gate**
+4. **A6 revisit gate**
    - Revisit test strategy only after items above are stabilized.
 
 ---
@@ -72,6 +74,7 @@ When an item is released:
 | A6  | Define automated test strategy (adopt baseline tests or remove idle stack)    | Blocked     | High     | Deferred by decision (no tests changes now) |
 | A7  | Replace renderer `package.json` imports with injected app version metadata    | Open        | Medium   | Avoid shipping full manifest in UI bundles  |
 | A8  | Expand i18n language coverage (`de`/`fr`) with tray/startup parity            | In Progress | High     | Keep renderer + native tray locale in sync  |
+| A9  | Unify auto-language source between renderer and native tray                   | Open        | Medium   | Evaluate locale bridge adoption/fallbacks   |
 
 ### A0 — Tauri-only runtime consolidation
 
@@ -234,6 +237,42 @@ Decision checkpoint:
   - [x] `cargo check --manifest-path src-tauri/Cargo.toml`
 - Suggested commit:
   - `feat(i18n): add de/fr locales and align tray startup localization`
+
+### A9 — Locale source unification decision (`tauri-plugin-locale` gate)
+
+Decision checkpoint:
+
+- Current behavior uses two locale detection paths:
+  - Renderer auto mode: browser locale (`navigator.languages` / `navigator.language`).
+  - Native tray startup: environment variables (`LC_ALL`, `LC_MESSAGES`, `LANG`).
+- Recommendation:
+  - Keep `react-i18next` as the renderer translation layer.
+  - Unify locale discovery via one bridge only for detection/sync.
+  - Do not introduce Rust-side Fluent unless backend starts emitting user-facing localized copy.
+
+- Scope checklist:
+  - [ ] Run dependency impact review for locale bridge adoption (`tauri-plugin-locale` candidate): maintenance, Tauri v2 compatibility, and fallback behavior.
+  - [ ] If approved: wire auto-language resolution to the bridge in renderer (`settings.language = auto`).
+  - [ ] If approved: align native startup tray locale resolution with the same source/fallback contract.
+  - [ ] Preserve manual language selection behavior exactly as-is.
+  - [ ] Document final architecture in `docs/LANGUAGE_EXPANSION_GUIDE.md`.
+- Validation checklist:
+  - [ ] Manual: in `auto` mode, UI and tray start with the same language.
+  - [ ] Manual: runtime locale changes keep UI/tray aligned after renderer sync.
+  - [ ] Manual: unsupported locale falls back to `en` without missing-key warnings.
+  - [ ] `pnpm typecheck:renderer`
+  - [ ] `pnpm build:renderer`
+  - [ ] `cargo check --manifest-path src-tauri/Cargo.toml`
+- Suggested commit:
+  - `refactor(i18n): unify locale detection path for renderer and tray`
+
+Migration value notes (decision support):
+
+- `react-i18next`: keep (already aligned with Tauri frontend-agnostic model).
+- Locale source unification (`A9`): worth doing (medium effort, reduces drift bugs in `auto` mode).
+- Rust Fluent i18n: defer (only adds value when Rust generates user-facing localized copy).
+- Jest -> Vitest: evaluate only after `A6` is unblocked and test strategy is finalized.
+- `styled-components` migration: not recommended now due high churn vs current roadmap priorities.
 
 ---
 

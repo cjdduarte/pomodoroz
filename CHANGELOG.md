@@ -6,6 +6,17 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.4.32] - TBD
+
+### Fixed
+
+- **In-app updater now blocks installer flow on unsupported runtime channels** — local Linux installs generated from `--no-bundle` no longer attempt `downloadAndInstall`; updater actions now fall back to opening the release page when the current bundle type does not support installer replacement.
+
+### Changed
+
+- **Updater channel support is now explicitly checked in the native bridge** — new command `is_updater_channel_supported` was added and wired through the Tauri invoke handler to keep updater behavior aligned with the running package type.
+- **Local install scripts now state updater-channel limitations clearly** — `scripts/install.sh` and `scripts/install.ps1` now print that `--no-bundle` local installs do not run automatic in-app installer updates.
+
 ## [26.4.31] - 2026-04-21
 
 ### Fixed

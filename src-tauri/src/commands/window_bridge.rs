@@ -4,6 +4,7 @@ use std::{fs, io::Cursor, path::PathBuf, sync::Mutex, time::Duration};
 use tauri::{
     image::Image,
     menu::{MenuBuilder, MenuItemBuilder},
+    utils::{config::BundleType, platform::bundle_type},
     AppHandle, Emitter, LogicalSize, Manager, Runtime, State, Theme, Window,
 };
 
@@ -210,6 +211,21 @@ pub fn close_window(window: Window) -> Result<(), String> {
 #[tauri::command]
 pub fn restart_app<R: Runtime>(app: AppHandle<R>) {
     app.restart();
+}
+
+#[tauri::command]
+pub fn is_updater_channel_supported() -> bool {
+    matches!(
+        bundle_type(),
+        Some(
+            BundleType::AppImage
+                | BundleType::Deb
+                | BundleType::Rpm
+                | BundleType::Msi
+                | BundleType::Nsis
+                | BundleType::App
+        )
+    )
 }
 
 #[tauri::command(rename_all = "camelCase")]
