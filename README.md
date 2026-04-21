@@ -15,18 +15,15 @@
 </p>
 
 <p align="center">
-  <img src="assets/timerA.png" alt="Pomodoroz - Light Theme" width="340">
-  <img src="assets/timerB.png" alt="Pomodoroz - Dark Theme" width="340">
+  <img src="assets/timerA.png" alt="Pomodoroz - Light Theme" width="49%"><img src="assets/timerB.png" alt="Pomodoroz - Dark Theme" width="49%">
 </p>
 
 <p align="center">
-  <img src="assets/miniA.png" alt="Pomodoroz - Mini Preview A" width="340">
-  <img src="assets/miniB.png" alt="Pomodoroz - Mini Preview B" width="340">
+  <img src="assets/miniA.png" alt="Pomodoroz - Mini Preview A" width="49%"><img src="assets/miniB.png" alt="Pomodoroz - Mini Preview B" width="49%">
 </p>
 
 <p align="center">
-  <img src="assets/gridA.png" alt="Pomodoroz - Grid Preview A" width="340">
-  <img src="assets/gridB.png" alt="Pomodoroz - Grid Preview B" width="340">
+  <img src="assets/gridA.png" alt="Pomodoroz - Grid Preview A" width="49%"><img src="assets/gridB.png" alt="Pomodoroz - Grid Preview B" width="49%">
 </p>
 
 <p align="center">
