@@ -275,9 +275,9 @@ Why this changed (explicit rationale):
   - [ ] Manual: in `auto` mode, UI and tray start with the same language.
   - [ ] Manual: runtime locale changes keep UI/tray aligned after renderer sync.
   - [ ] Manual: unsupported locale falls back to `en` without missing-key warnings.
-  - [ ] `pnpm typecheck:renderer`
-  - [ ] `pnpm build:renderer`
-  - [ ] `cargo check --manifest-path src-tauri/Cargo.toml`
+  - [x] `pnpm typecheck:renderer`
+  - [x] `pnpm build:renderer`
+  - [x] `cargo check --manifest-path src-tauri/Cargo.toml`
 - Suggested commit:
   - `refactor(i18n): unify locale detection with tauri plugin os`
 
