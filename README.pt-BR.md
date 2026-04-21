@@ -15,9 +15,15 @@
 </p>
 
 <p align="center">
-  <img src="assets/timerA.png" alt="Pomodoroz - Tema Claro" width="340">
-  &nbsp;&nbsp;
-  <img src="assets/timerB.png" alt="Pomodoroz - Tema Escuro" width="340">
+  <img src="assets/timerA.png" alt="Pomodoroz - Tema Claro" width="49%"><img src="assets/timerB.png" alt="Pomodoroz - Tema Escuro" width="49%">
+</p>
+
+<p align="center">
+  <img src="assets/miniA.png" alt="Pomodoroz - Prévia Mini A" width="49%"><img src="assets/miniB.png" alt="Pomodoroz - Prévia Mini B" width="49%">
+</p>
+
+<p align="center">
+  <img src="assets/gridA.png" alt="Pomodoroz - Prévia Grid A" width="49%"><img src="assets/gridB.png" alt="Pomodoroz - Prévia Grid B" width="49%">
 </p>
 
 <p align="center">
