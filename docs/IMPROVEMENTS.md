@@ -48,6 +48,7 @@ When an item is released:
   - `A5` dependency modernization major batches are now completed (`eslint`/`@eslint/js` 10.x with `eslint-react`, and `vite-plugin-svgr@5.2.0`) with full validation.
   - `A6` intentionally deferred by product decision (no test-track changes now).
   - `A9` locale-source unification is now implemented with `@tauri-apps/plugin-os` (renderer) + `tauri_plugin_os::locale()` (native startup).
+  - `A10` opens a dependency-rationalization gate where migration is executed only if measurable ROI justifies the change.
 
 ### Next execution order (after 26.4.32)
 
@@ -57,23 +58,26 @@ When an item is released:
    - Cadence presets, session extension, break suggestion prompts.
 3. **A6 revisit gate**
    - Revisit test strategy only after items above are stabilized.
+4. **A10 dependency rationalization gate**
+   - Evaluate necessity first; execute only if metrics and maintenance ROI are clear.
 
 ---
 
 ## 2. Track A — Conversion Hardening (Tauri-only)
 
-| ID  | Item                                                                          | Status  | Priority | Notes                                       |
-| --- | ----------------------------------------------------------------------------- | ------- | -------- | ------------------------------------------- |
-| A0  | Consolidate runtime to Tauri-only and remove browser fallback branches        | Done    | High     | Released in 26.4.28                         |
-| A1  | Resolve titlebar legacy CSS/changelog divergence (`-webkit-app-region`)       | Done    | High     | Released in 26.4.28                         |
-| A2  | `.env` hygiene (`app/renderer/.env` tracked)                                  | Done    | High     | Completed and registered in 26.4.29 draft   |
-| A3  | Persist custom shortcuts (`Shortcut.tsx` TODO)                                | Open    | Medium   | Avoid loss after restart                    |
-| A4  | Simplify `check-updates` to root-only narrative and flows                     | Done    | Medium   | Released in 26.4.28                         |
-| A5  | Controlled major updates (`eslint`/`@eslint/js` 10.x, `vite-plugin-svgr` 5.x) | Done    | Medium   | Batches 1/2/3 completed in 26.4.29 draft    |
-| A6  | Define automated test strategy (adopt baseline tests or remove idle stack)    | Blocked | High     | Deferred by decision (no tests changes now) |
-| A7  | Replace renderer `package.json` imports with injected app version metadata    | Open    | Medium   | Avoid shipping full manifest in UI bundles  |
-| A8  | Expand i18n language coverage (`de`/`fr`) with tray/startup parity            | Done    | High     | Delivered in 26.4.31                        |
-| A9  | Unify auto-language source between renderer and native tray                   | Done    | Medium   | Delivered in 26.4.33 draft                  |
+| ID  | Item                                                                          | Status  | Priority | Notes                                                |
+| --- | ----------------------------------------------------------------------------- | ------- | -------- | ---------------------------------------------------- |
+| A0  | Consolidate runtime to Tauri-only and remove browser fallback branches        | Done    | High     | Released in 26.4.28                                  |
+| A1  | Resolve titlebar legacy CSS/changelog divergence (`-webkit-app-region`)       | Done    | High     | Released in 26.4.28                                  |
+| A2  | `.env` hygiene (`app/renderer/.env` tracked)                                  | Done    | High     | Completed and registered in 26.4.29 draft            |
+| A3  | Persist custom shortcuts (`Shortcut.tsx` TODO)                                | Open    | Medium   | Avoid loss after restart                             |
+| A4  | Simplify `check-updates` to root-only narrative and flows                     | Done    | Medium   | Released in 26.4.28                                  |
+| A5  | Controlled major updates (`eslint`/`@eslint/js` 10.x, `vite-plugin-svgr` 5.x) | Done    | Medium   | Batches 1/2/3 completed in 26.4.29 draft             |
+| A6  | Define automated test strategy (adopt baseline tests or remove idle stack)    | Blocked | High     | Deferred by decision (no tests changes now)          |
+| A7  | Replace renderer `package.json` imports with injected app version metadata    | Open    | Medium   | Avoid shipping full manifest in UI bundles           |
+| A8  | Expand i18n language coverage (`de`/`fr`) with tray/startup parity            | Done    | High     | Delivered in 26.4.31                                 |
+| A9  | Unify auto-language source between renderer and native tray                   | Done    | Medium   | Delivered in 26.4.33 draft                           |
+| A10 | Dependency rationalization gate (`uuid`, debounce, tests, style/state stack)  | Blocked | Medium   | Execute only with measurable ROI; no-change is valid |
 
 ### A0 — Tauri-only runtime consolidation
 
@@ -288,6 +292,45 @@ Migration value notes (decision support):
 - Rust Fluent i18n: defer (only adds value when Rust generates user-facing localized copy).
 - Jest -> Vitest: evaluate only after `A6` is unblocked and test strategy is finalized.
 - `styled-components` migration: not recommended now due high churn vs current roadmap priorities.
+- Additional dependency swaps must pass `A10` necessity/ROI gate before execution.
+
+### A10 — Dependency rationalization gate (evaluate necessity first)
+
+Decision checkpoint:
+
+- This item exists to avoid migrations by trend alone.
+- Every candidate dependency change needs measurable motivation and a clear success metric.
+- "No change required" is an acceptable and explicit final decision.
+
+Candidate set under evaluation:
+
+- Low-risk candidates:
+  - `uuid` -> native `crypto.randomUUID()` (with safe fallback contract).
+  - `lodash.debounce` -> local debounced utility preserving `flush()` semantics.
+- Conditional candidates:
+  - `Jest` -> `Vitest` only after `A6` test-strategy decision is unblocked.
+- High-churn candidates (default is defer):
+  - `styled-components` -> zero-runtime/utility alternatives.
+  - `Redux Toolkit` -> lighter state alternatives.
+  - `react-markdown` -> alternative markdown stack.
+
+Scope checklist:
+
+- [ ] Capture baseline metrics before any migration decision (bundle chunks, startup behavior, maintenance friction).
+- [ ] Define go/no-go thresholds per candidate (expected gain, risk tolerance, migration effort).
+- [ ] Produce one short decision note per candidate (keep/swap + rationale).
+- [ ] Execute only candidates that meet thresholds and preserve behavior.
+- [ ] If no candidate meets threshold, close as `Done` with explicit "no migration required" outcome.
+
+Validation checklist:
+
+- [ ] Decision log recorded in roadmap/changelog (including "no change" outcomes).
+- [ ] For approved migrations: `pnpm lint`, `pnpm typecheck:renderer`, `pnpm build:renderer`, `cargo check --manifest-path src-tauri/Cargo.toml`.
+- [ ] Manual parity check confirms no UX regression in timer/tasks/settings/tray flows.
+
+Suggested commit:
+
+- `chore(deps): evaluate dependency rationalization by measurable roi gate`
 
 ---
 
