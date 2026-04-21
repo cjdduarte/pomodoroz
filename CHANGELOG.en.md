@@ -6,6 +6,23 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.4.31] - TBD
+
+### Fixed
+
+- **Automatic cycle-end transitions are now resilient to timer state races** — `CounterContext` now manages/clears break-transition timeout through a single ref plus lifecycle cleanup, preventing stale delayed execution after reset/reconfigure/unmount.
+- **Global `Escape` listener in the special-break setter is no longer always active** — keyboard handler registration in `SpecialField` now happens only while the setter popup is open.
+- **Button ripple positioning was fixed for scroll scenarios** — `useRippleEffect` now uses `clientX/clientY` with `getBoundingClientRect()`.
+- **Local persistence now flushes defensively on WebView lifecycle events** — debounced `store.subscribe` writes are now flushed on `beforeunload`, `pagehide`, and `visibilitychange`, reducing last-state loss on fast shutdown.
+
+### Changed
+
+- **Special-break setter moved to full i18n coverage (pt/en/es/ja/zh)** — hardcoded strings were replaced with translation keys across all supported languages.
+- **Short-break config contract normalized** — typo action `setShorBreak` was renamed to `setShortBreak` (slice and consumers), with no intended behavior change.
+- **Orphan `restartTimer` action removed from the `timer` slice** — dead renderer path was removed to reduce misuse surface.
+- **Tauri `read_text_file` command hardened for task import flow** — file reads now enforce `.json` extension, reject non-file paths, and cap payload size (5 MB).
+- **Technical roadmap updated with explicit renderer-versioning follow-up** — `docs/IMPROVEMENTS.md` now includes item `A7` to migrate UI version display away from `package.json` bundle dependency in a future cycle.
+
 ## [26.4.30] - 2026-04-20
 
 ### Changed

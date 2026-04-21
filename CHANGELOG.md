@@ -6,6 +6,23 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.4.31] - A definir
+
+### Corrigido
+
+- **Transições automáticas de fim de ciclo no timer ficaram resilientes a corrida de estado** — o `CounterContext` agora controla/limpa timeout de transição de break com referência única e cleanup no ciclo de vida, evitando execução tardia após reset/reconfiguração/desmontagem.
+- **Listener global de `Escape` no setter de pausa especial deixou de ficar ativo permanentemente** — o handler de teclado em `SpecialField` agora só é registrado enquanto o popup está aberto.
+- **Posicionamento do ripple em botões foi corrigido para cenários com scroll** — `useRippleEffect` passou a usar `clientX/clientY` com `getBoundingClientRect()`.
+- **Persistência local ganhou flush defensivo em eventos de ciclo de vida da WebView** — o debounce do `store.subscribe` agora é descarregado em `beforeunload`, `pagehide` e `visibilitychange`, reduzindo risco de perder o último estado em fechamento rápido.
+
+### Alterado
+
+- **Setter de pausa especial migrado para i18n completo (pt/en/es/ja/zh)** — textos hardcoded foram substituídos por chaves de tradução para todos os idiomas suportados.
+- **Contrato de configuração do break curto normalizado** — action typo `setShorBreak` foi renomeada para `setShortBreak` (slice e consumidores), sem mudança funcional esperada.
+- **Action órfã `restartTimer` removida do slice `timer`** — caminho sem consumidores no renderer foi eliminado para reduzir superfície de uso indevido.
+- **Comando Tauri `read_text_file` endurecido para import de tarefas** — leitura agora valida extensão `.json`, recusa caminhos não-arquivo e limita tamanho do payload (5 MB).
+- **Roadmap técnico atualizado com pendência explícita para versionamento no renderer** — `docs/IMPROVEMENTS.md` recebeu o item `A7` para migrar exibição de versão e remover dependência de `package.json` no bundle da UI em ciclo futuro.
+
 ## [26.4.30] - 2026-04-20
 
 ### Alterado
