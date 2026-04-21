@@ -94,7 +94,9 @@ const TRAY_COPY_BY_LANGUAGE: Record<LanguageCode, TrayCopy> = {
   },
 };
 
-const resolveTrayLanguage = (language: string): LanguageCode => {
+const resolveTrayLanguage = async (
+  language: string
+): Promise<LanguageCode> => {
   if (language === "auto") {
     return detectSystemLanguage();
   }
@@ -169,8 +171,21 @@ export const TauriConnectorProvider = ({
   }, [sendToMain, settings.closeToTray, settings.minimizeToTray]);
 
   useEffect(() => {
-    const language = resolveTrayLanguage(settings.language);
-    sendToMain(SET_TRAY_COPY, TRAY_COPY_BY_LANGUAGE[language]);
+    let isCancelled = false;
+
+    const syncTrayCopy = async () => {
+      const language = await resolveTrayLanguage(settings.language);
+      if (isCancelled) {
+        return;
+      }
+      sendToMain(SET_TRAY_COPY, TRAY_COPY_BY_LANGUAGE[language]);
+    };
+
+    void syncTrayCopy();
+
+    return () => {
+      isCancelled = true;
+    };
   }, [sendToMain, settings.language]);
 
   useEffect(() => {

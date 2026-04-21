@@ -6,6 +6,17 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.4.33] - A definir
+
+### Alterado
+
+- **Detecção automática de idioma passou a usar o plugin oficial de OS do Tauri no renderer** — `detectSystemLanguage` agora resolve locale por `@tauri-apps/plugin-os` (`locale()`), com fallback seguro para locale do browser apenas quando o locale nativo não estiver disponível.
+- **Fluxo de bootstrap/sincronização do i18n foi adaptado para resolução assíncrona de locale** — a inicialização do idioma no renderer agora começa com fallback síncrono e reconcilia para o locale nativo em modo auto, sem alterar o comportamento de seleção manual de idioma.
+- **Fonte de locale no startup da bandeja foi unificada com a arquitetura do renderer** — a resolução de copy inicial nativa agora usa `tauri_plugin_os::locale()` no lugar de leitura direta de `LC_ALL`/`LC_MESSAGES`/`LANG`.
+- **Capabilities do Tauri agora incluem permissão explícita do plugin de OS** — `src-tauri/capabilities/default.json` passou a conceder `os:default` para acesso ao locale.
+- **Roadmap de melhorias foi sincronizado com a entrega do A9** — `docs/IMPROVEMENTS.md` agora marca a unificação da fonte de locale como concluída e atualiza a ordem de execução após `26.4.32`.
+- **Racional da arquitetura de locale ficou explícito na documentação** — `docs/IMPROVEMENTS.md` e `docs/LANGUAGE_EXPANSION_GUIDE.md` agora explicam por que o A9 foi executado (consistência de startup em modo auto, menor risco de drift e alinhamento ao plugin oficial do Tauri), e não apenas o que foi alterado.
+
 ## [26.4.32] - 2026-04-21
 
 ### Corrigido

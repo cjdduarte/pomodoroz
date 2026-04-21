@@ -35,7 +35,7 @@ When an item is released:
 2. Add implementation details to `CHANGELOG.md` and `CHANGELOG.pt.md`.
 3. Remove unnecessary detail from this roadmap in the next planning cycle.
 
-### Current checkpoint (2026-04-20)
+### Current checkpoint (2026-04-21)
 
 - Released in `26.4.28` (PT/EN changelogs):
   - `A0` runtime consolidation to Tauri-only.
@@ -43,38 +43,37 @@ When an item is released:
   - `A4` `check-updates` simplification to root-only narrative.
   - Linux release pipeline/AppImage hardening and `sync-latest-json` alignment.
 - Current planning baseline:
-  - Next open version headers already prepared in changelog (`26.4.29` as `A definir` / `TBD`).
+  - Releases up to `26.4.32` are already published in EN/PT changelogs.
   - `A2` env hygiene completed (renderer `.env` untracked, no committed `.env.example` required by default).
   - `A5` dependency modernization major batches are now completed (`eslint`/`@eslint/js` 10.x with `eslint-react`, and `vite-plugin-svgr@5.2.0`) with full validation.
   - `A6` intentionally deferred by product decision (no test-track changes now).
+  - `A9` locale-source unification is now implemented with `@tauri-apps/plugin-os` (renderer) + `tauri_plugin_os::locale()` (native startup).
 
-### Next execution order (after 26.4.28)
+### Next execution order (after 26.4.32)
 
 1. **A3 — Shortcut persistence**
    - Persist customizable shortcuts and restore on boot.
-2. **A9 — Locale source unification decision gate**
-   - Decide whether to unify auto-language source with a single locale bridge.
-3. **Product cycle (B1 -> B2 -> B3)**
+2. **Product cycle (B1 -> B2 -> B3)**
    - Cadence presets, session extension, break suggestion prompts.
-4. **A6 revisit gate**
+3. **A6 revisit gate**
    - Revisit test strategy only after items above are stabilized.
 
 ---
 
 ## 2. Track A — Conversion Hardening (Tauri-only)
 
-| ID  | Item                                                                          | Status      | Priority | Notes                                       |
-| --- | ----------------------------------------------------------------------------- | ----------- | -------- | ------------------------------------------- |
-| A0  | Consolidate runtime to Tauri-only and remove browser fallback branches        | Done        | High     | Released in 26.4.28                         |
-| A1  | Resolve titlebar legacy CSS/changelog divergence (`-webkit-app-region`)       | Done        | High     | Released in 26.4.28                         |
-| A2  | `.env` hygiene (`app/renderer/.env` tracked)                                  | Done        | High     | Completed and registered in 26.4.29 draft   |
-| A3  | Persist custom shortcuts (`Shortcut.tsx` TODO)                                | Open        | Medium   | Avoid loss after restart                    |
-| A4  | Simplify `check-updates` to root-only narrative and flows                     | Done        | Medium   | Released in 26.4.28                         |
-| A5  | Controlled major updates (`eslint`/`@eslint/js` 10.x, `vite-plugin-svgr` 5.x) | Done        | Medium   | Batches 1/2/3 completed in 26.4.29 draft    |
-| A6  | Define automated test strategy (adopt baseline tests or remove idle stack)    | Blocked     | High     | Deferred by decision (no tests changes now) |
-| A7  | Replace renderer `package.json` imports with injected app version metadata    | Open        | Medium   | Avoid shipping full manifest in UI bundles  |
-| A8  | Expand i18n language coverage (`de`/`fr`) with tray/startup parity            | In Progress | High     | Keep renderer + native tray locale in sync  |
-| A9  | Unify auto-language source between renderer and native tray                   | Open        | Medium   | Evaluate locale bridge adoption/fallbacks   |
+| ID  | Item                                                                          | Status  | Priority | Notes                                       |
+| --- | ----------------------------------------------------------------------------- | ------- | -------- | ------------------------------------------- |
+| A0  | Consolidate runtime to Tauri-only and remove browser fallback branches        | Done    | High     | Released in 26.4.28                         |
+| A1  | Resolve titlebar legacy CSS/changelog divergence (`-webkit-app-region`)       | Done    | High     | Released in 26.4.28                         |
+| A2  | `.env` hygiene (`app/renderer/.env` tracked)                                  | Done    | High     | Completed and registered in 26.4.29 draft   |
+| A3  | Persist custom shortcuts (`Shortcut.tsx` TODO)                                | Open    | Medium   | Avoid loss after restart                    |
+| A4  | Simplify `check-updates` to root-only narrative and flows                     | Done    | Medium   | Released in 26.4.28                         |
+| A5  | Controlled major updates (`eslint`/`@eslint/js` 10.x, `vite-plugin-svgr` 5.x) | Done    | Medium   | Batches 1/2/3 completed in 26.4.29 draft    |
+| A6  | Define automated test strategy (adopt baseline tests or remove idle stack)    | Blocked | High     | Deferred by decision (no tests changes now) |
+| A7  | Replace renderer `package.json` imports with injected app version metadata    | Open    | Medium   | Avoid shipping full manifest in UI bundles  |
+| A8  | Expand i18n language coverage (`de`/`fr`) with tray/startup parity            | Done    | High     | Delivered in 26.4.31                        |
+| A9  | Unify auto-language source between renderer and native tray                   | Done    | Medium   | Delivered in 26.4.33 draft                  |
 
 ### A0 — Tauri-only runtime consolidation
 
@@ -238,24 +237,40 @@ Decision checkpoint:
 - Suggested commit:
   - `feat(i18n): add de/fr locales and align tray startup localization`
 
-### A9 — Locale source unification decision (`tauri-plugin-locale` gate)
+### A9 — Locale source unification (`@tauri-apps/plugin-os`)
 
 Decision checkpoint:
 
-- Current behavior uses two locale detection paths:
+- Previous behavior used two locale detection paths:
   - Renderer auto mode: browser locale (`navigator.languages` / `navigator.language`).
   - Native tray startup: environment variables (`LC_ALL`, `LC_MESSAGES`, `LANG`).
-- Recommendation:
+- Implemented direction:
   - Keep `react-i18next` as the renderer translation layer.
-  - Unify locale discovery via one bridge only for detection/sync.
+  - Use `@tauri-apps/plugin-os` `locale()` as the primary renderer locale source in auto mode.
+  - Use `tauri_plugin_os::locale()` for native tray startup fallback resolution.
+  - Keep safe browser fallback in renderer when plugin locale is unavailable.
   - Do not introduce Rust-side Fluent unless backend starts emitting user-facing localized copy.
 
+Why this changed (explicit rationale):
+
+- Consistency issue:
+  - Auto-language behavior used different data sources in renderer and native startup.
+  - This made locale mismatch possible during boot (`auto` mode), especially around tray labels versus initial UI language.
+- Maintenance issue:
+  - Locale parsing logic based on environment variables was duplicated and drift-prone across boundaries.
+  - Moving both sides to the same Tauri OS locale contract reduces long-term divergence risk.
+- Ecosystem alignment:
+  - `@tauri-apps/plugin-os` is official, versioned with Tauri v2 plugins workspace, and already fits the current plugin stack.
+- Product impact:
+  - No UX contract change for manual language selection.
+  - Main benefit is deterministic startup behavior and clearer architecture, not a visible feature change.
+
 - Scope checklist:
-  - [ ] Run dependency impact review for locale bridge adoption (`tauri-plugin-locale` candidate): maintenance, Tauri v2 compatibility, and fallback behavior.
-  - [ ] If approved: wire auto-language resolution to the bridge in renderer (`settings.language = auto`).
-  - [ ] If approved: align native startup tray locale resolution with the same source/fallback contract.
-  - [ ] Preserve manual language selection behavior exactly as-is.
-  - [ ] Document final architecture in `docs/LANGUAGE_EXPANSION_GUIDE.md`.
+  - [x] Run dependency impact review for locale bridge adoption and select official Tauri source (`@tauri-apps/plugin-os`).
+  - [x] Wire auto-language resolution to plugin `locale()` in renderer (`settings.language = auto`).
+  - [x] Align native startup tray locale resolution to `tauri_plugin_os::locale()`.
+  - [x] Preserve manual language selection behavior exactly as-is.
+  - [x] Update roadmap/changelog traces for the final architecture decision.
 - Validation checklist:
   - [ ] Manual: in `auto` mode, UI and tray start with the same language.
   - [ ] Manual: runtime locale changes keep UI/tray aligned after renderer sync.
@@ -264,12 +279,12 @@ Decision checkpoint:
   - [ ] `pnpm build:renderer`
   - [ ] `cargo check --manifest-path src-tauri/Cargo.toml`
 - Suggested commit:
-  - `refactor(i18n): unify locale detection path for renderer and tray`
+  - `refactor(i18n): unify locale detection with tauri plugin os`
 
 Migration value notes (decision support):
 
 - `react-i18next`: keep (already aligned with Tauri frontend-agnostic model).
-- Locale source unification (`A9`): worth doing (medium effort, reduces drift bugs in `auto` mode).
+- Locale source unification (`A9`): implemented using official Tauri OS plugin.
 - Rust Fluent i18n: defer (only adds value when Rust generates user-facing localized copy).
 - Jest -> Vitest: evaluate only after `A6` is unblocked and test strategy is finalized.
 - `styled-components` migration: not recommended now due high churn vs current roadmap priorities.

@@ -3,6 +3,7 @@ import { initReactI18next } from "react-i18next";
 import { getFromStorage } from "utils";
 import {
   detectSystemLanguage,
+  detectSystemLanguageSync,
   fallbackLanguage,
   normalizeLanguageCode,
   supportedLanguages,
@@ -31,9 +32,9 @@ const storedState = getFromStorage<{
 const storedLanguage = storedState?.settings?.language;
 const initialLanguage = storedLanguage
   ? storedLanguage === "auto"
-    ? detectSystemLanguage()
+    ? detectSystemLanguageSync()
     : normalizeLanguageCode(storedLanguage)
-  : detectSystemLanguage();
+  : detectSystemLanguageSync();
 
 i18n.use(initReactI18next).init({
   resources,
@@ -44,5 +45,13 @@ i18n.use(initReactI18next).init({
     escapeValue: false,
   },
 });
+
+if (!storedLanguage || storedLanguage === "auto") {
+  void detectSystemLanguage().then((resolvedLanguage) => {
+    if (i18n.language !== resolvedLanguage) {
+      void i18n.changeLanguage(resolvedLanguage);
+    }
+  });
+}
 
 export default i18n;

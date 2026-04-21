@@ -6,6 +6,17 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.4.33] - TBD
+
+### Changed
+
+- **Auto-language detection now uses the official Tauri OS plugin in the renderer** — `detectSystemLanguage` now resolves locale through `@tauri-apps/plugin-os` (`locale()`) with safe browser fallback only when native locale is unavailable.
+- **i18n bootstrap/sync flow was adapted for async locale resolution** — renderer language initialization now starts with synchronous fallback and reconciles to native locale asynchronously in auto mode, preserving manual language behavior.
+- **Tray startup locale source was unified with renderer architecture** — native startup copy resolution now uses `tauri_plugin_os::locale()` instead of reading `LC_ALL`/`LC_MESSAGES`/`LANG` directly.
+- **Tauri capabilities now explicitly include OS plugin permissions** — `src-tauri/capabilities/default.json` now grants `os:default` for locale access.
+- **Improvements roadmap synchronized with A9 delivery** — `docs/IMPROVEMENTS.md` now marks locale-source unification as completed and updates next execution order after `26.4.32`.
+- **Locale architecture rationale is now explicit in docs** — `docs/IMPROVEMENTS.md` and `docs/LANGUAGE_EXPANSION_GUIDE.md` now document why A9 was executed (startup consistency in auto mode, reduced drift risk, and official Tauri plugin alignment), not only what changed.
+
 ## [26.4.32] - 2026-04-21
 
 ### Fixed

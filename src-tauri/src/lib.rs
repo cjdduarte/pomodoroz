@@ -87,16 +87,9 @@ fn resolve_linux_tray_temp_dir() -> PathBuf {
 }
 
 fn resolve_tray_copy() -> TrayCopy {
-    let raw_locale = ["LC_ALL", "LC_MESSAGES", "LANG"]
-        .iter()
-        .find_map(|key| std::env::var(key).ok())
-        .unwrap_or_default()
-        .to_lowercase();
+    let raw_locale = tauri_plugin_os::locale().unwrap_or_default().to_lowercase();
 
     let language = raw_locale
-        .split(['.', '@'])
-        .next()
-        .unwrap_or_default()
         .split(['-', '_'])
         .next()
         .unwrap_or_default();
@@ -257,6 +250,7 @@ fn setup_global_shortcuts<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<()> {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_os::init())
         .manage(TrayBehaviorState::default())
         .invoke_handler(tauri::generate_handler![
             set_always_on_top,

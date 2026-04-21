@@ -20,16 +20,30 @@ const useLanguageSync = () => {
   const language = useAppSelector((state) => state.settings.language);
 
   useEffect(() => {
-    const resolvedLanguage =
-      language === "auto"
-        ? detectSystemLanguage()
-        : normalizeLanguageCode(language);
+    let isCancelled = false;
 
-    if (i18n.language !== resolvedLanguage) {
-      i18n.changeLanguage(resolvedLanguage);
-    }
+    const syncLanguage = async () => {
+      const resolvedLanguage =
+        language === "auto"
+          ? await detectSystemLanguage()
+          : normalizeLanguageCode(language);
 
-    syncLanguageToDom(resolvedLanguage);
+      if (isCancelled) {
+        return;
+      }
+
+      if (i18n.language !== resolvedLanguage) {
+        await i18n.changeLanguage(resolvedLanguage);
+      }
+
+      syncLanguageToDom(resolvedLanguage);
+    };
+
+    void syncLanguage();
+
+    return () => {
+      isCancelled = true;
+    };
   }, [language]);
 
   useEffect(() => {
@@ -37,22 +51,35 @@ const useLanguageSync = () => {
       return;
     }
 
-    const handleLanguageChange = () => {
-      const resolvedLanguage = detectSystemLanguage();
+    let isCancelled = false;
+
+    const syncAutoLanguage = async () => {
+      const resolvedLanguage = await detectSystemLanguage();
+
+      if (isCancelled) {
+        return;
+      }
 
       if (i18n.language !== resolvedLanguage) {
-        i18n.changeLanguage(resolvedLanguage);
+        await i18n.changeLanguage(resolvedLanguage);
       }
 
       syncLanguageToDom(resolvedLanguage);
     };
 
+    const handleLanguageChange = () => {
+      void syncAutoLanguage();
+    };
+
     window.addEventListener("languagechange", handleLanguageChange);
-    return () =>
+
+    return () => {
+      isCancelled = true;
       window.removeEventListener(
         "languagechange",
         handleLanguageChange
       );
+    };
   }, [language]);
 };
 

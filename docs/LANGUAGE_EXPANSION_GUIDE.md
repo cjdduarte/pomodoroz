@@ -9,6 +9,21 @@ Current architecture has two localization paths:
 
 Both are required for a complete language rollout.
 
+Auto-language source (A9 decision):
+
+- Renderer auto mode:
+  - Primary source: `@tauri-apps/plugin-os` `locale()`.
+  - Safe fallback: browser locale (`navigator.languages` / `navigator.language`) when native locale is unavailable.
+- Native tray startup:
+  - Source: `tauri_plugin_os::locale()`.
+- Final language normalization/fallback:
+  - `normalizeLanguageCode(...)` with fallback to `en`.
+
+Why this was changed:
+
+- Before A9, renderer and tray startup could use different locale origins, which allowed startup mismatch in `auto` mode.
+- A single OS-locale contract across boundaries makes behavior deterministic and easier to maintain.
+
 ---
 
 ## 1) Required files to update
@@ -25,6 +40,7 @@ Both are required for a complete language rollout.
 - `src/i18n/languages.ts`
   - Add new entries in `supportedLanguages`.
   - Keep `normalizeLanguageCode` fallback behavior.
+  - Keep plugin-first detection contract for `auto` mode.
 
 ### 1.3 i18n resources registry
 
@@ -54,6 +70,7 @@ Both are required for a complete language rollout.
 
 - `src-tauri/src/lib.rs`
   - Update `resolve_tray_copy()` locale mapping.
+  - Keep locale origin from `tauri_plugin_os::locale()`.
   - Include all supported languages and keep a final fallback.
 
 ### 1.8 Optional metadata alignment
