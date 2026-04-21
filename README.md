@@ -21,15 +21,15 @@
 </p>
 
 <p align="center">
-  <img src="assets/gridA.png" alt="Pomodoroz - Grid Preview A" width="340">
-  &nbsp;&nbsp;
-  <img src="assets/gridB.png" alt="Pomodoroz - Grid Preview B" width="340">
-</p>
-
-<p align="center">
   <img src="assets/miniA.png" alt="Pomodoroz - Mini Preview A" width="340">
   &nbsp;&nbsp;
   <img src="assets/miniB.png" alt="Pomodoroz - Mini Preview B" width="340">
+</p>
+
+<p align="center">
+  <img src="assets/gridA.png" alt="Pomodoroz - Grid Preview A" width="340">
+  &nbsp;&nbsp;
+  <img src="assets/gridB.png" alt="Pomodoroz - Grid Preview B" width="340">
 </p>
 
 <p align="center">
