@@ -63,10 +63,14 @@ O objetivo do Pomodoroz não é "corrigir flexibilidade", e sim adicionar recurs
 | Gerenciador de pacotes          | Yarn (histórico)                                                                               | pnpm                                                                                                              |
 | Base Tauri                      | Tauri 2 (alpha)                                                                                | Tauri `2.10.x`, com capabilities explícitas e plugins pinados                                                     |
 | Navegação principal             | Lista de tarefas, Config, Timer, Ajustes                                                       | Adiciona rota de **Estatísticas** (filtros por período, detalhamentos e limpeza de histórico)                     |
-| Fluxo de tarefas                | Gestão de tarefas focada em lista                                                              | Adiciona **Grade de Rotação de Estudos** (lista/grade, ciclo diário de cores, Sortear, clique direito para Timer) |
+| Ajustes (opções extras)         | none                                                                                           | Adiciona toggles de Sortear no grid, rotação de cores, som de notificação, auto update no app e reset para ocioso |
+| Visualização em lista           | Sim                                                                                            | Sim                                                                                                               |
+| Visualização em grade (grid)    | Não                                                                                            | Sim (**Grade de Rotação de Estudos** com ciclo diário, Sortear e clique direito para Timer)                       |
+| Rodapé da grade (status atual)  | none                                                                                           | Mostra contadores de total, visitadas e restantes                                                                 |
 | Importação/Exportação de listas | Sem fluxo dedicado (dados ficam apenas no armazenamento local interno)                         | Adiciona **importação/exportação JSON de listas/cartões** com validação e modos merge/substituição                |
+| Contagem de ociosidade          | none                                                                                           | Relatório inclui tempo ocioso por período + opção de mover foco para Ocioso no reset                              |
 | Noção de tempo                  | Níveis de notificação                                                                          | Adiciona seleção de som customizado + opção de registrar reset de foco como ocioso                                |
-| Idiomas                         | en/es/ja/zh                                                                                    | Adiciona pt-BR (`pt`) e mantém os idiomas existentes                                                              |
+| Idiomas                         | en/es/ja/zh                                                                                    | Adiciona pt-BR (`pt`)                                                                                             |
 
 > Data da comparação: 2026-04-21.
 
