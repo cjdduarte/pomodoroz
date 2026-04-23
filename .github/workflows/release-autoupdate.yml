@@ -50,7 +50,7 @@ jobs:
       - name: Setup pnpm (Corepack)
         run: |
           corepack enable
-          corepack prepare pnpm@10.33.0 --activate
+          corepack prepare pnpm@10.33.2 --activate
 
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -179,7 +179,7 @@ jobs:
       - name: Setup pnpm (Corepack)
         run: |
           corepack enable
-          corepack prepare pnpm@10.33.0 --activate
+          corepack prepare pnpm@10.33.2 --activate
 
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -476,3 +476,4 @@ jobs:
         run: |
           TAG="${RELEASE_TAG}"
           gh release upload "${TAG}" latest.json --clobber --repo "${GITHUB_REPOSITORY}"
+

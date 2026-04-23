@@ -6,6 +6,12 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.4.34] - A definir
+
+### Alterado
+
+- **Dependências do projeto foram atualizadas em um lote de manutenção** — sem mudanças funcionais planejadas.
+
 ## [26.4.33] - 2026-04-23
 
 ### Alterado
