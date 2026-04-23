@@ -12,6 +12,7 @@
 
 - **Dependências do projeto foram atualizadas em um lote de manutenção** — sem mudanças funcionais planejadas.
 - **CI agora inclui paridade de qualidade no Windows** — `.github/workflows/ci.yml` agora roda os gates de qualidade do renderer e `cargo check` do Tauri em `windows-latest`, além dos jobs existentes em Linux, com execução bem-sucedida nos dois lanes.
+- **Bridge de escrita do export no Tauri agora usa validação defensiva de entrada** — `write_text_file` agora exige extensão `.json`, rejeita destinos existentes que não sejam arquivo regular e limita payload a 5 MB para alinhar com o hardening já aplicado no import/read.
 
 ## [26.4.33] - 2026-04-23
 

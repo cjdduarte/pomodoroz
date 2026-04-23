@@ -51,22 +51,20 @@ When an item is released:
   - `A9` locale-source unification is now implemented with `@tauri-apps/plugin-os` (renderer) + `tauri_plugin_os::locale()` (native startup).
   - `A10` opens a dependency-rationalization gate where migration is executed only if measurable ROI justifies the change.
   - `A11` Windows CI parity gate is now implemented (`ubuntu-latest` + `windows-latest`) and workflow runs completed successfully in both OS lanes.
-  - `write_text_file` still lacks the guardrails already applied to `read_text_file`; symmetry is now prioritized.
+  - `A12` write-path hardening is now implemented: `write_text_file` enforces `.json`, rejects existing non-file targets, and caps payload at 5 MB.
   - Updater channel support checks currently deduplicate only in-flight calls; explicit session memoization is now prioritized for clarity and reduced IPC noise.
 
 ### Next execution order (after 26.4.34)
 
-1. **A12 — Export write-path hardening**
-   - Apply `write_text_file` guardrails aligned with existing import/read hardening.
-2. **A13 — Updater support memoization**
+1. **A13 — Updater support memoization**
    - Make updater-channel support checks explicit session memoization.
-3. **A3 — Shortcut persistence**
+2. **A3 — Shortcut persistence**
    - Persist customizable shortcuts and restore on boot.
-4. **Product cycle (B1 -> B2 -> B3)**
+3. **Product cycle (B1 -> B2 -> B3)**
    - Cadence presets, session extension, break suggestion prompts.
-5. **A6 revisit gate**
+4. **A6 revisit gate**
    - Revisit test strategy only after items above are stabilized.
-6. **A10 dependency rationalization gate**
+5. **A10 dependency rationalization gate**
    - Evaluate necessity first; execute only if metrics and maintenance ROI are clear.
 
 ---
@@ -87,7 +85,7 @@ When an item is released:
 | A9  | Unify auto-language source between renderer and native tray                   | Done    | Medium   | Delivered in 26.4.33 draft                           |
 | A10 | Dependency rationalization gate (`uuid`, debounce, tests, style/state stack)  | Blocked | Medium   | Execute only with measurable ROI; no-change is valid |
 | A11 | Add Windows CI parity gate for renderer and Rust quality checks               | Done    | High     | Delivered in 26.4.34 draft                           |
-| A12 | Harden `write_text_file` to mirror `read_text_file` guardrails                | Open    | High     | Defense-in-depth for export write path               |
+| A12 | Harden `write_text_file` to mirror `read_text_file` guardrails                | Done    | High     | Delivered in 26.4.34 draft                           |
 | A13 | Memoize updater-channel support result across runtime session                 | Open    | Medium   | Clarify behavior and avoid repeated native checks    |
 
 ### A0 — Tauri-only runtime consolidation
@@ -375,25 +373,25 @@ Suggested commit:
 Decision checkpoint:
 
 - `read_text_file` already enforces `.json`, regular-file checks, and a 5 MB limit.
-- `write_text_file` currently writes arbitrary path/content with no equivalent guardrails.
+- `write_text_file` now applies equivalent command-level guardrails for defense in depth.
 - Export flow is user-initiated via native save dialog, but command-level hardening should still be symmetric for defense in depth.
 
 Scope checklist:
 
-- [ ] Restrict `write_text_file` to `.json` output extension.
-- [ ] Add maximum payload size validation (align target with import/read limits, currently 5 MB).
-- [ ] Return explicit, user-safe error messages for rejected writes.
-- [ ] Keep current successful export UX unchanged for valid `.json` paths.
+- [x] Restrict `write_text_file` to `.json` output extension.
+- [x] Add maximum payload size validation (align target with import/read limits, currently 5 MB).
+- [x] Return explicit, user-safe error messages for rejected writes.
+- [x] Keep current successful export UX unchanged for valid `.json` paths.
 
 Validation checklist:
 
 - [ ] Manual: valid `.json` export succeeds through native save dialog.
 - [ ] Manual: non-`.json` target is rejected with a clear message.
 - [ ] Manual: oversized payload is rejected predictably.
-- [ ] `pnpm lint`
-- [ ] `pnpm typecheck:renderer`
-- [ ] `pnpm build:renderer`
-- [ ] `cargo check --manifest-path src-tauri/Cargo.toml`
+- [x] `pnpm lint`
+- [x] `pnpm typecheck:renderer`
+- [x] `pnpm build:renderer`
+- [x] `cargo check --manifest-path src-tauri/Cargo.toml`
 
 Suggested commit:
 

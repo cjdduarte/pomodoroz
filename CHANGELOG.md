@@ -12,6 +12,7 @@
 
 - **Project dependencies were updated in a maintenance batch** — no functional behavior changes are intended.
 - **CI now includes Windows parity quality checks** — `.github/workflows/ci.yml` now runs renderer quality gates and Tauri `cargo check` on `windows-latest` in addition to existing Linux jobs, with successful workflow execution in both lanes.
+- **Tauri export write bridge now uses defensive input validation** — `write_text_file` now enforces `.json` extension, rejects existing non-file targets, and limits payload size to 5 MB to align with import/read hardening.
 
 ## [26.4.33] - 2026-04-23
 

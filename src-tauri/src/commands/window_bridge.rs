@@ -58,6 +58,18 @@ fn map_error(error: impl std::fmt::Display) -> String {
     error.to_string()
 }
 
+fn validate_json_extension(path: &PathBuf) -> Result<(), String> {
+    let extension = path
+        .extension()
+        .and_then(|value| value.to_str())
+        .map(|value| value.to_ascii_lowercase());
+    if extension.as_deref() != Some("json") {
+        return Err("Only .json files are allowed.".to_string());
+    }
+
+    Ok(())
+}
+
 fn is_native_titlebar(window: &Window) -> Result<bool, String> {
     window.is_decorated().map_err(map_error)
 }
@@ -230,20 +242,28 @@ pub fn is_updater_channel_supported() -> bool {
 
 #[tauri::command(rename_all = "camelCase")]
 pub fn write_text_file(file_path: String, content: String) -> Result<(), String> {
-    fs::write(file_path, content).map_err(map_error)
+    let path = PathBuf::from(file_path);
+
+    validate_json_extension(&path)?;
+
+    if content.len() as u64 > MAX_IMPORT_FILE_BYTES {
+        return Err("Provided content is too large.".to_string());
+    }
+
+    if let Ok(metadata) = fs::metadata(&path) {
+        if !metadata.is_file() {
+            return Err("Selected path is not a file.".to_string());
+        }
+    }
+
+    fs::write(path, content).map_err(map_error)
 }
 
 #[tauri::command(rename_all = "camelCase")]
 pub fn read_text_file(file_path: String) -> Result<String, String> {
     let path = PathBuf::from(file_path);
 
-    let extension = path
-        .extension()
-        .and_then(|value| value.to_str())
-        .map(|value| value.to_ascii_lowercase());
-    if extension.as_deref() != Some("json") {
-        return Err("Only .json files are allowed.".to_string());
-    }
+    validate_json_extension(&path)?;
 
     let metadata = fs::metadata(&path).map_err(map_error)?;
     if !metadata.is_file() {
