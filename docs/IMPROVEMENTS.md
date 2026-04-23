@@ -385,9 +385,9 @@ Scope checklist:
 
 Validation checklist:
 
-- [ ] Manual: valid `.json` export succeeds through native save dialog.
-- [ ] Manual: non-`.json` target is rejected with a clear message.
-- [ ] Manual: oversized payload is rejected predictably.
+- [x] Manual: valid `.json` export succeeds through native save dialog.
+- [x] Manual: non-`.json` target is rejected with a clear message.
+- [x] Manual: oversized payload is rejected predictably.
 - [x] `pnpm lint`
 - [x] `pnpm typecheck:renderer`
 - [x] `pnpm build:renderer`
