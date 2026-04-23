@@ -50,25 +50,23 @@ When an item is released:
   - `A6` intentionally deferred by product decision (no test-track changes now).
   - `A9` locale-source unification is now implemented with `@tauri-apps/plugin-os` (renderer) + `tauri_plugin_os::locale()` (native startup).
   - `A10` opens a dependency-rationalization gate where migration is executed only if measurable ROI justifies the change.
-  - CI remains Linux-only (`ubuntu-latest`) and is now prioritized for Windows parity hardening.
+  - `A11` Windows CI parity gate is now implemented (`ubuntu-latest` + `windows-latest`) and workflow runs completed successfully in both OS lanes.
   - `write_text_file` still lacks the guardrails already applied to `read_text_file`; symmetry is now prioritized.
   - Updater channel support checks currently deduplicate only in-flight calls; explicit session memoization is now prioritized for clarity and reduced IPC noise.
 
-### Next execution order (after 26.4.33)
+### Next execution order (after 26.4.34)
 
-1. **A11 — Windows CI parity gate**
-   - Add `windows-latest` quality gate for renderer + Rust checks.
-2. **A12 — Export write-path hardening**
+1. **A12 — Export write-path hardening**
    - Apply `write_text_file` guardrails aligned with existing import/read hardening.
-3. **A13 — Updater support memoization**
+2. **A13 — Updater support memoization**
    - Make updater-channel support checks explicit session memoization.
-4. **A3 — Shortcut persistence**
+3. **A3 — Shortcut persistence**
    - Persist customizable shortcuts and restore on boot.
-5. **Product cycle (B1 -> B2 -> B3)**
+4. **Product cycle (B1 -> B2 -> B3)**
    - Cadence presets, session extension, break suggestion prompts.
-6. **A6 revisit gate**
+5. **A6 revisit gate**
    - Revisit test strategy only after items above are stabilized.
-7. **A10 dependency rationalization gate**
+6. **A10 dependency rationalization gate**
    - Evaluate necessity first; execute only if metrics and maintenance ROI are clear.
 
 ---
@@ -88,7 +86,7 @@ When an item is released:
 | A8  | Expand i18n language coverage (`de`/`fr`) with tray/startup parity            | Done    | High     | Delivered in 26.4.31                                 |
 | A9  | Unify auto-language source between renderer and native tray                   | Done    | Medium   | Delivered in 26.4.33 draft                           |
 | A10 | Dependency rationalization gate (`uuid`, debounce, tests, style/state stack)  | Blocked | Medium   | Execute only with measurable ROI; no-change is valid |
-| A11 | Add Windows CI parity gate for renderer and Rust quality checks               | Open    | High     | Reduce late Windows regressions before release       |
+| A11 | Add Windows CI parity gate for renderer and Rust quality checks               | Done    | High     | Delivered in 26.4.34 draft                           |
 | A12 | Harden `write_text_file` to mirror `read_text_file` guardrails                | Open    | High     | Defense-in-depth for export write path               |
 | A13 | Memoize updater-channel support result across runtime session                 | Open    | Medium   | Clarify behavior and avoid repeated native checks    |
 
@@ -349,24 +347,24 @@ Suggested commit:
 
 Decision checkpoint:
 
-- Current CI runs only `ubuntu-latest` jobs (`frontend-quality` and `tauri-rust-check`).
-- Windows script/build regressions have historically required reactive hotfixes.
-- A minimal Windows parity gate in CI reduces release-time surprises without changing product behavior.
+- Previous CI ran only `ubuntu-latest` jobs (`frontend-quality` and `tauri-rust-check`).
+- Windows script/build regressions historically required reactive hotfixes.
+- A minimal Windows parity gate in CI was implemented to reduce release-time surprises without changing product behavior.
 
 Scope checklist:
 
-- [ ] Add `windows-latest` job(s) in `.github/workflows/ci.yml` with Node + Corepack `pnpm` setup.
-- [ ] Run `pnpm lint` on Windows.
-- [ ] Run `pnpm typecheck:renderer` on Windows.
-- [ ] Run `pnpm build:renderer` on Windows.
-- [ ] Run `cargo check --manifest-path src-tauri/Cargo.toml` on Windows.
-- [ ] Keep Linux jobs unchanged as baseline parity reference.
+- [x] Add `windows-latest` job(s) in `.github/workflows/ci.yml` with Node + Corepack `pnpm` setup.
+- [x] Run `pnpm lint` on Windows.
+- [x] Run `pnpm typecheck:renderer` on Windows.
+- [x] Run `pnpm build:renderer` on Windows.
+- [x] Run `cargo check --manifest-path src-tauri/Cargo.toml` on Windows.
+- [x] Keep Linux jobs unchanged as baseline parity reference.
 
 Validation checklist:
 
-- [ ] Pull requests require both Linux and Windows CI jobs green before merge.
-- [ ] No script path/quoting regressions are introduced in existing Linux jobs.
-- [ ] `pnpm lint`, `pnpm typecheck:renderer`, `pnpm build:renderer`, and `cargo check --manifest-path src-tauri/Cargo.toml` pass in both OS runners.
+- [x] Workflow runs completed with Linux and Windows jobs green for renderer and Rust checks.
+- [x] No script path/quoting regressions were introduced in existing Linux jobs.
+- [x] Pull requests require both Linux and Windows CI jobs green before merge (branch protection rules configured).
 
 Suggested commit:
 
