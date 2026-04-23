@@ -89,10 +89,7 @@ fn resolve_linux_tray_temp_dir() -> PathBuf {
 fn resolve_tray_copy() -> TrayCopy {
     let raw_locale = tauri_plugin_os::locale().unwrap_or_default().to_lowercase();
 
-    let language = raw_locale
-        .split(['-', '_'])
-        .next()
-        .unwrap_or_default();
+    let language = raw_locale.split(['-', '_']).next().unwrap_or_default();
 
     match language {
         "pt" => TrayCopy {
