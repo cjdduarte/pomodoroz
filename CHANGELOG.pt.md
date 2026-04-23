@@ -11,6 +11,7 @@
 ### Alterado
 
 - **Dependências do projeto foram atualizadas em um lote de manutenção** — sem mudanças funcionais planejadas.
+- **CI agora inclui paridade de qualidade no Windows** — `.github/workflows/ci.yml` agora roda os gates de qualidade do renderer e `cargo check` do Tauri em `windows-latest`, além dos jobs existentes em Linux.
 
 ## [26.4.33] - 2026-04-23
 

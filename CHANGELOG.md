@@ -11,6 +11,7 @@
 ### Changed
 
 - **Project dependencies were updated in a maintenance batch** — no functional behavior changes are intended.
+- **CI now includes Windows parity quality checks** — `.github/workflows/ci.yml` now runs renderer quality gates and Tauri `cargo check` on `windows-latest` in addition to existing Linux jobs.
 
 ## [26.4.33] - 2026-04-23
 
