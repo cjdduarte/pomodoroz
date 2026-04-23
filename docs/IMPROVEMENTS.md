@@ -35,7 +35,7 @@ When an item is released:
 2. Add implementation details to `CHANGELOG.md` and `CHANGELOG.pt.md`.
 3. Remove unnecessary detail from this roadmap in the next planning cycle.
 
-### Current checkpoint (2026-04-21)
+### Current checkpoint (2026-04-23)
 
 - Released in `26.4.28` (PT/EN changelogs):
   - `A0` runtime consolidation to Tauri-only.
@@ -44,21 +44,31 @@ When an item is released:
   - Linux release pipeline/AppImage hardening and `sync-latest-json` alignment.
 - Current planning baseline:
   - Releases up to `26.4.32` are already published in EN/PT changelogs.
+  - `26.4.33` changelog draft is release-ready (dated in EN/PT) for publication.
   - `A2` env hygiene completed (renderer `.env` untracked, no committed `.env.example` required by default).
   - `A5` dependency modernization major batches are now completed (`eslint`/`@eslint/js` 10.x with `eslint-react`, and `vite-plugin-svgr@5.2.0`) with full validation.
   - `A6` intentionally deferred by product decision (no test-track changes now).
   - `A9` locale-source unification is now implemented with `@tauri-apps/plugin-os` (renderer) + `tauri_plugin_os::locale()` (native startup).
   - `A10` opens a dependency-rationalization gate where migration is executed only if measurable ROI justifies the change.
+  - CI remains Linux-only (`ubuntu-latest`) and is now prioritized for Windows parity hardening.
+  - `write_text_file` still lacks the guardrails already applied to `read_text_file`; symmetry is now prioritized.
+  - Updater channel support checks currently deduplicate only in-flight calls; explicit session memoization is now prioritized for clarity and reduced IPC noise.
 
-### Next execution order (after 26.4.32)
+### Next execution order (after 26.4.33)
 
-1. **A3 — Shortcut persistence**
+1. **A11 — Windows CI parity gate**
+   - Add `windows-latest` quality gate for renderer + Rust checks.
+2. **A12 — Export write-path hardening**
+   - Apply `write_text_file` guardrails aligned with existing import/read hardening.
+3. **A13 — Updater support memoization**
+   - Make updater-channel support checks explicit session memoization.
+4. **A3 — Shortcut persistence**
    - Persist customizable shortcuts and restore on boot.
-2. **Product cycle (B1 -> B2 -> B3)**
+5. **Product cycle (B1 -> B2 -> B3)**
    - Cadence presets, session extension, break suggestion prompts.
-3. **A6 revisit gate**
+6. **A6 revisit gate**
    - Revisit test strategy only after items above are stabilized.
-4. **A10 dependency rationalization gate**
+7. **A10 dependency rationalization gate**
    - Evaluate necessity first; execute only if metrics and maintenance ROI are clear.
 
 ---
@@ -78,6 +88,9 @@ When an item is released:
 | A8  | Expand i18n language coverage (`de`/`fr`) with tray/startup parity            | Done    | High     | Delivered in 26.4.31                                 |
 | A9  | Unify auto-language source between renderer and native tray                   | Done    | Medium   | Delivered in 26.4.33 draft                           |
 | A10 | Dependency rationalization gate (`uuid`, debounce, tests, style/state stack)  | Blocked | Medium   | Execute only with measurable ROI; no-change is valid |
+| A11 | Add Windows CI parity gate for renderer and Rust quality checks               | Open    | High     | Reduce late Windows regressions before release       |
+| A12 | Harden `write_text_file` to mirror `read_text_file` guardrails                | Open    | High     | Defense-in-depth for export write path               |
+| A13 | Memoize updater-channel support result across runtime session                 | Open    | Medium   | Clarify behavior and avoid repeated native checks    |
 
 ### A0 — Tauri-only runtime consolidation
 
@@ -331,6 +344,91 @@ Validation checklist:
 Suggested commit:
 
 - `chore(deps): evaluate dependency rationalization by measurable roi gate`
+
+### A11 — Windows CI parity gate
+
+Decision checkpoint:
+
+- Current CI runs only `ubuntu-latest` jobs (`frontend-quality` and `tauri-rust-check`).
+- Windows script/build regressions have historically required reactive hotfixes.
+- A minimal Windows parity gate in CI reduces release-time surprises without changing product behavior.
+
+Scope checklist:
+
+- [ ] Add `windows-latest` job(s) in `.github/workflows/ci.yml` with Node + Corepack `pnpm` setup.
+- [ ] Run `pnpm lint` on Windows.
+- [ ] Run `pnpm typecheck:renderer` on Windows.
+- [ ] Run `pnpm build:renderer` on Windows.
+- [ ] Run `cargo check --manifest-path src-tauri/Cargo.toml` on Windows.
+- [ ] Keep Linux jobs unchanged as baseline parity reference.
+
+Validation checklist:
+
+- [ ] Pull requests require both Linux and Windows CI jobs green before merge.
+- [ ] No script path/quoting regressions are introduced in existing Linux jobs.
+- [ ] `pnpm lint`, `pnpm typecheck:renderer`, `pnpm build:renderer`, and `cargo check --manifest-path src-tauri/Cargo.toml` pass in both OS runners.
+
+Suggested commit:
+
+- `ci(workflows): add windows parity quality gates for renderer and tauri`
+
+### A12 — Export write-path hardening symmetry
+
+Decision checkpoint:
+
+- `read_text_file` already enforces `.json`, regular-file checks, and a 5 MB limit.
+- `write_text_file` currently writes arbitrary path/content with no equivalent guardrails.
+- Export flow is user-initiated via native save dialog, but command-level hardening should still be symmetric for defense in depth.
+
+Scope checklist:
+
+- [ ] Restrict `write_text_file` to `.json` output extension.
+- [ ] Add maximum payload size validation (align target with import/read limits, currently 5 MB).
+- [ ] Return explicit, user-safe error messages for rejected writes.
+- [ ] Keep current successful export UX unchanged for valid `.json` paths.
+
+Validation checklist:
+
+- [ ] Manual: valid `.json` export succeeds through native save dialog.
+- [ ] Manual: non-`.json` target is rejected with a clear message.
+- [ ] Manual: oversized payload is rejected predictably.
+- [ ] `pnpm lint`
+- [ ] `pnpm typecheck:renderer`
+- [ ] `pnpm build:renderer`
+- [ ] `cargo check --manifest-path src-tauri/Cargo.toml`
+
+Suggested commit:
+
+- `fix(tauri): harden write_text_file guardrails for export flow`
+
+### A13 — Updater support memoization clarity
+
+Decision checkpoint:
+
+- Updater channel support (`is_updater_channel_supported`) is effectively static for a running binary.
+- Current renderer logic deduplicates only concurrent calls and resets promise state after resolve.
+- Persisting the resolved value for the runtime session keeps behavior explicit and reduces repeated native `invoke` noise.
+
+Scope checklist:
+
+- [ ] Replace in-flight-only dedupe with session memoization of the resolved boolean.
+- [ ] Preserve concurrent-call deduplication and existing fallback-to-`false` safety behavior on errors.
+- [ ] Keep updater UX unchanged: unsupported channels open release page instead of installer flow.
+- [ ] Add concise inline comment documenting memoization intent.
+
+Validation checklist:
+
+- [ ] Manual: unsupported runtime channel still falls back to release page.
+- [ ] Manual: supported runtime channel still allows install-and-restart flow.
+- [ ] Repeated support checks in one session avoid redundant native invocations.
+- [ ] `pnpm lint`
+- [ ] `pnpm typecheck:renderer`
+- [ ] `pnpm build:renderer`
+- [ ] `cargo check --manifest-path src-tauri/Cargo.toml`
+
+Suggested commit:
+
+- `refactor(updater): memoize updater channel support per runtime session`
 
 ---
 
