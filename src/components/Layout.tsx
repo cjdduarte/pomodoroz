@@ -80,13 +80,18 @@ const FirstRunAutoUpdateActions = styled.div`
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.8rem;
+
+  @media (max-width: 380px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 const FirstRunAutoUpdatePrimaryButton = styled(StyledButtonPrimary)`
   min-width: 0;
   min-height: 3.4rem;
   height: auto;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
   line-height: 1.2;
   text-align: center;
   padding: 0.7rem 0.9rem;
@@ -96,7 +101,8 @@ const FirstRunAutoUpdateNormalButton = styled(StyledButtonNormal)`
   min-width: 0;
   min-height: 3.4rem;
   height: auto;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
   line-height: 1.2;
   text-align: center;
   padding: 0.7rem 0.9rem;

@@ -15,7 +15,7 @@
 ### Alterado
 
 - **Modo manual de update agora pergunta antes de instalar** — quando a instalação automática de updates está desligada, o app mostra um prompt localizado com `Atualizar agora` / `Agora não` em vez de substituir a tela de Ajustes pelo updater.
-- **Texto de atualização automática foi clarificado em todos os idiomas** — a configuração agora descreve o comportamento de instalação automática, enquanto o caminho sem automação fica como perguntar antes.
+- **Texto de atualização automática foi clarificado e encurtado em todos os idiomas** — a configuração mantém o sentido de atualização automática e passa a caber melhor em linhas estreitas de Ajustes e prompts compactos.
 - **Checagens de suporte do canal de updater agora são memoizadas por sessão de runtime** — ações repetidas do updater reutilizam o resultado resolvido de `is_updater_channel_supported`, preservando fallback seguro para `false` em erros nativos.
 
 ## [26.4.34] - 2026-04-24
