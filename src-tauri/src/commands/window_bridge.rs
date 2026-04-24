@@ -1,6 +1,12 @@
 use crate::constants::{MAIN_TRAY_ID, TRAY_MENU_QUIT_ID, TRAY_MENU_RESTORE_ID};
 use rodio::{play, DeviceSinkBuilder};
-use std::{fs, io::Cursor, path::PathBuf, sync::Mutex, time::Duration};
+use std::{
+    fs,
+    io::Cursor,
+    path::{Path, PathBuf},
+    sync::Mutex,
+    time::Duration,
+};
 use tauri::{
     image::Image,
     menu::{MenuBuilder, MenuItemBuilder},
@@ -58,7 +64,7 @@ fn map_error(error: impl std::fmt::Display) -> String {
     error.to_string()
 }
 
-fn validate_json_extension(path: &PathBuf) -> Result<(), String> {
+fn validate_json_extension(path: &Path) -> Result<(), String> {
     let extension = path
         .extension()
         .and_then(|value| value.to_str())
