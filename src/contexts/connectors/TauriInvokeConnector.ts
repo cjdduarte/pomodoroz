@@ -78,6 +78,37 @@ const buildErrorMessage = (error: unknown): string =>
 const toInvokeArgs = (payload: unknown): Record<string, unknown> =>
   (payload ?? {}) as Record<string, unknown>;
 
+type SendErrorPayload = {
+  event: ToMainChannel;
+  error: unknown;
+};
+
+type SendErrorListener = (payload: SendErrorPayload) => void;
+
+const sendErrorListeners = new Set<SendErrorListener>();
+
+export const subscribeTauriInvokeConnectorSendErrors = (
+  listener: SendErrorListener
+) => {
+  sendErrorListeners.add(listener);
+  return () => {
+    sendErrorListeners.delete(listener);
+  };
+};
+
+const notifySendError = (payload: SendErrorPayload) => {
+  sendErrorListeners.forEach((listener) => {
+    try {
+      listener(payload);
+    } catch (error) {
+      console.error(
+        "[TAURI IPC] Failed to notify send error listener.",
+        error
+      );
+    }
+  });
+};
+
 let updaterPolicySyncPromise: Promise<void> | null = null;
 let updaterInstallPromise: Promise<void> | null = null;
 let updaterChannelSupportMemo: boolean | null = null;
@@ -488,7 +519,11 @@ export const TauriInvokeConnector: InvokeConnector = {
     ...payload: ToMainPayloadMap[C]
   ) => {
     void sendToTauri(event, payload).catch((error: unknown) => {
-      console.error("[TAURI IPC] Failed to send command.", error);
+      console.error("[TAURI IPC] Failed to send command.", {
+        event,
+        error,
+      });
+      notifySendError({ event, error });
     });
   },
 

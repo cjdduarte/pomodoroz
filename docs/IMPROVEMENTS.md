@@ -43,8 +43,8 @@ When an item is released:
   - `A4` `check-updates` simplification to root-only narrative.
   - Linux release pipeline/AppImage hardening and `sync-latest-json` alignment.
 - Current planning baseline:
-  - Releases up to `26.4.34` are already published in EN/PT changelogs.
-  - `26.4.35` changelog draft currently contains the manual updater prompt flow, updater copy/layout tightening, and `A13` session memoization.
+  - Releases up to `26.4.35` are already published in EN/PT changelogs.
+  - `26.4.36` changelog draft currently contains `A14` native IPC error visibility.
   - `A2` env hygiene completed (renderer `.env` untracked, no committed `.env.example` required by default).
   - `A5` dependency modernization major batches are now completed (`eslint`/`@eslint/js` 10.x with `eslint-react`, and `vite-plugin-svgr@5.2.0`) with full validation.
   - `A6` intentionally deferred by product decision (no test-track changes now).
@@ -53,46 +53,45 @@ When an item is released:
   - `A11` Windows CI parity gate is now implemented (`ubuntu-latest` + `windows-latest`) and workflow runs completed successfully in both OS lanes.
   - `A12` write-path hardening is now implemented: `write_text_file` enforces `.json`, rejects existing non-file targets, and caps payload at 5 MB.
   - `A13` updater channel support memoization is implemented; only manual runtime-channel validation remains.
+  - `A14` native IPC error visibility is implemented; only manual failure-injection validation remains.
 
-### Next execution order (after 26.4.35)
+### Next execution order (after 26.4.36)
 
-1. **A14 — Native IPC error visibility**
-   - Surface asynchronous Tauri command failures in the renderer UI instead of leaving them only in console logs.
-2. **A7 — Renderer version source hardening**
+1. **A7 — Renderer version source hardening**
    - Replace direct renderer imports of `package.json` with injected app version metadata.
-3. **A15 — CSP hardening and cleanup**
+2. **A15 — CSP hardening and cleanup**
    - Tighten renderer CSP and remove small dead-code residues in one low-risk cleanup block.
-4. **A3 — Shortcut persistence**
+3. **A3 — Shortcut persistence**
    - Persist customizable shortcuts and restore on boot.
-5. **Product cycle (B1 -> B2 -> B3)**
+4. **Product cycle (B1 -> B2 -> B3)**
    - Cadence presets, session extension, break suggestion prompts.
-6. **A6 revisit gate**
+5. **A6 revisit gate**
    - Revisit test strategy only after items above are stabilized.
-7. **A10 dependency rationalization gate**
+6. **A10 dependency rationalization gate**
    - Evaluate necessity first; execute only if metrics and maintenance ROI are clear.
 
 ---
 
 ## 2. Track A — Conversion Hardening (Tauri-only)
 
-| ID  | Item                                                                          | Status  | Priority | Notes                                                  |
-| --- | ----------------------------------------------------------------------------- | ------- | -------- | ------------------------------------------------------ |
-| A0  | Consolidate runtime to Tauri-only and remove browser fallback branches        | Done    | High     | Released in 26.4.28                                    |
-| A1  | Resolve titlebar legacy CSS/changelog divergence (`-webkit-app-region`)       | Done    | High     | Released in 26.4.28                                    |
-| A2  | `.env` hygiene (`app/renderer/.env` tracked)                                  | Done    | High     | Completed and registered in 26.4.29 draft              |
-| A3  | Persist custom shortcuts (`Shortcut.tsx` TODO)                                | Open    | Medium   | Avoid loss after restart                               |
-| A4  | Simplify `check-updates` to root-only narrative and flows                     | Done    | Medium   | Released in 26.4.28                                    |
-| A5  | Controlled major updates (`eslint`/`@eslint/js` 10.x, `vite-plugin-svgr` 5.x) | Done    | Medium   | Batches 1/2/3 completed in 26.4.29 draft               |
-| A6  | Define automated test strategy (adopt baseline tests or remove idle stack)    | Blocked | High     | Deferred by decision (no tests changes now)            |
-| A7  | Replace renderer `package.json` imports with injected app version metadata    | Open    | Medium   | Avoid shipping full manifest in UI bundles             |
-| A8  | Expand i18n language coverage (`de`/`fr`) with tray/startup parity            | Done    | High     | Delivered in 26.4.31                                   |
-| A9  | Unify auto-language source between renderer and native tray                   | Done    | Medium   | Delivered in 26.4.33 draft                             |
-| A10 | Dependency rationalization gate (`uuid`, debounce, tests, style/state stack)  | Blocked | Medium   | Execute only with measurable ROI; no-change is valid   |
-| A11 | Add Windows CI parity gate for renderer and Rust quality checks               | Done    | High     | Delivered in 26.4.34 draft                             |
-| A12 | Harden `write_text_file` to mirror `read_text_file` guardrails                | Done    | High     | Delivered in 26.4.34 draft                             |
-| A13 | Memoize updater-channel support result across runtime session                 | Done    | Medium   | Delivered in 26.4.35 draft                             |
-| A14 | Surface asynchronous Tauri IPC command errors in the UI                       | Open    | High     | `send` failures currently stay in async catch/log path |
-| A15 | Tighten renderer CSP and remove small dead-code residues                      | Open    | High     | Keep CSP validation separate from product work         |
+| ID  | Item                                                                          | Status  | Priority | Notes                                                |
+| --- | ----------------------------------------------------------------------------- | ------- | -------- | ---------------------------------------------------- |
+| A0  | Consolidate runtime to Tauri-only and remove browser fallback branches        | Done    | High     | Released in 26.4.28                                  |
+| A1  | Resolve titlebar legacy CSS/changelog divergence (`-webkit-app-region`)       | Done    | High     | Released in 26.4.28                                  |
+| A2  | `.env` hygiene (`app/renderer/.env` tracked)                                  | Done    | High     | Completed and registered in 26.4.29 draft            |
+| A3  | Persist custom shortcuts (`Shortcut.tsx` TODO)                                | Open    | Medium   | Avoid loss after restart                             |
+| A4  | Simplify `check-updates` to root-only narrative and flows                     | Done    | Medium   | Released in 26.4.28                                  |
+| A5  | Controlled major updates (`eslint`/`@eslint/js` 10.x, `vite-plugin-svgr` 5.x) | Done    | Medium   | Batches 1/2/3 completed in 26.4.29 draft             |
+| A6  | Define automated test strategy (adopt baseline tests or remove idle stack)    | Blocked | High     | Deferred by decision (no tests changes now)          |
+| A7  | Replace renderer `package.json` imports with injected app version metadata    | Open    | Medium   | Avoid shipping full manifest in UI bundles           |
+| A8  | Expand i18n language coverage (`de`/`fr`) with tray/startup parity            | Done    | High     | Delivered in 26.4.31                                 |
+| A9  | Unify auto-language source between renderer and native tray                   | Done    | Medium   | Delivered in 26.4.33 draft                           |
+| A10 | Dependency rationalization gate (`uuid`, debounce, tests, style/state stack)  | Blocked | Medium   | Execute only with measurable ROI; no-change is valid |
+| A11 | Add Windows CI parity gate for renderer and Rust quality checks               | Done    | High     | Delivered in 26.4.34 draft                           |
+| A12 | Harden `write_text_file` to mirror `read_text_file` guardrails                | Done    | High     | Delivered in 26.4.34 draft                           |
+| A13 | Memoize updater-channel support result across runtime session                 | Done    | Medium   | Delivered in 26.4.35 draft                           |
+| A14 | Surface asynchronous Tauri IPC command errors in the UI                       | Done    | High     | Delivered in 26.4.36 draft                           |
+| A15 | Tighten renderer CSP and remove small dead-code residues                      | Open    | High     | Keep CSP validation separate from product work       |
 
 ### A0 — Tauri-only runtime consolidation
 
@@ -442,19 +441,19 @@ Decision checkpoint:
 
 Scope checklist:
 
-- [ ] Route asynchronous `sendToTauri` failures to a UI-visible connector error channel.
-- [ ] Preserve current fire-and-forget call sites unless a stronger contract is needed.
-- [ ] Keep user-facing error text safe and concise; keep technical details in console logs.
-- [ ] Avoid duplicate alerts for repeated failures from the same command path.
+- [x] Route asynchronous `sendToTauri` failures to a UI-visible connector error channel.
+- [x] Preserve current fire-and-forget call sites unless a stronger contract is needed.
+- [x] Keep user-facing error text safe and concise; keep technical details in console logs.
+- [x] Avoid duplicate alerts for repeated failures from the same command path.
 
 Validation checklist:
 
 - [ ] Manual: force a native command failure and confirm the renderer alert appears.
 - [ ] Manual: dismissing the alert clears the visible error.
-- [ ] `pnpm lint`
-- [ ] `pnpm typecheck:renderer`
-- [ ] `pnpm build:renderer`
-- [ ] `cargo check --manifest-path src-tauri/Cargo.toml`
+- [x] `pnpm lint`
+- [x] `pnpm typecheck:renderer`
+- [x] `pnpm build:renderer`
+- [x] `cargo check --manifest-path src-tauri/Cargo.toml`
 
 Suggested commit:
 

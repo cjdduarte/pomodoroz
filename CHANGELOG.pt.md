@@ -6,6 +6,12 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.4.36] - A definir
+
+### Corrigido
+
+- **Falhas de comandos nativos do Tauri agora aparecem na UI** — falhas assíncronas de `TauriInvokeConnector.send()` agora notificam o provider do conector, permitindo que o aviso existente de integração nativa apareça em vez de deixar a falha apenas nos logs do console.
+
 ## [26.4.35] - 2026-04-24
 
 ### Corrigido

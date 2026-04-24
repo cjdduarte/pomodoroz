@@ -41,7 +41,10 @@ import { listen } from "@tauri-apps/api/event";
 import { useTrayIconUpdates } from "hooks/useTrayIconUpdates";
 import { setUpdateBody, setUpdateVersion } from "store/update";
 import { isFreshInstallProfile } from "store";
-import { TauriInvokeConnector } from "./TauriInvokeConnector";
+import {
+  TauriInvokeConnector,
+  subscribeTauriInvokeConnectorSendErrors,
+} from "./TauriInvokeConnector";
 
 const IPC_ERROR_MESSAGE =
   "Falha ao comunicar com o runtime nativo (Tauri). Reinicie o app.";
@@ -119,8 +122,7 @@ export const TauriConnectorProvider = ({
     setConnectorError(null);
   }, []);
 
-  const setConnectorIpcError = useCallback((error: unknown) => {
-    console.error("[TAURI IPC] Native communication error.", error);
+  const showConnectorIpcError = useCallback(() => {
     setConnectorError(IPC_ERROR_MESSAGE);
   }, []);
 
@@ -131,13 +133,19 @@ export const TauriConnectorProvider = ({
     ) => {
       try {
         TauriInvokeConnector.send(channel, ...payload);
-        clearConnectorError();
       } catch (error) {
-        setConnectorIpcError(error);
+        console.error("[TAURI IPC] Native communication error.", error);
+        showConnectorIpcError();
       }
     },
-    [clearConnectorError, setConnectorIpcError]
+    [showConnectorIpcError]
   );
+
+  useEffect(() => {
+    return subscribeTauriInvokeConnectorSendErrors(() => {
+      showConnectorIpcError();
+    });
+  }, [showConnectorIpcError]);
 
   useEffect(() => {
     ignoreUpdateRef.current = settings.ignoreUpdate;
