@@ -20,9 +20,11 @@ type Props = {
 const Navigation: React.FC<Props> = ({ timerType }) => {
   const { t } = useTranslation();
   const settings = useAppSelector((state) => state.settings);
-  const hasUpdateNotification = useAppSelector(
-    (state) => state.update.updateBody
+  const updateVersion = useAppSelector(
+    (state) => state.update.updateVersion
   );
+  const hasUpdateNotification =
+    !settings.enableInAppAutoUpdate && updateVersion;
 
   return (
     <StyledNav useNativeTitlebar={settings.useNativeTitlebar}>

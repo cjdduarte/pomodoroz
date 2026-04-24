@@ -86,7 +86,7 @@ When an item is released:
 | A10 | Dependency rationalization gate (`uuid`, debounce, tests, style/state stack)  | Blocked | Medium   | Execute only with measurable ROI; no-change is valid |
 | A11 | Add Windows CI parity gate for renderer and Rust quality checks               | Done    | High     | Delivered in 26.4.34 draft                           |
 | A12 | Harden `write_text_file` to mirror `read_text_file` guardrails                | Done    | High     | Delivered in 26.4.34 draft                           |
-| A13 | Memoize updater-channel support result across runtime session                 | Open    | Medium   | Clarify behavior and avoid repeated native checks    |
+| A13 | Memoize updater-channel support result across runtime session                 | Done    | Medium   | Delivered in 26.4.35 draft                           |
 
 ### A0 — Tauri-only runtime consolidation
 
@@ -407,20 +407,20 @@ Decision checkpoint:
 
 Scope checklist:
 
-- [ ] Replace in-flight-only dedupe with session memoization of the resolved boolean.
-- [ ] Preserve concurrent-call deduplication and existing fallback-to-`false` safety behavior on errors.
-- [ ] Keep updater UX unchanged: unsupported channels open release page instead of installer flow.
-- [ ] Add concise inline comment documenting memoization intent.
+- [x] Replace in-flight-only dedupe with session memoization of the resolved boolean.
+- [x] Preserve concurrent-call deduplication and existing fallback-to-`false` safety behavior on errors.
+- [x] Preserve unsupported-channel fallback: unsupported channels open release page instead of installer flow.
+- [x] Add concise inline comment documenting memoization intent.
 
 Validation checklist:
 
 - [ ] Manual: unsupported runtime channel still falls back to release page.
 - [ ] Manual: supported runtime channel still allows install-and-restart flow.
 - [ ] Repeated support checks in one session avoid redundant native invocations.
-- [ ] `pnpm lint`
-- [ ] `pnpm typecheck:renderer`
-- [ ] `pnpm build:renderer`
-- [ ] `cargo check --manifest-path src-tauri/Cargo.toml`
+- [x] `pnpm lint`
+- [x] `pnpm typecheck:renderer`
+- [x] `pnpm build:renderer`
+- [x] `cargo check --manifest-path src-tauri/Cargo.toml`
 
 Suggested commit:
 

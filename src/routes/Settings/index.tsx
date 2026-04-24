@@ -12,21 +12,14 @@ import HelpSection from "./HelpSection";
 import ShortcutSection from "./ShortcutSection";
 import StickySection from "./StickySection";
 import SettingHeader from "./SettingHeader";
-import { useAppSelector } from "hooks/storeHooks";
-import { Updater } from "../../components";
 
 export default function Settings() {
   const { t } = useTranslation();
   const alertState = getFromStorage<string>("alert") || null;
 
-  const update = useAppSelector((state) => state.update);
-  const settings = useAppSelector((state) => state.settings);
-
   const [alert, setAlert] = useState(alertState);
 
-  return update.updateBody && !settings.enableInAppAutoUpdate ? (
-    <Updater />
-  ) : (
+  return (
     <StyledSettings>
       <SettingHeader />
       {alert === null && (

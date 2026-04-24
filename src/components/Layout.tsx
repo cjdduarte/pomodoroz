@@ -14,6 +14,7 @@ import {
 } from "styles";
 
 import Alert from "./Alert";
+import ConfirmDialog from "./ConfirmDialog";
 import Titlebar from "./Titlebar";
 import Navigation from "./Navigation";
 import Portal from "./Portal";
@@ -21,10 +22,13 @@ import {
   ThemeContext,
   ConnectorContext,
   CounterContext,
+  getInvokeConnector,
 } from "contexts";
+import { INSTALL_UPDATE } from "ipc";
 import { TimerStatus } from "store/timer/types";
 import { useAppDispatch, useAppSelector } from "hooks/storeHooks";
 import { isFreshInstallProfile, setEnableInAppAutoUpdate } from "store";
+import { setUpdateBody, setUpdateVersion } from "store/update";
 import { getFromStorage, saveToStorage } from "utils";
 
 const AUTO_UPDATE_POLICY_PROMPT_SEEN_KEY =
@@ -109,6 +113,7 @@ const Layout: React.FC<Props> = ({ children }) => {
   const timer = useAppSelector((state) => state.timer);
 
   const settings = useAppSelector((state) => state.settings);
+  const update = useAppSelector((state) => state.update);
   const dispatch = useAppDispatch();
 
   const { toggleThemeAction } = useContext(ThemeContext);
@@ -121,6 +126,10 @@ const Layout: React.FC<Props> = ({ children }) => {
     showFirstRunAutoUpdatePrompt,
     setShowFirstRunAutoUpdatePrompt,
   ] = useState(false);
+  const [
+    dismissedUpdatePromptVersion,
+    setDismissedUpdatePromptVersion,
+  ] = useState("");
 
   const registerKey = useCallback(
     (e: KeyboardEvent) => {
@@ -193,6 +202,23 @@ const Layout: React.FC<Props> = ({ children }) => {
     [dispatch]
   );
 
+  const clearUpdatePromptForSession = useCallback(() => {
+    setDismissedUpdatePromptVersion(update.updateVersion);
+    dispatch(setUpdateVersion(""));
+    dispatch(setUpdateBody(""));
+  }, [dispatch, update.updateVersion]);
+
+  const onInstallPromptConfirm = useCallback(() => {
+    clearUpdatePromptForSession();
+    getInvokeConnector().send(INSTALL_UPDATE);
+  }, [clearUpdatePromptForSession]);
+
+  const shouldShowUpdateInstallPrompt =
+    Boolean(update.updateVersion) &&
+    !settings.enableInAppAutoUpdate &&
+    !showFirstRunAutoUpdatePrompt &&
+    dismissedUpdatePromptVersion !== update.updateVersion;
+
   return (
     <StyledLayout noTransition={noTransition}>
       {!settings.useNativeTitlebar && (
@@ -239,6 +265,17 @@ const Layout: React.FC<Props> = ({ children }) => {
           </FirstRunAutoUpdateOverlay>
         </Portal>
       )}
+      <ConfirmDialog
+        open={shouldShowUpdateInstallPrompt}
+        title={t("updater.promptTitle")}
+        message={t("updater.promptBody", {
+          version: update.updateVersion,
+        })}
+        cancelLabel={t("updater.notNow")}
+        confirmLabel={t("updater.updateNow")}
+        onCancel={clearUpdatePromptForSession}
+        onConfirm={onInstallPromptConfirm}
+      />
       {children}
     </StyledLayout>
   );

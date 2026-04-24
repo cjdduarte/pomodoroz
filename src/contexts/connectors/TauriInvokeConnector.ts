@@ -80,6 +80,7 @@ const toInvokeArgs = (payload: unknown): Record<string, unknown> =>
 
 let updaterPolicySyncPromise: Promise<void> | null = null;
 let updaterInstallPromise: Promise<void> | null = null;
+let updaterChannelSupportMemo: boolean | null = null;
 let updaterChannelSupportPromise: Promise<boolean> | null = null;
 
 type TauriUpdateHandle = NonNullable<
@@ -87,10 +88,15 @@ type TauriUpdateHandle = NonNullable<
 >;
 
 const isUpdaterChannelSupported = async (): Promise<boolean> => {
+  if (updaterChannelSupportMemo !== null) {
+    return updaterChannelSupportMemo;
+  }
+
   if (updaterChannelSupportPromise) {
     return updaterChannelSupportPromise;
   }
 
+  // Bundle type is static for a running app, so cache the resolved support flag.
   updaterChannelSupportPromise = invoke<boolean>(
     "is_updater_channel_supported"
   )
@@ -100,6 +106,10 @@ const isUpdaterChannelSupported = async (): Promise<boolean> => {
         error
       );
       return false;
+    })
+    .then((isSupported) => {
+      updaterChannelSupportMemo = isSupported;
+      return isSupported;
     })
     .finally(() => {
       updaterChannelSupportPromise = null;

@@ -159,12 +159,12 @@ export const ja = {
     closeToTray: "トレイに閉じる",
     voiceAssistance: "音声アシスタント",
     openAtLogin: "ログイン時に起動",
-    inAppAutoUpdate: "アプリ内自動アップデート",
-    autoUpdatePromptTitle: "自動アップデート",
+    inAppAutoUpdate: "アップデートを自動インストール",
+    autoUpdatePromptTitle: "アップデートの自動インストール",
     autoUpdatePromptBody:
-      "新しいバージョンを自動でダウンロードしてインストールしますか？この設定は後で設定画面から変更できます。",
-    autoUpdatePromptEnable: "自動更新する",
-    autoUpdatePromptNotifyOnly: "通知のみ",
+      "新しいバージョンが見つかったときに、自動でダウンロード、インストール、再起動しますか？この設定は後で変更できます。",
+    autoUpdatePromptEnable: "自動でインストール",
+    autoUpdatePromptNotifyOnly: "先に確認する",
     notificationSound: "通知サウンド",
     notificationSoundDefault: "アプリ既定サウンド",
     notificationSoundCustom: "カスタムサウンド",
@@ -205,18 +205,11 @@ export const ja = {
     },
   },
   updater: {
-    heading: "アップデートがあります",
-    noUpdateBody: "アップデート内容が見つかりません",
-    installAndRestart: "インストールして再起動",
-    installingTitle: "アップデートをインストール中",
-    installingBody:
-      "アプリ内でアップデートのダウンロードを開始しました。完了後に Pomodoroz を再起動します。",
-    openingReleaseTitle: "リリースページを開いています",
-    openingReleaseBody:
-      "ブラウザで最新のリリースノートとインストーラーを開きます。",
-    openReleasePage: "リリースページを開く",
-    remindMeLater: "後で通知する",
-    ignoreThisVersion: "このバージョンを無視",
+    promptTitle: "新しいバージョンがあります",
+    promptBody:
+      "バージョン {{version}} が利用できます。今すぐ更新しますか？",
+    updateNow: "今すぐ更新",
+    notNow: "あとで",
   },
   statistics: {
     title: "レポート",

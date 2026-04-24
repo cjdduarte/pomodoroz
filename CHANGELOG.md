@@ -8,6 +8,16 @@
 
 ## [26.4.35] - TBD
 
+### Fixed
+
+- **Manual update prompts no longer depend on release-note body text** — update availability now uses `updateVersion`, so the install prompt and navigation indicator remain available even when the updater feed has an empty body.
+
+### Changed
+
+- **Manual update mode now asks before installing** — when automatic update installation is disabled, the app shows a localized `Update now` / `Not now` prompt instead of replacing Settings with the updater screen.
+- **Automatic update wording was clarified across all translations** — the setting now describes automatic installation behavior, while the opt-out path is framed as asking first.
+- **Updater channel support checks are memoized per runtime session** — repeated updater actions now reuse the resolved `is_updater_channel_supported` result while preserving safe `false` fallback behavior on native errors.
+
 ## [26.4.34] - 2026-04-24
 
 ### Changed

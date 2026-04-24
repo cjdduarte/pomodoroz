@@ -160,12 +160,12 @@ export const fr = {
     closeToTray: "Fermer dans la zone de notification",
     voiceAssistance: "Assistance vocale",
     openAtLogin: "Ouvrir a la connexion",
-    inAppAutoUpdate: "Mise a jour auto dans l'app",
-    autoUpdatePromptTitle: "Mises a jour automatiques",
+    inAppAutoUpdate: "Installer les mises a jour automatiquement",
+    autoUpdatePromptTitle: "Installation automatique des mises a jour",
     autoUpdatePromptBody:
-      "Veux-tu que l'app telecharge et installe automatiquement les nouvelles versions ? Tu pourras changer cela plus tard dans les Parametres.",
-    autoUpdatePromptEnable: "Mise a jour auto",
-    autoUpdatePromptNotifyOnly: "Seulement notifier",
+      "Veux-tu que l'app telecharge, installe et redemarre automatiquement quand une nouvelle version est disponible ? Tu pourras changer cela plus tard dans les Parametres.",
+    autoUpdatePromptEnable: "Installer automatiquement",
+    autoUpdatePromptNotifyOnly: "Demander avant",
     notificationSound: "Son de notification",
     notificationSoundDefault: "Son par defaut de l'app",
     notificationSoundCustom: "Son personnalise",
@@ -206,18 +206,11 @@ export const fr = {
     },
   },
   updater: {
-    heading: "Une mise a jour est disponible",
-    noUpdateBody: "Aucun contenu de mise a jour trouve",
-    installAndRestart: "Installer et redemarrer",
-    installingTitle: "Installation de la mise a jour",
-    installingBody:
-      "Le telechargement de la mise a jour a commence dans l'app. Pomodoroz redemarrera a la fin.",
-    openingReleaseTitle: "Ouverture de la page de release",
-    openingReleaseBody:
-      "Ton navigateur va ouvrir les notes de version et l'installateur le plus recent.",
-    openReleasePage: "Ouvrir la page de release",
-    remindMeLater: "Me rappeler plus tard",
-    ignoreThisVersion: "Ignorer cette version",
+    promptTitle: "Nouvelle version trouvee",
+    promptBody:
+      "La version {{version}} est disponible. Veux-tu mettre a jour maintenant ?",
+    updateNow: "Mettre a jour",
+    notNow: "Pas maintenant",
   },
   statistics: {
     title: "Rapport",

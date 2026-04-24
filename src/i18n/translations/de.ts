@@ -161,12 +161,12 @@ export const de = {
     closeToTray: "In den Tray schliessen",
     voiceAssistance: "Sprachunterstuetzung",
     openAtLogin: "Beim Login starten",
-    inAppAutoUpdate: "Auto-Update in der App",
-    autoUpdatePromptTitle: "Automatische Updates",
+    inAppAutoUpdate: "Updates automatisch installieren",
+    autoUpdatePromptTitle: "Automatische Update-Installation",
     autoUpdatePromptBody:
-      "Soll die App neue Versionen automatisch herunterladen und installieren? Du kannst das spaeter in den Einstellungen aendern.",
-    autoUpdatePromptEnable: "Auto-Update",
-    autoUpdatePromptNotifyOnly: "Nur benachrichtigen",
+      "Soll die App neue Versionen automatisch herunterladen, installieren und neu starten? Du kannst das spaeter in den Einstellungen aendern.",
+    autoUpdatePromptEnable: "Automatisch installieren",
+    autoUpdatePromptNotifyOnly: "Vorher fragen",
     notificationSound: "Benachrichtigungston",
     notificationSoundDefault: "Standardton der App",
     notificationSoundCustom: "Eigener Ton",
@@ -208,18 +208,11 @@ export const de = {
     },
   },
   updater: {
-    heading: "Ein Update ist verfuegbar",
-    noUpdateBody: "Keine Update-Beschreibung gefunden",
-    installAndRestart: "Installieren und neu starten",
-    installingTitle: "Update wird installiert",
-    installingBody:
-      "Der Update-Download wurde in der App gestartet. Pomodoroz startet nach Abschluss neu.",
-    openingReleaseTitle: "Release-Seite wird geoeffnet",
-    openingReleaseBody:
-      "Dein Browser oeffnet die neuesten Release Notes und den Installer.",
-    openReleasePage: "Release-Seite oeffnen",
-    remindMeLater: "Spaeter erinnern",
-    ignoreThisVersion: "Diese Version ignorieren",
+    promptTitle: "Neue Version gefunden",
+    promptBody:
+      "Version {{version}} ist verfuegbar. Moechtest du jetzt aktualisieren?",
+    updateNow: "Jetzt aktualisieren",
+    notNow: "Jetzt nicht",
   },
   statistics: {
     title: "Bericht",
