@@ -17,6 +17,7 @@
 - **Manual update mode now asks before installing** — when automatic update installation is disabled, the app shows a localized `Update now` / `Not now` prompt instead of replacing Settings with the updater screen.
 - **Automatic update wording was clarified and shortened across all translations** — the setting keeps the automatic-update meaning while fitting narrow settings rows and compact prompts better.
 - **Updater channel support checks are memoized per runtime session** — repeated updater actions now reuse the resolved `is_updater_channel_supported` result while preserving safe `false` fallback behavior on native errors.
+- **Improvements roadmap was synchronized after the updater block** — `docs/IMPROVEMENTS.md` now marks `A13` as delivered, queues IPC error visibility, `A7`, CSP/cleanup, and `A3` as the next technical sequence, and returns unfinished product items to `Open`.
 
 ## [26.4.34] - 2026-04-24
 
