@@ -18,7 +18,7 @@
 - **Texto de atualização automática foi clarificado e encurtado em todos os idiomas** — a configuração mantém o sentido de atualização automática e passa a caber melhor em linhas estreitas de Ajustes e prompts compactos.
 - **Checagens de suporte do canal de updater agora são memoizadas por sessão de runtime** — ações repetidas do updater reutilizam o resultado resolvido de `is_updater_channel_supported`, preservando fallback seguro para `false` em erros nativos.
 - **Roadmap de melhorias sincronizado após o bloco de updater** — `docs/IMPROVEMENTS.md` agora marca `A13` como entregue, enfileira visibilidade de erro IPC, `A7`, CSP/limpezas e `A3` como a próxima sequência técnica, e retorna itens de produto ainda não concluídos para `Open`.
-- **Orientação de versão do pnpm alinhada entre CI e checagens locais** — o CI agora usa o mesmo pin `pnpm@10.33.2` do workflow de release, e `check-updates.sh` passa a orientar melhor Manjaro/Arch quando o binário `pnpm` ativo difere do pacote do sistema.
+- **Gestão de pins do pnpm alinhada entre CI e release** — o CI agora usa o mesmo pin `pnpm@10.33.2` do workflow de release, e `check-updates.sh` agora reporta e pode atualizar todos os pins de pnpm dos workflows em conjunto, além de orientar melhor Manjaro/Arch quando o binário `pnpm` ativo difere do pacote do sistema.
 
 ## [26.4.34] - 2026-04-24
 

@@ -150,13 +150,26 @@ is_arch_like_linux() {
   esac
 }
 
-collect_release_workflow_pnpm_pins() {
-  local workflow_file="$POMODOROZ_DIR/.github/workflows/release-autoupdate.yml"
-  if [ ! -f "$workflow_file" ]; then
+workflow_pnpm_files() {
+  local workflows_dir="$POMODOROZ_DIR/.github/workflows"
+  if [ ! -d "$workflows_dir" ]; then
     return
   fi
 
-  awk '
+  find "$workflows_dir" -maxdepth 1 -type f \( -name "*.yml" -o -name "*.yaml" \) | sort
+}
+
+collect_workflow_pnpm_pin_rows() {
+  local workflow_file
+  while IFS= read -r workflow_file; do
+    local relative_file
+    relative_file="${workflow_file#$POMODOROZ_DIR/}"
+
+    awk '
+      BEGIN {
+        file = ARGV[1]
+        ARGV[1] = ""
+      }
     /uses:[[:space:]]*pnpm\/action-setup@/ {
       in_setup = 1
       next
@@ -164,7 +177,7 @@ collect_release_workflow_pnpm_pins() {
     in_setup && /^[[:space:]]*version:[[:space:]]*/ {
       value = $2
       gsub(/"/, "", value)
-      print value
+        print file "\t" value
       in_setup = 0
       next
     }
@@ -174,50 +187,92 @@ collect_release_workflow_pnpm_pins() {
     {
       line = $0
       if (match(line, /corepack[[:space:]]+prepare[[:space:]]+pnpm@([0-9][0-9A-Za-z._-]*)[[:space:]]+--activate/, m)) {
-        print m[1]
+          print file "\t" m[1]
       }
     }
-  ' "$workflow_file" | sort -u
+    ' "$relative_file" "$workflow_file"
+  done < <(workflow_pnpm_files) | sort -u
 }
 
-check_release_workflow_pnpm_pin() {
+collect_workflow_pnpm_pin_versions() {
+  collect_workflow_pnpm_pin_rows | awk -F '\t' '{ print $2 }' | sort -u
+}
+
+join_lines_with_comma() {
+  awk '
+    BEGIN { first = 1 }
+    {
+      if (!first) {
+        printf ", "
+      }
+      printf "%s", $0
+      first = 0
+    }
+    END {
+      if (!first) {
+        printf "\n"
+      }
+    }
+  '
+}
+
+check_workflow_pnpm_pins() {
   local pins_raw
-  pins_raw="$(collect_release_workflow_pnpm_pins || true)"
+  pins_raw="$(collect_workflow_pnpm_pin_versions || true)"
   if [ -z "$pins_raw" ]; then
-    echo "  Release workflow pin (pnpm): ⚠ nao encontrado"
-    echo "    Arquivo esperado: .github/workflows/release-autoupdate.yml"
+    echo "  Workflow pins (pnpm): ⚠ nao encontrados"
+    echo "    Arquivos esperados: .github/workflows/*.yml"
     return
   fi
 
   local pin_count
   pin_count="$(printf "%s\n" "$pins_raw" | wc -l | tr -d '[:space:]')"
   local pins_display
-  pins_display="$(printf "%s\n" "$pins_raw" | paste -sd', ' -)"
-  echo "  Release workflow pin (pnpm): ${pins_display}"
+  pins_display="$(printf "%s\n" "$pins_raw" | join_lines_with_comma)"
+  echo "  Workflow pins (pnpm): ${pins_display}"
 
-  local first_pin
-  first_pin="$(printf "%s\n" "$pins_raw" | head -n 1)"
+  local pin_rows
+  pin_rows="$(collect_workflow_pnpm_pin_rows || true)"
+  if [ -n "$pin_rows" ]; then
+    while IFS="$(printf '\t')" read -r workflow_file pin_version; do
+      echo "    ${workflow_file}: pnpm@${pin_version}"
+    done <<< "$pin_rows"
+  fi
 
   if [ "$pin_count" -gt 1 ]; then
-    echo "    ⚠ Inconsistencia: workflow possui mais de um pin de versao para pnpm."
+    echo "    ⚠ Inconsistencia: workflows possuem mais de um pin de versao para pnpm."
   fi
 
-  if [ -n "$PNPM_VERSION_CURRENT" ] && [ "$first_pin" != "$PNPM_VERSION_CURRENT" ]; then
-    echo "    Aviso: pnpm local (${PNPM_VERSION_CURRENT}) difere do pin do workflow (${first_pin})."
+  if [ "$pin_count" -eq 1 ]; then
+    local first_pin
+    first_pin="$(printf "%s\n" "$pins_raw" | head -n 1)"
+    if [ -n "$PNPM_VERSION_CURRENT" ] && [ "$first_pin" != "$PNPM_VERSION_CURRENT" ]; then
+      echo "    Aviso: pnpm local (${PNPM_VERSION_CURRENT}) difere do pin dos workflows (${first_pin})."
+    fi
   fi
 
-  if [ -n "$PNPM_VERSION_LATEST" ] && version_gt "$PNPM_VERSION_LATEST" "$first_pin"; then
-    echo "    Suggestion: update workflow pin ${first_pin} -> ${PNPM_VERSION_LATEST}"
-    echo "    File: .github/workflows/release-autoupdate.yml"
+  if [ -n "$PNPM_VERSION_LATEST" ]; then
+    local has_outdated_pin=0
+    local pin
+    while IFS= read -r pin; do
+      if version_gt "$PNPM_VERSION_LATEST" "$pin"; then
+        has_outdated_pin=1
+      fi
+    done <<< "$pins_raw"
+
+    if [ "$has_outdated_pin" -eq 1 ]; then
+      echo "    Suggestion: update workflow pnpm pins -> ${PNPM_VERSION_LATEST}"
+      echo "    Files: .github/workflows/*.yml"
+    fi
   fi
 }
 
-update_release_workflow_pnpm_pin() {
+update_workflow_pnpm_pin_file() {
   local target_version="$1"
-  local workflow_file="$POMODOROZ_DIR/.github/workflows/release-autoupdate.yml"
+  local workflow_file="$2"
 
   if [ ! -f "$workflow_file" ]; then
-    echo "  ⚠ Arquivo de workflow nao encontrado: .github/workflows/release-autoupdate.yml"
+    echo "  ⚠ Arquivo de workflow nao encontrado: ${workflow_file#$POMODOROZ_DIR/}"
     return 1
   fi
 
@@ -279,7 +334,27 @@ fs.writeFileSync(file, out.join("\n") + (hadFinalNewline ? "\n" : ""), "utf8");
   return 0
 }
 
-maybe_offer_release_workflow_pnpm_pin_update() {
+update_workflow_pnpm_pins() {
+  local target_version="$1"
+  local failed_count=0
+  local relative_workflow_file
+  local workflow_file
+
+  while IFS= read -r relative_workflow_file; do
+    workflow_file="$POMODOROZ_DIR/$relative_workflow_file"
+    if ! update_workflow_pnpm_pin_file "$target_version" "$workflow_file"; then
+      failed_count=$((failed_count + 1))
+    fi
+  done < <(collect_workflow_pnpm_pin_rows | awk -F '\t' '{ print $1 }' | sort -u)
+
+  if [ "$failed_count" -gt 0 ]; then
+    return 1
+  fi
+
+  return 0
+}
+
+maybe_offer_workflow_pnpm_pin_update() {
   if [ "$MODE" != "interactive" ]; then
     return
   fi
@@ -289,35 +364,34 @@ maybe_offer_release_workflow_pnpm_pin_update() {
   fi
 
   local pins_raw
-  pins_raw="$(collect_release_workflow_pnpm_pins || true)"
+  pins_raw="$(collect_workflow_pnpm_pin_versions || true)"
   if [ -z "$pins_raw" ]; then
     return
   fi
 
-  local pin_count
-  pin_count="$(printf "%s\n" "$pins_raw" | wc -l | tr -d '[:space:]')"
-  if [ "$pin_count" -ne 1 ]; then
-    echo "  ⚠ Pulando atualizacao automatica do pin do workflow: multiplos pins detectados."
-    return
-  fi
+  local has_outdated_pin=0
+  local pin
+  while IFS= read -r pin; do
+    if version_gt "$PNPM_VERSION_LATEST" "$pin"; then
+      has_outdated_pin=1
+    fi
+  done <<< "$pins_raw"
 
-  local current_pin
-  current_pin="$(printf "%s\n" "$pins_raw" | head -n 1)"
-  if ! version_gt "$PNPM_VERSION_LATEST" "$current_pin"; then
+  if [ "$has_outdated_pin" -eq 0 ]; then
     return
   fi
 
   echo ""
   local confirm
-  if ! read -r -p "Atualizar pin do workflow de release para pnpm@${PNPM_VERSION_LATEST}? (s/N): " confirm; then
+  if ! read -r -p "Atualizar pins de pnpm em todos os workflows para pnpm@${PNPM_VERSION_LATEST}? (s/N): " confirm; then
     die "falha ao ler confirmacao para update de pin do workflow."
   fi
 
   if [[ "$confirm" =~ ^[sS]$ ]]; then
-    update_release_workflow_pnpm_pin "$PNPM_VERSION_LATEST"
-    echo "  ✓ Workflow atualizado: pnpm ${PNPM_VERSION_LATEST}"
+    update_workflow_pnpm_pins "$PNPM_VERSION_LATEST"
+    echo "  ✓ Workflows atualizados: pnpm ${PNPM_VERSION_LATEST}"
   else
-    echo "  Pin do workflow mantido em ${current_pin}."
+    echo "  Pins de workflow mantidos."
   fi
 }
 
@@ -708,8 +782,8 @@ check_dev_environment() {
     echo "  pnpm: ❌ nao encontrado"
   fi
 
-  check_release_workflow_pnpm_pin
-  maybe_offer_release_workflow_pnpm_pin_update
+  check_workflow_pnpm_pins
+  maybe_offer_workflow_pnpm_pin_update
 }
 
 get_pkg_version() {
