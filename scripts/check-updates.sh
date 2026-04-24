@@ -133,6 +133,23 @@ version_gt() {
   [ "$max_version" = "$left" ] && [ "$left" != "$right" ]
 }
 
+is_arch_like_linux() {
+  local os_id=""
+  local os_id_like=""
+
+  if [ ! -r /etc/os-release ]; then
+    return 1
+  fi
+
+  os_id="$(. /etc/os-release; printf "%s" "${ID:-}")"
+  os_id_like="$(. /etc/os-release; printf "%s" "${ID_LIKE:-}")"
+
+  case " ${os_id} ${os_id_like} " in
+    *" arch "*|*" manjaro "*) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
 collect_release_workflow_pnpm_pins() {
   local workflow_file="$POMODOROZ_DIR/.github/workflows/release-autoupdate.yml"
   if [ ! -f "$workflow_file" ]; then
@@ -639,8 +656,9 @@ check_dev_environment() {
   fi
 
   if command -v pnpm >/dev/null 2>&1; then
-    local pnpm_version pnpm_latest
+    local pnpm_version pnpm_latest pnpm_path
     local lookup_status
+    pnpm_path="$(command -v pnpm)"
     pnpm_version="$(pnpm --version)"
     PNPM_VERSION_CURRENT="$pnpm_version"
     echo "  pnpm: ${pnpm_version} ✓"
@@ -665,8 +683,24 @@ check_dev_environment() {
           echo "    To update: corepack use pnpm@${PNPM_VERSION_LATEST}"
         else
           echo "    Corepack nao encontrado no PATH."
-          echo "    To update (fallback sem root): npm install -g pnpm@${PNPM_VERSION_LATEST} --prefix \"\$HOME/.local\""
-          echo "    Se necessario, adicione ao PATH: export PATH=\"\$HOME/.local/bin:\$PATH\""
+          if is_arch_like_linux; then
+            echo "    Manjaro/Arch detectado."
+            echo "    pnpm ativo no PATH: ${pnpm_path}"
+            if command -v pacman >/dev/null 2>&1; then
+              local pacman_pnpm_version
+              pacman_pnpm_version="$(pacman -Q pnpm 2>/dev/null || true)"
+              if [ -n "$pacman_pnpm_version" ]; then
+                echo "    pnpm via pacman: ${pacman_pnpm_version}"
+              fi
+            fi
+            echo "    Para alinhar o pnpm ativo com o workflow:"
+            echo "      npm install -g pnpm@${PNPM_VERSION_LATEST} --prefix \"\$HOME/.local\""
+            echo "    Alternativa via sistema, quando o repositorio atualizar:"
+            echo "      sudo pacman -Syu pnpm"
+          else
+            echo "    To update (fallback sem root): npm install -g pnpm@${PNPM_VERSION_LATEST} --prefix \"\$HOME/.local\""
+            echo "    Se necessario, adicione ao PATH: export PATH=\"\$HOME/.local/bin:\$PATH\""
+          fi
         fi
       fi
     fi
