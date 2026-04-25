@@ -12,6 +12,10 @@
 
 - **Native Tauri command failures are now visible in the UI** — asynchronous `TauriInvokeConnector.send()` failures now notify the connector provider, allowing the existing native integration warning to appear instead of leaving failures only in console logs.
 
+### Changed
+
+- **Claude Code guidance was aligned with the current Tauri-only architecture** — `CLAUDE.md` now reflects the ESLint 10 / `@eslint-react` lint stack, the full `de`/`fr` language coverage, and the current connector bridge after removal of the legacy runtime router.
+
 ## [26.4.35] - 2026-04-24
 
 ### Fixed

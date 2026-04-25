@@ -35,7 +35,7 @@ When an item is released:
 2. Add implementation details to `CHANGELOG.md` and `CHANGELOG.pt.md`.
 3. Remove unnecessary detail from this roadmap in the next planning cycle.
 
-### Current checkpoint (2026-04-23)
+### Current checkpoint (2026-04-25)
 
 - Released in `26.4.28` (PT/EN changelogs):
   - `A0` runtime consolidation to Tauri-only.
@@ -44,7 +44,7 @@ When an item is released:
   - Linux release pipeline/AppImage hardening and `sync-latest-json` alignment.
 - Current planning baseline:
   - Releases up to `26.4.35` are already published in EN/PT changelogs.
-  - `26.4.36` changelog draft currently contains `A14` native IPC error visibility.
+  - `26.4.36` changelog draft currently contains `A14` native IPC error visibility and operational guide alignment.
   - `A2` env hygiene completed (renderer `.env` untracked, no committed `.env.example` required by default).
   - `A5` dependency modernization major batches are now completed (`eslint`/`@eslint/js` 10.x with `eslint-react`, and `vite-plugin-svgr@5.2.0`) with full validation.
   - `A6` intentionally deferred by product decision (no test-track changes now).

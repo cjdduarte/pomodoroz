@@ -43,8 +43,8 @@ Pomodoroz is a cross-platform Pomodoro desktop app, forked from [Pomatez](https:
 - **Redux Toolkit** `2.x` — state management
 - **Styled Components** — CSS-in-JS
 - **@dnd-kit** — drag-and-drop
-- **i18next** — internationalization (en, pt, es, ja, zh)
-- **ESLint 9** + `@typescript-eslint 8` (flat config)
+- **i18next** — internationalization (en, pt, es, ja, zh, de, fr)
+- **ESLint 10** + `@eslint-react` + `@typescript-eslint 8` (flat config)
 - **pnpm** `10.x` — package manager
 - **Node.js** `v24` (see `.nvmrc`)
 
@@ -82,10 +82,10 @@ Validation wrapper scripts:
 
 ### Renderer <-> Native Bridge
 
-- **Connector abstraction**: `src/contexts/ConnectorContext.tsx` — provides `useConnector()` for renderer-to-native calls.
-- **Runtime routing**: `src/contexts/connectors/runtimeInvokeConnector.ts` — resolves runtime and delegates to current connector implementation.
-- **Active native connector**: `src/contexts/connectors/TauriInvokeConnector.ts` — Tauri command/event adapter.
-- **Rust command bridge**: `src-tauri/src/commands/window_bridge.rs` + registrations in `src-tauri/src/lib.rs`.
+- **Connector abstraction**: `src/contexts/ConnectorContext.tsx` — exposes the Tauri-only connector provider and `getInvokeConnector()`.
+- **Connector provider**: `src/contexts/connectors/TauriConnector.tsx` — syncs renderer settings with native tray/window/updater behavior and surfaces native communication errors.
+- **Active native connector**: `src/contexts/connectors/TauriInvokeConnector.ts` — Tauri command/event adapter through `invoke`, `emit`, and `listen`.
+- **Rust command bridge**: `src-tauri/src/commands/` + registrations in `src-tauri/src/lib.rs`.
 
 ### State Management
 
