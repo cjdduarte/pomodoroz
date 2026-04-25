@@ -14,6 +14,7 @@
 
 ### Changed
 
+- **Dependencies were updated in a patch refresh** — no functional behavior change is intended.
 - **Manual updater prompt state was simplified** — release-note body storage was removed from the renderer update state and IPC payload because the manual prompt now stays focused on the available version and install choice.
 
 ## [26.4.37] - 2026-04-25

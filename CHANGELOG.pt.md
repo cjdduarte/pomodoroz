@@ -14,6 +14,7 @@
 
 ### Alterado
 
+- **Dependências foram atualizadas em um refresh patch** — nenhuma mudança funcional é intencional.
 - **Estado do prompt manual de update foi simplificado** — o armazenamento do body das notas de release foi removido do estado de update do renderer e do payload IPC porque o prompt manual agora permanece focado na versão disponível e na escolha de instalação.
 
 ## [26.4.37] - 2026-04-25

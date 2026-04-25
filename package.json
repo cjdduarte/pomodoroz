@@ -91,7 +91,7 @@
     "@tauri-apps/plugin-updater": "2.10.1",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "i18next": "^26.0.7",
+    "i18next": "^26.0.8",
     "lodash.debounce": "^4.0.8",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
