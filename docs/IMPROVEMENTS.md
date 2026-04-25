@@ -43,7 +43,8 @@ When an item is released:
   - `A4` `check-updates` simplification to root-only narrative.
   - Linux release pipeline/AppImage hardening and `sync-latest-json` alignment.
 - Current planning baseline:
-  - Releases up to `26.4.35` are already published in EN/PT changelogs.
+  - Releases up to `26.4.36` are already published in EN/PT changelogs.
+  - `26.4.37` changelog entries are open as the next release placeholders (`TBD` / `A definir`).
   - `26.4.36` changelog entry contains `A14` native IPC error visibility, `A7` renderer version source hardening, and operational guide alignment.
   - `A2` env hygiene completed (renderer `.env` untracked, no committed `.env.example` required by default).
   - `A5` dependency modernization major batches are now completed (`eslint`/`@eslint/js` 10.x with `eslint-react`, and `vite-plugin-svgr@5.2.0`) with full validation.
