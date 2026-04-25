@@ -1,4 +1,5 @@
 import { PayloadAction } from "@reduxjs/toolkit";
+import type { ShortcutSettings } from "utils/shortcuts";
 
 export type SettingTypes = {
   ignoreUpdate: string;
@@ -23,6 +24,7 @@ export type SettingTypes = {
   openAtLogin: boolean;
   enableInAppAutoUpdate: boolean;
   language: LanguageOption;
+  shortcuts: ShortcutSettings;
 };
 
 export type LanguageCode =

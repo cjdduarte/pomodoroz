@@ -8,6 +8,10 @@
 
 ## [26.4.38] - A definir
 
+### Adicionado
+
+- **Customização do atalho de tema agora persiste** — o atalho local `Alternar tema`, controlado pelo app, agora pode ser alterado em Ajustes, armazenado nas configurações locais, restaurado na inicialização e protegido contra atalhos inválidos ou reservados.
+
 ### Alterado
 
 - **Estado do prompt manual de update foi simplificado** — o armazenamento do body das notas de release foi removido do estado de update do renderer e do payload IPC porque o prompt manual agora permanece focado na versão disponível e na escolha de instalação.

@@ -29,7 +29,11 @@ import { TimerStatus } from "store/timer/types";
 import { useAppDispatch, useAppSelector } from "hooks/storeHooks";
 import { isFreshInstallProfile, setEnableInAppAutoUpdate } from "store";
 import { setUpdateVersion } from "store/update";
-import { getFromStorage, saveToStorage } from "utils";
+import {
+  getFromStorage,
+  saveToStorage,
+  shortcutMatchesEvent,
+} from "utils";
 
 const AUTO_UPDATE_POLICY_PROMPT_SEEN_KEY =
   "auto-update-policy-prompt-seen";
@@ -139,11 +143,12 @@ const Layout: React.FC<Props> = ({ children }) => {
 
   const registerKey = useCallback(
     (e: KeyboardEvent) => {
-      if (e.altKey && e.shiftKey && e.code === "KeyT") {
+      if (shortcutMatchesEvent(settings.shortcuts.toggleTheme, e)) {
+        e.preventDefault();
         if (toggleThemeAction) toggleThemeAction();
       }
     },
-    [toggleThemeAction]
+    [settings.shortcuts.toggleTheme, toggleThemeAction]
   );
 
   useEffect(() => {

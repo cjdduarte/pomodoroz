@@ -56,16 +56,15 @@ When an item is released:
   - `A13` updater channel support memoization is implemented; only manual runtime-channel validation remains.
   - `A14` native IPC error visibility is implemented; only manual failure-injection validation remains.
   - `26.4.37` draft contains `A15` renderer CSP hardening and an IPC warning refinement so optional background sync failures do not show the generic native warning banner.
+  - `26.4.38` draft contains updater prompt state simplification and `A3` shortcut persistence for the app-owned toggle-theme shortcut.
 
-### Next execution order (after 26.4.36)
+### Next execution order (after 26.4.38)
 
-1. **A3 — Shortcut persistence**
-   - Persist customizable shortcuts and restore on boot.
-2. **Product cycle (B1 -> B2 -> B3)**
+1. **Product cycle (B1 -> B2 -> B3)**
    - Cadence presets, session extension, break suggestion prompts.
-3. **A6 revisit gate**
+2. **A6 revisit gate**
    - Revisit test strategy only after items above are stabilized.
-4. **A10 dependency rationalization gate**
+3. **A10 dependency rationalization gate**
    - Evaluate necessity first; execute only if metrics and maintenance ROI are clear.
 
 ---
@@ -77,7 +76,7 @@ When an item is released:
 | A0  | Consolidate runtime to Tauri-only and remove browser fallback branches        | Done    | High     | Released in 26.4.28                                  |
 | A1  | Resolve titlebar legacy CSS/changelog divergence (`-webkit-app-region`)       | Done    | High     | Released in 26.4.28                                  |
 | A2  | `.env` hygiene (`app/renderer/.env` tracked)                                  | Done    | High     | Completed and registered in 26.4.29 draft            |
-| A3  | Persist custom shortcuts (`Shortcut.tsx` TODO)                                | Open    | Medium   | Avoid loss after restart                             |
+| A3  | Persist custom shortcuts (`Shortcut.tsx` TODO)                                | Done    | Medium   | Delivered in 26.4.38 draft                           |
 | A4  | Simplify `check-updates` to root-only narrative and flows                     | Done    | Medium   | Released in 26.4.28                                  |
 | A5  | Controlled major updates (`eslint`/`@eslint/js` 10.x, `vite-plugin-svgr` 5.x) | Done    | Medium   | Batches 1/2/3 completed in 26.4.29 draft             |
 | A6  | Define automated test strategy (adopt baseline tests or remove idle stack)    | Blocked | High     | Deferred by decision (no tests changes now)          |
@@ -150,12 +149,21 @@ Impact:
 
 ### A3 — Shortcut persistence
 
+Resolution status:
+
+- The app-owned `Toggle Theme` shortcut now persists through `settings.shortcuts.toggleTheme` and is restored by the existing root-state hydration path.
+- Invalid shortcuts and conflicts with reserved system/native shortcuts are ignored safely.
+- System editing shortcuts and native hide/show shortcuts remain informational until a future native re-registration flow exists.
+
 - Scope checklist:
-  - [ ] Persist custom shortcut setting in local state storage.
-  - [ ] Restore values at boot.
-  - [ ] Handle invalid conflicts safely.
+  - [x] Persist custom shortcut setting in local state storage.
+  - [x] Restore values at boot.
+  - [x] Handle invalid conflicts safely.
 - Validation checklist:
   - [ ] Manual restart preserves changed shortcut.
+  - [x] `pnpm lint`
+  - [x] `pnpm typecheck:renderer`
+  - [x] `pnpm build:renderer`
 - Suggested commit:
   - `feat(shortcuts): persist custom shortcut bindings across restarts`
 

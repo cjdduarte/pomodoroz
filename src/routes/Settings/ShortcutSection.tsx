@@ -1,10 +1,27 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import SettingSection from "./SettingSection";
 import { Shortcut } from "components";
+import { useAppDispatch, useAppSelector } from "hooks/storeHooks";
+import { setShortcut } from "store/settings";
+import { RESERVED_SHORTCUTS } from "utils";
 
 const ShortcutSection: React.FC = () => {
   const { t } = useTranslation();
+  const dispatch = useAppDispatch();
+  const shortcuts = useAppSelector((state) => state.settings.shortcuts);
+
+  const onToggleThemeShortcutChange = useCallback(
+    (shortcut: string) => {
+      dispatch(
+        setShortcut({
+          shortcut: "toggleTheme",
+          value: shortcut,
+        })
+      );
+    },
+    [dispatch]
+  );
 
   return (
     <>
@@ -16,7 +33,9 @@ const ShortcutSection: React.FC = () => {
         />
         <Shortcut
           name={t("shortcuts.toggleTheme")}
-          shortcutKey="Alt + Shift + T"
+          onShortcutChange={onToggleThemeShortcutChange}
+          reservedShortcuts={RESERVED_SHORTCUTS}
+          shortcutKey={shortcuts.toggleTheme}
           id="toggle-themes"
         />
         <Shortcut

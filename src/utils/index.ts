@@ -11,3 +11,4 @@ export * from "./tasksTransfer";
 export * from "./activeTaskSelection";
 export * from "./desktopNotification";
 export * from "./notificationAudio";
+export * from "./shortcuts";

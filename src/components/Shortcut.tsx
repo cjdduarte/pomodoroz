@@ -1,27 +1,44 @@
-import React, { useState, type KeyboardEvent } from "react";
+import React, { type KeyboardEvent } from "react";
 import {
   StyledShortcutWrapper,
   StyledShortcutName,
   StyledShortcutKey,
 } from "styles";
-import { getShortcutFromEvent } from "utils/getShortcutFromEvent";
+import {
+  formatShortcut,
+  getShortcutFromEvent,
+  isReservedShortcut,
+} from "utils";
 
 type Props = {
   id: string;
   name: string;
+  onShortcutChange?: (shortcut: string) => void;
+  reservedShortcuts?: readonly string[];
   shortcutKey: string;
 };
 
-const Shortcut: React.FC<Props> = ({ id, name, shortcutKey }) => {
-  const [shortcut, setShortcut] = useState(() => shortcutKey);
-
+const Shortcut: React.FC<Props> = ({
+  id,
+  name,
+  onShortcutChange,
+  reservedShortcuts,
+  shortcutKey,
+}) => {
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (!onShortcutChange) {
+      return;
+    }
+
+    e.stopPropagation();
     const shortcut = getShortcutFromEvent(e);
 
     if (shortcut) {
-      // For now we don't update the UI, as it is not being saved
-      // TODO: Uncomment when we have a way to save the shortcuts
-      // setShortcut(shortcut);
+      if (isReservedShortcut(shortcut, reservedShortcuts)) {
+        return;
+      }
+
+      onShortcutChange(shortcut);
     }
   };
 
@@ -30,7 +47,7 @@ const Shortcut: React.FC<Props> = ({ id, name, shortcutKey }) => {
       <StyledShortcutName htmlFor={id}>{name}</StyledShortcutName>
       <StyledShortcutKey
         type="text"
-        value={shortcut}
+        value={formatShortcut(shortcutKey)}
         id={id}
         onKeyDown={handleKeyDown}
         readOnly

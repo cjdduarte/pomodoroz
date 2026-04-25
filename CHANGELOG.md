@@ -8,6 +8,10 @@
 
 ## [26.4.38] - TBD
 
+### Added
+
+- **Theme shortcut customization now persists** — the app-owned `Toggle Theme` shortcut can now be changed in Settings, stored with local settings, restored on startup, and protected against invalid or reserved shortcut conflicts.
+
 ### Changed
 
 - **Manual updater prompt state was simplified** — release-note body storage was removed from the renderer update state and IPC payload because the manual prompt now stays focused on the available version and install choice.

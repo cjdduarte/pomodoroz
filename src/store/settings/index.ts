@@ -1,11 +1,17 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getFromStorage } from "utils";
+import {
+  getFromStorage,
+  isReservedShortcut,
+  normalizeShortcut,
+  RESERVED_SHORTCUTS,
+} from "utils";
 import {
   NotificationSoundTypes,
   NotificationTypes,
   SettingTypes,
   SettingsPayload,
 } from "./types";
+import type { ShortcutSettings } from "utils/shortcuts";
 import { defaultSettings } from "./defaultSettings";
 
 export type { SettingTypes };
@@ -46,6 +52,42 @@ const isLanguageOption = (
   );
 };
 
+const cloneSettings = (
+  settings: Readonly<SettingTypes>
+): SettingTypes => ({
+  ...settings,
+  shortcuts: { ...settings.shortcuts },
+});
+
+const normalizeShortcutSettings = (
+  value: unknown,
+  base: ShortcutSettings
+): ShortcutSettings | null => {
+  if (typeof value !== "object" || value === null) {
+    return null;
+  }
+
+  const candidate = (
+    value as Partial<Record<keyof ShortcutSettings, unknown>>
+  ).toggleTheme;
+  if (typeof candidate !== "string") {
+    return null;
+  }
+
+  const normalizedShortcut = normalizeShortcut(candidate);
+  if (
+    !normalizedShortcut ||
+    isReservedShortcut(normalizedShortcut, RESERVED_SHORTCUTS)
+  ) {
+    return null;
+  }
+
+  return {
+    ...base,
+    toggleTheme: normalizedShortcut,
+  };
+};
+
 const isSettingValue = <K extends keyof SettingTypes>(
   key: K,
   value: unknown
@@ -59,6 +101,11 @@ const isSettingValue = <K extends keyof SettingTypes>(
       return isNotificationSound(value);
     case "language":
       return isLanguageOption(value);
+    case "shortcuts":
+      return (
+        normalizeShortcutSettings(value, defaultSettings.shortcuts) !==
+        null
+      );
     default:
       return typeof value === "boolean";
   }
@@ -85,7 +132,7 @@ function mergeSettings(
   base: SettingTypes,
   override: SettingsOverride
 ): SettingTypes {
-  const merged: SettingTypes = { ...base };
+  const merged: SettingTypes = cloneSettings(base);
   const setMergedValue = <K extends keyof SettingTypes>(
     key: K,
     value: SettingTypes[K]
@@ -95,6 +142,17 @@ function mergeSettings(
 
   for (const key of Object.keys(base) as Array<keyof SettingTypes>) {
     const candidateValue = override[key];
+
+    if (key === "shortcuts") {
+      const shortcuts = normalizeShortcutSettings(
+        candidateValue,
+        base.shortcuts
+      );
+      if (shortcuts) {
+        setMergedValue(key, shortcuts);
+      }
+      continue;
+    }
 
     if (
       candidateValue !== undefined &&
@@ -251,8 +309,30 @@ const settingsSlice = createSlice({
       state.language = action.payload;
     },
 
+    setShortcut(
+      state,
+      action: {
+        payload: {
+          shortcut: keyof ShortcutSettings;
+          value: string;
+        };
+      }
+    ) {
+      const normalizedShortcut = normalizeShortcut(
+        action.payload.value
+      );
+      if (
+        !normalizedShortcut ||
+        isReservedShortcut(normalizedShortcut, RESERVED_SHORTCUTS)
+      ) {
+        return;
+      }
+
+      state.shortcuts[action.payload.shortcut] = normalizedShortcut;
+    },
+
     restoreDefaultSettings() {
-      return defaultSettings;
+      return cloneSettings(defaultSettings);
     },
   },
 });
@@ -278,6 +358,7 @@ export const {
   setNotificationType,
   setEnableInAppAutoUpdate,
   setOpenAtLogin,
+  setShortcut,
   setLanguage,
   setUseNativeTitlebar,
   toggleNotificationSound,
