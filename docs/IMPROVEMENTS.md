@@ -44,7 +44,7 @@ When an item is released:
   - Linux release pipeline/AppImage hardening and `sync-latest-json` alignment.
 - Current planning baseline:
   - Releases up to `26.4.35` are already published in EN/PT changelogs.
-  - `26.4.36` changelog draft currently contains `A14` native IPC error visibility, `A7` renderer version source hardening, and operational guide alignment.
+  - `26.4.36` changelog entry contains `A14` native IPC error visibility, `A7` renderer version source hardening, and operational guide alignment.
   - `A2` env hygiene completed (renderer `.env` untracked, no committed `.env.example` required by default).
   - `A5` dependency modernization major batches are now completed (`eslint`/`@eslint/js` 10.x with `eslint-react`, and `vite-plugin-svgr@5.2.0`) with full validation.
   - `A6` intentionally deferred by product decision (no test-track changes now).
@@ -81,14 +81,14 @@ When an item is released:
 | A4  | Simplify `check-updates` to root-only narrative and flows                     | Done    | Medium   | Released in 26.4.28                                  |
 | A5  | Controlled major updates (`eslint`/`@eslint/js` 10.x, `vite-plugin-svgr` 5.x) | Done    | Medium   | Batches 1/2/3 completed in 26.4.29 draft             |
 | A6  | Define automated test strategy (adopt baseline tests or remove idle stack)    | Blocked | High     | Deferred by decision (no tests changes now)          |
-| A7  | Replace renderer `package.json` imports with injected app version metadata    | Done    | Medium   | Delivered in 26.4.36 draft                           |
+| A7  | Replace renderer `package.json` imports with injected app version metadata    | Done    | Medium   | Delivered in 26.4.36                                 |
 | A8  | Expand i18n language coverage (`de`/`fr`) with tray/startup parity            | Done    | High     | Delivered in 26.4.31                                 |
 | A9  | Unify auto-language source between renderer and native tray                   | Done    | Medium   | Delivered in 26.4.33 draft                           |
 | A10 | Dependency rationalization gate (`uuid`, debounce, tests, style/state stack)  | Blocked | Medium   | Execute only with measurable ROI; no-change is valid |
 | A11 | Add Windows CI parity gate for renderer and Rust quality checks               | Done    | High     | Delivered in 26.4.34 draft                           |
 | A12 | Harden `write_text_file` to mirror `read_text_file` guardrails                | Done    | High     | Delivered in 26.4.34 draft                           |
 | A13 | Memoize updater-channel support result across runtime session                 | Done    | Medium   | Delivered in 26.4.35 draft                           |
-| A14 | Surface asynchronous Tauri IPC command errors in the UI                       | Done    | High     | Delivered in 26.4.36 draft                           |
+| A14 | Surface asynchronous Tauri IPC command errors in the UI                       | Done    | High     | Delivered in 26.4.36                                 |
 | A15 | Tighten renderer CSP and remove small dead-code residues                      | Open    | High     | Keep CSP validation separate from product work       |
 
 ### A0 — Tauri-only runtime consolidation
