@@ -2,6 +2,7 @@ import { SVGTypes } from "components";
 import { TaskList, Config, Timer, Settings, Statistics } from "routes";
 
 export const APP_NAME = "Pomodoroz";
+export const APP_VERSION = __POMODOROZ_APP_VERSION__;
 
 export const SUPPORT_CONFIG = {
   githubRepoUrl: "https://github.com/cjdduarte/pomodoroz",

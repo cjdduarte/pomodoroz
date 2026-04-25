@@ -44,7 +44,7 @@ When an item is released:
   - Linux release pipeline/AppImage hardening and `sync-latest-json` alignment.
 - Current planning baseline:
   - Releases up to `26.4.35` are already published in EN/PT changelogs.
-  - `26.4.36` changelog draft currently contains `A14` native IPC error visibility and operational guide alignment.
+  - `26.4.36` changelog draft currently contains `A14` native IPC error visibility, `A7` renderer version source hardening, and operational guide alignment.
   - `A2` env hygiene completed (renderer `.env` untracked, no committed `.env.example` required by default).
   - `A5` dependency modernization major batches are now completed (`eslint`/`@eslint/js` 10.x with `eslint-react`, and `vite-plugin-svgr@5.2.0`) with full validation.
   - `A6` intentionally deferred by product decision (no test-track changes now).
@@ -57,17 +57,15 @@ When an item is released:
 
 ### Next execution order (after 26.4.36)
 
-1. **A7 — Renderer version source hardening**
-   - Replace direct renderer imports of `package.json` with injected app version metadata.
-2. **A15 — CSP hardening and cleanup**
+1. **A15 — CSP hardening and cleanup**
    - Tighten renderer CSP and remove small dead-code residues in one low-risk cleanup block.
-3. **A3 — Shortcut persistence**
+2. **A3 — Shortcut persistence**
    - Persist customizable shortcuts and restore on boot.
-4. **Product cycle (B1 -> B2 -> B3)**
+3. **Product cycle (B1 -> B2 -> B3)**
    - Cadence presets, session extension, break suggestion prompts.
-5. **A6 revisit gate**
+4. **A6 revisit gate**
    - Revisit test strategy only after items above are stabilized.
-6. **A10 dependency rationalization gate**
+5. **A10 dependency rationalization gate**
    - Evaluate necessity first; execute only if metrics and maintenance ROI are clear.
 
 ---
@@ -83,7 +81,7 @@ When an item is released:
 | A4  | Simplify `check-updates` to root-only narrative and flows                     | Done    | Medium   | Released in 26.4.28                                  |
 | A5  | Controlled major updates (`eslint`/`@eslint/js` 10.x, `vite-plugin-svgr` 5.x) | Done    | Medium   | Batches 1/2/3 completed in 26.4.29 draft             |
 | A6  | Define automated test strategy (adopt baseline tests or remove idle stack)    | Blocked | High     | Deferred by decision (no tests changes now)          |
-| A7  | Replace renderer `package.json` imports with injected app version metadata    | Open    | Medium   | Avoid shipping full manifest in UI bundles           |
+| A7  | Replace renderer `package.json` imports with injected app version metadata    | Done    | Medium   | Delivered in 26.4.36 draft                           |
 | A8  | Expand i18n language coverage (`de`/`fr`) with tray/startup parity            | Done    | High     | Delivered in 26.4.31                                 |
 | A9  | Unify auto-language source between renderer and native tray                   | Done    | Medium   | Delivered in 26.4.33 draft                           |
 | A10 | Dependency rationalization gate (`uuid`, debounce, tests, style/state stack)  | Blocked | Medium   | Execute only with measurable ROI; no-change is valid |
@@ -226,12 +224,12 @@ Decision checkpoint:
 ### A7 — Renderer version source hardening
 
 - Scope checklist:
-  - [ ] Remove direct `package.json` imports from renderer components.
-  - [ ] Inject app version through build-time env (`import.meta.env`) or dedicated runtime bridge.
-  - [ ] Keep titlebar/settings version display behavior unchanged.
+  - [x] Remove direct `package.json` imports from renderer components.
+  - [x] Inject app version through build-time metadata (`define` / `import.meta.env`) or dedicated runtime bridge.
+  - [x] Keep titlebar/settings version display behavior unchanged.
 - Validation checklist:
-  - [ ] `pnpm build:renderer`
-  - [ ] Confirm output bundles do not include full root package manifest object.
+  - [x] `pnpm build:renderer`
+  - [x] Confirm output bundles do not include full root package manifest object.
 - Suggested commit:
   - `refactor(renderer): replace package-json imports with injected app version`
 

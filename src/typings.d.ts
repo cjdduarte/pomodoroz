@@ -7,6 +7,8 @@ declare module "*.mp4";
 declare module "*.ogv";
 declare module "*.webm";
 
+declare const __POMODOROZ_APP_VERSION__: string;
+
 declare module "*.svg" {
   import * as React from "react";
 

@@ -14,6 +14,7 @@
 
 ### Alterado
 
+- **Exibição de versão no renderer não importa mais o manifesto raiz do pacote** — o Vite agora injeta a versão do app no build, e os labels de versão na barra de título/Ajustes consomem a constante compartilhada `APP_VERSION` em vez de empacotar o `package.json`.
 - **Guia do Claude Code foi alinhado com a arquitetura Tauri-only atual** — `CLAUDE.md` agora reflete o stack de lint ESLint 10 / `@eslint-react`, a cobertura completa de idiomas `de`/`fr` e a ponte de conector atual após a remoção do roteador legado de runtime.
 
 ## [26.4.35] - 2026-04-24

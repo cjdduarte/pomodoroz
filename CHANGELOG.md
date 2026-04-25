@@ -14,6 +14,7 @@
 
 ### Changed
 
+- **Renderer version display no longer imports the root package manifest** — Vite now injects the app version at build time, and titlebar/settings version labels consume the shared `APP_VERSION` constant instead of bundling `package.json`.
 - **Claude Code guidance was aligned with the current Tauri-only architecture** — `CLAUDE.md` now reflects the ESLint 10 / `@eslint-react` lint stack, the full `de`/`fr` language coverage, and the current connector bridge after removal of the legacy runtime router.
 
 ## [26.4.35] - 2026-04-24

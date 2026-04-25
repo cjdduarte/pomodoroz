@@ -11,9 +11,7 @@ import {
   StyledMarkName,
 } from "styles";
 import { ConnectorContext } from "contexts";
-import { APP_NAME } from "config";
-
-import Json from "../../package.json";
+import { APP_NAME, APP_VERSION } from "config";
 
 import appIcon from "assets/logos/tray.png";
 import appIconDark from "assets/logos/tray-dark.png";
@@ -63,7 +61,7 @@ const Titlebar: React.FC<Props> = ({ darkMode, timerType }) => {
         <StyledMarkWrapper>
           <StyledMarkLogo src={getAppIcon()} />
           <StyledMarkName>
-            {APP_NAME} {Json.version && <span>v{Json.version}</span>}
+            {APP_NAME} {APP_VERSION && <span>v{APP_VERSION}</span>}
           </StyledMarkName>
         </StyledMarkWrapper>
       </StyledTitlebarDragRegion>

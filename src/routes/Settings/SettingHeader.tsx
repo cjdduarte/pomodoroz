@@ -4,9 +4,9 @@ import { restoreDefaultSettings } from "store";
 import { useAppDispatch } from "hooks/storeHooks";
 import styled from "styled-components";
 
+import { APP_VERSION } from "config";
 import { Header } from "components";
 import { StyledHeaderButton } from "styles";
-import Json from "../../../package.json";
 
 const StyledSettingsVersion = styled.div`
   margin-top: -0.2rem;
@@ -36,8 +36,8 @@ const SettingHeader: React.FC = () => {
             : t("settings.restoreDefault")}
         </StyledHeaderButton>
       </Header>
-      {Json.version && (
-        <StyledSettingsVersion>v{Json.version}</StyledSettingsVersion>
+      {APP_VERSION && (
+        <StyledSettingsVersion>v{APP_VERSION}</StyledSettingsVersion>
       )}
     </>
   );

@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
+import { readFileSync } from "node:fs";
 import { fileURLToPath, URL } from "node:url";
 
 const RENDERER_ROOT_DIR = fileURLToPath(new URL("./", import.meta.url));
@@ -9,9 +10,18 @@ const ROOT_SRC_DIR = fileURLToPath(
   new URL("../../src", import.meta.url)
 );
 
+const packageJson = JSON.parse(
+  readFileSync(new URL("../../package.json", import.meta.url), "utf8")
+) as { version?: string };
+
 export default defineConfig({
   root: RENDERER_ROOT_DIR,
   base: "./",
+  define: {
+    __POMODOROZ_APP_VERSION__: JSON.stringify(
+      packageJson.version ?? ""
+    ),
+  },
   plugins: [
     react(),
     svgr({
