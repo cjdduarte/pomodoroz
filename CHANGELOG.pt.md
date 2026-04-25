@@ -8,6 +8,15 @@
 
 ## [26.4.37] - A definir
 
+### Corrigido
+
+- **Avisos de integração nativa não aparecem mais para falhas opcionais de sincronização em segundo plano** — erros de bandeja, autostart, ícone da bandeja e sync da política de update continuam registrados para diagnóstico, mas não exibem mais o banner genérico do Tauri na inicialização.
+
+### Alterado
+
+- **CSP do renderer agora é explícita na configuração do Tauri** — `app.security.csp` agora define uma política conservadora para o pacote final, `devCsp` preserva as necessidades locais do Vite/Tauri em desenvolvimento, e a meta CSP ampla dos templates do renderer foi removida.
+- **Pequenos resíduos mortos do renderer foram removidos** — classes marcadoras sem uso em espaçadores do timer e a prop de conector sem consumo `openExternalCallback` foram removidas sem alterar comportamento visível.
+
 ## [26.4.36] - 2026-04-25
 
 ### Corrigido

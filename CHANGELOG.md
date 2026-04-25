@@ -8,6 +8,15 @@
 
 ## [26.4.37] - TBD
 
+### Fixed
+
+- **Native integration warnings no longer appear for optional background sync failures** — tray, autostart, tray-icon, and update-policy sync errors remain logged for diagnosis but no longer show the generic Tauri warning banner on startup.
+
+### Changed
+
+- **Renderer CSP is now explicit in Tauri configuration** — `app.security.csp` now defines a conservative packaged policy, `devCsp` preserves local Vite/Tauri development needs, and the broad HTML meta CSP was removed from renderer templates.
+- **Small renderer dead-code residues were removed** — unused timer spacer marker classes and the unconsumed `openExternalCallback` connector prop were removed without changing user-facing behavior.
+
 ## [26.4.36] - 2026-04-25
 
 ### Fixed

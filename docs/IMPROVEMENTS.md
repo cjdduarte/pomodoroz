@@ -55,18 +55,17 @@ When an item is released:
   - `A12` write-path hardening is now implemented: `write_text_file` enforces `.json`, rejects existing non-file targets, and caps payload at 5 MB.
   - `A13` updater channel support memoization is implemented; only manual runtime-channel validation remains.
   - `A14` native IPC error visibility is implemented; only manual failure-injection validation remains.
+  - `26.4.37` draft contains `A15` renderer CSP hardening and an IPC warning refinement so optional background sync failures do not show the generic native warning banner.
 
 ### Next execution order (after 26.4.36)
 
-1. **A15 — CSP hardening and cleanup**
-   - Tighten renderer CSP and remove small dead-code residues in one low-risk cleanup block.
-2. **A3 — Shortcut persistence**
+1. **A3 — Shortcut persistence**
    - Persist customizable shortcuts and restore on boot.
-3. **Product cycle (B1 -> B2 -> B3)**
+2. **Product cycle (B1 -> B2 -> B3)**
    - Cadence presets, session extension, break suggestion prompts.
-4. **A6 revisit gate**
+3. **A6 revisit gate**
    - Revisit test strategy only after items above are stabilized.
-5. **A10 dependency rationalization gate**
+4. **A10 dependency rationalization gate**
    - Evaluate necessity first; execute only if metrics and maintenance ROI are clear.
 
 ---
@@ -90,7 +89,7 @@ When an item is released:
 | A12 | Harden `write_text_file` to mirror `read_text_file` guardrails                | Done    | High     | Delivered in 26.4.34 draft                           |
 | A13 | Memoize updater-channel support result across runtime session                 | Done    | Medium   | Delivered in 26.4.35 draft                           |
 | A14 | Surface asynchronous Tauri IPC command errors in the UI                       | Done    | High     | Delivered in 26.4.36                                 |
-| A15 | Tighten renderer CSP and remove small dead-code residues                      | Open    | High     | Keep CSP validation separate from product work       |
+| A15 | Tighten renderer CSP and remove small dead-code residues                      | Done    | High     | Delivered in 26.4.37 draft                           |
 
 ### A0 — Tauri-only runtime consolidation
 
@@ -460,27 +459,28 @@ Suggested commit:
 
 ### A15 — CSP hardening and cleanup
 
-Decision checkpoint:
+Resolution status:
 
-- Current Tauri config leaves `app.security.csp` as `null`, and the renderer HTML policy still allows broad inline behavior.
-- CSP hardening must be validated against styled-components, Tauri IPC, local assets, and the packaged renderer.
-- Small dead-code residues can be removed in the same cleanup block if they do not change behavior.
+- Tauri now owns the renderer CSP through explicit `app.security.csp` and `devCsp` entries.
+- The packaged policy keeps local scripts, styled-components/inline style needs, local/data images, fonts, media, and Tauri IPC while blocking object/frame/form/worker sources.
+- The renderer HTML templates no longer carry the old broad meta CSP.
+- Non-functional `className="test"` spacer markers and the unconsumed `openExternalCallback` connector prop were removed.
 
 Scope checklist:
 
-- [ ] Replace `app.security.csp: null` with an explicit renderer policy that preserves required Tauri/runtime behavior.
-- [ ] Remove leftover non-functional markers such as `className="test"` after confirming they have no styling or test dependency.
-- [ ] Confirm whether `openExternalCallback` has any consumer; remove only if it is truly unused.
-- [ ] Keep cleanup edits behavior-neutral outside CSP.
+- [x] Replace `app.security.csp: null` with an explicit renderer policy that preserves required Tauri/runtime behavior.
+- [x] Remove leftover non-functional markers such as `className="test"` after confirming they have no styling or test dependency.
+- [x] Confirm whether `openExternalCallback` has any consumer; remove only if it is truly unused.
+- [x] Keep cleanup edits behavior-neutral outside CSP.
 
 Validation checklist:
 
 - [ ] Manual: app starts and navigates in dev mode without CSP violations.
 - [ ] Manual: packaged renderer starts without CSP violations.
-- [ ] `pnpm lint`
-- [ ] `pnpm typecheck:renderer`
-- [ ] `pnpm build:renderer`
-- [ ] `pnpm tauri build --no-bundle`
+- [x] `pnpm lint`
+- [x] `pnpm typecheck:renderer`
+- [x] `pnpm build:renderer`
+- [x] `pnpm tauri build --no-bundle`
 
 Suggested commit:
 

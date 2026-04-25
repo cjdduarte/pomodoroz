@@ -296,7 +296,7 @@ const Control: React.FC<Props> = ({
             sessionRounds={config.sessionRounds}
             onClick={onResetSessionCallback}
           />
-          <StyledControlSpacer className="test" />
+          <StyledControlSpacer />
           <StyledControlMain compact={settings.compactMode}>
             <ResetButton
               className="compact"
@@ -309,7 +309,7 @@ const Control: React.FC<Props> = ({
             />
             <SkipButton className="compact" onClick={onSkipAction} />
           </StyledControlMain>
-          <StyledControlSpacer className="test" />
+          <StyledControlSpacer />
           <StyledControlMain compact={settings.compactMode}>
             <StatisticsButton
               className="compact"

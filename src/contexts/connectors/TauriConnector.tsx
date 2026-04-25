@@ -18,7 +18,6 @@ import { detectOS, getFromStorage } from "utils";
 import {
   CLOSE_WINDOW,
   MINIMIZE_WINDOW,
-  OPEN_RELEASE_PAGE,
   SET_ALWAYS_ON_TOP,
   SET_COMPACT_MODE,
   SET_FULLSCREEN_BREAK,
@@ -52,6 +51,16 @@ const AUTO_UPDATE_POLICY_PROMPT_SEEN_KEY =
   "auto-update-policy-prompt-seen";
 const AUTO_UPDATE_POLICY_PROMPT_PENDING_KEY =
   "auto-update-policy-prompt-pending-choice";
+const BACKGROUND_SYNC_CHANNELS = new Set<ToMainChannel>([
+  SET_IN_APP_AUTO_UPDATE,
+  SET_OPEN_AT_LOGIN,
+  SET_TRAY_BEHAVIOR,
+  SET_TRAY_COPY,
+  TRAY_ICON_UPDATE,
+]);
+
+const shouldShowNativeWarning = (channel: ToMainChannel) =>
+  !BACKGROUND_SYNC_CHANNELS.has(channel);
 
 type TrayCopy = {
   restoreLabel: string;
@@ -135,15 +144,19 @@ export const TauriConnectorProvider = ({
         TauriInvokeConnector.send(channel, ...payload);
       } catch (error) {
         console.error("[TAURI IPC] Native communication error.", error);
-        showConnectorIpcError();
+        if (shouldShowNativeWarning(channel)) {
+          showConnectorIpcError();
+        }
       }
     },
     [showConnectorIpcError]
   );
 
   useEffect(() => {
-    return subscribeTauriInvokeConnectorSendErrors(() => {
-      showConnectorIpcError();
+    return subscribeTauriInvokeConnectorSendErrors(({ event }) => {
+      if (shouldShowNativeWarning(event)) {
+        showConnectorIpcError();
+      }
     });
   }, [showConnectorIpcError]);
 
@@ -165,10 +178,6 @@ export const TauriConnectorProvider = ({
 
   const onTitlebarDragStart = useCallback(() => {
     sendToMain(START_WINDOW_DRAG);
-  }, [sendToMain]);
-
-  const openExternalCallback = useCallback(() => {
-    sendToMain(OPEN_RELEASE_PAGE);
   }, [sendToMain]);
 
   useEffect(() => {
@@ -351,7 +360,6 @@ export const TauriConnectorProvider = ({
         onMinimizeCallback,
         onExitCallback,
         onTitlebarDragStart,
-        openExternalCallback,
         connectorError,
         dismissConnectorError: clearConnectorError,
       }}
