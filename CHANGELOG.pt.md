@@ -6,6 +6,12 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.4.38] - A definir
+
+### Alterado
+
+- **Estado do prompt manual de update foi simplificado** — o armazenamento do body das notas de release foi removido do estado de update do renderer e do payload IPC porque o prompt manual agora permanece focado na versão disponível e na escolha de instalação.
+
 ## [26.4.37] - 2026-04-25
 
 ### Corrigido

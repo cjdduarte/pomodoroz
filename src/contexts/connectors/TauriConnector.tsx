@@ -38,7 +38,7 @@ import {
 } from "ipc";
 import { listen } from "@tauri-apps/api/event";
 import { useTrayIconUpdates } from "hooks/useTrayIconUpdates";
-import { setUpdateBody, setUpdateVersion } from "store/update";
+import { setUpdateVersion } from "store/update";
 import { isFreshInstallProfile } from "store";
 import {
   TauriInvokeConnector,
@@ -335,14 +335,12 @@ export const TauriConnectorProvider = ({
       UPDATE_AVAILABLE,
       (payload: UpdateAvailablePayload) => {
         const version = payload.version;
-        const updateBody = payload.updateBody;
 
         if (!version || version === ignoreUpdateRef.current) {
           return;
         }
 
         dispatch(setUpdateVersion(version));
-        dispatch(setUpdateBody(updateBody));
       }
     );
 

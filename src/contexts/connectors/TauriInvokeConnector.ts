@@ -327,11 +327,9 @@ const importTasksWithNativeDialog = async () => {
 };
 
 const toUpdateAvailablePayload = (
-  version: string,
-  updateBody?: string
+  version: string
 ): UpdateAvailablePayload => ({
   version,
-  updateBody: updateBody?.trim() ?? "",
 });
 
 const syncTauriUpdatePolicy = async (
@@ -362,10 +360,7 @@ const syncTauriUpdatePolicy = async (
 
       await emitFromMain(
         UPDATE_AVAILABLE,
-        toUpdateAvailablePayload(
-          updateHandle.version,
-          updateHandle.body
-        )
+        toUpdateAvailablePayload(updateHandle.version)
       );
 
       if (enableInAppAutoUpdate) {

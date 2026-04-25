@@ -28,7 +28,7 @@ import { INSTALL_UPDATE } from "ipc";
 import { TimerStatus } from "store/timer/types";
 import { useAppDispatch, useAppSelector } from "hooks/storeHooks";
 import { isFreshInstallProfile, setEnableInAppAutoUpdate } from "store";
-import { setUpdateBody, setUpdateVersion } from "store/update";
+import { setUpdateVersion } from "store/update";
 import { getFromStorage, saveToStorage } from "utils";
 
 const AUTO_UPDATE_POLICY_PROMPT_SEEN_KEY =
@@ -211,7 +211,6 @@ const Layout: React.FC<Props> = ({ children }) => {
   const clearUpdatePromptForSession = useCallback(() => {
     setDismissedUpdatePromptVersion(update.updateVersion);
     dispatch(setUpdateVersion(""));
-    dispatch(setUpdateBody(""));
   }, [dispatch, update.updateVersion]);
 
   const onInstallPromptConfirm = useCallback(() => {

@@ -114,7 +114,6 @@ export type ExportTasksDialogPayload = {
 
 export type UpdateAvailablePayload = {
   version: string;
-  updateBody: string;
 };
 
 export type TasksExportResultPayload = {
