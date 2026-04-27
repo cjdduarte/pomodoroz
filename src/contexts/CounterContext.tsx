@@ -223,6 +223,11 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
     typeof setTimeout
   > | null>(null);
 
+  const setFocusExtensionUsedValue = useCallback((used: boolean) => {
+    focusExtensionUsedRef.current = used;
+    setFocusExtensionUsed(used);
+  }, []);
+
   const clearBreakTransitionTimeout = useCallback(() => {
     if (breakTransitionTimeoutRef.current === null) {
       return;
@@ -256,10 +261,9 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
       }
       setHasNotifiedBreak(false);
       setHasNotifiedFocusExtension(false);
-      focusExtensionUsedRef.current = false;
-      setFocusExtensionUsed(false);
+      setFocusExtensionUsedValue(false);
     },
-    [clearBreakTransitionTimeout]
+    [clearBreakTransitionTimeout, setFocusExtensionUsedValue]
   );
 
   const extendFocusSession = useCallback(
@@ -277,7 +281,7 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
 
       const extensionSeconds = minutes * 60;
       clearBreakTransitionTimeout();
-      focusExtensionUsedRef.current = true;
+      setFocusExtensionUsedValue(true);
       setDuration(
         (currentDuration) => currentDuration + extensionSeconds
       );
@@ -287,12 +291,12 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
       setLastCountTime(Date.now());
       setHasNotified30Seconds(false);
       setHasNotifiedBreak(false);
-      setFocusExtensionUsed(true);
     },
     [
       clearBreakTransitionTimeout,
       count,
       settings.enableFocusExtension,
+      setFocusExtensionUsedValue,
       timer.playing,
       timer.timerType,
     ]
