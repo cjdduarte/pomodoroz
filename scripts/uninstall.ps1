@@ -3,11 +3,14 @@
 
 param(
     [switch]$Purge,
+    [switch]$Installers,
     [switch]$Yes,
     [switch]$Help
 )
 
 $ErrorActionPreference = "Stop"
+$APP_DIR = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
+$INSTALLERS_BUNDLE_DIR = Join-Path $APP_DIR "src-tauri/target/release/bundle"
 
 function Step($message) {
     Write-Host "`n==> $message" -ForegroundColor Cyan
@@ -44,7 +47,7 @@ function Join-IfBasePath($basePath, $childPath) {
 function Show-Usage {
     @"
 Uso:
-  ./scripts/uninstall.ps1 [-Purge] [-Yes]
+  ./scripts/uninstall.ps1 [-Purge] [-Installers] [-Yes]
 
 Padrao:
   Linux: remove somente a instalacao local criada por scripts/install.ps1/install.sh.
@@ -52,8 +55,9 @@ Padrao:
   Sem parametros em terminal interativo, mostra um menu de opcoes.
 
 Opcoes:
-  -Purge   Remove tambem dados locais da aplicacao (Linux/Windows).
-  -Yes     Pula confirmacao interativa exigida por -Purge.
+  -Purge       Remove tambem dados locais da aplicacao (Linux/Windows).
+  -Installers  Remove tambem instaladores locais em src-tauri/target/release/bundle.
+  -Yes         Pula confirmacao interativa exigida por -Purge.
   -Help
 "@
 }
@@ -63,13 +67,15 @@ function Show-ModeMenu {
     Write-Host "Escolha o nivel de limpeza."
     Write-Host "- Padrao: remove apenas app/atalho/icone instalados localmente."
     Write-Host "- Purge: faz o padrao + remove dados locais (config/cache/share)."
+    Write-Host "- Instaladores: faz o padrao + remove instaladores gerados localmente."
     Write-Host ""
     Write-Host "Escolha o modo de desinstalacao:"
     Write-Host "  1) Padrao  - remove apenas instalacao local do pomodoroz"
     Write-Host "  2) Purge   - padrao + dados locais (~/.config, ~/.cache e ~/.local/share)"
-    Write-Host "  3) Cancelar"
+    Write-Host "  3) Instaladores - padrao + instaladores locais (src-tauri/target/release/bundle)"
+    Write-Host "  4) Cancelar"
 
-    $menuOption = Read-Host "Opcao [1-3]"
+    $menuOption = Read-Host "Opcao [1-4]"
     switch ($menuOption) {
         "" { }
         "1" { }
@@ -77,6 +83,9 @@ function Show-ModeMenu {
             $script:Purge = $true
         }
         "3" {
+            $script:Installers = $true
+        }
+        "4" {
             Write-Host "Operacao cancelada."
             exit 0
         }
@@ -236,9 +245,22 @@ if ($isLinuxOs) {
     Run-WindowsUninstall
 }
 
+if ($Installers) {
+    Step "Removendo instaladores locais gerados pelo validar-tudo"
+    Remove-IfExists $INSTALLERS_BUNDLE_DIR
+}
+
 Step "Concluido"
 if ($Purge) {
-    Write-Host "Instalacao local e dados locais foram removidos."
+    if ($Installers) {
+        Write-Host "Instalacao local, dados locais e instaladores locais foram removidos."
+    } else {
+        Write-Host "Instalacao local e dados locais foram removidos."
+    }
 } else {
-    Write-Host "Somente a instalacao local (user-scope) foi removida."
+    if ($Installers) {
+        Write-Host "Instalacao local e instaladores locais foram removidos."
+    } else {
+        Write-Host "Somente a instalacao local (user-scope) foi removida."
+    }
 }

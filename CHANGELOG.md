@@ -22,6 +22,7 @@
 - **Grid study helpers are now enabled by default** — new/restored profiles now show the grid draw button and rotate grid colors by default.
 - **Dependencies were updated in a patch refresh** — no functional behavior change is intended.
 - **Manual updater prompt state was simplified** — release-note body storage was removed from the renderer update state and IPC payload because the manual prompt now stays focused on the available version and install choice.
+- **Local uninstall scripts can now remove generated installer artifacts** — `scripts/uninstall.sh` and `scripts/uninstall.ps1` gained an installer cleanup mode for `src-tauri/target/release/bundle`, matching the local output produced by `validar-tudo --installers`.
 
 ## [26.4.37] - 2026-04-25
 

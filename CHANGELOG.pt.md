@@ -22,6 +22,7 @@
 - **Ajudas de estudo do grid agora vêm ligadas por padrão** — perfis novos/restaurados agora mostram o botão Sortear no grid e rotacionam as cores do grid por padrão.
 - **Dependências foram atualizadas em um refresh patch** — nenhuma mudança funcional é intencional.
 - **Estado do prompt manual de update foi simplificado** — o armazenamento do body das notas de release foi removido do estado de update do renderer e do payload IPC porque o prompt manual agora permanece focado na versão disponível e na escolha de instalação.
+- **Scripts de desinstalação local agora podem remover artefatos de instaladores gerados** — `scripts/uninstall.sh` e `scripts/uninstall.ps1` ganharam um modo de limpeza de instaladores para `src-tauri/target/release/bundle`, alinhado à saída local produzida por `validar-tudo --installers`.
 
 ## [26.4.37] - 2026-04-25
 

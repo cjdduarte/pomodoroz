@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
 INSTALL_ROOT="${HOME}/.local/opt/pomodoroz"
 MANIFEST_PATH="${INSTALL_ROOT}/install-manifest.txt"
+INSTALLERS_BUNDLE_DIR="${ROOT}/src-tauri/target/release/bundle"
 
 BIN_PATH="${HOME}/.local/bin/pomodoroz"
 DESKTOP_PATH="${HOME}/.local/share/applications/pomodoroz.desktop"
@@ -25,6 +28,7 @@ USER_DATA_PATHS=(
 )
 
 PURGE=0
+REMOVE_INSTALLERS=0
 ASSUME_YES=0
 
 step() {
@@ -39,15 +43,16 @@ die() {
 usage() {
   cat <<'EOF'
 Uso:
-  ./scripts/uninstall.sh [--purge] [--yes]
+  ./scripts/uninstall.sh [--purge] [--installers] [--yes]
 
 Padrao:
   Remove somente a instalacao local criada por scripts/install.sh.
   Sem parametros em terminal interativo, mostra um menu de opcoes.
 
 Opcoes:
-  --purge   Remove tambem dados locais em ~/.config, ~/.cache e ~/.local/share.
-  --yes     Pula confirmacao interativa exigida por --purge.
+  --purge       Remove tambem dados locais em ~/.config, ~/.cache e ~/.local/share.
+  --installers  Remove tambem instaladores locais em src-tauri/target/release/bundle.
+  --yes         Pula confirmacao interativa exigida por --purge.
   -h, --help
 EOF
 }
@@ -66,14 +71,16 @@ Menu de desinstalacao:
 Escolha o nivel de limpeza.
 - Padrao: remove apenas app/atalho/icone instalados localmente.
 - Purge: faz o padrao + remove dados locais (config/cache/share).
+- Instaladores: faz o padrao + remove instaladores gerados localmente.
 
 Escolha o modo de desinstalacao:
   1) Padrao  - remove apenas instalacao local do pomodoroz
   2) Purge   - padrao + dados locais (~/.config, ~/.cache e ~/.local/share)
-  3) Cancelar
+  3) Instaladores - padrao + instaladores locais (src-tauri/target/release/bundle)
+  4) Cancelar
 EOF
 
-  read -r -p "Opcao [1-3]: " MENU_OPTION
+  read -r -p "Opcao [1-4]: " MENU_OPTION
   case "$MENU_OPTION" in
     1|"")
       ;;
@@ -81,6 +88,9 @@ EOF
       PURGE=1
       ;;
     3)
+      REMOVE_INSTALLERS=1
+      ;;
+    4)
       echo "Operacao cancelada."
       exit 0
       ;;
@@ -98,6 +108,10 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --purge)
       PURGE=1
+      shift
+      ;;
+    --installers)
+      REMOVE_INSTALLERS=1
       shift
       ;;
     --yes)
@@ -161,6 +175,11 @@ if (( PURGE == 1 )); then
   done
 fi
 
+if (( REMOVE_INSTALLERS == 1 )); then
+  step "Removendo instaladores locais gerados pelo validar-tudo"
+  remove_path_if_exists "$INSTALLERS_BUNDLE_DIR"
+fi
+
 if command -v update-desktop-database >/dev/null 2>&1; then
   update-desktop-database "${HOME}/.local/share/applications" >/dev/null 2>&1 || true
 fi
@@ -171,7 +190,15 @@ fi
 
 step "Concluido"
 if (( PURGE == 1 )); then
-  printf "Instalacao local e dados locais foram removidos.\n"
+  if (( REMOVE_INSTALLERS == 1 )); then
+    printf "Instalacao local, dados locais e instaladores locais foram removidos.\n"
+  else
+    printf "Instalacao local e dados locais foram removidos.\n"
+  fi
 else
-  printf "Somente a instalacao local criada por scripts/install.sh foi removida.\n"
+  if (( REMOVE_INSTALLERS == 1 )); then
+    printf "Instalacao local e instaladores locais foram removidos.\n"
+  else
+    printf "Somente a instalacao local criada por scripts/install.sh foi removida.\n"
+  fi
 fi
