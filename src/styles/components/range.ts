@@ -6,9 +6,9 @@ export const StyledRangeContainer = styled.div`
   height: max-content;
 
   display: grid;
-  row-gap: 0.8rem;
+  row-gap: 0.5rem;
 
-  padding: 0.8rem 0;
+  padding: 0.55rem 0;
 `;
 
 export const StyledRangeWrapper = styled.div`

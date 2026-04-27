@@ -7,6 +7,7 @@ import { StyledTimer } from "styles";
 import Control from "./Control";
 import Counter from "./Counter";
 import CompactTaskDisplay from "./CompactTaskDisplay";
+import FocusExtensionPrompt from "./FocusExtensionPrompt";
 
 type TimerLocationState = {
   enableCompactMode?: boolean;
@@ -53,6 +54,7 @@ export default function Timer() {
         resetTimerAction={onResetCallback}
         shouldPromptFocusToIdleReset={shouldPromptFocusToIdleReset}
       />
+      <FocusExtensionPrompt />
       <CompactTaskDisplay />
     </StyledTimer>
   );

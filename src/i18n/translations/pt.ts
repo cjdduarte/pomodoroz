@@ -14,6 +14,8 @@ export const pt = {
     shortBreak: "Pausa curta",
     longBreak: "Pausa longa",
     sessionRounds: "Ciclos da sessão",
+    shortFocusExtension: "Extensão curta",
+    longFocusExtension: "Extensão longa",
     specialBreaks: "Pausas especiais",
     specialBreakSetterTitle: "Configurar pausa especial",
     specialBreakSetterDescription:
@@ -49,6 +51,11 @@ export const pt = {
       "Aproveite sua pausa especial de {{duration}} {{minuteLabel}}.",
     notifStayFocusedBody:
       "Mantenha o foco o máximo possível por {{duration}} {{minuteLabel}}.",
+    notifFocusExtensionAvailableTitle: "O foco está terminando",
+    notifFocusExtensionAvailableBody:
+      "Abra o Pomodoroz para estender por {{shortDuration}} {{shortMinuteLabel}} ou {{longDuration}} {{longMinuteLabel}}. Ignore este aviso para iniciar a pausa normalmente.",
+    focusExtensionPrompt: "Continuar focando?",
+    focusExtensionAction: "+{{duration}} {{minuteLabel}}",
     strictModeNotice: "Você está no {{mode}}!",
     minuteSingular: "minuto",
     minutePlural: "minutos",
@@ -153,6 +160,7 @@ export const pt = {
     followSystemTheme: "Seguir tema do sistema",
     nativeTitlebar: "Barra de título nativa",
     progressAnimation: "Animação de progresso",
+    focusExtension: "Estender tempo do foco",
     autoStartWorkTime: "Iniciar foco automaticamente",
     resetFocusToIdle: "Voltar pode contar como Ocioso",
     minimizeToTray: "Minimizar para a bandeja",

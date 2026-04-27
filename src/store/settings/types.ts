@@ -12,6 +12,7 @@ export type SettingTypes = {
   followSystemTheme: boolean;
   enableStrictMode: boolean;
   enableProgressAnimation: boolean;
+  enableFocusExtension: boolean;
   enableVoiceAssistance: boolean;
   useNativeTitlebar: boolean;
   notificationSoundOn: boolean;

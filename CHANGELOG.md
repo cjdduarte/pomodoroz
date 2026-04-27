@@ -6,14 +6,16 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
-## [26.4.38] - TBD
+## [26.4.38] - 2026-04-27
 
 ### Added
 
+- **Focus sessions can now be extended near completion** — a new opt-in Focus Extension setting shows a non-modal `+short` / `+long` prompt during the final 30 seconds of focus, temporarily expands compact mode when needed, uses configurable extension durations in Config/Rules, allows one extension per focus block, and sends a native reminder when the app is in the background and notifications are enabled.
 - **Theme shortcut customization now persists** — the app-owned `Toggle Theme` shortcut can now be changed in Settings, stored with local settings, restored on startup, and protected against invalid or reserved shortcut conflicts.
 
 ### Changed
 
+- **Grid study helpers are now enabled by default** — new/restored profiles now show the grid draw button and rotate grid colors by default.
 - **Dependencies were updated in a patch refresh** — no functional behavior change is intended.
 - **Manual updater prompt state was simplified** — release-note body storage was removed from the renderer update state and IPC payload because the manual prompt now stays focused on the available version and install choice.
 

@@ -11,6 +11,8 @@ export type ConfigTypes = {
   shortBreak: number;
   longBreak: number;
   sessionRounds: number;
+  shortFocusExtension: number;
+  longFocusExtension: number;
   specialBreaks: {
     firstBreak?: SpecialBreakTypes;
     secondBreak?: SpecialBreakTypes;

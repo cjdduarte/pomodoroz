@@ -14,6 +14,8 @@ export const en = {
     shortBreak: "Short break",
     longBreak: "Long break",
     sessionRounds: "Session rounds",
+    shortFocusExtension: "Short extension",
+    longFocusExtension: "Long extension",
     specialBreaks: "Special Breaks",
     specialBreakSetterTitle: "Special Break Setter",
     specialBreakSetterDescription:
@@ -49,6 +51,11 @@ export const en = {
       "Enjoy your {{duration}} {{minuteLabel}} special break.",
     notifStayFocusedBody:
       "Stay focused as much as possible for {{duration}} {{minuteLabel}}.",
+    notifFocusExtensionAvailableTitle: "Focus is ending soon",
+    notifFocusExtensionAvailableBody:
+      "Open Pomodoroz to extend by {{shortDuration}} {{shortMinuteLabel}} or {{longDuration}} {{longMinuteLabel}}. Ignore this to start your break as usual.",
+    focusExtensionPrompt: "Keep focusing?",
+    focusExtensionAction: "+{{duration}} {{minuteLabel}}",
     strictModeNotice: "You are currently on {{mode}}!",
     minuteSingular: "minute",
     minutePlural: "minutes",
@@ -153,6 +160,7 @@ export const en = {
     followSystemTheme: "Follow System Theme",
     nativeTitlebar: "Native Titlebar",
     progressAnimation: "Progress Animation",
+    focusExtension: "Extend Focus Time",
     autoStartWorkTime: "Auto-start Work Time",
     resetFocusToIdle: "Back may count as Idle",
     minimizeToTray: "Minimize To Tray",

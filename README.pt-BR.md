@@ -68,10 +68,11 @@ O objetivo do Pomodoroz não é "corrigir flexibilidade", e sim adicionar recurs
 | Visualização em grade (grid)    | Não                                                                                            | Sim (**Grade de Rotação de Estudos** com ciclo diário, Sortear e clique direito para Timer)                       |
 | Rodapé da grade (status atual)  | Não                                                                                            | Mostra contadores de total, visitadas e restantes                                                                 |
 | Importação/Exportação de listas | Sem fluxo dedicado (dados ficam apenas no armazenamento local interno)                         | Adiciona **importação/exportação JSON de listas/cartões** com validação e modos merge/substituição                |
+| Extensão de foco                | Não                                                                                            | Prompt opcional perto do fim do foco para adicionar tempo curto/longo, com durações configuráveis e aviso no tray |
 | Contagem de ociosidade          | Não                                                                                            | Relatório inclui tempo ocioso por período + opção de mover foco para Ocioso no reset                              |
 | Idiomas                         | Inglês (`en`), Espanhol (`es`), Japonês (`ja`), Chinês (`zh`)                                  | Adiciona Português (Brasil) (`pt`), Alemão (`de`) e Francês (`fr`)                                                |
 
-> Data da comparação: 2026-04-21.
+> Data da comparação: 2026-04-27.
 
 ### Começo rápido (sugestões)
 
@@ -91,6 +92,7 @@ O objetivo do Pomodoroz não é "corrigir flexibilidade", e sim adicionar recurs
 
 - **Notificações progressivas** (60s e 30s antes das transições).
 - **Assistente de voz** com aviso sonoro de status da sessão.
+- **Extensão de foco** perto do fim de um bloco de foco, com uma escolha curta/longa por sessão.
 
 **Qualidade de pausa**
 
@@ -129,6 +131,7 @@ O objetivo do Pomodoroz não é "corrigir flexibilidade", e sim adicionar recurs
 - Modos: **Foco**, **Pausa curta**, **Pausa longa** e **Pausas especiais** (horários configuráveis).
 - Controles: iniciar, pausar, pular, resetar.
 - Rodadas de sessão configuráveis.
+- **Extensão de foco** — prompt opcional `+curto` / `+longo` perto do fim do foco, com durações configuráveis.
 - **Modo rigoroso** — impede pausar/pular/resetar uma vez iniciado.
 - **Início automático** do foco após a pausa.
 - **Breaks de 0 minutos** — pula a pausa automaticamente.
@@ -172,6 +175,7 @@ O objetivo do Pomodoroz não é "corrigir flexibilidade", e sim adicionar recurs
 - **Nenhuma** — sem notificação.
 - **Normal** — notifica a cada pausa.
 - **Extra** — notifica 60s antes da pausa, 30s antes do fim e no início.
+- **Lembrete de extensão de foco** — quando o app está oculto ou no tray, a janela de extensão pode disparar um aviso nativo.
 - **Som customizável** — sino padrão ou arquivo de áudio personalizado.
 - **Assistente de voz** — aviso sonoro sobre status da sessão.
 
@@ -205,7 +209,6 @@ O objetivo do Pomodoroz não é "corrigir flexibilidade", e sim adicionar recurs
 Melhorias pensadas a partir de feedback real de usuários que lidam com dificuldade de foco e TDAH. Veja detalhes em [docs/IMPROVEMENTS.md](docs/IMPROVEMENTS.md).
 
 - **Presets de cadência** — Só começa (5/1), Sprint (10/3), Clássico (25/5), Flow (50/10).
-- **Estender sessão** — "+5 min" / "+10 min" quando estiver em hiperfoco, sem perder o ritmo.
 - **Sugestão de pausa** — dicas rotativas (beber água, alongar, respirar) para evitar doomscroll.
 
 ## 💻 Instalação

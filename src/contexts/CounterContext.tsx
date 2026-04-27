@@ -40,6 +40,10 @@ type CounterProps = {
   count: number;
   duration: number;
   timerType?: TimerStatus;
+  shouldPromptFocusExtension: boolean;
+  shortFocusExtension: number;
+  longFocusExtension: number;
+  extendFocusSession?: (minutes: number) => void;
   resetTimerAction?: (options?: ResetTimerActionOptions) => void;
   shouldPromptFocusToIdleReset: boolean;
   shouldRequestFullscreen: boolean;
@@ -49,6 +53,9 @@ type CounterProps = {
 const CounterContext = React.createContext<CounterProps>({
   count: 0,
   duration: 0,
+  shouldPromptFocusExtension: false,
+  shortFocusExtension: 5,
+  longFocusExtension: 10,
   shouldPromptFocusToIdleReset: false,
   shouldRequestFullscreen: false,
   shouldFullscreen: false,
@@ -82,6 +89,7 @@ const TRACKING_INTERVAL_MS = 1000;
 const TRACKING_SLEEP_GAP_MS = 5000;
 const TRACKING_PERSIST_CHUNK_SECONDS = 120;
 const COUNTDOWN_INTERVAL_FALLBACK_MS = 1000;
+const FOCUS_EXTENSION_PROMPT_THRESHOLD_SECONDS = 30;
 
 const createStatisticsDateKey = (timestamp: number): string => {
   const date = new Date(timestamp);
@@ -202,8 +210,12 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
   const [hasNotified60Seconds, setHasNotified60Seconds] =
     useState(false);
   const [hasNotifiedBreak, setHasNotifiedBreak] = useState(false);
+  const [hasNotifiedFocusExtension, setHasNotifiedFocusExtension] =
+    useState(false);
 
   const [duration, setDuration] = useState(config.stayFocus * 60);
+  const [focusExtensionUsed, setFocusExtensionUsed] = useState(false);
+  const focusExtensionUsedRef = useRef(false);
   const previousTimerTypeRef = useRef(timer.timerType);
   const trackingSegmentRef = useRef<TrackingSegment | null>(null);
   const pendingCycleCompletionRef = useRef(false);
@@ -243,8 +255,48 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
         setHasNotified60Seconds(false);
       }
       setHasNotifiedBreak(false);
+      setHasNotifiedFocusExtension(false);
+      focusExtensionUsedRef.current = false;
+      setFocusExtensionUsed(false);
     },
     [clearBreakTransitionTimeout]
+  );
+
+  const extendFocusSession = useCallback(
+    (minutes: number) => {
+      if (
+        !settings.enableFocusExtension ||
+        focusExtensionUsedRef.current ||
+        timer.timerType !== TimerStatus.STAY_FOCUS ||
+        !timer.playing ||
+        count <= 0 ||
+        minutes <= 0
+      ) {
+        return;
+      }
+
+      const extensionSeconds = minutes * 60;
+      clearBreakTransitionTimeout();
+      focusExtensionUsedRef.current = true;
+      setDuration(
+        (currentDuration) => currentDuration + extensionSeconds
+      );
+      setCount(
+        (currentCount) => Math.max(0, currentCount) + extensionSeconds
+      );
+      setLastCountTime(Date.now());
+      setHasNotified30Seconds(false);
+      setHasNotifiedBreak(false);
+      setHasNotifiedFocusExtension(false);
+      setFocusExtensionUsed(true);
+    },
+    [
+      clearBreakTransitionTimeout,
+      count,
+      settings.enableFocusExtension,
+      timer.playing,
+      timer.timerType,
+    ]
   );
 
   useEffect(() => {
@@ -654,6 +706,22 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
   }, [timer.playing, lastCountTime, count]);
 
   useEffect(() => {
+    const isFocusExtensionWindow =
+      settings.enableFocusExtension &&
+      timer.playing &&
+      timer.timerType === TimerStatus.STAY_FOCUS &&
+      !focusExtensionUsedRef.current &&
+      count <= FOCUS_EXTENSION_PROMPT_THRESHOLD_SECONDS &&
+      count > 0;
+    const isAppInBackground =
+      typeof document !== "undefined" &&
+      (document.visibilityState !== "visible" || !document.hasFocus());
+    const shouldNotifyFocusExtension =
+      settings.notificationType !== "none" &&
+      isFocusExtensionWindow &&
+      isAppInBackground &&
+      !hasNotifiedFocusExtension;
+
     if (settings.notificationType === "extra") {
       if (count <= 60 && count > 0 && !hasNotified60Seconds) {
         setHasNotified60Seconds(true);
@@ -672,7 +740,8 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
         count <= 30 &&
         count > 0 &&
         timer.timerType === TimerStatus.STAY_FOCUS &&
-        !hasNotified30Seconds
+        !hasNotified30Seconds &&
+        !shouldNotifyFocusExtension
       ) {
         setHasNotified30Seconds(true);
         notification(
@@ -681,6 +750,19 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
           settings.enableVoiceAssistance && thirtySecondsLeftWav
         );
       }
+    }
+
+    if (shouldNotifyFocusExtension) {
+      setHasNotifiedFocusExtension(true);
+      setHasNotified30Seconds(true);
+      notification(t("timer.notifFocusExtensionAvailableTitle"), {
+        body: t("timer.notifFocusExtensionAvailableBody", {
+          shortDuration: config.shortFocusExtension,
+          shortMinuteLabel: getMinuteLabel(config.shortFocusExtension),
+          longDuration: config.longFocusExtension,
+          longMinuteLabel: getMinuteLabel(config.longFocusExtension),
+        }),
+      });
     }
 
     if (count <= 0 && !hasNotifiedBreak) {
@@ -825,7 +907,10 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
     config.shortBreak,
     config.longBreak,
     config.sessionRounds,
+    config.shortFocusExtension,
+    config.longFocusExtension,
     getMinuteLabel,
+    settings.enableFocusExtension,
     settings.notificationType,
     settings.autoStartWorkTime,
     settings.enableVoiceAssistance,
@@ -834,6 +919,7 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
     hasNotified30Seconds,
     hasNotified60Seconds,
     hasNotifiedBreak,
+    hasNotifiedFocusExtension,
     setHasNotified30Seconds,
     setHasNotified60Seconds,
     setHasNotifiedBreak,
@@ -928,11 +1014,23 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
     duration - count > 0 &&
     trackingSegmentRef.current?.bucket === StatisticsBucket.FOCUS;
 
+  const shouldPromptFocusExtension =
+    settings.enableFocusExtension &&
+    timer.playing &&
+    timer.timerType === TimerStatus.STAY_FOCUS &&
+    !focusExtensionUsed &&
+    count > 0 &&
+    count <= FOCUS_EXTENSION_PROMPT_THRESHOLD_SECONDS;
+
   return (
     <CounterContext.Provider
       value={{
         count: Math.ceil(count),
         duration,
+        shouldPromptFocusExtension,
+        shortFocusExtension: config.shortFocusExtension,
+        longFocusExtension: config.longFocusExtension,
+        extendFocusSession,
         resetTimerAction,
         shouldPromptFocusToIdleReset,
         shouldRequestFullscreen,

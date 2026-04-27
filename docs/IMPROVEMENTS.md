@@ -501,7 +501,7 @@ Suggested commit:
 | ID  | Feature                                  | Status | Priority | Effort |
 | --- | ---------------------------------------- | ------ | -------- | ------ |
 | B1  | Cadence presets (5/1, 10/3, 25/5, 50/10) | Open   | High     | Low    |
-| B2  | Extend session (+5 / +10)                | Open   | High     | Medium |
+| B2  | Extend session (+5 / +10)                | Done   | High     | Medium |
 | B3  | Break suggestion prompts                 | Open   | High     | Low    |
 | B4  | Global play/pause hotkey                 | Open   | Medium   | Low    |
 | B5  | Cadence insights in statistics           | Open   | Medium   | Medium |
@@ -509,11 +509,19 @@ Suggested commit:
 | B7  | Reverse Pomodoro mode                    | Open   | Low      | Medium |
 | B8  | Ambient sounds                           | Open   | Low      | High   |
 | B9  | No-judgment mode                         | Open   | Low      | Low    |
+| B10 | Timer circle small-window layout fix     | Open   | Medium   | Low    |
 
 Current product baseline:
 
 - Manual cadence configuration already exists via config sliders (`stayFocus`, `shortBreak`, `longBreak`, `sessionRounds`).
 - Global shortcuts already exist for hide/show app (`Alt+Shift+H` / `Alt+Shift+S`); play/pause is still pending.
+
+### B10 bug note
+
+- In a short window, the main timer circle can overlap the navigation area and timer controls.
+- Reproduce by reducing the window height on the Timer route until the circle touches the top navigation and bottom controls.
+- Do not handle this inside B2. After focus extension is finalized, evaluate responsive constraints for the timer circle and control block.
+- Validation target: timer circle must remain fully visible and must not overlap navigation, titlebar, session label, play/skip/volume/fullscreen controls, or compact task footer in small windows.
 
 ### B2 decision notes
 
@@ -522,9 +530,14 @@ Current product baseline:
 - Add configurable extension durations to the Config/Rules screen:
   - Short extension: default `5 min`.
   - Long extension: default `10 min`.
+  - Valid range: `1-30 min`.
 - Add localized copy for every supported language (`en`, `pt`, `es`, `ja`, `zh`, `de`, `fr`) for the settings toggle, Config/Rules labels, and extension prompt actions.
 - MVP limit: allow one extension per focus session. Keep this limit internal for now instead of adding another user-facing setting.
-- Show the extension prompt near the end of a focus session, not as a blocking step at zero. If the user takes no action, the normal automatic break transition must continue.
+- Show the extension prompt at `T-30s` during a focus session, not as a blocking step at zero. If the user takes no action, the normal automatic break transition must continue.
+- If the app is hidden, unfocused, minimized, or in tray when the `T-30s` extension window opens, send one native reminder only when Settings -> Notification Types is not `none`.
+- The hidden-app reminder must align with the existing notification setting: `none` means no native reminder; `normal` and `extra` may show the extension reminder.
+- The prompt is non-modal. It disappears when the user pauses the timer or when focus ends.
+- Do not rewind an already-started break in the first B2 implementation.
 - Extending focus keeps the same focus session and round. It must not create a new pomodoro/session count.
 - Statistics should record one focus block with the real final duration, including the extension.
 - The next break keeps its configured duration; focus extension must not scale short/long break length.
@@ -534,21 +547,33 @@ Current product baseline:
 
 - Scope checklist:
   - [ ] Implement presets UI in settings.
-  - [ ] Implement optional extend-session feature toggle in settings.
-  - [ ] Implement configurable short/long extension durations in Config/Rules.
-  - [ ] Implement one-use extend-session prompt near focus end.
+  - [x] Implement optional extend-session feature toggle in settings.
+  - [x] Implement configurable short/long extension durations in Config/Rules.
+  - [x] Implement one-use extend-session prompt at `T-30s`.
   - [ ] Implement rotating break suggestion copy.
 - Validation checklist:
   - [ ] Manual E2E: extension disabled -> timer start -> focus end -> automatic break starts as today.
-  - [ ] Manual E2E: extension enabled -> prompt appears near focus end -> no action -> automatic break starts as today.
+  - [ ] Manual E2E: extension enabled -> prompt appears at `T-30s` -> no action -> automatic break starts as today.
   - [ ] Manual E2E: extension enabled -> choose short extension -> focus duration increases by configured short value -> break starts after extended focus.
   - [ ] Manual E2E: extension enabled -> choose long extension -> focus duration increases by configured long value -> break starts after extended focus.
+  - [ ] Verify extension duration controls enforce the `1-30 min` range.
+  - [ ] Verify pausing the timer while the extension prompt is visible hides the prompt.
+  - [ ] Verify hidden/minimized/tray behavior: with notifications disabled, no native reminder appears; with `normal` or `extra`, one extension reminder appears at `T-30s`.
+  - [ ] Verify `extra` notification mode does not duplicate the standard 30-second focus notification when the hidden-app extension reminder is sent.
   - [ ] Verify the extension prompt does not appear more than once in the same focus session.
   - [ ] Verify statistics record one focus block with the real extended duration and do not inflate completed session count.
   - [ ] Verify short/long break duration remains unchanged after an extended focus.
   - [ ] Verify i18n keys and rendered copy in `en/pt/es/ja/zh/de/fr` with no fallback/missing-key text.
+- Validation executed:
+  - [x] `pnpm lint`
+  - [x] `pnpm typecheck:renderer`
+  - [x] `pnpm build:renderer`
+  - [x] Browser smoke: settings toggle renders, Config/Rules extension sliders enforce `1-30 min`, prompt appears at `T-30s`, and short extension adds time once.
+  - [x] Normal timer layout smoke: extension prompt renders inline below the controls and stays clear of the task footer.
+  - [x] Config/Rules layout smoke: extension sliders remain reachable in short windows through denser spacing and route-level scrolling.
+  - [x] Compact layout smoke: extension prompt closes the compact grid if open, uses a prompt-sized compact expansion, keeps both extension buttons visible, and collapses after the prompt closes.
 - Suggested commit:
-  - `feat(timer): add cadence presets, session extension, and break suggestions`
+  - `feat(timer): add focus session extension`
 
 ---
 

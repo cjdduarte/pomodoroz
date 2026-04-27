@@ -1,13 +1,24 @@
 import styled, { css } from "styled-components";
 import { StyledHeaderHeading } from "styles";
+import { StyledScrollbar } from "styles/mixins";
 import { themes } from "styles/themes";
 
 export const StyledConfig = styled.main`
-  padding: 0 2rem;
+  width: 100%;
+  height: 100%;
+
+  padding-left: 2rem;
+  padding-right: 1.4rem;
+  padding-bottom: 1.2rem;
+
+  flex: 1 1;
+  overflow: hidden scroll;
 
   animation: 320ms ${themes.enterFromLeft} ease;
 
   position: relative;
+
+  ${StyledScrollbar};
 `;
 
 export const StyledConfigSliderSection = styled.section`
@@ -15,7 +26,7 @@ export const StyledConfigSliderSection = styled.section`
   height: max-content;
 
   display: grid;
-  row-gap: 0.4rem;
+  row-gap: 0.2rem;
 `;
 
 export const StyledConfigSpecialBreaks = styled.div`

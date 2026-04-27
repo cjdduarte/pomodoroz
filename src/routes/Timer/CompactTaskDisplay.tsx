@@ -4,6 +4,7 @@ import React, {
   useEffect,
   useCallback,
   useMemo,
+  useContext,
 } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router";
@@ -25,7 +26,7 @@ import type { TaskList, Task } from "store/tasks/types";
 import { resolveActiveTaskSelection } from "utils";
 import TaskListGrid from "routes/Tasks/TaskListGrid";
 import { COMPACT_COLLAPSE, COMPACT_EXPAND } from "ipc";
-import { getInvokeConnector } from "contexts";
+import { CounterContext, getInvokeConnector } from "contexts";
 
 type TimerLocationState = {
   selectedTask?: TaskSelection;
@@ -416,6 +417,7 @@ const CompactTaskDisplay: React.FC = () => {
   );
   const selected = useAppSelector((state) => state.taskSelection);
   const dispatch = useAppDispatch();
+  const { shouldPromptFocusExtension } = useContext(CounterContext);
 
   const [showDropdown, setShowDropdown] = useState(false);
   const [showActions, setShowActions] = useState(false);
@@ -622,6 +624,17 @@ const CompactTaskDisplay: React.FC = () => {
       closeGrid();
     }
   }, [closeGrid, showGrid, showPrompt, tasks.length]);
+
+  // Let the focus extension prompt own the compact expansion size.
+  useEffect(() => {
+    if (!shouldPromptFocusExtension || !showGrid) {
+      return;
+    }
+
+    setShowGrid(false);
+    setShowDropdown(false);
+    setShowActions(false);
+  }, [shouldPromptFocusExtension, showGrid]);
 
   // On unmount, collapse compact window if grid was open
   useEffect(() => {

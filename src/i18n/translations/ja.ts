@@ -14,6 +14,8 @@ export const ja = {
     shortBreak: "短い休憩",
     longBreak: "長い休憩",
     sessionRounds: "セッション回数",
+    shortFocusExtension: "短い延長",
+    longFocusExtension: "長い延長",
     specialBreaks: "特別休憩",
     specialBreakSetterTitle: "特別休憩の設定",
     specialBreakSetterDescription:
@@ -50,6 +52,11 @@ export const ja = {
       "{{duration}}{{minuteLabel}}の特別休憩をお楽しみください。",
     notifStayFocusedBody:
       "{{duration}}{{minuteLabel}}できるだけ集中してください。",
+    notifFocusExtensionAvailableTitle: "集中時間がまもなく終了します。",
+    notifFocusExtensionAvailableBody:
+      "Pomodorozを開いて{{shortDuration}}{{shortMinuteLabel}}または{{longDuration}}{{longMinuteLabel}}延長できます。通常どおり休憩を開始するには、この通知を無視してください。",
+    focusExtensionPrompt: "集中を延長しますか？",
+    focusExtensionAction: "+{{duration}}{{minuteLabel}}",
     strictModeNotice: "現在は{{mode}}です。",
     minuteSingular: "分",
     minutePlural: "分",
@@ -153,6 +160,7 @@ export const ja = {
     followSystemTheme: "システムテーマに従う",
     nativeTitlebar: "ネイティブタイトルバー",
     progressAnimation: "進捗アニメーション",
+    focusExtension: "集中時間を延長",
     autoStartWorkTime: "作業時間を自動開始",
     resetFocusToIdle: "戻るでアイドル計上",
     minimizeToTray: "トレイに最小化",

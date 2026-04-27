@@ -3,8 +3,27 @@ import { getFromStorage } from "utils";
 import { ConfigPayload, ConfigTypes } from "./types";
 import { defaultConfig } from "./defaultConfig";
 
-const storedState = getFromStorage<{ config?: ConfigTypes }>("state");
-const config = storedState?.config || defaultConfig;
+const mergeConfig = (
+  override: Partial<ConfigTypes> | undefined
+): ConfigTypes => ({
+  stayFocus: override?.stayFocus ?? defaultConfig.stayFocus,
+  shortBreak: override?.shortBreak ?? defaultConfig.shortBreak,
+  longBreak: override?.longBreak ?? defaultConfig.longBreak,
+  sessionRounds: override?.sessionRounds ?? defaultConfig.sessionRounds,
+  shortFocusExtension:
+    override?.shortFocusExtension ?? defaultConfig.shortFocusExtension,
+  longFocusExtension:
+    override?.longFocusExtension ?? defaultConfig.longFocusExtension,
+  specialBreaks: {
+    ...defaultConfig.specialBreaks,
+    ...override?.specialBreaks,
+  },
+});
+
+const storedState = getFromStorage<{ config?: Partial<ConfigTypes> }>(
+  "state"
+);
+const config = mergeConfig(storedState?.config);
 
 const initialState: ConfigTypes = config;
 
@@ -26,6 +45,20 @@ const configSlice = createSlice({
 
     setSessionRounds(state, action: ConfigPayload<"sessionRounds">) {
       state.sessionRounds = action.payload;
+    },
+
+    setShortFocusExtension(
+      state,
+      action: ConfigPayload<"shortFocusExtension">
+    ) {
+      state.shortFocusExtension = action.payload;
+    },
+
+    setLongFocusExtension(
+      state,
+      action: ConfigPayload<"longFocusExtension">
+    ) {
+      state.longFocusExtension = action.payload;
     },
 
     restoreDefaultConfig() {
@@ -66,9 +99,11 @@ export const {
   restoreDefaultConfig,
   setFourthSpecialBreak,
   setLongBreak,
+  setLongFocusExtension,
   setSecondSpecialBreak,
   setSessionRounds,
   setShortBreak,
+  setShortFocusExtension,
   setStayFocus,
   setThirdSpecialBreak,
   setFirstSpecialBreak,

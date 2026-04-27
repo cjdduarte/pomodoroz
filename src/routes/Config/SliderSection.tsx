@@ -6,6 +6,8 @@ import {
   setSessionRounds,
   setShortBreak,
   setLongBreak,
+  setShortFocusExtension,
+  setLongFocusExtension,
 } from "store";
 import { StyledConfigSliderSection } from "styles";
 import ConfigSlider, { ConfigSliderProps } from "./ConfigSlider";
@@ -19,7 +21,14 @@ const SliderSection: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const config = useAppSelector((state) => state.config);
-  const { stayFocus, shortBreak, longBreak, sessionRounds } = config;
+  const {
+    stayFocus,
+    shortBreak,
+    longBreak,
+    sessionRounds,
+    shortFocusExtension,
+    longFocusExtension,
+  } = config;
 
   const sliderRangeList: SliderConfigItem[] = [
     {
@@ -67,6 +76,30 @@ const SliderSection: React.FC = () => {
       value: sessionRounds,
       handleConfigChange: useCallback(
         (value) => dispatch(setSessionRounds(value)),
+        [dispatch]
+      ),
+    },
+    {
+      id: "short-focus-extension",
+      label: t("config.shortFocusExtension"),
+      valueType: "mins",
+      minValue: 1,
+      maxValue: 30,
+      value: shortFocusExtension,
+      handleConfigChange: useCallback(
+        (value) => dispatch(setShortFocusExtension(value)),
+        [dispatch]
+      ),
+    },
+    {
+      id: "long-focus-extension",
+      label: t("config.longFocusExtension"),
+      valueType: "mins",
+      minValue: 1,
+      maxValue: 30,
+      value: longFocusExtension,
+      handleConfigChange: useCallback(
+        (value) => dispatch(setLongFocusExtension(value)),
         [dispatch]
       ),
     },

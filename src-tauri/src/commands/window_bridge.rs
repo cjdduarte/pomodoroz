@@ -21,6 +21,7 @@ const WINDOW_FRAME_HEIGHT_FRAMELESS: f64 = 490.0;
 const WINDOW_COMPACT_BASE_HEIGHT: f64 = 100.0;
 const WINDOW_COMPACT_TITLEBAR_COMPENSATION: f64 = 40.0;
 const WINDOW_COMPACT_GRID_HEIGHT: f64 = 320.0;
+const WINDOW_COMPACT_FOCUS_EXTENSION_HEIGHT: f64 = 76.0;
 const MAX_IMPORT_FILE_BYTES: u64 = 5 * 1024 * 1024;
 
 const EVENT_FULLSCREEN_BREAK_ENTERED: &str = "FULLSCREEN_BREAK_ENTERED";
@@ -151,6 +152,17 @@ pub fn compact_expand(window: Window) -> Result<(), String> {
         .set_size(LogicalSize::new(
             WINDOW_WIDTH,
             compact_height + WINDOW_COMPACT_GRID_HEIGHT,
+        ))
+        .map_err(map_error)
+}
+
+#[tauri::command]
+pub fn compact_expand_focus_extension(window: Window) -> Result<(), String> {
+    let compact_height = get_compact_height(&window)?;
+    window
+        .set_size(LogicalSize::new(
+            WINDOW_WIDTH,
+            compact_height + WINDOW_COMPACT_FOCUS_EXTENSION_HEIGHT,
         ))
         .map_err(map_error)
 }

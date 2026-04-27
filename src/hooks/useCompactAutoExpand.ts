@@ -1,9 +1,16 @@
 import { useCallback, useEffect, useRef } from "react";
 import { getInvokeConnector } from "contexts";
-import { COMPACT_COLLAPSE, COMPACT_EXPAND } from "ipc";
+import {
+  COMPACT_COLLAPSE,
+  COMPACT_EXPAND,
+  COMPACT_EXPAND_FOCUS_EXTENSION,
+} from "ipc";
 
 type UseCompactAutoExpandOptions = {
   compactModeEnabled: boolean;
+  expandChannel?:
+    | typeof COMPACT_EXPAND
+    | typeof COMPACT_EXPAND_FOCUS_EXTENSION;
   threshold?: number;
 };
 
@@ -11,6 +18,7 @@ const DEFAULT_THRESHOLD = 260;
 
 const useCompactAutoExpand = ({
   compactModeEnabled,
+  expandChannel = COMPACT_EXPAND,
   threshold = DEFAULT_THRESHOLD,
 }: UseCompactAutoExpandOptions) => {
   const didExpandRef = useRef(false);
@@ -37,9 +45,9 @@ const useCompactAutoExpand = ({
     }
 
     didExpandRef.current = true;
-    getInvokeConnector().send(COMPACT_EXPAND);
+    getInvokeConnector().send(expandChannel);
     return true;
-  }, [compactModeEnabled, threshold]);
+  }, [compactModeEnabled, expandChannel, threshold]);
 
   const collapseCompact = useCallback(() => {
     if (!didExpandRef.current) {

@@ -14,6 +14,8 @@ export const de = {
     shortBreak: "Kurze Pause",
     longBreak: "Lange Pause",
     sessionRounds: "Sitzungsrunden",
+    shortFocusExtension: "Kurze Verlaengerung",
+    longFocusExtension: "Lange Verlaengerung",
     specialBreaks: "Spezielle Pausen",
     specialBreakSetterTitle: "Spezialpause einstellen",
     specialBreakSetterDescription:
@@ -51,6 +53,11 @@ export const de = {
       "Geniesse deine spezielle Pause von {{duration}} {{minuteLabel}}.",
     notifStayFocusedBody:
       "Bleib moeglichst konzentriert fuer {{duration}} {{minuteLabel}}.",
+    notifFocusExtensionAvailableTitle: "Die Fokuszeit endet bald.",
+    notifFocusExtensionAvailableBody:
+      "Oeffne Pomodoroz, um um {{shortDuration}} {{shortMinuteLabel}} oder {{longDuration}} {{longMinuteLabel}} zu verlaengern. Ignoriere diesen Hinweis, um deine Pause wie gewohnt zu starten.",
+    focusExtensionPrompt: "Weiter fokussieren?",
+    focusExtensionAction: "+{{duration}} {{minuteLabel}}",
     strictModeNotice: "Du bist aktuell im {{mode}}!",
     minuteSingular: "Minute",
     minutePlural: "Minuten",
@@ -155,6 +162,7 @@ export const de = {
     followSystemTheme: "System-Theme folgen",
     nativeTitlebar: "Native Titelleiste",
     progressAnimation: "Fortschrittsanimation",
+    focusExtension: "Fokuszeit verlaengern",
     autoStartWorkTime: "Arbeitszeit automatisch starten",
     resetFocusToIdle: "Zurueck kann als Leerlauf zaehlen",
     minimizeToTray: "In den Tray minimieren",

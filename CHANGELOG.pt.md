@@ -6,14 +6,16 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
-## [26.4.38] - A definir
+## [26.4.38] - 2026-04-27
 
 ### Adicionado
 
+- **Sessões de foco agora podem ser estendidas perto do fim** — o novo ajuste opcional de Extensão de foco mostra um prompt não-modal `+curto` / `+longo` nos últimos 30 segundos do foco, expande temporariamente o modo compacto quando necessário, usa durações configuráveis em Configurações/Regras, permite uma extensão por bloco de foco e envia um lembrete nativo quando o app está em segundo plano e notificações estão ligadas.
 - **Customização do atalho de tema agora persiste** — o atalho local `Alternar tema`, controlado pelo app, agora pode ser alterado em Ajustes, armazenado nas configurações locais, restaurado na inicialização e protegido contra atalhos inválidos ou reservados.
 
 ### Alterado
 
+- **Ajudas de estudo do grid agora vêm ligadas por padrão** — perfis novos/restaurados agora mostram o botão Sortear no grid e rotacionam as cores do grid por padrão.
 - **Dependências foram atualizadas em um refresh patch** — nenhuma mudança funcional é intencional.
 - **Estado do prompt manual de update foi simplificado** — o armazenamento do body das notas de release foi removido do estado de update do renderer e do payload IPC porque o prompt manual agora permanece focado na versão disponível e na escolha de instalação.
 

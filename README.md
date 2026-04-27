@@ -68,10 +68,11 @@ Pomodoroz is not about "fixing flexibility"; it focuses on adding workflow featu
 | Grid view                    | No                                                                                        | Yes (**Study Rotation Grid** with daily color cycle, Draw button, and right-click to Timer)                   |
 | Grid footer (current status) | No                                                                                        | Shows total, visited, and remaining counters                                                                  |
 | Task-list import/export      | No dedicated flow (data stays only in internal local storage)                             | Adds **JSON import/export for task lists/cards** with validation and merge/replace modes                      |
+| Focus extension              | No                                                                                        | Optional end-of-focus prompt to add short/long focus time, with configurable durations and tray reminder      |
 | Idle counting                | No                                                                                        | Report includes idle time by period + optional focus-to-idle reclassification on reset                        |
 | Languages                    | English (`en`), Spanish (`es`), Japanese (`ja`), Chinese (`zh`)                           | Adds Portuguese (Brazil) (`pt`), German (`de`), and French (`fr`)                                             |
 
-> Comparison date: 2026-04-21.
+> Comparison date: 2026-04-27.
 
 ### Quick Start (suggested presets)
 
@@ -91,6 +92,7 @@ Pomodoroz is not about "fixing flexibility"; it focuses on adding workflow featu
 
 - **Progressive notifications** (60s and 30s before transitions).
 - **Voice assistance** with audio session-status cues.
+- **Focus extension** near the end of a focus block, with one short/long extension choice per session.
 
 **Break quality**
 
@@ -129,6 +131,7 @@ Pomodoroz is not about "fixing flexibility"; it focuses on adding workflow featu
 - Modes: **Focus**, **Short break**, **Long break**, and **Special breaks** (configurable times).
 - Controls: start, pause, skip, reset.
 - Configurable session rounds.
+- **Focus extension** — optional `+short` / `+long` prompt near the end of focus, with configurable extension durations.
 - **Strict mode** — prevents pausing/skipping/resetting once started.
 - **Auto-start** focus after break ends.
 - **0-minute breaks** — auto-skip breaks.
@@ -172,6 +175,7 @@ Pomodoroz is not about "fixing flexibility"; it focuses on adding workflow featu
 - **None** — no notifications.
 - **Normal** — notifies on every break.
 - **Extra** — notifies 60s before break, 30s before break ends, and on break start.
+- **Focus extension reminder** — when the app is hidden or in the tray, the extension window can trigger one native reminder.
 - **Custom sound** — default bell or custom audio file.
 - **Voice assistance** — audio cue about session status.
 
@@ -205,7 +209,6 @@ Pomodoroz is not about "fixing flexibility"; it focuses on adding workflow featu
 Improvements informed by real feedback from users who deal with focus difficulties and ADHD. See details at [docs/IMPROVEMENTS.md](docs/IMPROVEMENTS.md).
 
 - **Cadence presets** — Just Start (5/1), Sprint (10/3), Classic (25/5), Flow (50/10).
-- **Extend session** — "+5 min" / "+10 min" when in hyperfocus, without breaking your flow.
 - **Break suggestions** — rotating tips (drink water, stretch, breathe) to avoid doomscrolling.
 
 ## 💻 Installation

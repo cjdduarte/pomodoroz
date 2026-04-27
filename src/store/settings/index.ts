@@ -248,6 +248,13 @@ const settingsSlice = createSlice({
       state.enableProgressAnimation = action.payload;
     },
 
+    setEnableFocusExtension(
+      state,
+      action: SettingsPayload<"enableFocusExtension">
+    ) {
+      state.enableFocusExtension = action.payload;
+    },
+
     setEnableVoiceAssistance(
       state,
       action: SettingsPayload<"enableVoiceAssistance">
@@ -349,6 +356,7 @@ export const {
   setShowGridRandomButton,
   setFollowSystemTheme,
   setEnableFullscreenBreak,
+  setEnableFocusExtension,
   setEnableProgressAnimation,
   setEnableStrictMode,
   setEnableVoiceAssistance,

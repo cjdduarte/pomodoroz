@@ -8,6 +8,7 @@ import {
   setEnableProgressAnimation,
   setNotificationType,
   setEnableFullscreenBreak,
+  setEnableFocusExtension,
   setUseNativeTitlebar,
   setAutoStartWorkTime,
   setResetFocusToIdleEnabled,
@@ -141,6 +142,16 @@ const FeatureSection: React.FC = () => {
           setEnableProgressAnimation(!settings.enableProgressAnimation)
         );
       }, [dispatch, settings.enableProgressAnimation]),
+    },
+    {
+      id: "focus-extension",
+      label: t("settings.focusExtension"),
+      checked: settings.enableFocusExtension,
+      onChange: useCallback(() => {
+        dispatch(
+          setEnableFocusExtension(!settings.enableFocusExtension)
+        );
+      }, [dispatch, settings.enableFocusExtension]),
     },
     {
       id: "auto-start-work-time",

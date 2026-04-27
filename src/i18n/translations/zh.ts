@@ -14,6 +14,8 @@ export const zh = {
     shortBreak: "短休息",
     longBreak: "长休息",
     sessionRounds: "循环次数",
+    shortFocusExtension: "短延长",
+    longFocusExtension: "长延长",
     specialBreaks: "特殊休息",
     specialBreakSetterTitle: "特殊休息设置",
     specialBreakSetterDescription: "根据你的日常节奏设置特殊休息。",
@@ -46,6 +48,11 @@ export const zh = {
     notifEnjoySpecialBreakBody:
       "享受你的{{duration}}{{minuteLabel}}特殊休息。",
     notifStayFocusedBody: "请尽可能专注{{duration}}{{minuteLabel}}。",
+    notifFocusExtensionAvailableTitle: "专注即将结束。",
+    notifFocusExtensionAvailableBody:
+      "打开 Pomodoroz，可延长 {{shortDuration}}{{shortMinuteLabel}} 或 {{longDuration}}{{longMinuteLabel}}。忽略此通知将照常开始休息。",
+    focusExtensionPrompt: "继续专注？",
+    focusExtensionAction: "+{{duration}}{{minuteLabel}}",
     strictModeNotice: "当前处于{{mode}}。",
     minuteSingular: "分钟",
     minutePlural: "分钟",
@@ -149,6 +156,7 @@ export const zh = {
     followSystemTheme: "跟随系统主题",
     nativeTitlebar: "原生标题栏",
     progressAnimation: "进度动画",
+    focusExtension: "延长专注时间",
     autoStartWorkTime: "自动开始工作时间",
     resetFocusToIdle: "返回可计为空闲",
     minimizeToTray: "最小化到托盘",
