@@ -69,7 +69,7 @@ Pomodoroz is not about "fixing flexibility"; it focuses on adding workflow featu
 | Focus extension              | No                                                                                        | Yes (optional short/long focus extension with configurable durations and tray reminder)     |
 | 0-minute breaks              | No                                                                                        | Yes (auto-skip breaks when short/long break duration is set to zero)                        |
 | Idle counting                | No                                                                                        | Yes (idle time by period + optional focus-to-idle reclassification on reset)                |
-| Languages                    | English (`en`), Spanish (`es`), Japanese (`ja`), Chinese (`zh`)                           | Adds Portuguese (Brazil) (`pt`), German (`de`), and French (`fr`)                           |
+| Supported languages          | 4                                                                                         | 7                                                                                           |
 
 > Comparison date: 2026-04-27.
 
@@ -195,7 +195,7 @@ Pomodoroz is not about "fixing flexibility"; it focuses on adding workflow featu
 
 ### Languages
 
-- Portuguese (BR), English, Spanish, Japanese, Chinese.
+- Portuguese (BR), English, Spanish, Japanese, Chinese, German, and French.
 - Automatic system language detection.
 
 ### Fullscreen Breaks

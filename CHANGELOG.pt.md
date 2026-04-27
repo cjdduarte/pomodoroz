@@ -6,6 +6,12 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.4.39] - A definir
+
+### Alterado
+
+- **Documentação de idiomas no README ficou mais clara** — a tabela Pomatez vs Pomodoroz agora resume a cobertura de idiomas suportados por quantidade, e a lista de idiomas reflete todos os 7 locales suportados.
+
 ## [26.4.38] - 2026-04-27
 
 ### Adicionado

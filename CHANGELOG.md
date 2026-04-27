@@ -6,6 +6,12 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.4.39] - TBD
+
+### Changed
+
+- **README language documentation is now clearer** — the Pomatez vs Pomodoroz table now summarizes supported language coverage by count, and the language list reflects all 7 supported locales.
+
 ## [26.4.38] - 2026-04-27
 
 ### Added

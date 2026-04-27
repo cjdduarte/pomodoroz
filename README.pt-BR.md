@@ -69,7 +69,7 @@ O objetivo do Pomodoroz não é "corrigir flexibilidade", e sim adicionar recurs
 | Extensão de foco                | Não                                                                                            | Sim (extensão curta/longa opcional com durações configuráveis e aviso no tray)                  |
 | Pausas de 0 minuto              | Não                                                                                            | Sim (pula pausas quando a duração da pausa curta/longa é definida como zero)                    |
 | Contagem de ociosidade          | Não                                                                                            | Sim (tempo ocioso por período + opção de mover foco para Ocioso no reset)                       |
-| Idiomas                         | Inglês (`en`), Espanhol (`es`), Japonês (`ja`), Chinês (`zh`)                                  | Adiciona Português (Brasil) (`pt`), Alemão (`de`) e Francês (`fr`)                              |
+| Idiomas suportados              | 4                                                                                              | 7 suportados                                                                                    |
 
 > Data da comparação: 2026-04-27.
 
@@ -195,7 +195,7 @@ O objetivo do Pomodoroz não é "corrigir flexibilidade", e sim adicionar recurs
 
 ### Idiomas
 
-- Português (BR), Inglês, Espanhol, Japonês, Chinês.
+- Português (BR), Inglês, Espanhol, Japonês, Chinês, Alemão e Francês.
 - Detecção automática do idioma do sistema.
 
 ### Tela cheia durante pausas
