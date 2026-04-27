@@ -67,6 +67,7 @@ O objetivo do Pomodoroz não é "corrigir flexibilidade", e sim adicionar recurs
 | Rodapé da grade (status atual)  | Não                                                                                            | Sim (contadores de total, visitadas e restantes)                                                |
 | Importação/Exportação de listas | Não                                                                                            | Sim (**importação/exportação JSON de listas/cartões** com validação e modos merge/substituição) |
 | Extensão de foco                | Não                                                                                            | Sim (extensão curta/longa opcional com durações configuráveis e aviso no tray)                  |
+| Pausas de 0 minuto              | Não                                                                                            | Sim (pula pausas quando a duração da pausa curta/longa é definida como zero)                    |
 | Contagem de ociosidade          | Não                                                                                            | Sim (tempo ocioso por período + opção de mover foco para Ocioso no reset)                       |
 | Idiomas                         | Inglês (`en`), Espanhol (`es`), Japonês (`ja`), Chinês (`zh`)                                  | Adiciona Português (Brasil) (`pt`), Alemão (`de`) e Francês (`fr`)                              |
 
