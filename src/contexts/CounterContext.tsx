@@ -214,7 +214,6 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
     useState(false);
 
   const [duration, setDuration] = useState(config.stayFocus * 60);
-  const [focusExtensionUsed, setFocusExtensionUsed] = useState(false);
   const focusExtensionUsedRef = useRef(false);
   const previousTimerTypeRef = useRef(timer.timerType);
   const trackingSegmentRef = useRef<TrackingSegment | null>(null);
@@ -222,11 +221,6 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
   const breakTransitionTimeoutRef = useRef<ReturnType<
     typeof setTimeout
   > | null>(null);
-
-  const setFocusExtensionUsedValue = useCallback((used: boolean) => {
-    focusExtensionUsedRef.current = used;
-    setFocusExtensionUsed(used);
-  }, []);
 
   const clearBreakTransitionTimeout = useCallback(() => {
     if (breakTransitionTimeoutRef.current === null) {
@@ -261,9 +255,9 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
       }
       setHasNotifiedBreak(false);
       setHasNotifiedFocusExtension(false);
-      setFocusExtensionUsedValue(false);
+      focusExtensionUsedRef.current = false;
     },
-    [clearBreakTransitionTimeout, setFocusExtensionUsedValue]
+    [clearBreakTransitionTimeout]
   );
 
   const extendFocusSession = useCallback(
@@ -281,7 +275,7 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
 
       const extensionSeconds = minutes * 60;
       clearBreakTransitionTimeout();
-      setFocusExtensionUsedValue(true);
+      focusExtensionUsedRef.current = true;
       setDuration(
         (currentDuration) => currentDuration + extensionSeconds
       );
@@ -296,7 +290,6 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
       clearBreakTransitionTimeout,
       count,
       settings.enableFocusExtension,
-      setFocusExtensionUsedValue,
       timer.playing,
       timer.timerType,
     ]
@@ -1021,7 +1014,7 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
     settings.enableFocusExtension &&
     timer.playing &&
     timer.timerType === TimerStatus.STAY_FOCUS &&
-    !focusExtensionUsed &&
+    !focusExtensionUsedRef.current &&
     count > 0 &&
     count <= FOCUS_EXTENSION_PROMPT_THRESHOLD_SECONDS;
 

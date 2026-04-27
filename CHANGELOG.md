@@ -13,6 +13,10 @@
 - **Focus sessions can now be extended near completion** — a new opt-in Focus Extension setting shows a non-modal `+short` / `+long` prompt during the final 30 seconds of focus, temporarily expands compact mode when needed, uses configurable extension durations in Config/Rules, allows one extension per focus block, and sends a native reminder when the app is in the background and notifications are enabled.
 - **Theme shortcut customization now persists** — the app-owned `Toggle Theme` shortcut can now be changed in Settings, stored with local settings, restored on startup, and protected against invalid or reserved shortcut conflicts.
 
+### Fixed
+
+- **Focus extension polish after review** — extension usage tracking now has a single source of truth, and German focus-extension copy now uses native spelling for `Verlängerung` / `verlängern`.
+
 ### Changed
 
 - **Grid study helpers are now enabled by default** — new/restored profiles now show the grid draw button and rotate grid colors by default.
