@@ -499,18 +499,18 @@ Suggested commit:
 
 ## 3. Track B — Product Features
 
-| ID  | Feature                                  | Status      | Priority | Effort |
-| --- | ---------------------------------------- | ----------- | -------- | ------ |
-| B1  | Cadence presets (5/1, 10/3, 25/5, 50/10) | Open        | High     | Low    |
-| B2  | Extend session (+5 / +10)                | Implemented | High     | Medium |
-| B3  | Break suggestion prompts                 | Open        | High     | Low    |
-| B4  | Global play/pause hotkey                 | Open        | Medium   | Low    |
-| B5  | Cadence insights in statistics           | Open        | Medium   | Medium |
-| B6  | Motivational completion messages         | Open        | Medium   | Low    |
-| B7  | Reverse Pomodoro mode                    | Open        | Low      | Medium |
-| B8  | Ambient sounds                           | Open        | Low      | High   |
-| B9  | No-judgment mode                         | Open        | Low      | Low    |
-| B10 | Timer circle small-window layout fix     | Open        | Medium   | Low    |
+| ID  | Feature                                  | Status | Priority | Effort |
+| --- | ---------------------------------------- | ------ | -------- | ------ |
+| B1  | Cadence presets (5/1, 10/3, 25/5, 50/10) | Open   | High     | Low    |
+| B2  | Extend session (+5 / +10)                | Done   | High     | Medium |
+| B3  | Break suggestion prompts                 | Open   | High     | Low    |
+| B4  | Global play/pause hotkey                 | Open   | Medium   | Low    |
+| B5  | Cadence insights in statistics           | Open   | Medium   | Medium |
+| B6  | Motivational completion messages         | Open   | Medium   | Low    |
+| B7  | Reverse Pomodoro mode                    | Open   | Low      | Medium |
+| B8  | Ambient sounds                           | Open   | Low      | High   |
+| B9  | No-judgment mode                         | Open   | Low      | Low    |
+| B10 | Timer circle small-window layout fix     | Open   | Medium   | Low    |
 
 Current product baseline:
 
@@ -554,18 +554,18 @@ Current product baseline:
   - [x] Implement one-use extend-session prompt at `T-30s`.
   - [ ] Implement rotating break suggestion copy.
 - Validation checklist:
-  - [ ] Manual E2E: extension disabled -> timer start -> focus end -> automatic break starts as today.
-  - [ ] Manual E2E: extension enabled -> prompt appears at `T-30s` -> no action -> automatic break starts as today.
-  - [ ] Manual E2E: extension enabled -> choose short extension -> focus duration increases by configured short value -> break starts after extended focus.
-  - [ ] Manual E2E: extension enabled -> choose long extension -> focus duration increases by configured long value -> break starts after extended focus.
-  - [ ] Verify extension duration controls enforce the `1-30 min` range.
-  - [ ] Verify pausing the timer while the extension prompt is visible hides the prompt.
-  - [ ] Verify hidden/minimized/tray behavior: with notifications disabled, no native reminder appears; with `normal` or `extra`, one extension reminder appears at `T-30s`.
-  - [ ] Verify `extra` notification mode suppresses the simultaneous standard 30-second focus notification when the hidden-app extension reminder is sent, while still allowing the standard 30-second warning near the end of an accepted extension.
-  - [ ] Verify the extension prompt does not appear more than once in the same focus session.
-  - [ ] Verify statistics record one focus block with the real extended duration and do not inflate completed session count.
-  - [ ] Verify short/long break duration remains unchanged after an extended focus.
-  - [ ] Verify i18n keys and rendered copy in `en/pt/es/ja/zh/de/fr` with no fallback/missing-key text.
+  - [x] Manual E2E: extension disabled -> timer start -> focus end -> automatic break starts as today.
+  - [x] Manual E2E: extension enabled -> prompt appears at `T-30s` -> no action -> automatic break starts as today.
+  - [x] Manual E2E: extension enabled -> choose short extension -> focus duration increases by configured short value -> break starts after extended focus.
+  - [x] Manual E2E: extension enabled -> choose long extension -> focus duration increases by configured long value -> break starts after extended focus.
+  - [x] Verify extension duration controls enforce the `1-30 min` range.
+  - [x] Verify pausing the timer while the extension prompt is visible hides the prompt.
+  - [x] Verify hidden/minimized/tray behavior: with notifications disabled, no native reminder appears; with `normal` or `extra`, one extension reminder appears at `T-30s`.
+  - [x] Verify `extra` notification mode suppresses the simultaneous standard 30-second focus notification when the hidden-app extension reminder is sent, while still allowing the standard 30-second warning near the end of an accepted extension.
+  - [x] Verify the extension prompt does not appear more than once in the same focus session.
+  - [x] Verify statistics record one focus block with the real extended duration and do not inflate completed session count.
+  - [x] Verify short/long break duration remains unchanged after an extended focus.
+  - [x] Verify i18n keys and rendered copy in `en/pt/es/ja/zh/de/fr` with no fallback/missing-key text.
 - Validation executed:
   - [x] `pnpm lint`
   - [x] `pnpm typecheck:renderer`
