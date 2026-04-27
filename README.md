@@ -56,21 +56,19 @@ Pomodoroz is not about "fixing flexibility"; it focuses on adding workflow featu
 
 ### Pomatez vs Pomodoroz (quick comparison)
 
-| Area                         | Pomatez (original)                                                                        | Pomodoroz (this fork)                                                                                         |
-| ---------------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| Runtime architecture         | Mixed workspace (`app/electron` + `app/tauri`) with legacy Electron scripts still present | Tauri-only runtime with dedicated `src-tauri/` and no Electron runtime path                                   |
-| Frontend base                | React 16                                                                                  | React 19                                                                                                      |
-| Package manager              | Yarn (historical)                                                                         | pnpm                                                                                                          |
-| Tauri baseline               | Tauri 2 (alpha)                                                                           | Tauri `2.10.x` with explicit capabilities and pinned plugins                                                  |
-| Main navigation              | Task list, Config, Timer, Settings                                                        | Adds **Statistics** route (period filters, breakdowns, and history cleanup)                                   |
-| Settings (extra options)     | No                                                                                        | Adds toggles for grid Draw button, grid color loop, notification sound, in-app auto update, and reset-to-idle |
-| List view                    | Yes                                                                                       | Yes                                                                                                           |
-| Grid view                    | No                                                                                        | Yes (**Study Rotation Grid** with daily color cycle, Draw button, and right-click to Timer)                   |
-| Grid footer (current status) | No                                                                                        | Shows total, visited, and remaining counters                                                                  |
-| Task-list import/export      | No dedicated flow (data stays only in internal local storage)                             | Adds **JSON import/export for task lists/cards** with validation and merge/replace modes                      |
-| Focus extension              | No                                                                                        | Optional end-of-focus prompt to add short/long focus time, with configurable durations and tray reminder      |
-| Idle counting                | No                                                                                        | Report includes idle time by period + optional focus-to-idle reclassification on reset                        |
-| Languages                    | English (`en`), Spanish (`es`), Japanese (`ja`), Chinese (`zh`)                           | Adds Portuguese (Brazil) (`pt`), German (`de`), and French (`fr`)                                             |
+| Area                         | Pomatez (original)                                                                        | Pomodoroz (this fork)                                                                       |
+| ---------------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Runtime architecture         | Mixed workspace (`app/electron` + `app/tauri`) with legacy Electron scripts still present | Tauri-only runtime with dedicated `src-tauri/` and no Electron runtime path                 |
+| Frontend base                | React 16                                                                                  | React 19                                                                                    |
+| Package manager              | Yarn (historical)                                                                         | pnpm                                                                                        |
+| Tauri baseline               | Tauri 2 (alpha)                                                                           | Tauri `2.10.x` with explicit capabilities and pinned plugins                                |
+| Statistics                   | No                                                                                        | Yes (period filters, breakdowns, and history cleanup)                                       |
+| Grid view                    | No                                                                                        | Yes (**Study Rotation Grid** with daily color cycle, Draw button, and right-click to Timer) |
+| Grid footer (current status) | No                                                                                        | Yes (total, visited, and remaining counters)                                                |
+| Task-list import/export      | No                                                                                        | Yes (**JSON import/export for task lists/cards** with validation and merge/replace modes)   |
+| Focus extension              | No                                                                                        | Yes (optional short/long focus extension with configurable durations and tray reminder)     |
+| Idle counting                | No                                                                                        | Yes (idle time by period + optional focus-to-idle reclassification on reset)                |
+| Languages                    | English (`en`), Spanish (`es`), Japanese (`ja`), Chinese (`zh`)                           | Adds Portuguese (Brazil) (`pt`), German (`de`), and French (`fr`)                           |
 
 > Comparison date: 2026-04-27.
 

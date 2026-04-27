@@ -56,21 +56,19 @@ O objetivo do Pomodoroz não é "corrigir flexibilidade", e sim adicionar recurs
 
 ### Pomatez vs Pomodoroz (visão rápida)
 
-| Área                            | Pomatez (original)                                                                             | Pomodoroz (este fork)                                                                                             |
-| ------------------------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Arquitetura de runtime          | Workspace misto (`app/electron` + `app/tauri`) com scripts legados de Electron ainda presentes | Runtime Tauri-only com `src-tauri/` dedicado e sem caminho de execução Electron                                   |
-| Base de frontend                | React 16                                                                                       | React 19                                                                                                          |
-| Gerenciador de pacotes          | Yarn (histórico)                                                                               | pnpm                                                                                                              |
-| Base Tauri                      | Tauri 2 (alpha)                                                                                | Tauri `2.10.x`, com capabilities explícitas e plugins pinados                                                     |
-| Navegação principal             | Lista de tarefas, Config, Timer, Ajustes                                                       | Adiciona rota de **Estatísticas** (filtros por período, detalhamentos e limpeza de histórico)                     |
-| Ajustes (opções extras)         | Não                                                                                            | Adiciona toggles de Sortear no grid, rotação de cores, som de notificação, auto update no app e reset para ocioso |
-| Visualização em lista           | Sim                                                                                            | Sim                                                                                                               |
-| Visualização em grade (grid)    | Não                                                                                            | Sim (**Grade de Rotação de Estudos** com ciclo diário, Sortear e clique direito para Timer)                       |
-| Rodapé da grade (status atual)  | Não                                                                                            | Mostra contadores de total, visitadas e restantes                                                                 |
-| Importação/Exportação de listas | Sem fluxo dedicado (dados ficam apenas no armazenamento local interno)                         | Adiciona **importação/exportação JSON de listas/cartões** com validação e modos merge/substituição                |
-| Extensão de foco                | Não                                                                                            | Prompt opcional perto do fim do foco para adicionar tempo curto/longo, com durações configuráveis e aviso no tray |
-| Contagem de ociosidade          | Não                                                                                            | Relatório inclui tempo ocioso por período + opção de mover foco para Ocioso no reset                              |
-| Idiomas                         | Inglês (`en`), Espanhol (`es`), Japonês (`ja`), Chinês (`zh`)                                  | Adiciona Português (Brasil) (`pt`), Alemão (`de`) e Francês (`fr`)                                                |
+| Área                            | Pomatez (original)                                                                             | Pomodoroz (este fork)                                                                           |
+| ------------------------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Arquitetura de runtime          | Workspace misto (`app/electron` + `app/tauri`) com scripts legados de Electron ainda presentes | Runtime Tauri-only com `src-tauri/` dedicado e sem caminho de execução Electron                 |
+| Base de frontend                | React 16                                                                                       | React 19                                                                                        |
+| Gerenciador de pacotes          | Yarn (histórico)                                                                               | pnpm                                                                                            |
+| Base Tauri                      | Tauri 2 (alpha)                                                                                | Tauri `2.10.x`, com capabilities explícitas e plugins pinados                                   |
+| Estatísticas                    | Não                                                                                            | Sim (filtros por período, detalhamentos e limpeza de histórico)                                 |
+| Visualização em grade (grid)    | Não                                                                                            | Sim (**Grade de Rotação de Estudos** com ciclo diário, Sortear e clique direito para Timer)     |
+| Rodapé da grade (status atual)  | Não                                                                                            | Sim (contadores de total, visitadas e restantes)                                                |
+| Importação/Exportação de listas | Não                                                                                            | Sim (**importação/exportação JSON de listas/cartões** com validação e modos merge/substituição) |
+| Extensão de foco                | Não                                                                                            | Sim (extensão curta/longa opcional com durações configuráveis e aviso no tray)                  |
+| Contagem de ociosidade          | Não                                                                                            | Sim (tempo ocioso por período + opção de mover foco para Ocioso no reset)                       |
+| Idiomas                         | Inglês (`en`), Espanhol (`es`), Japonês (`ja`), Chinês (`zh`)                                  | Adiciona Português (Brasil) (`pt`), Alemão (`de`) e Francês (`fr`)                              |
 
 > Data da comparação: 2026-04-27.
 
