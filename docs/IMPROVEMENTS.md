@@ -18,6 +18,7 @@ This roadmap has two tracks:
 
 - `Open`: approved and pending implementation.
 - `In Progress`: currently being implemented.
+- `Implemented`: implemented and tracked in changelog, pending final manual validation.
 - `Blocked`: pending decision or dependency.
 - `Done`: implemented and moved to changelog on release.
 
@@ -498,18 +499,18 @@ Suggested commit:
 
 ## 3. Track B — Product Features
 
-| ID  | Feature                                  | Status | Priority | Effort |
-| --- | ---------------------------------------- | ------ | -------- | ------ |
-| B1  | Cadence presets (5/1, 10/3, 25/5, 50/10) | Open   | High     | Low    |
-| B2  | Extend session (+5 / +10)                | Done   | High     | Medium |
-| B3  | Break suggestion prompts                 | Open   | High     | Low    |
-| B4  | Global play/pause hotkey                 | Open   | Medium   | Low    |
-| B5  | Cadence insights in statistics           | Open   | Medium   | Medium |
-| B6  | Motivational completion messages         | Open   | Medium   | Low    |
-| B7  | Reverse Pomodoro mode                    | Open   | Low      | Medium |
-| B8  | Ambient sounds                           | Open   | Low      | High   |
-| B9  | No-judgment mode                         | Open   | Low      | Low    |
-| B10 | Timer circle small-window layout fix     | Open   | Medium   | Low    |
+| ID  | Feature                                  | Status      | Priority | Effort |
+| --- | ---------------------------------------- | ----------- | -------- | ------ |
+| B1  | Cadence presets (5/1, 10/3, 25/5, 50/10) | Open        | High     | Low    |
+| B2  | Extend session (+5 / +10)                | Implemented | High     | Medium |
+| B3  | Break suggestion prompts                 | Open        | High     | Low    |
+| B4  | Global play/pause hotkey                 | Open        | Medium   | Low    |
+| B5  | Cadence insights in statistics           | Open        | Medium   | Medium |
+| B6  | Motivational completion messages         | Open        | Medium   | Low    |
+| B7  | Reverse Pomodoro mode                    | Open        | Low      | Medium |
+| B8  | Ambient sounds                           | Open        | Low      | High   |
+| B9  | No-judgment mode                         | Open        | Low      | Low    |
+| B10 | Timer circle small-window layout fix     | Open        | Medium   | Low    |
 
 Current product baseline:
 
@@ -536,6 +537,7 @@ Current product baseline:
 - Show the extension prompt at `T-30s` during a focus session, not as a blocking step at zero. If the user takes no action, the normal automatic break transition must continue.
 - If the app is hidden, unfocused, minimized, or in tray when the `T-30s` extension window opens, send one native reminder only when Settings -> Notification Types is not `none`.
 - The hidden-app reminder must align with the existing notification setting: `none` means no native reminder; `normal` and `extra` may show the extension reminder.
+- In `extra` notification mode, accepting an extension may allow the standard 30-second focus warning to appear again near the end of the extended focus. This is intentional: the hidden-app extension reminder only suppresses the simultaneous standard 30-second warning at the original extension window.
 - The prompt is non-modal. It disappears when the user pauses the timer or when focus ends.
 - Do not rewind an already-started break in the first B2 implementation.
 - Extending focus keeps the same focus session and round. It must not create a new pomodoro/session count.
@@ -559,7 +561,7 @@ Current product baseline:
   - [ ] Verify extension duration controls enforce the `1-30 min` range.
   - [ ] Verify pausing the timer while the extension prompt is visible hides the prompt.
   - [ ] Verify hidden/minimized/tray behavior: with notifications disabled, no native reminder appears; with `normal` or `extra`, one extension reminder appears at `T-30s`.
-  - [ ] Verify `extra` notification mode does not duplicate the standard 30-second focus notification when the hidden-app extension reminder is sent.
+  - [ ] Verify `extra` notification mode suppresses the simultaneous standard 30-second focus notification when the hidden-app extension reminder is sent, while still allowing the standard 30-second warning near the end of an accepted extension.
   - [ ] Verify the extension prompt does not appear more than once in the same focus session.
   - [ ] Verify statistics record one focus block with the real extended duration and do not inflate completed session count.
   - [ ] Verify short/long break duration remains unchanged after an extended focus.

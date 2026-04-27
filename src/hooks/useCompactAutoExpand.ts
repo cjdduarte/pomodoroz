@@ -11,6 +11,7 @@ type UseCompactAutoExpandOptions = {
   expandChannel?:
     | typeof COMPACT_EXPAND
     | typeof COMPACT_EXPAND_FOCUS_EXTENSION;
+  alwaysExpand?: boolean;
   threshold?: number;
 };
 
@@ -19,6 +20,7 @@ const DEFAULT_THRESHOLD = 260;
 const useCompactAutoExpand = ({
   compactModeEnabled,
   expandChannel = COMPACT_EXPAND,
+  alwaysExpand = false,
   threshold = DEFAULT_THRESHOLD,
 }: UseCompactAutoExpandOptions) => {
   const didExpandRef = useRef(false);
@@ -34,8 +36,8 @@ const useCompactAutoExpand = ({
     }
 
     if (
-      typeof window === "undefined" ||
-      window.innerHeight >= threshold
+      !alwaysExpand &&
+      (typeof window === "undefined" || window.innerHeight >= threshold)
     ) {
       return false;
     }
@@ -47,7 +49,7 @@ const useCompactAutoExpand = ({
     didExpandRef.current = true;
     getInvokeConnector().send(expandChannel);
     return true;
-  }, [compactModeEnabled, expandChannel, threshold]);
+  }, [alwaysExpand, compactModeEnabled, expandChannel, threshold]);
 
   const collapseCompact = useCallback(() => {
     if (!didExpandRef.current) {

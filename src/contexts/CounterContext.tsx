@@ -287,7 +287,6 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
       setLastCountTime(Date.now());
       setHasNotified30Seconds(false);
       setHasNotifiedBreak(false);
-      setHasNotifiedFocusExtension(false);
       setFocusExtensionUsed(true);
     },
     [

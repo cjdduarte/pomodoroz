@@ -23,7 +23,7 @@ const FocusExtensionPrompt: React.FC = () => {
   const { maybeExpandCompact, collapseCompact } = useCompactAutoExpand({
     compactModeEnabled,
     expandChannel: COMPACT_EXPAND_FOCUS_EXTENSION,
-    threshold: Number.POSITIVE_INFINITY,
+    alwaysExpand: true,
   });
 
   useEffect(() => {
