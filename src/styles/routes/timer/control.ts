@@ -38,6 +38,7 @@ export const StyledControlSpacer = styled.div<ControlProps>`
 export const StyledControl = styled.div<ControlProps>`
   width: 100%;
   height: 9.2rem;
+  flex: 0 0 9.2rem;
   position: relative;
 
   padding: 0.8rem 1.6rem;

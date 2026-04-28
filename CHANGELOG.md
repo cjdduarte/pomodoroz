@@ -11,6 +11,7 @@
 ### Fixed
 
 - **Compact task continuation prompt no longer nudges the compact window size** — the Continue/Switch footer now shares the same fixed row height as the normal compact task footer and truncates long task text inside that space.
+- **Normal Timer layout now holds up when the window is resized smaller** — the timer circle scales with its available container space and the control row keeps its height, preventing overlap with navigation, session text, and playback controls.
 
 ### Changed
 

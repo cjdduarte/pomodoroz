@@ -11,6 +11,7 @@
 ### Corrigido
 
 - **Prompt de continuar tarefa não desloca mais o tamanho da janela compacta** — o rodapé Continuar/Trocar agora usa a mesma altura fixa do rodapé compacto normal e trunca textos longos da tarefa dentro desse espaço.
+- **Layout normal do Timer agora resiste melhor quando a janela é reduzida** — o círculo do timer escala com o espaço disponível do container e a faixa de controles preserva sua altura, evitando sobreposição com navegação, texto de sessões e controles de reprodução.
 
 ### Alterado
 

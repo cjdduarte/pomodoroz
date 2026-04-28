@@ -55,7 +55,13 @@ type CounterContainerProps = {
 };
 
 export const StyledCounterContainer = styled.div<CounterContainerProps>`
+  --counter-circle-size: max(
+    6rem,
+    min(22rem, calc(100vw - 4rem), calc(100vh - 20.4rem))
+  );
+
   width: 100%;
+  min-height: 0;
 
   flex: 1 1;
 
@@ -64,6 +70,15 @@ export const StyledCounterContainer = styled.div<CounterContainerProps>`
   background-color: var(--color-bg-primary);
 
   position: relative;
+  overflow: hidden;
+
+  @supports (width: 1cqw) {
+    container-type: size;
+    --counter-circle-size: max(
+      6rem,
+      min(22rem, calc(100cqw - 4rem), calc(100cqh + 2.4rem))
+    );
+  }
 
   ${(p) =>
     p.fullscreen &&
@@ -92,8 +107,8 @@ export const StyledCounterContainer = styled.div<CounterContainerProps>`
     left: 50%;
     transform: translate(-50%, -50%) rotateY(-180deg) rotateZ(-90deg);
 
-    width: 22rem;
-    height: 22rem;
+    width: var(--counter-circle-size);
+    height: var(--counter-circle-size);
   }
 
   &::before {
@@ -122,6 +137,15 @@ export const StyledCounterType = styled.div`
     width: 4rem;
     height: 4rem;
     fill: currentColor;
+  }
+
+  @supports (width: 1cqw) {
+    padding-bottom: clamp(0.1rem, 1cqh, 0.4rem);
+
+    & > svg {
+      width: clamp(1.6rem, min(12cqw, 18cqh), 4rem);
+      height: clamp(1.6rem, min(12cqw, 18cqh), 4rem);
+    }
   }
 `;
 
@@ -168,9 +192,24 @@ export const StyledCounterTimer = styled.h3<TimerProps>`
     display: flex;
     gap: 0.25rem;
   }
+
+  @supports (width: 1cqw) {
+    font-size: clamp(1.8rem, min(12cqw, 18cqh), 4rem);
+    width: min(20rem, calc(var(--counter-circle-size) - 1.6rem));
+    column-gap: clamp(0.2rem, 1.6cqw, 0.8rem);
+
+    &.compact {
+      font-size: ${(p) => (p.fullscreen ? "4rem" : "2.3rem")};
+      width: unset;
+    }
+  }
 `;
 
 export const StyledCounterLabel = styled.p`
   font-size: 1.8rem;
   text-transform: capitalize;
+
+  @supports (width: 1cqw) {
+    font-size: clamp(0.9rem, min(5cqw, 8cqh), 1.8rem);
+  }
 `;
