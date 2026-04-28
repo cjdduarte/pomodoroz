@@ -11,7 +11,7 @@
 ### Corrigido
 
 - **Prompt de continuar tarefa não desloca mais o tamanho da janela compacta** — o rodapé Continuar/Trocar agora usa a mesma altura fixa do rodapé compacto normal e trunca textos longos da tarefa dentro desse espaço.
-- **Layout normal do Timer agora resiste melhor quando a janela é reduzida** — o círculo do timer escala com o espaço disponível do container e a faixa de controles preserva sua altura, evitando sobreposição com navegação, texto de sessões e controles de reprodução.
+- **Layout normal do Timer não pode mais ser reduzido abaixo do tamanho suportado** — a janela Tauri agora aplica um tamanho mínimo no modo normal enquanto o modo compacto mantém seu limite menor, evitando que o círculo do timer sobreponha navegação, texto de sessões e controles de reprodução.
 
 ### Alterado
 

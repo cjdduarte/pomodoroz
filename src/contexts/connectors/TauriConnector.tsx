@@ -244,8 +244,9 @@ export const TauriConnectorProvider = ({
   useEffect(() => {
     sendToMain(SET_NATIVE_TITLEBAR, {
       useNativeTitlebar: settings.useNativeTitlebar,
+      compactMode: settings.compactMode,
     });
-  }, [sendToMain, settings.useNativeTitlebar]);
+  }, [sendToMain, settings.compactMode, settings.useNativeTitlebar]);
 
   useEffect(() => {
     sendToMain(SET_OPEN_AT_LOGIN, {

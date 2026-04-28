@@ -55,10 +55,7 @@ type CounterContainerProps = {
 };
 
 export const StyledCounterContainer = styled.div<CounterContainerProps>`
-  --counter-circle-size: max(
-    6rem,
-    min(22rem, calc(100vw - 4rem), calc(100vh - 20.4rem))
-  );
+  --counter-circle-size: min(22rem, calc(100vw - 4rem));
 
   width: 100%;
   min-height: 0;
@@ -74,10 +71,7 @@ export const StyledCounterContainer = styled.div<CounterContainerProps>`
 
   @supports (width: 1cqw) {
     container-type: size;
-    --counter-circle-size: max(
-      6rem,
-      min(22rem, calc(100cqw - 4rem), calc(100cqh + 2.4rem))
-    );
+    --counter-circle-size: min(22rem, calc(100cqw - 4rem));
   }
 
   ${(p) =>
@@ -140,11 +134,9 @@ export const StyledCounterType = styled.div`
   }
 
   @supports (width: 1cqw) {
-    padding-bottom: clamp(0.1rem, 1cqh, 0.4rem);
-
     & > svg {
-      width: clamp(1.6rem, min(12cqw, 18cqh), 4rem);
-      height: clamp(1.6rem, min(12cqw, 18cqh), 4rem);
+      width: clamp(2.4rem, 12cqw, 4rem);
+      height: clamp(2.4rem, 12cqw, 4rem);
     }
   }
 `;
@@ -194,7 +186,7 @@ export const StyledCounterTimer = styled.h3<TimerProps>`
   }
 
   @supports (width: 1cqw) {
-    font-size: clamp(1.8rem, min(12cqw, 18cqh), 4rem);
+    font-size: clamp(2.8rem, 12cqw, 4rem);
     width: min(20rem, calc(var(--counter-circle-size) - 1.6rem));
     column-gap: clamp(0.2rem, 1.6cqw, 0.8rem);
 
@@ -210,6 +202,6 @@ export const StyledCounterLabel = styled.p`
   text-transform: capitalize;
 
   @supports (width: 1cqw) {
-    font-size: clamp(0.9rem, min(5cqw, 8cqh), 1.8rem);
+    font-size: clamp(1.2rem, 5cqw, 1.8rem);
   }
 `;

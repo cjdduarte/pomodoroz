@@ -521,7 +521,7 @@ Current product baseline:
 
 - In normal mode, when the user resizes the app by dragging the window border to a smaller width or height, the main timer circle can overflow its intended area and overlap the navigation area, session label, and timer controls.
 - Reproduce on the Timer route by dragging the window border inward until the circle touches or covers the top navigation and bottom controls.
-- Fixed by making the timer circle container-aware in normal mode and keeping the control row from shrinking vertically during window resize.
+- Fixed by enforcing the normal-mode native minimum window size, keeping the control row from shrinking vertically, and retaining width-aware timer-circle scaling for narrower supported layouts.
 - Validation target: timer circle must remain fully visible and must not overlap navigation, titlebar, session label, play/skip/volume/fullscreen controls, or compact task footer in small windows.
 
 ### B2 decision notes

@@ -101,6 +101,18 @@ fn get_compact_height(window: &Window) -> Result<f64, String> {
     }
 }
 
+fn set_window_min_size(window: &Window, compact_mode: bool) -> Result<(), String> {
+    let height = if compact_mode {
+        get_compact_height(window)?
+    } else {
+        get_frame_height(window)?
+    };
+
+    window
+        .set_min_size(Some(LogicalSize::new(WINDOW_WIDTH, height)))
+        .map_err(map_error)
+}
+
 fn has_tray(window: &Window) -> bool {
     window.app_handle().tray_by_id(MAIN_TRAY_ID).is_some()
 }
@@ -139,6 +151,8 @@ pub fn set_compact_mode(window: Window, compact_mode: bool) -> Result<(), String
     } else {
         get_frame_height(&window)?
     };
+
+    set_window_min_size(&window, compact_mode)?;
 
     window
         .set_size(LogicalSize::new(WINDOW_WIDTH, height))
@@ -187,7 +201,11 @@ pub fn set_ui_theme(window: Window, is_dark_mode: bool) -> Result<(), String> {
 }
 
 #[tauri::command(rename_all = "camelCase")]
-pub fn set_native_titlebar(window: Window, use_native_titlebar: bool) -> Result<(), String> {
+pub fn set_native_titlebar(
+    window: Window,
+    use_native_titlebar: bool,
+    compact_mode: bool,
+) -> Result<(), String> {
     window
         .set_decorations(use_native_titlebar)
         .map_err(map_error)?;
@@ -203,6 +221,8 @@ pub fn set_native_titlebar(window: Window, use_native_titlebar: bool) -> Result<
         window.set_resizable(was_resizable).map_err(map_error)?;
         window.set_focus().map_err(map_error)?;
     }
+
+    set_window_min_size(&window, compact_mode)?;
 
     Ok(())
 }

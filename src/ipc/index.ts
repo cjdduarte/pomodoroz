@@ -88,6 +88,7 @@ export type SetCompactModePayload = {
 
 export type SetNativeTitlebarPayload = {
   useNativeTitlebar: boolean;
+  compactMode: boolean;
 };
 
 export type SetOpenAtLoginPayload = {
