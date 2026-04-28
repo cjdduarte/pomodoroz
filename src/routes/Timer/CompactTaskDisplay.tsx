@@ -32,26 +32,32 @@ type TimerLocationState = {
   selectedTask?: TaskSelection;
 };
 
+const COMPACT_TASK_FOOTER_HEIGHT = "2.8rem";
+const COMPACT_GRID_PANEL_HEIGHT = 320;
+
 const StyledCompactTask = styled.div`
   width: 100%;
-  padding: 0.4rem 1.2rem;
+  min-width: 0;
+  height: ${COMPACT_TASK_FOOTER_HEIGHT};
+  min-height: ${COMPACT_TASK_FOOTER_HEIGHT};
+  max-height: ${COMPACT_TASK_FOOTER_HEIGHT};
+  padding: 0.35rem 1.2rem;
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  min-height: 2.4rem;
   border-top: 1px solid var(--color-border-primary);
   background-color: var(--color-bg-secondary);
   position: relative;
+  overflow: hidden;
 `;
 
 const StyledCompactTaskBlock = styled.div`
   width: 100%;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   min-height: 0;
 `;
-
-const COMPACT_GRID_PANEL_HEIGHT = 320;
 
 const StyledCompactGridPanel = styled.div`
   width: 100%;
@@ -158,6 +164,7 @@ const StyledTaskButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
+  flex: 0 0 auto;
   min-width: 1.6rem;
   min-height: 1.6rem;
   padding: 0;
@@ -371,26 +378,34 @@ const StyledNoTask = styled.span`
 
 const StyledPromptContainer = styled.div`
   width: 100%;
-  padding: 0.4rem 1.2rem;
+  min-width: 0;
+  height: ${COMPACT_TASK_FOOTER_HEIGHT};
+  min-height: ${COMPACT_TASK_FOOTER_HEIGHT};
+  max-height: ${COMPACT_TASK_FOOTER_HEIGHT};
+  padding: 0.35rem 1.2rem;
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  min-height: 2.4rem;
   border-top: 1px solid var(--color-border-primary);
   background-color: var(--color-bg-tertiary);
+  overflow: hidden;
 `;
 
 const StyledPromptText = styled.span`
   font-size: 1.1rem;
   color: var(--color-heading-text);
   flex: 1;
+  min-width: 0;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
 `;
 
 const StyledPromptButton = styled.button`
+  flex: 0 0 auto;
   font-size: 1rem;
+  line-height: 1;
+  min-height: 1.8rem;
   padding: 0.2rem 0.6rem;
   border: 1px solid var(--color-border-primary);
   border-radius: 3px;

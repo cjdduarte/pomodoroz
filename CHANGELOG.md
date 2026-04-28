@@ -8,6 +8,10 @@
 
 ## [26.4.39] - TBD
 
+### Fixed
+
+- **Compact task continuation prompt no longer nudges the compact window size** — the Continue/Switch footer now shares the same fixed row height as the normal compact task footer and truncates long task text inside that space.
+
 ### Changed
 
 - **README language documentation is now clearer** — the Pomatez vs Pomodoroz table now summarizes supported language coverage by count, and the language list reflects all 7 supported locales.

@@ -8,6 +8,10 @@
 
 ## [26.4.39] - A definir
 
+### Corrigido
+
+- **Prompt de continuar tarefa não desloca mais o tamanho da janela compacta** — o rodapé Continuar/Trocar agora usa a mesma altura fixa do rodapé compacto normal e trunca textos longos da tarefa dentro desse espaço.
+
 ### Alterado
 
 - **Documentação de idiomas no README ficou mais clara** — a tabela Pomatez vs Pomodoroz agora resume a cobertura de idiomas suportados por quantidade, e a lista de idiomas reflete todos os 7 locales suportados.
