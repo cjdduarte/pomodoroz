@@ -134,10 +134,32 @@ jobs:
         run: |
           $tag = "$env:RELEASE_TAG"
           $notesFile = "$env:RELEASE_NOTES_FILE"
-          gh release view $tag *> $null
-          if ($LASTEXITCODE -ne 0) {
-            gh release create $tag --title $tag --notes-file $notesFile
-          } else {
+
+          function Invoke-GhAllowFailure {
+            param(
+              [Parameter(Mandatory = $true)]
+              [string[]]$Arguments
+            )
+
+            $previousNativePreference = $PSNativeCommandUseErrorActionPreference
+            $PSNativeCommandUseErrorActionPreference = $false
+            try {
+              & gh @Arguments *> $null
+              return $LASTEXITCODE
+            } finally {
+              $PSNativeCommandUseErrorActionPreference = $previousNativePreference
+            }
+          }
+
+          $viewExitCode = Invoke-GhAllowFailure -Arguments @("release", "view", $tag)
+          if ($viewExitCode -eq 0) {
+            gh release edit $tag --notes-file $notesFile
+            exit $LASTEXITCODE
+          }
+
+          $createExitCode = Invoke-GhAllowFailure -Arguments @("release", "create", $tag, "--title", $tag, "--notes-file", $notesFile)
+          if ($createExitCode -ne 0) {
+            Write-Host "Release create failed; retrying as edit in case another job created it."
             gh release edit $tag --notes-file $notesFile
           }
 
@@ -328,9 +350,10 @@ jobs:
         run: |
           TAG="${RELEASE_TAG}"
           NOTES_FILE="${RELEASE_NOTES_FILE}"
-          if ! gh release view "${TAG}" >/dev/null 2>&1; then
-            gh release create "${TAG}" --title "${TAG}" --notes-file "${NOTES_FILE}"
-          else
+          if gh release view "${TAG}" >/dev/null 2>&1; then
+            gh release edit "${TAG}" --notes-file "${NOTES_FILE}"
+          elif ! gh release create "${TAG}" --title "${TAG}" --notes-file "${NOTES_FILE}"; then
+            echo "Release create failed; retrying as edit in case another job created it."
             gh release edit "${TAG}" --notes-file "${NOTES_FILE}"
           fi
 
@@ -476,4 +499,3 @@ jobs:
         run: |
           TAG="${RELEASE_TAG}"
           gh release upload "${TAG}" latest.json --clobber --repo "${GITHUB_REPOSITORY}"
-

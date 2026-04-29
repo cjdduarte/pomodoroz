@@ -6,6 +6,12 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.4.40] - TBD
+
+### Fixed
+
+- **Windows release publishing no longer aborts when the GitHub Release is not created yet** — the release workflow now treats a missing release as an expected creation path in PowerShell and tolerates Linux/Windows jobs racing to create the same release.
+
 ## [26.4.39] - 2026-04-29
 
 ### Fixed
