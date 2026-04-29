@@ -90,6 +90,7 @@ When an item is released:
 | A13 | Memoize updater-channel support result across runtime session                 | Done    | Medium   | Delivered in 26.4.35 draft                           |
 | A14 | Surface asynchronous Tauri IPC command errors in the UI                       | Done    | High     | Delivered in 26.4.36                                 |
 | A15 | Tighten renderer CSP and remove small dead-code residues                      | Done    | High     | Delivered in 26.4.37 draft                           |
+| A16 | Add AppImage external update information (`zsync`) for `AppImageUpdate`       | Open    | Low      | Schedule with next Linux pipeline change             |
 
 ### A0 — Tauri-only runtime consolidation
 
@@ -494,6 +495,59 @@ Validation checklist:
 Suggested commit:
 
 - `chore(security): tighten renderer csp and remove dead code`
+
+### A16 — AppImage external update information (`zsync`)
+
+Decision checkpoint:
+
+- This item is **independent from the in-app Tauri updater**. The Tauri updater path stays exactly as it is today (`*.AppImage` + `*.AppImage.sig` with check/notify/install/restart in-app).
+- Goal: also support **external update tools** like `AppImageUpdate` and `appimaged`, which can apply delta updates to a downloaded AppImage **without opening the app**, by reading an embedded "update information" string and downloading a per-release `.zsync` file.
+- Both paths must coexist: a user can choose to update from inside the app (Tauri flow) or from an external tool (AppImage flow). They must not interfere with each other.
+- Origin of the request:
+  - Local: [Pomodoroz #1](https://github.com/cjdduarte/pomodoroz/issues/1) (`@guidomz`).
+  - Upstream parity: [Pomatez #742](https://github.com/zidoro/pomatez/issues/742).
+- Timing rationale:
+  - The Linux release pipeline (AppImage build, signing, `sync-latest-json`) only recently stabilized after several hotfixes (see `26.4.28` notes).
+  - This change must be **scheduled together with the next planned change to the Linux release pipeline**, not as an isolated edit now, to avoid destabilizing a recently stabilized path.
+- Out of scope:
+  - Changes to Windows NSIS or Linux `deb`/`rpm` flows.
+  - Changes to the Tauri updater feed format or signature scheme.
+  - Auto-installing AppImage updates externally on behalf of the user (this remains a user-driven action via `AppImageUpdate`/`appimaged`).
+
+What "update information" means here:
+
+- A short string embedded in the AppImage ELF header that tells external tools where to find updates. For GitHub Releases the typical form is:
+  - `gh-releases-zsync|<owner>|<repo>|latest|<AppImage-name-pattern>.zsync`
+- A `.zsync` file published as a release asset alongside each `.AppImage`, describing block-level deltas so the external tool only downloads changed chunks.
+
+Scope checklist:
+
+- [ ] Decide and document the canonical AppImage filename pattern used in releases (must be stable across versions for `latest` resolution).
+- [ ] Extend the Linux build step to embed the GitHub Releases update-information string into the produced AppImage.
+- [ ] Generate a `.zsync` file for the produced AppImage during the release job.
+- [ ] Publish the `.zsync` file as a GitHub Release asset together with `*.AppImage` and `*.AppImage.sig`.
+- [ ] Confirm the existing Tauri updater feed (`latest.json` / signature flow) is **not** affected by the new asset.
+- [ ] Update [`docs/RELEASE_OPERATIONS.md`](RELEASE_OPERATIONS.md) Section 5 (Behavior Matrix) and asset list (Section currently at line ~75) to mention the optional external AppImage update path and the `.zsync` artifact.
+- [ ] Add a short note to the README (Installation section) describing the optional external update path for AppImage users, without implying it replaces the in-app updater.
+
+Validation checklist:
+
+- [ ] Manual: download AppImage `N`, run `AppImageUpdate ./Pomodoroz-N.AppImage` after publishing `N+1`, confirm it detects the new version, applies the delta, and produces a working `N+1` binary.
+- [ ] Manual: same flow with `appimaged` registering the AppImage and detecting the update via the embedded update-information string.
+- [ ] Manual: in-app Tauri update flow on Linux AppImage still works exactly as today (check, notify, install, restart) — no regression.
+- [ ] Manual: `*.AppImage.sig` still validates against the current Tauri updater public key.
+- [ ] Release page shows the new `.zsync` asset alongside `.AppImage` and `.AppImage.sig`.
+- [ ] No change in Windows NSIS or Linux `deb`/`rpm` artifacts or behavior.
+- [ ] CHANGELOG entry added under the release that ships A16, in both `CHANGELOG.md` and `CHANGELOG.pt.md`.
+
+Risk and rollback:
+
+- Risk: malformed update-information string can make the produced AppImage unusable by external tools (but does not affect in-app updater).
+- Rollback: stop publishing the `.zsync` asset and revert the build step that embeds the update-information string. The Tauri updater flow remains unaffected because it does not depend on either artifact.
+
+Suggested commit:
+
+- `feat(release): add appimage update information and zsync for external updaters`
 
 ---
 
