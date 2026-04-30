@@ -101,6 +101,7 @@ declare -A OUTDATED_SEEN=()
 OUTDATED_CHECK_FAILED=0
 PNPM_VERSION_CURRENT=""
 PNPM_VERSION_LATEST=""
+PNPM_PACKAGE_MANAGER_PIN=""
 CRITICAL_EXACT_PACKAGES=(
   "typescript"
   "@tauri-apps/cli"
@@ -198,6 +199,31 @@ collect_workflow_pnpm_pin_versions() {
   collect_workflow_pnpm_pin_rows | awk -F '\t' '{ print $2 }' | sort -u
 }
 
+get_package_manager_value() {
+  local root_pkg="$POMODOROZ_DIR/package.json"
+
+  if [ ! -f "$root_pkg" ] || ! command -v node >/dev/null 2>&1; then
+    return
+  fi
+
+  node -e '
+const fs = require("fs");
+const file = process.argv[1];
+const pkg = JSON.parse(fs.readFileSync(file, "utf8"));
+const value = typeof pkg.packageManager === "string" ? pkg.packageManager.trim() : "";
+process.stdout.write(value);
+' "$root_pkg" 2>/dev/null || true
+}
+
+get_package_manager_pnpm_pin() {
+  local value
+  value="$(get_package_manager_value)"
+
+  if [[ "$value" =~ ^pnpm@(.+)$ ]]; then
+    printf "%s\n" "${BASH_REMATCH[1]}"
+  fi
+}
+
 join_lines_with_comma() {
   awk '
     BEGIN { first = 1 }
@@ -214,6 +240,38 @@ join_lines_with_comma() {
       }
     }
   '
+}
+
+check_package_manager_pnpm_pin() {
+  local value pin
+  value="$(get_package_manager_value)"
+
+  if [ -z "$value" ]; then
+    echo "  packageManager (pnpm): ⚠ nao declarado"
+    if [ -n "$PNPM_VERSION_LATEST" ]; then
+      echo "    Suggestion: add packageManager -> pnpm@${PNPM_VERSION_LATEST}"
+      echo "    File: package.json"
+    fi
+    return
+  fi
+
+  if [[ ! "$value" =~ ^pnpm@(.+)$ ]]; then
+    echo "  packageManager (pnpm): ⚠ valor inesperado (${value})"
+    return
+  fi
+
+  pin="${BASH_REMATCH[1]}"
+  PNPM_PACKAGE_MANAGER_PIN="$pin"
+  echo "  packageManager (pnpm): pnpm@${pin}"
+
+  if [ -n "$PNPM_VERSION_CURRENT" ] && [ "$pin" != "$PNPM_VERSION_CURRENT" ]; then
+    echo "    Aviso: pnpm local (${PNPM_VERSION_CURRENT}) difere do packageManager (${pin})."
+  fi
+
+  if [ -n "$PNPM_VERSION_LATEST" ] && version_gt "$PNPM_VERSION_LATEST" "$pin"; then
+    echo "    Suggestion: update packageManager -> pnpm@${PNPM_VERSION_LATEST}"
+    echo "    File: package.json"
+  fi
 }
 
 check_workflow_pnpm_pins() {
@@ -265,6 +323,59 @@ check_workflow_pnpm_pins() {
       echo "    Files: .github/workflows/*.yml"
     fi
   fi
+}
+
+update_package_manager_pnpm_pin() {
+  local target_version="$1"
+  local root_pkg="$POMODOROZ_DIR/package.json"
+
+  if [ ! -f "$root_pkg" ]; then
+    echo "  ⚠ package.json nao encontrado."
+    return 1
+  fi
+
+  if ! command -v node >/dev/null 2>&1; then
+    echo "  ⚠ Node nao encontrado para atualizar packageManager."
+    return 1
+  fi
+
+  local node_code
+  node_code='
+const fs = require("fs");
+const file = process.argv[1];
+const target = process.argv[2];
+const source = JSON.parse(fs.readFileSync(file, "utf8"));
+const nextValue = `pnpm@${target}`;
+
+if (source.packageManager === nextValue) {
+  process.exit(0);
+}
+
+const hasPackageManager = Object.prototype.hasOwnProperty.call(source, "packageManager");
+const next = {};
+let inserted = false;
+
+for (const [key, value] of Object.entries(source)) {
+  next[key] = key === "packageManager" ? nextValue : value;
+  if (key === "version" && !hasPackageManager) {
+    next.packageManager = nextValue;
+    inserted = true;
+  }
+}
+
+if (!hasPackageManager && !inserted) {
+  next.packageManager = nextValue;
+}
+
+fs.writeFileSync(file, `${JSON.stringify(next, null, 2)}\n`, "utf8");
+'
+
+  if ! node -e "$node_code" "$root_pkg" "$target_version" >/dev/null 2>&1; then
+    echo "  ⚠ Falha ao atualizar packageManager."
+    return 1
+  fi
+
+  return 0
 }
 
 update_workflow_pnpm_pin_file() {
@@ -352,6 +463,44 @@ update_workflow_pnpm_pins() {
   fi
 
   return 0
+}
+
+maybe_offer_package_manager_pnpm_pin_update() {
+  if [ "$MODE" != "interactive" ]; then
+    return
+  fi
+
+  if [ -z "$PNPM_VERSION_LATEST" ]; then
+    return
+  fi
+
+  local value pin should_update
+  value="$(get_package_manager_value)"
+  pin="$(get_package_manager_pnpm_pin || true)"
+  should_update=0
+
+  if [ -z "$value" ]; then
+    should_update=1
+  elif [ -n "$pin" ] && version_gt "$PNPM_VERSION_LATEST" "$pin"; then
+    should_update=1
+  fi
+
+  if [ "$should_update" -eq 0 ]; then
+    return
+  fi
+
+  echo ""
+  local confirm
+  if ! read -r -p "Atualizar packageManager para pnpm@${PNPM_VERSION_LATEST}? (s/N): " confirm; then
+    die "falha ao ler confirmacao para update de packageManager."
+  fi
+
+  if [[ "$confirm" =~ ^[sS]$ ]]; then
+    update_package_manager_pnpm_pin "$PNPM_VERSION_LATEST"
+    echo "  ✓ package.json atualizado: packageManager pnpm@${PNPM_VERSION_LATEST}"
+  else
+    echo "  packageManager mantido."
+  fi
 }
 
 maybe_offer_workflow_pnpm_pin_update() {
@@ -782,6 +931,8 @@ check_dev_environment() {
     echo "  pnpm: ❌ nao encontrado"
   fi
 
+  check_package_manager_pnpm_pin
+  maybe_offer_package_manager_pnpm_pin_update
   check_workflow_pnpm_pins
   maybe_offer_workflow_pnpm_pin_update
 }

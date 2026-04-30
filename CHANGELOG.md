@@ -12,6 +12,10 @@
 
 - **Windows release publishing no longer aborts when the GitHub Release is not created yet** — the release workflow now treats a missing release as an expected creation path in PowerShell and tolerates Linux/Windows jobs racing to create the same release.
 
+### Changed
+
+- **pnpm version pin is now declared and maintained consistently** — `package.json` now declares `packageManager`, and `check-updates` can compare/update the manifest pin alongside workflow Corepack pins.
+
 ## [26.4.39] - 2026-04-29
 
 ### Fixed

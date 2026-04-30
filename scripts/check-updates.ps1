@@ -27,6 +27,7 @@ $script:OutdatedCheckFailed = $false
 $script:OutdatedSeen = [System.Collections.Generic.HashSet[string]]::new()
 $script:PnpmVersionCurrent = ""
 $script:PnpmVersionLatest = ""
+$script:PnpmPackageManagerPin = ""
 $script:LogModeSelection = $LogMode
 $script:LogTimestamp = ""
 $script:GeneralLogFile = ""
@@ -267,39 +268,213 @@ function Compare-Semver {
     return 0
 }
 
+function Get-PackageManagerValue {
+    $packageJson = Join-Path $POMODOROZ "package.json"
+    $json = Get-PackageJson -Path $packageJson
+    if ($null -eq $json) {
+        return ""
+    }
+
+    $property = $json.PSObject.Properties["packageManager"]
+    if ($null -eq $property -or $null -eq $property.Value) {
+        return ""
+    }
+
+    return "$($property.Value)".Trim()
+}
+
+function Get-PackageManagerPnpmPin {
+    $value = Get-PackageManagerValue
+    if ($value -match '^pnpm@(.+)$') {
+        return "$($Matches[1])".Trim()
+    }
+
+    return ""
+}
+
+function Show-PackageManagerPnpmPinStatus {
+    $value = Get-PackageManagerValue
+    if ([string]::IsNullOrWhiteSpace($value)) {
+        Write-Host "  packageManager (pnpm): [WARN] nao declarado" -ForegroundColor Yellow
+        if (-not [string]::IsNullOrWhiteSpace($script:PnpmVersionLatest)) {
+            Write-Host "    Suggestion: add packageManager -> pnpm@$($script:PnpmVersionLatest)" -ForegroundColor Yellow
+            Write-Host "    File: package.json" -ForegroundColor Gray
+        }
+        return
+    }
+
+    if ($value -notmatch '^pnpm@(.+)$') {
+        Write-Host "  packageManager (pnpm): [WARN] valor inesperado ($value)" -ForegroundColor Yellow
+        return
+    }
+
+    $pin = "$($Matches[1])".Trim()
+    $script:PnpmPackageManagerPin = $pin
+    Write-Host "  packageManager (pnpm): pnpm@$pin"
+
+    if (-not [string]::IsNullOrWhiteSpace($script:PnpmVersionCurrent) -and $pin -ne $script:PnpmVersionCurrent) {
+        Write-Host "    Aviso: pnpm local ($($script:PnpmVersionCurrent)) difere do packageManager ($pin)." -ForegroundColor Yellow
+    }
+
+    if (-not [string]::IsNullOrWhiteSpace($script:PnpmVersionLatest) -and (Compare-Semver -Left $pin -Right $script:PnpmVersionLatest) -lt 0) {
+        Write-Host "    Suggestion: update packageManager -> pnpm@$($script:PnpmVersionLatest)" -ForegroundColor Yellow
+        Write-Host "    File: package.json" -ForegroundColor Gray
+    }
+}
+
+function Update-PackageManagerPnpmPin {
+    param([string]$TargetVersion)
+
+    $packageJson = Join-Path $POMODOROZ "package.json"
+    if (-not (Test-Path $packageJson)) {
+        Write-Host "  [WARN] package.json nao encontrado." -ForegroundColor Yellow
+        return $false
+    }
+
+    if (-not (Check-Command "node")) {
+        Write-Host "  [WARN] Node nao encontrado para atualizar packageManager." -ForegroundColor Yellow
+        return $false
+    }
+
+    $nodeCode = @'
+const fs = require("fs");
+const file = process.argv[1];
+const target = process.argv[2];
+const source = JSON.parse(fs.readFileSync(file, "utf8"));
+const nextValue = `pnpm@${target}`;
+
+if (source.packageManager === nextValue) {
+  process.exit(0);
+}
+
+const hasPackageManager = Object.prototype.hasOwnProperty.call(source, "packageManager");
+const next = {};
+let inserted = false;
+
+for (const [key, value] of Object.entries(source)) {
+  next[key] = key === "packageManager" ? nextValue : value;
+  if (key === "version" && !hasPackageManager) {
+    next.packageManager = nextValue;
+    inserted = true;
+  }
+}
+
+if (!hasPackageManager && !inserted) {
+  next.packageManager = nextValue;
+}
+
+fs.writeFileSync(file, `${JSON.stringify(next, null, 2)}\n`, "utf8");
+'@
+
+    & node -e $nodeCode $packageJson $TargetVersion *> $null
+    return $LASTEXITCODE -eq 0
+}
+
+function Maybe-OfferPackageManagerPnpmPinUpdate {
+    if ($Mode -ne "interactive") {
+        return
+    }
+
+    if ([string]::IsNullOrWhiteSpace($script:PnpmVersionLatest)) {
+        return
+    }
+
+    $value = Get-PackageManagerValue
+    $pin = Get-PackageManagerPnpmPin
+    $shouldUpdate = $false
+
+    if ([string]::IsNullOrWhiteSpace($value)) {
+        $shouldUpdate = $true
+    } elseif (-not [string]::IsNullOrWhiteSpace($pin) -and (Compare-Semver -Left $pin -Right $script:PnpmVersionLatest) -lt 0) {
+        $shouldUpdate = $true
+    }
+
+    if (-not $shouldUpdate) {
+        return
+    }
+
+    Write-Host ""
+    $confirm = Read-Host "Atualizar packageManager para pnpm@$($script:PnpmVersionLatest)? (s/N)"
+    if ($confirm -match '^[sS]$') {
+        if (Update-PackageManagerPnpmPin -TargetVersion $script:PnpmVersionLatest) {
+            Write-Host "  [OK] package.json atualizado: packageManager pnpm@$($script:PnpmVersionLatest)" -ForegroundColor Green
+        } else {
+            Write-Host "  [WARN] Falha ao atualizar packageManager." -ForegroundColor Yellow
+        }
+    } else {
+        Write-Host "  packageManager mantido."
+    }
+}
+
+function Get-WorkflowPnpmFiles {
+    $workflowsDir = Join-Path $POMODOROZ ".github/workflows"
+    if (-not (Test-Path $workflowsDir)) {
+        return @()
+    }
+
+    return @(Get-ChildItem -Path $workflowsDir -File | Where-Object { $_.Name -match '\.ya?ml$' } | Sort-Object FullName)
+}
+
+function Get-WorkflowPnpmPinRows {
+    $workflowFiles = @(Get-WorkflowPnpmFiles)
+    if (-not $workflowFiles -or $workflowFiles.Count -eq 0) {
+        return @()
+    }
+
+    $rows = New-Object 'System.Collections.Generic.List[object]'
+    foreach ($workflowFile in $workflowFiles) {
+        $relativeFile = $workflowFile.FullName
+        if ($relativeFile.StartsWith($POMODOROZ, [System.StringComparison]::OrdinalIgnoreCase)) {
+            $relativeFile = ($relativeFile.Substring($POMODOROZ.Length) -replace '^[\\/]+', '')
+        }
+
+        $inSetup = $false
+        foreach ($line in (Get-Content $workflowFile.FullName)) {
+            if ($line -match 'uses:\s*pnpm/action-setup@') {
+                $inSetup = $true
+                continue
+            }
+
+            if ($inSetup -and $line -match '^\s*version:\s*(.+?)\s*$') {
+                $value = $Matches[1].Trim().Trim('"').Trim("'")
+                if (-not [string]::IsNullOrWhiteSpace($value)) {
+                    [void]$rows.Add([PSCustomObject]@{
+                        File = $relativeFile
+                        Pin  = $value
+                    })
+                }
+                $inSetup = $false
+                continue
+            }
+
+            if ($inSetup -and $line -match '^\s*-\s+name:') {
+                $inSetup = $false
+            }
+
+            if ($line -match 'corepack\s+prepare\s+pnpm@([0-9][0-9A-Za-z._-]*)\s+--activate') {
+                $value = "$($Matches[1])".Trim().Trim('"').Trim("'")
+                if (-not [string]::IsNullOrWhiteSpace($value)) {
+                    [void]$rows.Add([PSCustomObject]@{
+                        File = $relativeFile
+                        Pin  = $value
+                    })
+                }
+            }
+        }
+    }
+
+    return @($rows.ToArray() | Sort-Object File, Pin -Unique)
+}
+
 function Get-ReleaseWorkflowPnpmPins {
-    $workflowFile = Join-Path $POMODOROZ ".github/workflows/release-autoupdate.yml"
-    if (-not (Test-Path $workflowFile)) {
+    $pinRows = @(Get-WorkflowPnpmPinRows)
+    if (-not $pinRows -or $pinRows.Count -eq 0) {
         return @()
     }
 
     $pins = [System.Collections.Generic.HashSet[string]]::new()
-    $inSetup = $false
-    foreach ($line in (Get-Content $workflowFile)) {
-        if ($line -match 'uses:\s*pnpm/action-setup@') {
-            $inSetup = $true
-            continue
-        }
-
-        if ($inSetup -and $line -match '^\s*version:\s*(.+?)\s*$') {
-            $value = $Matches[1].Trim().Trim('"').Trim("'")
-            if (-not [string]::IsNullOrWhiteSpace($value)) {
-                [void]$pins.Add($value)
-            }
-            $inSetup = $false
-            continue
-        }
-
-        if ($inSetup -and $line -match '^\s*-\s+name:') {
-            $inSetup = $false
-        }
-
-        if ($line -match 'corepack\s+prepare\s+pnpm@([0-9][0-9A-Za-z._-]*)\s+--activate') {
-            $value = "$($Matches[1])".Trim().Trim('"').Trim("'")
-            if (-not [string]::IsNullOrWhiteSpace($value)) {
-                [void]$pins.Add($value)
-            }
-        }
+    foreach ($row in $pinRows) {
+        [void]$pins.Add("$($row.Pin)")
     }
 
     return @($pins | Sort-Object)
@@ -308,35 +483,49 @@ function Get-ReleaseWorkflowPnpmPins {
 function Show-ReleaseWorkflowPnpmPinStatus {
     $pins = @(Get-ReleaseWorkflowPnpmPins)
     if (-not $pins -or $pins.Count -eq 0) {
-        Write-Host "  Release workflow pin (pnpm): [WARN] nao encontrado" -ForegroundColor Yellow
-        Write-Host "    Arquivo esperado: .github/workflows/release-autoupdate.yml" -ForegroundColor Yellow
+        Write-Host "  Workflow pins (pnpm): [WARN] nao encontrados" -ForegroundColor Yellow
+        Write-Host "    Arquivos esperados: .github/workflows/*.yml" -ForegroundColor Yellow
         return
     }
 
     $pinsDisplay = ($pins -join ", ")
-    Write-Host "  Release workflow pin (pnpm): $pinsDisplay"
+    Write-Host "  Workflow pins (pnpm): $pinsDisplay"
+
+    $pinRows = @(Get-WorkflowPnpmPinRows)
+    foreach ($row in $pinRows) {
+        Write-Host "    $($row.File): pnpm@$($row.Pin)"
+    }
 
     if ($pins.Count -gt 1) {
-        Write-Host "    [WARN] Inconsistencia: workflow possui mais de um pin de versao para pnpm." -ForegroundColor Yellow
+        Write-Host "    [WARN] Inconsistencia: workflows possuem mais de um pin de versao para pnpm." -ForegroundColor Yellow
     }
 
     $firstPin = "$($pins[0])"
     if (-not [string]::IsNullOrWhiteSpace($script:PnpmVersionCurrent) -and $firstPin -ne $script:PnpmVersionCurrent) {
-        Write-Host "    Aviso: pnpm local ($($script:PnpmVersionCurrent)) difere do pin do workflow ($firstPin)." -ForegroundColor Yellow
+        Write-Host "    Aviso: pnpm local ($($script:PnpmVersionCurrent)) difere do pin dos workflows ($firstPin)." -ForegroundColor Yellow
     }
 
-    if (-not [string]::IsNullOrWhiteSpace($script:PnpmVersionLatest) -and (Compare-Semver -Left $firstPin -Right $script:PnpmVersionLatest) -lt 0) {
-        Write-Host "    Suggestion: update workflow pin $firstPin -> $($script:PnpmVersionLatest)" -ForegroundColor Yellow
-        Write-Host "    File: .github/workflows/release-autoupdate.yml" -ForegroundColor Gray
+    if (-not [string]::IsNullOrWhiteSpace($script:PnpmVersionLatest)) {
+        $hasOutdatedPin = $false
+        foreach ($pin in $pins) {
+            if ((Compare-Semver -Left "$pin" -Right $script:PnpmVersionLatest) -lt 0) {
+                $hasOutdatedPin = $true
+            }
+        }
+
+        if ($hasOutdatedPin) {
+            Write-Host "    Suggestion: update workflow pnpm pins -> $($script:PnpmVersionLatest)" -ForegroundColor Yellow
+            Write-Host "    Files: .github/workflows/*.yml" -ForegroundColor Gray
+        }
     }
 }
 
 function Update-ReleaseWorkflowPnpmPin {
     param([string]$TargetVersion)
 
-    $workflowFile = Join-Path $POMODOROZ ".github/workflows/release-autoupdate.yml"
-    if (-not (Test-Path $workflowFile)) {
-        Write-Host "  [WARN] Arquivo de workflow nao encontrado: .github/workflows/release-autoupdate.yml" -ForegroundColor Yellow
+    $pinRows = @(Get-WorkflowPnpmPinRows)
+    if (-not $pinRows -or $pinRows.Count -eq 0) {
+        Write-Host "  [WARN] Nenhum pin de pnpm encontrado em .github/workflows/*.yml" -ForegroundColor Yellow
         return $false
     }
 
@@ -395,8 +584,17 @@ if (!changed) {
 fs.writeFileSync(file, out.join("\n") + (hadFinalNewline ? "\n" : ""), "utf8");
 '@
 
-    & node -e $nodeCode $workflowFile $TargetVersion *> $null
-    return $LASTEXITCODE -eq 0
+    $failedCount = 0
+    $workflowFiles = @($pinRows | Select-Object -ExpandProperty File -Unique)
+    foreach ($relativeFile in $workflowFiles) {
+        $workflowFile = Join-Path $POMODOROZ $relativeFile
+        & node -e $nodeCode $workflowFile $TargetVersion *> $null
+        if ($LASTEXITCODE -ne 0) {
+            $failedCount++
+        }
+    }
+
+    return $failedCount -eq 0
 }
 
 function Maybe-OfferReleaseWorkflowPnpmPinUpdate {
@@ -413,26 +611,27 @@ function Maybe-OfferReleaseWorkflowPnpmPinUpdate {
         return
     }
 
-    if ($pins.Count -ne 1) {
-        Write-Host "  [WARN] Pulando atualizacao automatica do pin do workflow: multiplos pins detectados." -ForegroundColor Yellow
-        return
+    $hasOutdatedPin = $false
+    foreach ($pin in $pins) {
+        if ((Compare-Semver -Left "$pin" -Right $script:PnpmVersionLatest) -lt 0) {
+            $hasOutdatedPin = $true
+        }
     }
 
-    $currentPin = "$($pins[0])"
-    if ((Compare-Semver -Left $currentPin -Right $script:PnpmVersionLatest) -ge 0) {
+    if (-not $hasOutdatedPin) {
         return
     }
 
     Write-Host ""
-    $confirm = Read-Host "Atualizar pin do workflow de release para pnpm@$($script:PnpmVersionLatest)? (s/N)"
+    $confirm = Read-Host "Atualizar pins de pnpm em todos os workflows para pnpm@$($script:PnpmVersionLatest)? (s/N)"
     if ($confirm -match '^[sS]$') {
         if (Update-ReleaseWorkflowPnpmPin -TargetVersion $script:PnpmVersionLatest) {
-            Write-Host "  [OK] Workflow atualizado: pnpm $($script:PnpmVersionLatest)" -ForegroundColor Green
+            Write-Host "  [OK] Workflows atualizados: pnpm $($script:PnpmVersionLatest)" -ForegroundColor Green
         } else {
-            Write-Host "  [WARN] Falha ao atualizar pin do workflow." -ForegroundColor Yellow
+            Write-Host "  [WARN] Falha ao atualizar pins dos workflows." -ForegroundColor Yellow
         }
     } else {
-        Write-Host "  Pin do workflow mantido em $currentPin."
+        Write-Host "  Pins de workflow mantidos."
     }
 }
 
@@ -581,6 +780,8 @@ function Check-DevEnvironment {
         Write-Host "  pnpm: [ERROR] nao encontrado (nem via corepack/pnpmw)." -ForegroundColor Red
     }
 
+    Show-PackageManagerPnpmPinStatus
+    Maybe-OfferPackageManagerPnpmPinUpdate
     Show-ReleaseWorkflowPnpmPinStatus
     Maybe-OfferReleaseWorkflowPnpmPinUpdate
 }
