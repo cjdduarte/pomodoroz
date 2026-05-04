@@ -1,6 +1,7 @@
 import React, { useEffect, useId, useRef } from "react";
 import styled from "styled-components";
 import { StyledButtonNormal, StyledButtonPrimary } from "styles";
+import { StyledScrollbar } from "styles/mixins";
 import Portal from "./Portal";
 
 type ConfirmDialogProps = {
@@ -25,6 +26,8 @@ const ConfirmDialogOverlay = styled.div`
   overflow-y: auto;
 
   background-color: rgba(0, 0, 0, 0.28);
+
+  ${StyledScrollbar};
 
   @media (max-height: 360px) {
     align-items: flex-start;

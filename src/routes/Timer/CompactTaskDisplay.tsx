@@ -21,6 +21,7 @@ import { SVG } from "components";
 import { TimerStatus } from "store/timer/types";
 import styled from "styled-components";
 import { themes } from "styles/themes";
+import { StyledScrollbar } from "styles/mixins";
 import type { TaskSelection } from "store";
 import type { TaskList, Task } from "store/tasks/types";
 import { resolveActiveTaskSelection } from "utils";
@@ -219,6 +220,8 @@ const StyledActionsMenu = styled.div<{ compact?: boolean }>`
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   z-index: 140;
 
+  ${StyledScrollbar};
+
   ${(p) =>
     p.compact &&
     `
@@ -280,6 +283,8 @@ const StyledDropdown = styled.div`
   border-radius: 3px;
   z-index: 100;
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.15);
+
+  ${StyledScrollbar};
 
   &.upward {
     bottom: 100%;

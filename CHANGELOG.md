@@ -10,7 +10,7 @@
 
 ### Fixed
 
-- **Task Grid scrollbar is visible as soon as overflowing content loads** — the Tasks Grid no longer waits for hover or card interaction to reveal the scroll thumb when cards extend below the visible area.
+- **Scrollable app areas now use the same visible thin scrollbar style** — Tasks Grid, main scrollable views, task details, text areas, and timer task menus no longer mix hidden, hover-only, and thicker native scrollbar appearances.
 - **Update checks no longer suggest manual Rust updates when root crates are current** — the Cargo section now hides generic manual commands when `cargo outdated` succeeds and reports no root crate updates.
 - **Update checks now offer and apply Rust patch/minor root crate updates correctly** — `check-updates` now treats `cargo outdated` `latest` patch/minor results as safe candidates when `compat` is unavailable, updates exact Cargo manifest pins before refreshing the lockfile, and makes the JS/Tauri recommendation wait for Rust alignment when needed.
 - **Compact timer footer now sits flush with the window edge** — compact mode now lets the Timer fill the available window height and anchors the task footer to the bottom, removing the small background gap below the footer.
