@@ -10,10 +10,13 @@
 
 ### Corrigido
 
+- **Checagem de updates agora oferece e aplica corretamente updates Rust patch/minor root** — o `check-updates` passa a tratar resultados `latest` patch/minor do `cargo outdated` como candidatos seguros quando `compat` não está disponível, atualiza pins exatos no manifesto Cargo antes de refrescar o lockfile e condiciona a recomendação JS/Tauri ao alinhamento Rust quando necessário.
+- **Rodapé do Timer compacto agora encosta na borda da janela** — o modo compacto faz o Timer preencher a altura disponível e ancora o rodapé de tarefa no fim, removendo o pequeno espaço de fundo abaixo do rodapé.
 - **Publicação Windows não aborta mais quando a GitHub Release ainda não foi criada** — o workflow de release agora trata a release ausente como caminho esperado de criação no PowerShell e tolera a corrida entre os jobs Linux/Windows para criar a mesma release.
 
 ### Alterado
 
+- **Dependências Tauri foram mantidas alinhadas entre JS e Rust** — os updates JS de `@tauri-apps/*` agora acompanham os crates Rust correspondentes para o `tauri dev` não relatar divergência de versão do Tauri.
 - **Pin de versão do pnpm agora fica declarado e mantido de forma consistente** — `package.json` declara `packageManager`, e o `check-updates` compara/atualiza o pin do manifesto junto dos pins Corepack dos workflows.
 
 ## [26.4.39] - 2026-04-29

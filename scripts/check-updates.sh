@@ -1291,6 +1291,7 @@ check_js_dependencies() {
   echo "  cd \"$POMODOROZ_DIR\" && pnpm install"
   echo "  cd \"$POMODOROZ_DIR\" && pnpm build"
   echo "  cd \"$POMODOROZ_DIR\" && pnpm tauri dev"
+  echo "  Obs.: se @tauri-apps/api/cli foram atualizados, conclua o alinhamento Rust/Tauri na etapa [5/5] antes do tauri dev."
 }
 
 cargo_subcommand_available() {
@@ -1373,6 +1374,7 @@ run_rust_updates_for_selected() {
     fi
 
     echo "  -> [$ws] cargo update -p $crate --precise $target"
+    update_cargo_manifest_dependency_version "$tauri_dir" "$crate" "$target"
     local status=0
     set +e
     (
@@ -1389,6 +1391,63 @@ run_rust_updates_for_selected() {
       echo "       Dica: cd \"$tauri_dir\" && cargo add \"$crate@$target\""
     fi
   done
+}
+
+update_cargo_manifest_dependency_version() {
+  local tauri_dir="$1"
+  local crate="$2"
+  local target="$3"
+  local cargo_toml="$tauri_dir/Cargo.toml"
+
+  if [ ! -f "$cargo_toml" ]; then
+    return
+  fi
+
+  local status=0
+  set +e
+  node -e '
+const fs = require("fs");
+const [file, crateName, target] = process.argv.slice(1);
+const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const keepExactIfPinned = (previous) =>
+  String(previous).trim().startsWith("=") ? `=${target}` : target;
+
+let text = fs.readFileSync(file, "utf8");
+const original = text;
+const name = escapeRegExp(crateName);
+const inlinePattern = new RegExp(`(^\\s*${name}\\s*=\\s*\\{[^\\n}]*\\bversion\\s*=\\s*")([^"]+)(")`, "m");
+const simplePattern = new RegExp(`(^\\s*${name}\\s*=\\s*")([^"]+)(")`, "m");
+
+if (inlinePattern.test(text)) {
+  text = text.replace(inlinePattern, (_match, before, previous, after) =>
+    `${before}${keepExactIfPinned(previous)}${after}`
+  );
+} else if (simplePattern.test(text)) {
+  text = text.replace(simplePattern, (_match, before, previous, after) =>
+    `${before}${keepExactIfPinned(previous)}${after}`
+  );
+}
+
+if (text === original) {
+  process.exit(2);
+}
+
+fs.writeFileSync(file, text);
+' "$cargo_toml" "$crate" "$target"
+  status=$?
+  set -e
+
+  case "$status" in
+    0)
+      echo "     Cargo.toml atualizado: $crate => $target"
+      ;;
+    2)
+      echo "     Cargo.toml sem declaracao root para $crate; atualizando lockfile apenas."
+      ;;
+    *)
+      echo "     ⚠ falha ao atualizar Cargo.toml para $crate; tentando lockfile mesmo assim."
+      ;;
+  esac
 }
 
 maybe_offer_rust_root_updates() {
@@ -1411,20 +1470,30 @@ maybe_offer_rust_root_updates() {
   local safe_candidates=()
   local major_candidates=()
   local crate project compat latest
+  local safe_target
 
   while IFS=$'\t' read -r crate project compat latest; do
     [ -z "$crate" ] && continue
 
+    safe_target=""
     if [ -n "$compat" ] && [ "$compat" != "n/a" ] && [ "$compat" != "Removed" ] && [ "$compat" != "$project" ]; then
       if ! is_major_update "$project" "$compat"; then
-        safe_candidates+=("src-tauri"$'\t'"$crate"$'\t'"$project"$'\t'"$compat"$'\t'"$compat"$'\t'"safe")
+        safe_target="$compat"
       fi
     fi
 
     if [ -n "$latest" ] && [ "$latest" != "n/a" ] && [ "$latest" != "Removed" ] && [ "$latest" != "$project" ]; then
-      if is_major_update "$project" "$latest"; then
+      if ! is_major_update "$project" "$latest"; then
+        if [ -z "$safe_target" ]; then
+          safe_target="$latest"
+        fi
+      else
         major_candidates+=("src-tauri"$'\t'"$crate"$'\t'"$project"$'\t'"$latest"$'\t'"$latest"$'\t'"major")
       fi
+    fi
+
+    if [ -n "$safe_target" ]; then
+      safe_candidates+=("src-tauri"$'\t'"$crate"$'\t'"$project"$'\t'"$safe_target"$'\t'"$safe_target"$'\t'"safe")
     fi
   done <<< "$parsed_rows"
 

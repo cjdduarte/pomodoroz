@@ -87,12 +87,13 @@ export const StyledTimer = styled.main`
 
   &.compact {
     padding-top: 0;
-    height: auto;
-    flex: 0 0 auto;
+    height: 100%;
+    min-height: 0;
+    flex: 1 1 auto;
     display: grid;
     grid-template-columns: auto 1fr;
-    grid-template-rows: auto auto;
-    align-content: start;
+    grid-template-rows: minmax(0, 1fr) auto;
+    align-content: stretch;
     align-items: center;
 
     & > :last-child {

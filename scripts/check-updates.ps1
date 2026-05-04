@@ -1258,6 +1258,7 @@ function Check-JsDependencies {
     Write-Host 'Recomendado:' -ForegroundColor Gray
     Write-Host ('  Set-Location "{0}"; pnpm build' -f $POMODOROZ) -ForegroundColor Gray
     Write-Host ('  Set-Location "{0}"; pnpm tauri dev' -f $POMODOROZ) -ForegroundColor Gray
+    Write-Host '  Obs.: se @tauri-apps/api/cli foram atualizados, conclua o alinhamento Rust/Tauri na etapa [5/5] antes do tauri dev.' -ForegroundColor Gray
 }
 
 function Test-CargoSubcommand {
@@ -1400,6 +1401,7 @@ function Invoke-RustRootUpdates {
         }
 
         Write-Host "  -> [$($row.Workspace)] cargo update -p $($row.Package) --precise $target"
+        Update-CargoManifestDependencyVersion -TauriDir $TauriDir -PackageName "$($row.Package)" -TargetVersion $target
         Push-Location $TauriDir
         try {
             & cargo update -p $row.Package --precise $target
@@ -1413,6 +1415,40 @@ function Invoke-RustRootUpdates {
             Pop-Location
         }
     }
+}
+
+function Update-CargoManifestDependencyVersion {
+    param(
+        [string]$TauriDir,
+        [string]$PackageName,
+        [string]$TargetVersion
+    )
+
+    $cargoToml = Join-Path $TauriDir "Cargo.toml"
+    if (-not (Test-Path $cargoToml)) {
+        return
+    }
+
+    $content = Get-Content -Raw -Path $cargoToml
+    $escapedName = [regex]::Escape($PackageName)
+    $inlinePattern = "(?m)^(\s*$escapedName\s*=\s*\{[^\n}]*\bversion\s*=\s*"")([^""]+)("")"
+    $simplePattern = "(?m)^(\s*$escapedName\s*=\s*"")([^""]+)("")"
+
+    $match = [regex]::Match($content, $inlinePattern)
+    if (-not $match.Success) {
+        $match = [regex]::Match($content, $simplePattern)
+    }
+
+    if (-not $match.Success) {
+        Write-Host "     Cargo.toml sem declaracao root para $PackageName; atualizando lockfile apenas."
+        return
+    }
+
+    $previous = "$($match.Groups[2].Value)"
+    $next = if ($previous.Trim().StartsWith("=")) { "=$TargetVersion" } else { $TargetVersion }
+    $updated = $content.Remove($match.Groups[2].Index, $match.Groups[2].Length).Insert($match.Groups[2].Index, $next)
+    Set-Content -Path $cargoToml -Value $updated -NoNewline
+    Write-Host "     Cargo.toml atualizado: $PackageName => $TargetVersion"
 }
 
 function Maybe-OfferRustRootUpdates {
@@ -1440,24 +1476,20 @@ function Maybe-OfferRustRootUpdates {
         $project = "$($item.Project)"
         $compat = "$($item.Compat)"
         $latest = "$($item.Latest)"
+        $safeTarget = ""
 
         if (-not [string]::IsNullOrWhiteSpace($compat) -and $compat -ne "n/a" -and $compat -ne "Removed" -and $compat -ne $project) {
             if (-not (Is-MajorUpdate -Current $project -Latest $compat)) {
-                $safeCandidates += [PSCustomObject]@{
-                    Workspace = "src-tauri"
-                    Package = $name
-                    Current = $project
-                    Wanted = $compat
-                    Latest = $compat
-                    PackageType = "cargo"
-                    Target = $compat
-                    UpdateKind = "safe"
-                }
+                $safeTarget = $compat
             }
         }
 
         if (-not [string]::IsNullOrWhiteSpace($latest) -and $latest -ne "n/a" -and $latest -ne "Removed" -and $latest -ne $project) {
-            if (Is-MajorUpdate -Current $project -Latest $latest) {
+            if (-not (Is-MajorUpdate -Current $project -Latest $latest)) {
+                if ([string]::IsNullOrWhiteSpace($safeTarget)) {
+                    $safeTarget = $latest
+                }
+            } else {
                 $majorCandidates += [PSCustomObject]@{
                     Workspace = "src-tauri"
                     Package = $name
@@ -1468,6 +1500,19 @@ function Maybe-OfferRustRootUpdates {
                     Target = $latest
                     UpdateKind = "major"
                 }
+            }
+        }
+
+        if (-not [string]::IsNullOrWhiteSpace($safeTarget)) {
+            $safeCandidates += [PSCustomObject]@{
+                Workspace = "src-tauri"
+                Package = $name
+                Current = $project
+                Wanted = $safeTarget
+                Latest = $safeTarget
+                PackageType = "cargo"
+                Target = $safeTarget
+                UpdateKind = "safe"
             }
         }
     }

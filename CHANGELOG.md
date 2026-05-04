@@ -10,10 +10,13 @@
 
 ### Fixed
 
+- **Update checks now offer and apply Rust patch/minor root crate updates correctly** — `check-updates` now treats `cargo outdated` `latest` patch/minor results as safe candidates when `compat` is unavailable, updates exact Cargo manifest pins before refreshing the lockfile, and makes the JS/Tauri recommendation wait for Rust alignment when needed.
+- **Compact timer footer now sits flush with the window edge** — compact mode now lets the Timer fill the available window height and anchors the task footer to the bottom, removing the small background gap below the footer.
 - **Windows release publishing no longer aborts when the GitHub Release is not created yet** — the release workflow now treats a missing release as an expected creation path in PowerShell and tolerates Linux/Windows jobs racing to create the same release.
 
 ### Changed
 
+- **Tauri dependencies were kept aligned across JS and Rust** — the JS `@tauri-apps/*` updates are paired with matching Rust crate updates so `tauri dev` no longer reports a Tauri package version mismatch.
 - **pnpm version pin is now declared and maintained consistently** — `package.json` now declares `packageManager`, and `check-updates` can compare/update the manifest pin alongside workflow Corepack pins.
 
 ## [26.4.39] - 2026-04-29
