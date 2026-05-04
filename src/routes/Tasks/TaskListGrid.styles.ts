@@ -78,26 +78,21 @@ export const StyledGridContent = styled.div<{ $compact?: boolean }>`
 
   ${StyledScrollbar};
 
-  ${(p) =>
-    p.$compact &&
-    css`
-      /* Keep scrollbar visible in compact grid mode (no hover dependency). */
-      scrollbar-width: thin;
-      scrollbar-color: var(--color-disabled-text)
-        var(--color-bg-tertiary);
+  /* Keep the grid scrollbar visible without hover dependency. */
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-disabled-text) var(--color-bg-tertiary);
 
-      &::-webkit-scrollbar {
-        width: 0.6rem;
-      }
+  &::-webkit-scrollbar {
+    width: 0.6rem;
+  }
 
-      &::-webkit-scrollbar-thumb {
-        background-color: var(--color-disabled-text);
-      }
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--color-disabled-text);
+  }
 
-      &::-webkit-scrollbar-track {
-        background-color: var(--color-bg-tertiary);
-      }
-    `}
+  &::-webkit-scrollbar-track {
+    background-color: var(--color-bg-tertiary);
+  }
 `;
 
 export const StyledGridCards = styled.div<{
