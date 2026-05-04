@@ -6,10 +6,11 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
-## [26.5.1] - 2026-05-04
+## [26.5.4] - 2026-05-04
 
 ### Corrigido
 
+- **Script de release agora explica cabecalhos de changelog ausentes antes de sincronizar manifests** — o `release.sh` valida os dois changelogs antes do `version:sync`, mostra os cabecalhos de versao mais proximos quando a versao pedida esta ausente e nao emite mais ruido de perfil de login nos comandos internos.
 - **Áreas roláveis do app agora usam o mesmo padrão fino e visível de scrollbar** — Grid de Tarefas, telas principais com rolagem, detalhes de tarefa, campos de texto e menus de tarefas do Timer não misturam mais barras escondidas, dependentes de hover ou nativas mais grossas.
 - **Checagem de updates não sugere mais updates Rust manuais quando os root crates estão atuais** — a seção Cargo agora oculta comandos manuais genéricos quando o `cargo outdated` passa e não encontra updates de root crates.
 - **Checagem de updates agora oferece e aplica corretamente updates Rust patch/minor root** — o `check-updates` passa a tratar resultados `latest` patch/minor do `cargo outdated` como candidatos seguros quando `compat` não está disponível, atualiza pins exatos no manifesto Cargo antes de refrescar o lockfile e condiciona a recomendação JS/Tauri ao alinhamento Rust quando necessário.

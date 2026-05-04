@@ -6,10 +6,11 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
-## [26.5.1] - 2026-05-04
+## [26.5.4] - 2026-05-04
 
 ### Fixed
 
+- **Release script now explains missing changelog version headers before syncing manifests** — `release.sh` validates both changelogs before `version:sync`, prints the nearest version headers when the requested version is missing, and no longer emits unrelated login-shell profile noise for internal commands.
 - **Scrollable app areas now use the same visible thin scrollbar style** — Tasks Grid, main scrollable views, task details, text areas, and timer task menus no longer mix hidden, hover-only, and thicker native scrollbar appearances.
 - **Update checks no longer suggest manual Rust updates when root crates are current** — the Cargo section now hides generic manual commands when `cargo outdated` succeeds and reports no root crate updates.
 - **Update checks now offer and apply Rust patch/minor root crate updates correctly** — `check-updates` now treats `cargo outdated` `latest` patch/minor results as safe candidates when `compat` is unavailable, updates exact Cargo manifest pins before refreshing the lockfile, and makes the JS/Tauri recommendation wait for Rust alignment when needed.

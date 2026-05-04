@@ -94,8 +94,8 @@ Sem argumentos em terminal interativo, abre menu de modo:
 
 Fluxo:
   1) valida repo limpo e branch atual
-  2) sincroniza versao (package.json raiz + manifests de pacote existentes)
-  3) valida changelog da versao
+  2) valida changelog da versao
+  3) sincroniza versao (package.json raiz + manifests de pacote existentes)
   4) (opcional) preflight local (validar-tudo --skip-install)
   5) commit de release
   6) cria tag v<versao>
@@ -159,8 +159,33 @@ run_cmd() {
   if (( DRY_RUN == 1 )); then
     printf "[dry-run] %s\n" "$cmd"
   else
-    bash -lc "$cmd"
+    bash -c "$cmd"
   fi
+}
+
+extract_changelog_date() {
+  local file="$1"
+  local version="$2"
+  local line=""
+
+  line="$(rg -m1 "^## \\[$version\\] - " "$file" || true)"
+  if [[ -z "$line" ]]; then
+    return 1
+  fi
+
+  printf "%s" "${line#*] - }"
+}
+
+print_changelog_headers_hint() {
+  local file="$1"
+  local headers=""
+
+  headers="$(rg "^## \\[[0-9]+\\.[0-9]+\\.[0-9]+\\] - " "$file" | head -n 5 || true)"
+  if [[ -z "$headers" ]]; then
+    return
+  fi
+
+  printf "Cabecalhos encontrados em %s:\n%s\n" "$(basename "$file")" "$headers" >&2
 }
 
 build_release_git_add_cmd() {
@@ -294,25 +319,17 @@ if git -C "$APP_DIR" ls-remote --exit-code --tags origin "refs/tags/$TARGET_TAG"
   die "Tag remota $TARGET_TAG ja existe em origin."
 fi
 
-step "Sincronizando versao para $TARGET_VERSION"
-run_cmd "cd \"$APP_DIR\" && pnpm version:sync \"$TARGET_VERSION\""
-
 step "Validando entradas de changelog para $TARGET_VERSION"
-pt_date="$(
-  rg -m1 "^## \\[$TARGET_VERSION\\] - " "$APP_DIR/CHANGELOG.pt.md" \
-    | sed -E "s/^## \\[$TARGET_VERSION\\] - //"
-)"
-en_date="$(
-  rg -m1 "^## \\[$TARGET_VERSION\\] - " "$APP_DIR/CHANGELOG.md" \
-    | sed -E "s/^## \\[$TARGET_VERSION\\] - //"
-)"
+if ! pt_date="$(extract_changelog_date "$APP_DIR/CHANGELOG.pt.md" "$TARGET_VERSION")"; then
+  print_changelog_headers_hint "$APP_DIR/CHANGELOG.pt.md"
+  die "CHANGELOG.pt.md sem cabecalho de versao com data para [$TARGET_VERSION]. Esperado no topo: ## [$TARGET_VERSION] - YYYY-MM-DD"
+fi
 
-if [[ -z "$pt_date" ]]; then
-  die "CHANGELOG.pt.md sem cabecalho de versao com data para [$TARGET_VERSION]. Esperado: ## [$TARGET_VERSION] - YYYY-MM-DD"
+if ! en_date="$(extract_changelog_date "$APP_DIR/CHANGELOG.md" "$TARGET_VERSION")"; then
+  print_changelog_headers_hint "$APP_DIR/CHANGELOG.md"
+  die "CHANGELOG.md sem cabecalho de versao com data para [$TARGET_VERSION]. Esperado no topo: ## [$TARGET_VERSION] - YYYY-MM-DD"
 fi
-if [[ -z "$en_date" ]]; then
-  die "CHANGELOG.md sem cabecalho de versao com data para [$TARGET_VERSION]. Esperado: ## [$TARGET_VERSION] - YYYY-MM-DD"
-fi
+
 if ! [[ "$pt_date" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
   die "CHANGELOG.pt.md para [$TARGET_VERSION] precisa de data final no formato YYYY-MM-DD. Atual: '$pt_date'"
 fi
@@ -322,6 +339,9 @@ fi
 if [[ "$pt_date" != "$en_date" ]]; then
   die "Datas divergentes entre CHANGELOG.pt.md ($pt_date) e CHANGELOG.md ($en_date) para [$TARGET_VERSION]."
 fi
+
+step "Sincronizando versao para $TARGET_VERSION"
+run_cmd "cd \"$APP_DIR\" && pnpm version:sync \"$TARGET_VERSION\""
 
 confirm_skip_validate_if_needed
 
