@@ -6,10 +6,11 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
-## [26.5.1] - TBD
+## [26.5.1] - 2026-05-04
 
 ### Fixed
 
+- **Update checks no longer suggest manual Rust updates when root crates are current** — the Cargo section now hides generic manual commands when `cargo outdated` succeeds and reports no root crate updates.
 - **Update checks now offer and apply Rust patch/minor root crate updates correctly** — `check-updates` now treats `cargo outdated` `latest` patch/minor results as safe candidates when `compat` is unavailable, updates exact Cargo manifest pins before refreshing the lockfile, and makes the JS/Tauri recommendation wait for Rust alignment when needed.
 - **Compact timer footer now sits flush with the window edge** — compact mode now lets the Timer fill the available window height and anchors the task footer to the bottom, removing the small background gap below the footer.
 - **Windows release publishing no longer aborts when the GitHub Release is not created yet** — the release workflow now treats a missing release as an expected creation path in PowerShell and tolerates Linux/Windows jobs racing to create the same release.

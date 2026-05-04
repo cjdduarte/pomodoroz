@@ -1685,6 +1685,7 @@ function Check-RustDependencies {
     $outdatedLog = ""
     $auditLog = ""
     $outdatedJsonForSelection = ""
+    $outdatedCheckFailed = $false
     if ($writeCargoLogs) {
         $logsDir = Join-Path $POMODOROZ "logs"
         if (-not (Test-Path $logsDir)) {
@@ -1705,7 +1706,9 @@ function Check-RustDependencies {
                 $outdatedJson = (& cargo outdated --root-deps-only --format json 2>$null | Out-String).Trim()
                 if ($LASTEXITCODE -eq 0) {
                     Show-CargoOutdatedReportSummary -RawJson $outdatedJson
+                    $outdatedJsonForSelection = $outdatedJson
                 } else {
+                    $outdatedCheckFailed = $true
                     Write-Host "  [WARN] Falha ao executar cargo outdated em modo resumo." -ForegroundColor Yellow
                     Write-Host "    Dica: verifique rede/crates.io e lock do cache Cargo." -ForegroundColor Yellow
                 }
@@ -1713,6 +1716,7 @@ function Check-RustDependencies {
                 Pop-Location
             }
         } else {
+            $outdatedCheckFailed = $true
             Write-Host "  [WARN] cargo-outdated nao instalado." -ForegroundColor Yellow
             Write-Host "    Instale com: cargo install cargo-outdated" -ForegroundColor Yellow
         }
@@ -1737,12 +1741,18 @@ function Check-RustDependencies {
             Write-Host "    Instale com: cargo install cargo-audit" -ForegroundColor Yellow
         }
 
-        Write-Host "  Atualizacao manual recomendada:"
-        Write-Host ('    Set-Location "{0}"; cargo outdated --root-deps-only' -f $tauriDir)
-        Write-Host ('    Set-Location "{0}"; cargo audit' -f $tauriDir)
-        Write-Host ('    Set-Location "{0}"; cargo add <crate>@<versao>' -f $tauriDir)
-        Write-Host ('    Set-Location "{0}"; cargo update -p <crate> --precise <versao>' -f $tauriDir)
-        Write-Host ('    Set-Location "{0}"; cargo check' -f $tauriDir)
+        $reportRootRows = @()
+        if (-not [string]::IsNullOrWhiteSpace($outdatedJsonForSelection)) {
+            $reportRootRows = @(Get-CargoOutdatedRootRowsFromJson -RawJson $outdatedJsonForSelection)
+        }
+        if ($outdatedCheckFailed -or $reportRootRows.Count -gt 0) {
+            Write-Host "  Atualizacao manual recomendada:"
+            Write-Host ('    Set-Location "{0}"; cargo outdated --root-deps-only' -f $tauriDir)
+            Write-Host ('    Set-Location "{0}"; cargo audit' -f $tauriDir)
+            Write-Host ('    Set-Location "{0}"; cargo add <crate>@<versao>' -f $tauriDir)
+            Write-Host ('    Set-Location "{0}"; cargo update -p <crate> --precise <versao>' -f $tauriDir)
+            Write-Host ('    Set-Location "{0}"; cargo check' -f $tauriDir)
+        }
         return
     }
 
@@ -1776,6 +1786,7 @@ function Check-RustDependencies {
                 Show-CargoOutdatedReportSummary -RawJson $outdatedJson
                 $outdatedJsonForSelection = $outdatedJson
             } else {
+                $outdatedCheckFailed = $true
                 Write-Host "  [WARN] Falha ao executar resumo de cargo outdated." -ForegroundColor Yellow
                 Write-Host "    Dica: verifique rede/crates.io e lock do cache Cargo." -ForegroundColor Yellow
             }
@@ -1806,11 +1817,13 @@ function Check-RustDependencies {
                 Show-CargoOutdatedReportSummary -RawJson $outdatedJson
                 $outdatedJsonForSelection = $outdatedJson
             } else {
+                $outdatedCheckFailed = $true
                 Write-Host "  [WARN] Falha ao executar resumo de cargo outdated." -ForegroundColor Yellow
                 Write-Host "    Dica: verifique rede/crates.io e lock do cache Cargo." -ForegroundColor Yellow
             }
         }
     } else {
+        $outdatedCheckFailed = $true
         Write-Host "  [WARN] cargo-outdated nao instalado." -ForegroundColor Yellow
         Write-Host "    Instale com: cargo install cargo-outdated" -ForegroundColor Yellow
     }
@@ -1884,12 +1897,19 @@ function Check-RustDependencies {
         Write-Host "    Instale com: cargo install cargo-audit" -ForegroundColor Yellow
     }
 
+    $rootRowsForManual = @()
+    if (-not [string]::IsNullOrWhiteSpace($outdatedJsonForSelection)) {
+        $rootRowsForManual = @(Get-CargoOutdatedRootRowsFromJson -RawJson $outdatedJsonForSelection)
+    }
+
     Maybe-OfferRustRootUpdates -OutdatedJson $outdatedJsonForSelection -TauriDir $tauriDir
 
-    Write-Host "  Atualizacao manual recomendada:"
-    Write-Host ('    Set-Location "{0}"; cargo add <crate>@<versao>' -f $tauriDir)
-    Write-Host ('    Set-Location "{0}"; cargo update -p <crate> --precise <versao>' -f $tauriDir)
-    Write-Host ('    Set-Location "{0}"; cargo check' -f $tauriDir)
+    if ($outdatedCheckFailed -or $rootRowsForManual.Count -gt 0) {
+        Write-Host "  Atualizacao manual recomendada:"
+        Write-Host ('    Set-Location "{0}"; cargo add <crate>@<versao>' -f $tauriDir)
+        Write-Host ('    Set-Location "{0}"; cargo update -p <crate> --precise <versao>' -f $tauriDir)
+        Write-Host ('    Set-Location "{0}"; cargo check' -f $tauriDir)
+    }
 }
 
 if ($PSBoundParameters.Count -eq 0 -and [Environment]::UserInteractive -and $Mode -eq "interactive") {

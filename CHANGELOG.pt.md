@@ -6,10 +6,11 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
-## [26.5.1] - A definir
+## [26.5.1] - 2026-05-04
 
 ### Corrigido
 
+- **Checagem de updates não sugere mais updates Rust manuais quando os root crates estão atuais** — a seção Cargo agora oculta comandos manuais genéricos quando o `cargo outdated` passa e não encontra updates de root crates.
 - **Checagem de updates agora oferece e aplica corretamente updates Rust patch/minor root** — o `check-updates` passa a tratar resultados `latest` patch/minor do `cargo outdated` como candidatos seguros quando `compat` não está disponível, atualiza pins exatos no manifesto Cargo antes de refrescar o lockfile e condiciona a recomendação JS/Tauri ao alinhamento Rust quando necessário.
 - **Rodapé do Timer compacto agora encosta na borda da janela** — o modo compacto faz o Timer preencher a altura disponível e ancora o rodapé de tarefa no fim, removendo o pequeno espaço de fundo abaixo do rodapé.
 - **Publicação Windows não aborta mais quando a GitHub Release ainda não foi criada** — o workflow de release agora trata a release ausente como caminho esperado de criação no PowerShell e tolera a corrida entre os jobs Linux/Windows para criar a mesma release.

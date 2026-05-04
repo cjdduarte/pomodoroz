@@ -1627,6 +1627,7 @@ check_rust_dependencies() {
   local outdated_log
   local audit_log
   local outdated_json_for_selection=""
+  local rust_outdated_check_failed=0
   if [ ! -f "$tauri_dir/Cargo.toml" ]; then
     echo "  src-tauri/Cargo.toml nao encontrado; pulando verificacao Rust."
     return
@@ -1658,11 +1659,14 @@ check_rust_dependencies() {
       set -e
       if [ "$outdated_status" -eq 0 ]; then
         show_cargo_outdated_report_summary "$outdated_json"
+        outdated_json_for_selection="$outdated_json"
       else
+        rust_outdated_check_failed=1
         echo "  ⚠ Falha ao executar cargo outdated em modo resumo."
         echo "    Dica: verifique rede/crates.io e lock do cache Cargo."
       fi
     else
+      rust_outdated_check_failed=1
       echo "  ⚠ cargo-outdated nao instalado."
       echo "    Instale com: cargo install cargo-outdated"
     fi
@@ -1690,12 +1694,18 @@ check_rust_dependencies() {
       echo "    Instale com: cargo install cargo-audit"
     fi
 
-    echo "  Atualizacao manual recomendada:"
-    echo "    cd \"$tauri_dir\" && cargo outdated --root-deps-only"
-    echo "    cd \"$tauri_dir\" && cargo audit"
-    echo "    cd \"$tauri_dir\" && cargo add <crate>@<versao>"
-    echo "    cd \"$tauri_dir\" && cargo update -p <crate> --precise <versao>"
-    echo "    cd \"$tauri_dir\" && cargo check"
+    local report_root_rows=""
+    if [ -n "$outdated_json_for_selection" ]; then
+      report_root_rows="$(cargo_outdated_root_rows_tsv "$outdated_json_for_selection")"
+    fi
+    if [ "$rust_outdated_check_failed" -eq 1 ] || [ -n "$report_root_rows" ]; then
+      echo "  Atualizacao manual recomendada:"
+      echo "    cd \"$tauri_dir\" && cargo outdated --root-deps-only"
+      echo "    cd \"$tauri_dir\" && cargo audit"
+      echo "    cd \"$tauri_dir\" && cargo add <crate>@<versao>"
+      echo "    cd \"$tauri_dir\" && cargo update -p <crate> --precise <versao>"
+      echo "    cd \"$tauri_dir\" && cargo check"
+    fi
     return
   fi
 
@@ -1733,6 +1743,7 @@ check_rust_dependencies() {
         show_cargo_outdated_report_summary "$outdated_json"
         outdated_json_for_selection="$outdated_json"
       else
+        rust_outdated_check_failed=1
         echo "  ⚠ Falha ao executar resumo de cargo outdated."
         echo "    Dica: verifique rede/crates.io e lock do cache Cargo."
       fi
@@ -1762,11 +1773,13 @@ check_rust_dependencies() {
         show_cargo_outdated_report_summary "$outdated_json"
         outdated_json_for_selection="$outdated_json"
       else
+        rust_outdated_check_failed=1
         echo "  ⚠ Falha ao executar resumo de cargo outdated."
         echo "    Dica: verifique rede/crates.io e lock do cache Cargo."
       fi
     fi
   else
+    rust_outdated_check_failed=1
     echo "  ⚠ cargo-outdated nao instalado."
     echo "    Instale com: cargo install cargo-outdated"
   fi
@@ -1843,12 +1856,19 @@ check_rust_dependencies() {
     echo "    Instale com: cargo install cargo-audit"
   fi
 
+  local root_rows_for_manual=""
+  if [ -n "$outdated_json_for_selection" ]; then
+    root_rows_for_manual="$(cargo_outdated_root_rows_tsv "$outdated_json_for_selection")"
+  fi
+
   maybe_offer_rust_root_updates "$outdated_json_for_selection" "$tauri_dir"
 
-  echo "  Atualizacao manual recomendada:"
-  echo "    cd \"$tauri_dir\" && cargo add <crate>@<versao>"
-  echo "    cd \"$tauri_dir\" && cargo update -p <crate> --precise <versao>"
-  echo "    cd \"$tauri_dir\" && cargo check"
+  if [ "$rust_outdated_check_failed" -eq 1 ] || [ -n "$root_rows_for_manual" ]; then
+    echo "  Atualizacao manual recomendada:"
+    echo "    cd \"$tauri_dir\" && cargo add <crate>@<versao>"
+    echo "    cd \"$tauri_dir\" && cargo update -p <crate> --precise <versao>"
+    echo "    cd \"$tauri_dir\" && cargo check"
+  fi
 }
 
 if (( ORIGINAL_ARGC == 0 )) && [[ -t 0 ]] && [ "$MODE" = "interactive" ]; then

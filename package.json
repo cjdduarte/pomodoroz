@@ -50,7 +50,7 @@
     "@babel/core": "^7.29.0",
     "@babel/plugin-syntax-flow": "^7.28.6",
     "@babel/plugin-transform-react-jsx": "^7.28.6",
-    "@eslint-react/eslint-plugin": "4.2.3",
+    "@eslint-react/eslint-plugin": "5.7.2",
     "@eslint/js": "^10.0.1",
     "@rollup/plugin-typescript": "^12.3.0",
     "@tauri-apps/api": "2.11.0",
