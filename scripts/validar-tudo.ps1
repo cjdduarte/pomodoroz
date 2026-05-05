@@ -203,10 +203,11 @@ Fluxo padrao:
   2) pnpm install (sincroniza lockfile)
   3) pnpm lint (renderer)
   4) pnpm typecheck:renderer
-  5) cargo fmt --check (src-tauri)
-  6) cargo clippy -D warnings (src-tauri)
-  7) cargo check (src-tauri)
-  8) build release tauri sem bundle (pnpm tauri build --no-bundle)
+  5) pnpm test:run (renderer)
+  6) cargo fmt --check (src-tauri)
+  7) cargo clippy -D warnings (src-tauri)
+  8) cargo check (src-tauri)
+  9) build release tauri sem bundle (pnpm tauri build --no-bundle)
 
 Opcoes:
   -SkipInstall   Nao roda pnpm install
@@ -290,12 +291,12 @@ function Show-ModeMenu {
     Write-Host "Menu de validacao:"
     Write-Host "Escada de execucao (simples -> completo):"
     Write-Host "- 1) Quick run sem install (lint + typecheck renderer + tauri dev)."
-    Write-Host "- 2) Preflight sem install."
-    Write-Host "- 3) Preflight completo (com install)."
-    Write-Host "- 4) Preflight completo + Quick run (lint + tauri dev)."
-    Write-Host "- 5) (3) + empacotado (binario release)."
-    Write-Host "- 6) Instalar localmente."
-    Write-Host "- 7) Gerar instaladores da plataforma atual."
+    Write-Host "- 2) Preflight sem install (lint + typecheck + testes + build)."
+    Write-Host "- 3) Preflight completo (install + lint + typecheck + testes + build)."
+    Write-Host "- 4) Preflight completo + Quick run (inclui testes; depois tauri dev)."
+    Write-Host "- 5) (3) + empacotado (inclui testes)."
+    Write-Host "- 6) Instalar localmente (inclui testes antes do build)."
+    Write-Host "- 7) Gerar instaladores da plataforma atual (inclui testes)."
     Write-Host ""
     Write-Host "Escolha o fluxo:"
     Write-Host "  1) Quick run (sem install)"
@@ -508,6 +509,11 @@ Pop-Location
 Step "Typecheck do renderer (TypeScript)"
 Push-Location $APP_DIR
 Invoke-Pnpm typecheck:renderer
+Pop-Location
+
+Step "Testes do renderer (Vitest)"
+Push-Location $APP_DIR
+Invoke-Pnpm test:run
 Pop-Location
 
 $tauriDir = Join-Path $APP_DIR "src-tauri"

@@ -49,7 +49,7 @@ When an item is released:
   - `26.4.36` changelog entry contains `A14` native IPC error visibility, `A7` renderer version source hardening, and operational guide alignment.
   - `A2` env hygiene completed (renderer `.env` untracked, no committed `.env.example` required by default).
   - `A5` dependency modernization major batches are now completed (`eslint`/`@eslint/js` 10.x with `eslint-react`, and `vite-plugin-svgr@5.2.0`) with full validation.
-  - `A6` intentionally deferred by product decision (no test-track changes now).
+  - `A6` is now being reopened incrementally: Vitest replaced the idle Jest stack, CI/local validation run `pnpm test:run`, and the next work is prioritized unit coverage without adding React/DOM test dependencies first.
   - `A9` locale-source unification is now implemented with `@tauri-apps/plugin-os` (renderer) + `tauri_plugin_os::locale()` (native startup).
   - `A10` opens a dependency-rationalization gate where migration is executed only if measurable ROI justifies the change.
   - `A11` Windows CI parity gate is now implemented (`ubuntu-latest` + `windows-latest`) and workflow runs completed successfully in both OS lanes.
@@ -63,8 +63,8 @@ When an item is released:
 
 1. **Product cycle (B1 -> B2 -> B3)**
    - Cadence presets, session extension, break suggestion prompts.
-2. **A6 revisit gate**
-   - Revisit test strategy only after items above are stabilized.
+2. **A6 test coverage expansion**
+   - Expand Vitest coverage in small no-new-dependency batches before considering React/component test tooling.
 3. **A10 dependency rationalization gate**
    - Evaluate necessity first; execute only if metrics and maintenance ROI are clear.
 
@@ -72,25 +72,25 @@ When an item is released:
 
 ## 2. Track A — Conversion Hardening (Tauri-only)
 
-| ID  | Item                                                                          | Status  | Priority | Notes                                                |
-| --- | ----------------------------------------------------------------------------- | ------- | -------- | ---------------------------------------------------- |
-| A0  | Consolidate runtime to Tauri-only and remove browser fallback branches        | Done    | High     | Released in 26.4.28                                  |
-| A1  | Resolve titlebar legacy CSS/changelog divergence (`-webkit-app-region`)       | Done    | High     | Released in 26.4.28                                  |
-| A2  | `.env` hygiene (`app/renderer/.env` tracked)                                  | Done    | High     | Completed and registered in 26.4.29 draft            |
-| A3  | Persist custom shortcuts (`Shortcut.tsx` TODO)                                | Done    | Medium   | Delivered in 26.4.38 draft                           |
-| A4  | Simplify `check-updates` to root-only narrative and flows                     | Done    | Medium   | Released in 26.4.28                                  |
-| A5  | Controlled major updates (`eslint`/`@eslint/js` 10.x, `vite-plugin-svgr` 5.x) | Done    | Medium   | Batches 1/2/3 completed in 26.4.29 draft             |
-| A6  | Define automated test strategy (adopt baseline tests or remove idle stack)    | Blocked | High     | Deferred by decision (no tests changes now)          |
-| A7  | Replace renderer `package.json` imports with injected app version metadata    | Done    | Medium   | Delivered in 26.4.36                                 |
-| A8  | Expand i18n language coverage (`de`/`fr`) with tray/startup parity            | Done    | High     | Delivered in 26.4.31                                 |
-| A9  | Unify auto-language source between renderer and native tray                   | Done    | Medium   | Delivered in 26.4.33 draft                           |
-| A10 | Dependency rationalization gate (`uuid`, debounce, tests, style/state stack)  | Blocked | Medium   | Execute only with measurable ROI; no-change is valid |
-| A11 | Add Windows CI parity gate for renderer and Rust quality checks               | Done    | High     | Delivered in 26.4.34 draft                           |
-| A12 | Harden `write_text_file` to mirror `read_text_file` guardrails                | Done    | High     | Delivered in 26.4.34 draft                           |
-| A13 | Memoize updater-channel support result across runtime session                 | Done    | Medium   | Delivered in 26.4.35 draft                           |
-| A14 | Surface asynchronous Tauri IPC command errors in the UI                       | Done    | High     | Delivered in 26.4.36                                 |
-| A15 | Tighten renderer CSP and remove small dead-code residues                      | Done    | High     | Delivered in 26.4.37 draft                           |
-| A16 | Add AppImage external update information (`zsync`) for `AppImageUpdate`       | Open    | Low      | Schedule with next Linux pipeline change             |
+| ID  | Item                                                                          | Status      | Priority | Notes                                                         |
+| --- | ----------------------------------------------------------------------------- | ----------- | -------- | ------------------------------------------------------------- |
+| A0  | Consolidate runtime to Tauri-only and remove browser fallback branches        | Done        | High     | Released in 26.4.28                                           |
+| A1  | Resolve titlebar legacy CSS/changelog divergence (`-webkit-app-region`)       | Done        | High     | Released in 26.4.28                                           |
+| A2  | `.env` hygiene (`app/renderer/.env` tracked)                                  | Done        | High     | Completed and registered in 26.4.29 draft                     |
+| A3  | Persist custom shortcuts (`Shortcut.tsx` TODO)                                | Done        | Medium   | Delivered in 26.4.38 draft                                    |
+| A4  | Simplify `check-updates` to root-only narrative and flows                     | Done        | Medium   | Released in 26.4.28                                           |
+| A5  | Controlled major updates (`eslint`/`@eslint/js` 10.x, `vite-plugin-svgr` 5.x) | Done        | Medium   | Batches 1/2/3 completed in 26.4.29 draft                      |
+| A6  | Define automated test strategy and expand high-ROI unit coverage              | In Progress | High     | Vitest baseline adopted; expand no-new-dependency tests first |
+| A7  | Replace renderer `package.json` imports with injected app version metadata    | Done        | Medium   | Delivered in 26.4.36                                          |
+| A8  | Expand i18n language coverage (`de`/`fr`) with tray/startup parity            | Done        | High     | Delivered in 26.4.31                                          |
+| A9  | Unify auto-language source between renderer and native tray                   | Done        | Medium   | Delivered in 26.4.33 draft                                    |
+| A10 | Dependency rationalization gate (`uuid`, debounce, tests, style/state stack)  | Blocked     | Medium   | Execute only with measurable ROI; no-change is valid          |
+| A11 | Add Windows CI parity gate for renderer and Rust quality checks               | Done        | High     | Delivered in 26.4.34 draft                                    |
+| A12 | Harden `write_text_file` to mirror `read_text_file` guardrails                | Done        | High     | Delivered in 26.4.34 draft                                    |
+| A13 | Memoize updater-channel support result across runtime session                 | Done        | Medium   | Delivered in 26.4.35 draft                                    |
+| A14 | Surface asynchronous Tauri IPC command errors in the UI                       | Done        | High     | Delivered in 26.4.36                                          |
+| A15 | Tighten renderer CSP and remove small dead-code residues                      | Done        | High     | Delivered in 26.4.37 draft                                    |
+| A16 | Add AppImage external update information (`zsync`) for `AppImageUpdate`       | Open        | Low      | Schedule with next Linux pipeline change                      |
 
 ### A0 — Tauri-only runtime consolidation
 
@@ -214,22 +214,67 @@ Resolution status:
 - Suggested commit:
   - `chore(lint): migrate to eslint-react and upgrade eslint to v10`
 
-### A6 — Test strategy decision
+### A6 — Automated test strategy and high-ROI unit coverage
 
 Decision checkpoint:
 
-- Current decision is to **defer** test-strategy changes for now.
-- Keep this item `Blocked` until the team chooses one path (`adopt-tests` or `remove-test-stack`).
+- Final path selected: **adopt tests**.
+- Jest-specific packages and direct Babel test dependencies are being removed in favor of Vitest.
+- `pnpm test:run` is part of CI and local validation/build gates.
+- Expansion must start with pure TypeScript logic and reducers before adding React/DOM test tooling.
+
+Critical assessment of the proposed test plan:
+
+- The overall priority is correct: task/settings/statistics reducers and persistence helpers have the best regression-risk-to-effort ratio.
+- `jsdom` should not be treated as configuration-only. Vitest can run in `node` by default, and storage tests can mock `globalThis.localStorage` manually without adding a DOM dependency.
+- Reducer tests should prefer public actions/reducers over private helper exports. Private normalization helpers such as task day-color migration should be validated through hydrated/replaced state behavior where practical.
+- Hook/component tests are valuable later, but adding `@testing-library/react` / `user-event` should remain a separate dependency decision with a clear test target and maintenance cost.
+- Tauri E2E should stay deferred. Current CI build/check gates plus manual release checks are a better cost/risk tradeoff for now.
+
+Priority order:
+
+1. `src/store/tasks/utils/task.ts` and `tasklist.ts`
+   - Cover task/list creation, shallow edits, append/remove behavior, and immutability of the original list.
+   - Use `vi.mock("uuid")`; no new dependency.
+2. `src/store/tasks/index.ts`
+   - Cover `addTaskList`, `setTaskListPriority`, `skipTaskCard`, `dragList`, `replaceTaskLists` / `appendTaskLists`, and `undoTasks` / `redoTasks`.
+   - Validate the single-priority invariant and undo/redo boundaries.
+3. `src/store/settings/index.ts`
+   - Cover invalid persisted setting values, shortcut normalization, reserved shortcut rejection, and reset/default behavior through public reducer state where possible.
+4. `src/store/statistics/index.ts`
+   - Cover session merge versus append behavior, duration precision, ignored zero/negative durations, and legacy storage hydration behavior.
+5. `src/store/config`, `src/store/timer`, `src/store/taskSelection`, `src/store/update`
+   - Add smoke reducer tests for simple setters and merge/default behavior.
+6. `src/utils/storage.ts`
+   - Mock `localStorage` manually in `node` environment; cover serialization, parsing, missing keys, and swallowed storage/JSON errors.
+7. `src/hooks/useNotification.ts`
+   - Mock audio/desktop notification utilities and cover mute/notify/sound behavior without React Testing Library if the returned notifier remains directly callable.
+8. `src/hooks/useLanguageSync.ts`
+   - Blocked until React hook testing tooling is explicitly approved.
+9. Shared UI component tests
+   - Blocked until React Testing Library and user-event are explicitly approved.
+10. Tauri E2E
+
+- Deferred indefinitely unless release regressions justify tauri-driver/WebDriver setup.
 
 - Scope checklist:
-  - [x] Decide current cycle policy: defer test-strategy work.
-  - [ ] Decide final path: `adopt-tests` or `remove-test-stack`.
-  - [ ] If adopt: create baseline smoke tests + CI job.
-  - [ ] If remove: clean Jest/Babel test deps and scripts.
+  - [x] Decide final path: adopt automated tests.
+  - [x] Replace idle Jest stack with Vitest baseline.
+  - [x] Add `pnpm test:run` to CI.
+  - [x] Add `pnpm test:run` to local validation/build gates.
+  - [x] Add initial phase 1 task utility tests for `task.ts`.
+  - [ ] Add remaining phase 1 task utility tests for `tasklist.ts`.
+  - [ ] Add phase 2 high-risk reducer tests.
+  - [ ] Add phase 3 storage tests with manual `localStorage` mock.
+  - [ ] Decide separately whether React hook/component testing dependencies are worth adding.
 - Validation checklist:
-  - [ ] CI reflects the chosen strategy.
+  - [x] `pnpm test:run`
+  - [x] CI reflects the chosen strategy.
+  - [ ] `pnpm lint`
+  - [ ] `pnpm typecheck:renderer`
+  - [ ] `pnpm build:renderer`
 - Suggested commit:
-  - `chore(testing): define and apply project test strategy`
+  - `chore(testing): adopt vitest and expand renderer unit coverage`
 
 ### A7 — Renderer version source hardening
 

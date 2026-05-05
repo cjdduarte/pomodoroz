@@ -6,6 +6,12 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.5.2] - A definir
+
+### Alterado
+
+- **Ferramenta de testes do renderer agora usa Vitest** — os pacotes especificos de Jest e as dependencias Babel diretas dos testes foram removidos, scripts Vitest foram adicionados, o CI agora executa a suite de testes do renderer, e os fluxos locais de validacao/instalacao barram builds pela mesma suite com uma pequena base de testes de utilitarios.
+
 ## [26.5.1] - 2026-05-04
 
 ### Corrigido

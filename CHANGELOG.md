@@ -6,6 +6,12 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.5.2] - TBD
+
+### Changed
+
+- **Renderer test tooling now uses Vitest** — Jest-specific packages and direct Babel test dependencies were removed, Vitest scripts were added, CI now runs the renderer test suite, and local validation/install flows gate builds on the same tests with a small utility test baseline.
+
 ## [26.5.1] - 2026-05-04
 
 ### Fixed

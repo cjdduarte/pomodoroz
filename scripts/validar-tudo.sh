@@ -182,10 +182,11 @@ Fluxo padrao:
   2) pnpm install (sincroniza lockfile)
   3) pnpm lint (renderer)
   4) pnpm typecheck:renderer
-  5) cargo fmt --check (src-tauri)
-  6) cargo clippy -D warnings (src-tauri)
-  7) cargo check (src-tauri)
-  8) build release tauri sem bundle (pnpm tauri build --no-bundle)
+  5) pnpm test:run (renderer)
+  6) cargo fmt --check (src-tauri)
+  7) cargo clippy -D warnings (src-tauri)
+  8) cargo check (src-tauri)
+  9) build release tauri sem bundle (pnpm tauri build --no-bundle)
 
 Opcoes:
   --skip-install   Nao roda pnpm install
@@ -255,12 +256,12 @@ show_menu() {
 Menu de validacao:
 Escada de execucao (simples -> completo):
 - 1) Quick run sem install (lint + typecheck renderer + tauri dev).
-- 2) Preflight sem install.
-- 3) Preflight completo (com install).
-- 4) Preflight completo + Quick run (lint + tauri dev).
-- 5) (3) + empacotado (binario release).
-- 6) Instalar localmente.
-- 7) Gerar instaladores da plataforma atual.
+- 2) Preflight sem install (lint + typecheck + testes + build).
+- 3) Preflight completo (install + lint + typecheck + testes + build).
+- 4) Preflight completo + Quick run (inclui testes; depois tauri dev).
+- 5) (3) + empacotado (inclui testes).
+- 6) Instalar localmente (inclui testes antes do build).
+- 7) Gerar instaladores da plataforma atual (inclui testes).
 EOF2
   echo "Escolha o fluxo:"
   echo "  1) Quick run (sem install)"
@@ -453,6 +454,12 @@ step "Typecheck do renderer (TypeScript)"
 (
   cd "$APP_DIR" &&
     pnpm typecheck:renderer
+)
+
+step "Testes do renderer (Vitest)"
+(
+  cd "$APP_DIR" &&
+    pnpm test:run
 )
 
 if [[ -d "$APP_DIR/src-tauri" ]]; then

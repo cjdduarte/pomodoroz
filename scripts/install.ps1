@@ -72,6 +72,11 @@ if (-not $SkipBuild) {
     pnpm typecheck:renderer
     Pop-Location
 
+    Step "Testes do renderer (Vitest)"
+    Push-Location $APP_DIR
+    pnpm test:run
+    Pop-Location
+
     Step "Build release Tauri sem bundle (--no-bundle)"
     Push-Location $APP_DIR
     pnpm tauri build --no-bundle

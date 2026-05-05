@@ -35,7 +35,7 @@ Uso:
   ./scripts/install.sh [--skip-build]
 
 Fluxo (Tauri-only):
-  1) roda pre-check (lint + typecheck renderer)
+  1) roda pre-check (lint + typecheck renderer + testes)
   2) gera binario release (pnpm tauri build --no-bundle)
   3) instala binario em ~/.local/opt/pomodoroz/pomodoroz_tauri
   4) cria launcher em ~/.local/bin/pomodoroz
@@ -100,6 +100,9 @@ if (( SKIP_BUILD == 0 )); then
 
   step "Typecheck do renderer (TypeScript)"
   ( cd "$APP_DIR" && pnpm typecheck:renderer )
+
+  step "Testes do renderer (Vitest)"
+  ( cd "$APP_DIR" && pnpm test:run )
 
   step "Build release Tauri sem bundle (--no-bundle)"
   ( cd "$APP_DIR" && pnpm tauri build --no-bundle )
