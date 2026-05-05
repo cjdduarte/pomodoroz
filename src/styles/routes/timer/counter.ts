@@ -114,12 +114,14 @@ export const StyledCounterContainer = styled.div<CounterContainerProps>`
 
   &.compact {
     width: 100%;
-    height: auto;
+    height: 100%;
+    min-height: 2.8rem;
     padding: 0 0.8rem;
     display: flex;
     flex: none;
     align-items: center;
     justify-content: center;
+    overflow: visible;
     &::before {
       display: ${(p) => (p.fullscreen ? "auto" : "none")};
     }
@@ -187,6 +189,7 @@ export const StyledCounterTimer = styled.h3<TimerProps>`
     width: unset;
     display: flex;
     gap: 0.25rem;
+    white-space: nowrap;
   }
 
   @supports (width: 1cqw) {
@@ -197,6 +200,7 @@ export const StyledCounterTimer = styled.h3<TimerProps>`
     &.compact {
       font-size: ${(p) => (p.fullscreen ? "4rem" : "2.3rem")};
       width: unset;
+      white-space: nowrap;
     }
   }
 `;

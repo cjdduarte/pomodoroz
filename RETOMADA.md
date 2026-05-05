@@ -25,10 +25,10 @@ Atualizar este arquivo ao final de cada fase grande, correcao operacional releva
 
 ## Ponto atual
 
-- Ultimo commit conhecido: `1604f5c chore(release): v26.5.2`.
+- Ultimo commit conhecido: `0390704 fix(timer): restore compact clock visibility`.
 - Versao atual publicada: `v26.5.2`.
-- Trabalho atual: correcao regressiva do Timer compacto apos o ajuste do rodape flush; o relogio compacto voltava a ficar recortado porque a coluna do contador podia colapsar para a largura do padding.
-- Estado do repositorio: alterado com fix em `src/styles/routes/timer/timer.ts` e `src/styles/routes/timer/counter.ts`, mais entradas `26.5.3` pendentes nos dois changelogs.
+- Trabalho atual: correcao complementar do Timer compacto apos o prompt `Continuar/Trocar`; o relogio ganhava espaco, mas podia sumir porque o container compacto ainda podia ocultar o conteudo do contador.
+- Estado do repositorio: alterado apenas em `src/styles/routes/timer/counter.ts` para manter altura/overflow estaveis no contador compacto.
 
 ---
 
@@ -40,8 +40,8 @@ Correcao visual do Timer compacto concluida e validada; proximo passo e revisar/
 
 ## Validado
 
-- Reproducao visual em Vite/browser com viewport compacto `340x100`: antes o relogio aparecia recortado; depois o horario inteiro ficou visivel.
-- Reproducao visual em Vite/browser com titlebar customizada (`340x140`): horario compacto inteiro visivel e rodape permanece no fundo.
+- Reproducao visual em Vite/browser com viewport compacto `340x100`: horario inteiro visivel no footer normal e no prompt `Continuar/Trocar`.
+- Reproducao visual em Vite/browser com titlebar customizada (`340x140`): horario compacto inteiro visivel no prompt `Continuar/Trocar` e rodape permanece no fundo.
 - `pnpm lint` passa sem erros.
 - `pnpm typecheck:renderer` passa.
 - `pnpm build:renderer` gera assets sem erros.
@@ -53,7 +53,7 @@ Correcao visual do Timer compacto concluida e validada; proximo passo e revisar/
 
 ## Estado pendente
 
-- Nenhum item critico aberto no momento; pendente apenas revisar/commitar as alteracoes.
+- Nenhum item critico aberto no momento; pendente apenas revisar/commitar a correcao complementar.
 - Consultar `docs/IMPROVEMENTS.md` para o roadmap de features e melhorias tecnicas pendentes.
 
 ---
@@ -61,5 +61,5 @@ Correcao visual do Timer compacto concluida e validada; proximo passo e revisar/
 ## Retomar
 
 1. Revisar `git status --short` e `git log --oneline -5`.
-2. Conferir o diff do fix compacto e os changelogs `26.5.3`.
+2. Conferir o diff complementar em `src/styles/routes/timer/counter.ts`.
 3. Preparar commit convencional sugerido para a correcao.
