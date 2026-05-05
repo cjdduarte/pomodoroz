@@ -10,7 +10,7 @@
 
 ### Alterado
 
-- **Ferramenta de testes do renderer agora usa Vitest** — os pacotes especificos de Jest e as dependencias Babel diretas dos testes foram removidos, scripts Vitest foram adicionados, o CI agora executa a suite de testes do renderer, e os fluxos locais de validacao/instalacao barram builds pela mesma suite com uma pequena base de testes de utilitarios.
+- **Ferramenta de testes do renderer agora usa Vitest apenas para testes de funcionalidade** — os pacotes especificos de Jest e as dependencias Babel diretas dos testes foram removidos, scripts Vitest foram adicionados, o CI agora executa apenas a suite de testes de funcionalidade do renderer, e os fluxos locais de validacao/instalacao barram builds pelos mesmos testes funcionais.
 
 ## [26.5.1] - 2026-05-04
 

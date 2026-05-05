@@ -10,7 +10,7 @@
 
 ### Changed
 
-- **Renderer test tooling now uses Vitest** — Jest-specific packages and direct Babel test dependencies were removed, Vitest scripts were added, CI now runs the renderer test suite, and local validation/install flows gate builds on the same tests with a small utility test baseline.
+- **Renderer test tooling now uses Vitest for functional tests only** — Jest-specific packages and direct Babel test dependencies were removed, Vitest scripts were added, CI now runs only the renderer functional test suite, and local validation/install flows gate builds on the same functionality tests.
 
 ## [26.5.1] - 2026-05-04
 
