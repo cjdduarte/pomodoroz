@@ -46,8 +46,17 @@
 | Release/update operations    | `docs/RELEASE_OPERATIONS.md`                   |
 | Agent operational rules      | This file (`AGENTS.md`)                        |
 | Claude Code guide            | `CLAUDE.md`                                    |
+| Session handoff              | `RETOMADA.md`                                  |
 
 Do not create loose specs/checklists for topics already covered in the documents above.
+
+### RETOMADA.md Rules
+
+`RETOMADA.md` is an operational handoff document — a lean snapshot to resume work in a new chat without rebuilding context. It is **not** a source of truth for governance (that is `AGENTS.md`) and **not** a planning document (that is `docs/IMPROVEMENTS.md`).
+
+1. Update `RETOMADA.md` at the end of each major phase, relevant operational fix, or real/manual validation that changes the next step.
+2. Replace old context with current context; **do not accumulate history**.
+3. Keep it lean — it should contain only what the next session needs to pick up where work stopped.
 
 ### Changelog Rules
 

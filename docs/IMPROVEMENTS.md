@@ -263,7 +263,8 @@ Priority order:
   - [x] Add `pnpm test:run` to CI.
   - [x] Add `pnpm test:run` to local validation/build gates.
   - [x] Add initial phase 1 task utility tests for `task.ts`.
-  - [ ] Add remaining phase 1 task utility tests for `tasklist.ts`.
+  - [x] Add initial phase 1 task list utility immutability test for `tasklist.ts`.
+  - [ ] Add remaining phase 1 task list utility tests for creation/edit/remove behavior.
   - [ ] Add phase 2 high-risk reducer tests.
   - [ ] Add phase 3 storage tests with manual `localStorage` mock.
   - [ ] Decide separately whether React hook/component testing dependencies are worth adding.
