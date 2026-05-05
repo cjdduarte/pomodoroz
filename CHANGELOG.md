@@ -6,6 +6,12 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.5.3] - TBD
+
+### Fixed
+
+- **Compact Timer keeps the clock visible again** — compact mode now reserves a stable clock column and centers the counter text without clipping, preserving the flush task footer layout introduced in 26.5.1.
+
 ## [26.5.2] - 2026-05-05
 
 ### Changed

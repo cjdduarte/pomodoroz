@@ -91,7 +91,7 @@ export const StyledTimer = styled.main`
     min-height: 0;
     flex: 1 1 auto;
     display: grid;
-    grid-template-columns: auto 1fr;
+    grid-template-columns: 8rem minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr) auto;
     align-content: stretch;
     align-items: center;

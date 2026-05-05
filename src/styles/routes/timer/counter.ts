@@ -113,9 +113,13 @@ export const StyledCounterContainer = styled.div<CounterContainerProps>`
   }
 
   &.compact {
-    padding: 16px;
+    width: 100%;
+    height: auto;
+    padding: 0 0.8rem;
     display: flex;
-    flex: 0;
+    flex: none;
+    align-items: center;
+    justify-content: center;
     &::before {
       display: ${(p) => (p.fullscreen ? "auto" : "none")};
     }

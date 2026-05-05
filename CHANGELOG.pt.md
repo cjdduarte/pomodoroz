@@ -6,6 +6,12 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.5.3] - A definir
+
+### Corrigido
+
+- **Timer compacto volta a manter o relogio visivel** — o modo compacto agora reserva uma coluna estavel para o relogio e centraliza o texto do contador sem recorte, preservando o rodape de tarefas encostado na borda introduzido na 26.5.1.
+
 ## [26.5.2] - 2026-05-05
 
 ### Alterado

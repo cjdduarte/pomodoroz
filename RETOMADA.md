@@ -25,34 +25,35 @@ Atualizar este arquivo ao final de cada fase grande, correcao operacional releva
 
 ## Ponto atual
 
-- Ultimo commit conhecido: `8ec5965 chore(testing): adopt vitest and expand renderer unit coverage`.
-- Versao atual publicada: `v26.5.1`.
-- Trabalho recente: adocao do Vitest e expansao de cobertura de testes unitarios do renderer; nenhuma funcionalidade de usuario alterada.
-- Estado do repositorio: limpo (working tree clean, sem pendencias no staging).
+- Ultimo commit conhecido: `1604f5c chore(release): v26.5.2`.
+- Versao atual publicada: `v26.5.2`.
+- Trabalho atual: correcao regressiva do Timer compacto apos o ajuste do rodape flush; o relogio compacto voltava a ficar recortado porque a coluna do contador podia colapsar para a largura do padding.
+- Estado do repositorio: alterado com fix em `src/styles/routes/timer/timer.ts` e `src/styles/routes/timer/counter.ts`, mais entradas `26.5.3` pendentes nos dois changelogs.
 
 ---
 
 ## Intencao de ajuste agora
 
-Nenhum trabalho em andamento. Proximo passo a definir pelo operador.
+Correcao visual do Timer compacto concluida e validada; proximo passo e revisar/commitar o diff.
 
 ---
 
 ## Validado
 
+- Reproducao visual em Vite/browser com viewport compacto `340x100`: antes o relogio aparecia recortado; depois o horario inteiro ficou visivel.
+- Reproducao visual em Vite/browser com titlebar customizada (`340x140`): horario compacto inteiro visivel e rodape permanece no fundo.
 - `pnpm lint` passa sem erros.
 - `pnpm typecheck:renderer` passa.
 - `pnpm build:renderer` gera assets sem erros.
-- Suite Vitest adotada e passando (`pnpm test`).
 - Scrollbar visivelmente padronizada (fix `0c9521f`).
 - Validacao de changelog por script funcional (fixes `5516ca1`, `e8f2fd5`).
-- v26.5.1 publicada e anotada no CHANGELOG (ambos PT e EN).
+- v26.5.2 publicada e anotada no CHANGELOG (ambos PT e EN).
 
 ---
 
 ## Estado pendente
 
-- Nenhum item critico aberto no momento.
+- Nenhum item critico aberto no momento; pendente apenas revisar/commitar as alteracoes.
 - Consultar `docs/IMPROVEMENTS.md` para o roadmap de features e melhorias tecnicas pendentes.
 
 ---
@@ -60,7 +61,5 @@ Nenhum trabalho em andamento. Proximo passo a definir pelo operador.
 ## Retomar
 
 1. Revisar `git status --short` e `git log --oneline -5`.
-2. Ler `docs/IMPROVEMENTS.md` para entender o que esta aberto/em progresso.
-3. Perguntar ao operador qual e o proximo foco antes de comecar qualquer implementacao.
-4. Ao iniciar implementacao relevante, atualizar este arquivo com o ponto atual e a intencao.
-5. Ao concluir fase grande ou validacao manual, atualizar `Validado` e `Estado pendente` antes de encerrar o chat.
+2. Conferir o diff do fix compacto e os changelogs `26.5.3`.
+3. Preparar commit convencional sugerido para a correcao.
