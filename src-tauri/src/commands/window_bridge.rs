@@ -1,3 +1,5 @@
+#[cfg(target_os = "linux")]
+use crate::constants::WINDOW_RESTORED_EVENT;
 use crate::constants::{MAIN_TRAY_ID, TRAY_MENU_QUIT_ID, TRAY_MENU_RESTORE_ID};
 use rodio::{play, DeviceSinkBuilder};
 use std::{
@@ -118,6 +120,45 @@ fn has_tray(window: &Window) -> bool {
     window.app_handle().tray_by_id(MAIN_TRAY_ID).is_some()
 }
 
+#[cfg(target_os = "linux")]
+fn prepare_window_for_focus_restore(window: &Window) {
+    let is_visible = window.is_visible().unwrap_or(false);
+    let is_focused = window.is_focused().unwrap_or(false);
+
+    if is_visible && !is_focused {
+        let _ = window.hide();
+    }
+}
+
+#[cfg(not(target_os = "linux"))]
+fn prepare_window_for_focus_restore(_window: &Window) {}
+
+#[cfg(target_os = "linux")]
+fn refresh_linux_window_surface(window: &Window) {
+    let was_resizable = window.is_resizable().unwrap_or(true);
+    let _ = window.set_resizable(!was_resizable);
+    let _ = window.set_resizable(was_resizable);
+    let _ = window.set_focus();
+    let _ = window.emit(WINDOW_RESTORED_EVENT, ());
+}
+
+#[cfg(not(target_os = "linux"))]
+fn refresh_linux_window_surface(_window: &Window) {}
+
+fn restore_window_to_foreground(window: &Window) -> Result<(), String> {
+    prepare_window_for_focus_restore(window);
+    window.unminimize().map_err(map_error)?;
+    window.show().map_err(map_error)?;
+    window.set_focus().map_err(map_error)?;
+
+    // Workaround Linux/webkit2gtk:
+    // restaurar de minimizado/oculto pode deixar a superficie sem foco real.
+    // O mesmo refresh usado no tray força renegociação antes do fullscreen.
+    refresh_linux_window_surface(window);
+
+    Ok(())
+}
+
 #[tauri::command(rename_all = "camelCase")]
 pub fn set_always_on_top(window: Window, always_on_top: bool) -> Result<(), String> {
     window.set_always_on_top(always_on_top).map_err(map_error)
@@ -129,10 +170,23 @@ pub fn set_fullscreen_break(
     should_fullscreen: bool,
     always_on_top: bool,
 ) -> Result<(), String> {
-    window.set_always_on_top(always_on_top).map_err(map_error)?;
+    let effective_always_on_top = should_fullscreen || always_on_top;
+    window
+        .set_always_on_top(effective_always_on_top)
+        .map_err(map_error)?;
+
+    if should_fullscreen {
+        restore_window_to_foreground(&window)?;
+    }
+
     window
         .set_fullscreen(should_fullscreen)
         .map_err(map_error)?;
+
+    if should_fullscreen {
+        let _ = window.set_focus();
+    }
+
     window
         .emit(
             if should_fullscreen {
@@ -241,8 +295,7 @@ pub fn set_native_titlebar(
 
 #[tauri::command]
 pub fn show_window(window: Window) -> Result<(), String> {
-    window.show().map_err(map_error)?;
-    window.set_focus().map_err(map_error)
+    restore_window_to_foreground(&window)
 }
 
 #[tauri::command]

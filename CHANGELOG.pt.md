@@ -6,6 +6,12 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.5.5] - A definir
+
+### Corrigido
+
+- **Pausa em tela cheia agora traz janelas Tauri em segundo plano para frente antes de ocupar a tela** — ao entrar na pausa em tela cheia, a janela agora sai do minimizado, aparece, recebe foco e fica temporariamente acima quando estava minimizada fora da bandeja ou visível atrás de outros apps; ao sair, o ajuste Sempre no topo do usuário é restaurado.
+
 ## [26.5.4] - 2026-05-06
 
 ### Corrigido

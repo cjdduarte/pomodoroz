@@ -6,6 +6,12 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.5.5] - TBD
+
+### Fixed
+
+- **Fullscreen break now brings background Tauri windows forward before taking over the screen** — entering a fullscreen break now unminimizes, shows, focuses, and temporarily raises the window when it was minimized outside the tray or already visible behind other apps, then restores the user's Always On Top setting on exit.
+
 ## [26.5.4] - 2026-05-06
 
 ### Fixed
