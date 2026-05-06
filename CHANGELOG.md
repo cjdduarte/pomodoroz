@@ -6,11 +6,12 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
-## [26.5.4] - TBD
+## [26.5.4] - 2026-05-06
 
 ### Fixed
 
-- **Timer task controls open in the right direction for each window mode** — normal mode task overlays open above the footer without clipping, and compact mode task actions and priority lists now open in the expanded panel below the footer like the task grid.
+- **Timer task controls open in the right direction for each window mode** — normal mode task overlays open above the footer without clipping, compact mode task actions use a shorter expanded panel below the footer, and priority lists still use the taller grid-sized panel when more room is useful.
+- **Active task highlight in the grid is subtler** — the running task marker now uses a thinner, lighter ring without the extra drop shadow in both the standard and compact grids.
 
 ### Changed
 

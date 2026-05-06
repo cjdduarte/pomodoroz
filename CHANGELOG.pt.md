@@ -6,11 +6,12 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
-## [26.5.4] - A definir
+## [26.5.4] - 2026-05-06
 
 ### Corrigido
 
-- **Controles de tarefa do Timer abrem na direção correta em cada modo de janela** — no modo normal, os overlays de tarefa abrem acima do rodapé sem recorte; no modo compacto, ações de tarefa e listas de prioridade agora abrem no painel expandido abaixo do rodapé, como o grid de tarefas.
+- **Controles de tarefa do Timer abrem na direção correta em cada modo de janela** — no modo normal, os overlays de tarefa abrem acima do rodapé sem recorte; no modo compacto, ações de tarefa usam um painel expandido mais curto abaixo do rodapé, e listas de prioridade continuam usando o painel mais alto do grid quando mais espaço é útil.
+- **Destaque da tarefa ativa no grid ficou mais sutil** — o marcador da tarefa em execução agora usa um halo mais fino e leve, sem a sombra extra, tanto no grid padrão quanto no grid compacto.
 
 ### Alterado
 

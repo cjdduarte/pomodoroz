@@ -4,6 +4,7 @@ export const SET_TRAY_BEHAVIOR = "SET_TRAY_BEHAVIOR";
 export const SET_TRAY_COPY = "SET_TRAY_COPY";
 export const SET_COMPACT_MODE = "SET_COMPACT_MODE";
 export const COMPACT_EXPAND = "COMPACT_EXPAND";
+export const COMPACT_EXPAND_ACTIONS = "COMPACT_EXPAND_ACTIONS";
 export const COMPACT_EXPAND_FOCUS_EXTENSION =
   "COMPACT_EXPAND_FOCUS_EXTENSION";
 export const COMPACT_COLLAPSE = "COMPACT_COLLAPSE";
@@ -34,6 +35,7 @@ export const TO_MAIN = [
   SET_TRAY_COPY,
   SET_COMPACT_MODE,
   COMPACT_EXPAND,
+  COMPACT_EXPAND_ACTIONS,
   COMPACT_EXPAND_FOCUS_EXTENSION,
   COMPACT_COLLAPSE,
   SET_NATIVE_TITLEBAR,
@@ -148,37 +150,39 @@ export type ToMainPayloadMap = {
             ? [SetCompactModePayload]
             : K extends typeof COMPACT_EXPAND
               ? []
-              : K extends typeof COMPACT_EXPAND_FOCUS_EXTENSION
+              : K extends typeof COMPACT_EXPAND_ACTIONS
                 ? []
-                : K extends typeof COMPACT_COLLAPSE
+                : K extends typeof COMPACT_EXPAND_FOCUS_EXTENSION
                   ? []
-                  : K extends typeof SET_NATIVE_TITLEBAR
-                    ? [SetNativeTitlebarPayload]
-                    : K extends typeof SET_OPEN_AT_LOGIN
-                      ? [SetOpenAtLoginPayload]
-                      : K extends typeof TRAY_ICON_UPDATE
-                        ? [string]
-                        : K extends typeof SET_UI_THEME
-                          ? [SetUiThemePayload]
-                          : K extends typeof SET_IN_APP_AUTO_UPDATE
-                            ? [SetInAppAutoUpdatePayload]
-                            : K extends typeof MINIMIZE_WINDOW
-                              ? [MinimizeWindowPayload]
-                              : K extends typeof CLOSE_WINDOW
-                                ? [CloseWindowPayload]
-                                : K extends typeof SHOW_WINDOW
-                                  ? []
-                                  : K extends typeof START_WINDOW_DRAG
+                  : K extends typeof COMPACT_COLLAPSE
+                    ? []
+                    : K extends typeof SET_NATIVE_TITLEBAR
+                      ? [SetNativeTitlebarPayload]
+                      : K extends typeof SET_OPEN_AT_LOGIN
+                        ? [SetOpenAtLoginPayload]
+                        : K extends typeof TRAY_ICON_UPDATE
+                          ? [string]
+                          : K extends typeof SET_UI_THEME
+                            ? [SetUiThemePayload]
+                            : K extends typeof SET_IN_APP_AUTO_UPDATE
+                              ? [SetInAppAutoUpdatePayload]
+                              : K extends typeof MINIMIZE_WINDOW
+                                ? [MinimizeWindowPayload]
+                                : K extends typeof CLOSE_WINDOW
+                                  ? [CloseWindowPayload]
+                                  : K extends typeof SHOW_WINDOW
                                     ? []
-                                    : K extends typeof OPEN_RELEASE_PAGE
+                                    : K extends typeof START_WINDOW_DRAG
                                       ? []
-                                      : K extends typeof INSTALL_UPDATE
+                                      : K extends typeof OPEN_RELEASE_PAGE
                                         ? []
-                                        : K extends typeof EXPORT_TASKS_DIALOG
-                                          ? [ExportTasksDialogPayload]
-                                          : K extends typeof IMPORT_TASKS_DIALOG
-                                            ? []
-                                            : never;
+                                        : K extends typeof INSTALL_UPDATE
+                                          ? []
+                                          : K extends typeof EXPORT_TASKS_DIALOG
+                                            ? [ExportTasksDialogPayload]
+                                            : K extends typeof IMPORT_TASKS_DIALOG
+                                              ? []
+                                              : never;
 };
 
 export type FromMainPayloadMap = {

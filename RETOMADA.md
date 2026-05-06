@@ -25,16 +25,16 @@ Atualizar este arquivo ao final de cada fase grande, correcao operacional releva
 
 ## Ponto atual
 
-- Ultimo commit conhecido: `3278741 chore(release): v26.5.3`.
+- Ultimo commit conhecido: `6dd5120 fix(timer): prevent compact panel resize jitter`.
 - Versao atual publicada: `v26.5.3`.
-- Trabalho atual: correcao dos menus de tarefa do Timer; no modo normal, grid/acoes voltaram a abrir acima do rodape sem recorte; no modo compacto, acoes e lista de prioridade agora abrem como painel expandido abaixo do rodape, igual ao grid. A expansao compacta voltou a ser disparada no clique antes de renderizar o painel, evitando compressao temporaria do relogio/controles durante o resize nativo.
-- Estado do repositorio: alterado em `src/routes/Timer/CompactTaskDisplay.tsx`, `CHANGELOG.md`, `CHANGELOG.pt.md`, `package.json`, `pnpm-lock.yaml` e este `RETOMADA.md`.
+- Trabalho atual: correcao dos menus de tarefa do Timer e polimento do destaque da tarefa ativa no grid. No modo normal, grid/acoes voltaram a abrir acima do rodape sem recorte; no modo compacto, acoes abre como painel expandido mais curto abaixo do rodape, enquanto grid/lista de prioridade usam o painel mais alto. O destaque da tarefa em execucao no grid agora usa halo mais fino e sem sombra extra no grid normal e compacto.
+- Estado do repositorio: alterado em `src/routes/Timer/CompactTaskDisplay.tsx`, `src/routes/Tasks/TaskListGrid.styles.ts`, `src/ipc/index.ts`, `src/contexts/connectors/TauriInvokeConnector.ts`, `src-tauri/src/commands/window_bridge.rs`, `src-tauri/src/lib.rs`, `CHANGELOG.md`, `CHANGELOG.pt.md` e este `RETOMADA.md`.
 
 ---
 
 ## Intencao de ajuste agora
 
-Correcao visual dos menus de tarefa do Timer concluida e validada; proximo passo e revisar/commitar o diff.
+Correcao visual dos menus de tarefa do Timer e do destaque ativo no grid concluida e validada; changelogs da `26.5.4` datados em `2026-05-06`; proximo passo e revisar/commitar o diff.
 
 ---
 
@@ -42,12 +42,14 @@ Correcao visual dos menus de tarefa do Timer concluida e validada; proximo passo
 
 - Reproducao visual em Vite/browser com viewport normal `340x508`: botao de grid abre o painel acima do rodape sem recorte.
 - Reproducao visual em Vite/browser com viewport normal `340x508`: botao de acoes abre o menu acima do rodape sem recorte.
-- Reproducao visual em Vite/browser no modo compacto: botao de acoes abre painel abaixo do rodape.
+- Reproducao visual em Vite/browser no modo compacto: botao de acoes abre painel mais curto abaixo do rodape.
 - Reproducao visual em Vite/browser no modo compacto: acao `Lista de prioridade` troca para painel abaixo do rodape.
 - Reproducao visual em Vite/browser no modo compacto: botao de grid continua abrindo painel abaixo do rodape.
+- Destaque da tarefa ativa no `TaskListGrid` ajustado no estilo compartilhado, cobrindo grid normal e grid compacto.
 - `pnpm lint` passa sem erros.
 - `pnpm typecheck:renderer` passa.
 - `pnpm build:renderer` gera assets sem erros.
+- `cargo check --manifest-path src-tauri/Cargo.toml` passa sem erros.
 
 ---
 
@@ -61,5 +63,5 @@ Correcao visual dos menus de tarefa do Timer concluida e validada; proximo passo
 ## Retomar
 
 1. Revisar `git status --short` e `git log --oneline -5`.
-2. Conferir o diff em `src/routes/Timer/CompactTaskDisplay.tsx`, `CHANGELOG.md`, `CHANGELOG.pt.md`, `package.json`, `pnpm-lock.yaml` e `RETOMADA.md`.
+2. Conferir o diff em `src/routes/Timer/CompactTaskDisplay.tsx`, `src/routes/Tasks/TaskListGrid.styles.ts`, `src/ipc/index.ts`, `src/contexts/connectors/TauriInvokeConnector.ts`, `src-tauri/src/commands/window_bridge.rs`, `src-tauri/src/lib.rs`, `CHANGELOG.md`, `CHANGELOG.pt.md` e `RETOMADA.md`.
 3. Preparar commit convencional sugerido para a correcao.

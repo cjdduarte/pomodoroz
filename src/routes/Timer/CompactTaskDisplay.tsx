@@ -26,7 +26,11 @@ import type { TaskSelection } from "store";
 import type { TaskList, Task } from "store/tasks/types";
 import { resolveActiveTaskSelection } from "utils";
 import TaskListGrid from "routes/Tasks/TaskListGrid";
-import { COMPACT_COLLAPSE, COMPACT_EXPAND } from "ipc";
+import {
+  COMPACT_COLLAPSE,
+  COMPACT_EXPAND,
+  COMPACT_EXPAND_ACTIONS,
+} from "ipc";
 import { CounterContext, getInvokeConnector } from "contexts";
 
 type TimerLocationState = {
@@ -35,6 +39,9 @@ type TimerLocationState = {
 
 const COMPACT_TASK_FOOTER_HEIGHT = "2.8rem";
 const COMPACT_PANEL_HEIGHT = 320;
+const COMPACT_ACTIONS_PANEL_HEIGHT = 160;
+
+type CompactPanelSize = "collapsed" | "actions" | "full";
 
 const StyledCompactTask = styled.div`
   width: 100%;
@@ -91,8 +98,11 @@ const StyledCompactGridPanel = styled.div`
   }
 `;
 
-const StyledCompactMenuPanel = styled(StyledCompactGridPanel)`
+const StyledCompactMenuPanel = styled(StyledCompactGridPanel)<{
+  $height?: number;
+}>`
   background-color: var(--color-bg-primary);
+  height: ${(p) => p.$height ?? COMPACT_PANEL_HEIGHT}px;
 `;
 
 const StyledNormalGridOverlay = styled.div`
@@ -464,7 +474,7 @@ const CompactTaskDisplay: React.FC = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const actionMenuRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const compactPanelExpandedRef = useRef(false);
+  const compactPanelSizeRef = useRef<CompactPanelSize>("collapsed");
   const previousCompactModeRef = useRef(compactMode);
   const consumedSelectionNavigationKeyRef = useRef<string | null>(null);
 
@@ -512,7 +522,12 @@ const CompactTaskDisplay: React.FC = () => {
   }, [activeTaskSelection, dispatch, selected]);
 
   const sendCompactResizeEvent = useCallback(
-    (channel: typeof COMPACT_EXPAND | typeof COMPACT_COLLAPSE) => {
+    (
+      channel:
+        | typeof COMPACT_EXPAND
+        | typeof COMPACT_EXPAND_ACTIONS
+        | typeof COMPACT_COLLAPSE
+    ) => {
       const invokeConnector = getInvokeConnector();
 
       try {
@@ -527,13 +542,27 @@ const CompactTaskDisplay: React.FC = () => {
     []
   );
 
-  const expandCompactPanel = useCallback(() => {
-    if (!compactMode || compactPanelExpandedRef.current) {
+  const expandCompactPanel = useCallback(
+    (size: Exclude<CompactPanelSize, "collapsed">) => {
+      if (!compactMode || compactPanelSizeRef.current === size) {
+        return;
+      }
+
+      compactPanelSizeRef.current = size;
+      sendCompactResizeEvent(
+        size === "actions" ? COMPACT_EXPAND_ACTIONS : COMPACT_EXPAND
+      );
+    },
+    [compactMode, sendCompactResizeEvent]
+  );
+
+  const collapseCompactPanel = useCallback(() => {
+    if (!compactMode || compactPanelSizeRef.current === "collapsed") {
       return;
     }
 
-    compactPanelExpandedRef.current = true;
-    sendCompactResizeEvent(COMPACT_EXPAND);
+    compactPanelSizeRef.current = "collapsed";
+    sendCompactResizeEvent(COMPACT_COLLAPSE);
   }, [compactMode, sendCompactResizeEvent]);
 
   const closeGrid = useCallback(() => {
@@ -660,26 +689,32 @@ const CompactTaskDisplay: React.FC = () => {
     previousCompactModeRef.current = compactMode;
 
     if (compactModeChanged) {
-      compactPanelExpandedRef.current = false;
+      compactPanelSizeRef.current = "collapsed";
       return;
     }
 
-    const isCompactPanelOpen =
-      compactMode && (showGrid || showDropdown || showActions);
-    const wasCompactPanelOpen = compactPanelExpandedRef.current;
+    const desiredPanelSize: CompactPanelSize =
+      compactMode && showActions
+        ? "actions"
+        : compactMode && (showGrid || showDropdown)
+          ? "full"
+          : "collapsed";
+    const currentPanelSize = compactPanelSizeRef.current;
 
-    if (isCompactPanelOpen && !wasCompactPanelOpen) {
-      sendCompactResizeEvent(COMPACT_EXPAND);
+    if (desiredPanelSize === currentPanelSize) {
+      return;
     }
 
-    if (!isCompactPanelOpen && wasCompactPanelOpen && compactMode) {
-      sendCompactResizeEvent(COMPACT_COLLAPSE);
+    if (desiredPanelSize === "collapsed") {
+      collapseCompactPanel();
+      return;
     }
 
-    compactPanelExpandedRef.current = isCompactPanelOpen;
+    expandCompactPanel(desiredPanelSize);
   }, [
+    collapseCompactPanel,
     compactMode,
-    sendCompactResizeEvent,
+    expandCompactPanel,
     showActions,
     showDropdown,
     showGrid,
@@ -710,7 +745,7 @@ const CompactTaskDisplay: React.FC = () => {
   // On unmount, collapse compact window if any task panel was open.
   useEffect(() => {
     return () => {
-      if (compactPanelExpandedRef.current) {
+      if (compactPanelSizeRef.current !== "collapsed") {
         sendCompactResizeEvent(COMPACT_COLLAPSE);
       }
     };
@@ -847,7 +882,7 @@ const CompactTaskDisplay: React.FC = () => {
   };
 
   const handleOpenPriorityList = () => {
-    expandCompactPanel();
+    expandCompactPanel("full");
     closeGrid();
     setShowActions(false);
     setShowDropdown(true);
@@ -862,7 +897,7 @@ const CompactTaskDisplay: React.FC = () => {
       return;
     }
 
-    expandCompactPanel();
+    expandCompactPanel("full");
     setShowGrid(true);
   };
 
@@ -870,13 +905,13 @@ const CompactTaskDisplay: React.FC = () => {
     closeGrid();
     if (!currentTask) {
       setShowActions(false);
-      expandCompactPanel();
+      expandCompactPanel("full");
       setShowDropdown(true);
       return;
     }
     setShowDropdown(false);
     if (!showActions) {
-      expandCompactPanel();
+      expandCompactPanel("actions");
     }
     setShowActions((prev) => !prev);
   };
@@ -1029,7 +1064,7 @@ const CompactTaskDisplay: React.FC = () => {
             closeGrid();
             setShowActions(false);
             if (!showDropdown) {
-              expandCompactPanel();
+              expandCompactPanel("full");
             }
             setShowDropdown(!showDropdown);
           }}
@@ -1068,7 +1103,7 @@ const CompactTaskDisplay: React.FC = () => {
       </StyledCompactTask>
 
       {compactMode && showActions ? (
-        <StyledCompactMenuPanel>
+        <StyledCompactMenuPanel $height={COMPACT_ACTIONS_PANEL_HEIGHT}>
           {renderActionsMenu(true)}
         </StyledCompactMenuPanel>
       ) : null}

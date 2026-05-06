@@ -164,15 +164,13 @@ export const StyledGridCard = styled.button<{
   ${(p) =>
     p.$active &&
     css`
-      box-shadow:
-        0 0 0 2px rgba(var(--color-primary-rgb), 0.28),
-        0 2px 6px var(--color-shadow-primary);
+      box-shadow: 0 0 0 1px rgba(var(--color-primary-rgb), 0.2);
     `}
 
   &:hover {
     box-shadow: ${(p) =>
       p.$active
-        ? "0 0 0 2px rgba(var(--color-primary-rgb), 0.34), 0 3px 8px var(--color-shadow-primary)"
+        ? "0 0 0 1px rgba(var(--color-primary-rgb), 0.28)"
         : "0 2px 6px var(--color-shadow-primary)"};
   }
 `;
