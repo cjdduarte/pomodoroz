@@ -25,17 +25,17 @@ Atualizar este arquivo ao final de cada fase grande, correcao operacional releva
 
 ## Ponto atual
 
-- Ultimo commit conhecido: `9a07b85 fix(tasks): use existing border for active grid task`.
+- Ultimo commit conhecido: `98ed527 chore(release): fix Rust formatting preflight`.
 - Versao atual publicada: `v26.5.3`.
 - Trabalho da `26.5.4`: correcao dos menus de tarefa do Timer e polimento do destaque da tarefa ativa no grid ja commitados em `f39b12f` e `9a07b85`.
-- Tentativa de release `26.5.4` falhou no preflight local em `cargo fmt --all -- --check`, por formatacao do bloco `use commands::window_bridge` em `src-tauri/src/lib.rs`.
-- Estado do repositorio: alterado apenas para corrigir a formatacao Rust do gate de release e atualizar este handoff.
+- Tentativa de release `26.5.4` falhou no preflight local em `cargo fmt --all -- --check`, por formatacao do bloco `use commands::window_bridge` em `src-tauri/src/lib.rs`; a correcao Rust foi commitada em `98ed527`.
+- Estado do repositorio: alterado apenas para registrar a correcao nos changelogs e atualizar este handoff.
 
 ---
 
 ## Intencao de ajuste agora
 
-Desbloquear o `release.sh` da `26.5.4`: `cargo fmt --all` aplicado, preflight local validado, proximo passo e revisar/commitar este ajuste operacional e rerodar `./scripts/release.sh 26.5.4`.
+Desbloquear o `release.sh` da `26.5.4`: `cargo fmt --all` aplicado, preflight local validado e correcao Rust commitada; proximo passo e revisar/commitar changelogs/handoff e rerodar `./scripts/release.sh 26.5.4`.
 
 ---
 
@@ -57,7 +57,7 @@ Desbloquear o `release.sh` da `26.5.4`: `cargo fmt --all` aplicado, preflight lo
 
 ## Estado pendente
 
-- Pendente revisar/commitar `src-tauri/src/lib.rs` e `RETOMADA.md`.
+- Pendente revisar/commitar `CHANGELOG.md`, `CHANGELOG.pt.md` e `RETOMADA.md`.
 - Depois do commit, rerodar `./scripts/release.sh 26.5.4`.
 - Consultar `docs/IMPROVEMENTS.md` para o roadmap de features e melhorias tecnicas pendentes.
 
@@ -66,5 +66,5 @@ Desbloquear o `release.sh` da `26.5.4`: `cargo fmt --all` aplicado, preflight lo
 ## Retomar
 
 1. Revisar `git status --short` e `git log --oneline -5`.
-2. Conferir o diff em `src-tauri/src/lib.rs` e `RETOMADA.md`.
-3. Commitar o ajuste operacional e executar novamente `./scripts/release.sh 26.5.4`.
+2. Conferir o diff em `CHANGELOG.md`, `CHANGELOG.pt.md` e `RETOMADA.md`.
+3. Commitar changelogs/handoff e executar novamente `./scripts/release.sh 26.5.4`.

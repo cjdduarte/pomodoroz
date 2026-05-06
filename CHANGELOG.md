@@ -12,6 +12,7 @@
 
 - **Timer task controls open in the right direction for each window mode** — normal mode task overlays open above the footer without clipping, compact mode task actions use a shorter expanded panel below the footer, and priority lists still use the taller grid-sized panel when more room is useful.
 - **Active task highlight in the grid is subtler** — the running task marker now changes only the card's existing border color, without adding an extra ring or drop shadow, in both the standard and compact grids.
+- **Rust release preflight is formatted cleanly** — the Tauri command imports now match `cargo fmt`, preventing `release.sh` from stopping during the local Rust quality gate.
 
 ### Changed
 
