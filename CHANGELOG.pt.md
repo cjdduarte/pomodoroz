@@ -6,6 +6,16 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.5.4] - A definir
+
+### Corrigido
+
+- **Controles de tarefa do Timer abrem na direção correta em cada modo de janela** — no modo normal, os overlays de tarefa abrem acima do rodapé sem recorte; no modo compacto, ações de tarefa e listas de prioridade agora abrem no painel expandido abaixo do rodapé, como o grid de tarefas.
+
+### Alterado
+
+- **Dependências foram atualizadas em um refresh de pacotes** — nenhuma mudança funcional é intencional.
+
 ## [26.5.3] - 2026-05-05
 
 ### Corrigido

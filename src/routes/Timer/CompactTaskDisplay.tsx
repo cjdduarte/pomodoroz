@@ -34,7 +34,7 @@ type TimerLocationState = {
 };
 
 const COMPACT_TASK_FOOTER_HEIGHT = "2.8rem";
-const COMPACT_GRID_PANEL_HEIGHT = 320;
+const COMPACT_PANEL_HEIGHT = 320;
 
 const StyledCompactTask = styled.div`
   width: 100%;
@@ -49,7 +49,8 @@ const StyledCompactTask = styled.div`
   border-top: 1px solid var(--color-border-primary);
   background-color: var(--color-bg-secondary);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
+  z-index: 20;
 `;
 
 const StyledCompactTaskBlock = styled.div`
@@ -62,7 +63,7 @@ const StyledCompactTaskBlock = styled.div`
 
 const StyledCompactGridPanel = styled.div`
   width: 100%;
-  height: ${COMPACT_GRID_PANEL_HEIGHT}px;
+  height: ${COMPACT_PANEL_HEIGHT}px;
   display: flex;
   min-height: 0;
   border-top: 1px solid var(--color-border-primary);
@@ -90,12 +91,16 @@ const StyledCompactGridPanel = styled.div`
   }
 `;
 
+const StyledCompactMenuPanel = styled(StyledCompactGridPanel)`
+  background-color: var(--color-bg-primary);
+`;
+
 const StyledNormalGridOverlay = styled.div`
   position: absolute;
   left: 0;
   right: 0;
   bottom: 100%;
-  height: ${COMPACT_GRID_PANEL_HEIGHT}px;
+  height: ${COMPACT_PANEL_HEIGHT}px;
   display: flex;
   border: 1px solid var(--color-border-primary);
   border-bottom: none;
@@ -207,7 +212,7 @@ const StyledActionsTaskButton = styled(StyledTaskButton)`
   }
 `;
 
-const StyledActionsMenu = styled.div<{ compact?: boolean }>`
+const StyledActionsMenu = styled.div<{ $compactPanel?: boolean }>`
   position: absolute;
   right: 0.8rem;
   bottom: calc(100% + 0.2rem);
@@ -223,15 +228,17 @@ const StyledActionsMenu = styled.div<{ compact?: boolean }>`
   ${StyledScrollbar};
 
   ${(p) =>
-    p.compact &&
+    p.$compactPanel &&
     `
-      position: fixed;
-      left: 0.8rem;
-      right: 0.8rem;
-      bottom: 3.2rem;
+      position: static;
+      width: 100%;
+      height: 100%;
       min-width: 0;
-      max-height: min(24rem, calc(100vh - 4rem));
-      z-index: 180;
+      max-height: none;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      z-index: auto;
     `}
 `;
 
@@ -295,14 +302,14 @@ const StyledDropdown = styled.div`
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   }
 
-  &.compact {
-    position: fixed;
-    top: 0.8rem;
-    right: 0.8rem;
-    bottom: 3.2rem;
-    left: 0.8rem;
+  &.compact-panel {
+    position: static;
+    width: 100%;
+    height: 100%;
     max-height: none;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
   }
 `;
 
@@ -376,6 +383,12 @@ const StyledDropdownEmpty = styled.div`
 `;
 
 const StyledNoTask = styled.span`
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   font-size: 1.1rem;
   color: var(--color-body-text);
   font-style: italic;
@@ -451,6 +464,8 @@ const CompactTaskDisplay: React.FC = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const actionMenuRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const compactPanelExpandedRef = useRef(false);
+  const previousCompactModeRef = useRef(compactMode);
   const consumedSelectionNavigationKeyRef = useRef<string | null>(null);
 
   const activeTaskSelection = useMemo(
@@ -504,7 +519,7 @@ const CompactTaskDisplay: React.FC = () => {
         invokeConnector.send(channel);
       } catch (error) {
         console.error(
-          "[CompactGrid] Failed to send resize event.",
+          "[CompactTaskDisplay] Failed to send resize event.",
           error
         );
       }
@@ -512,20 +527,19 @@ const CompactTaskDisplay: React.FC = () => {
     []
   );
 
-  const collapseCompactGrid = useCallback(() => {
-    if (!showGrid) return;
-    setShowGrid(false);
-    sendCompactResizeEvent(COMPACT_COLLAPSE);
-  }, [sendCompactResizeEvent, showGrid]);
+  const expandCompactPanel = useCallback(() => {
+    if (!compactMode || compactPanelExpandedRef.current) {
+      return;
+    }
+
+    compactPanelExpandedRef.current = true;
+    sendCompactResizeEvent(COMPACT_EXPAND);
+  }, [compactMode, sendCompactResizeEvent]);
 
   const closeGrid = useCallback(() => {
     if (!showGrid) return;
-    if (compactMode) {
-      collapseCompactGrid();
-    } else {
-      setShowGrid(false);
-    }
-  }, [compactMode, collapseCompactGrid, showGrid]);
+    setShowGrid(false);
+  }, [showGrid]);
 
   // Consume selection sent by grid navigation (Tasks -> Timer) exactly once per location key.
   useEffect(() => {
@@ -633,37 +647,74 @@ const CompactTaskDisplay: React.FC = () => {
     setDropdownDirection("upward");
   }, [showDropdown, compactMode]);
 
-  // Close grid on mode transition (compact <-> normal)
+  // Close task panels on mode transition (compact <-> normal)
   useEffect(() => {
     setShowGrid(false);
+    setShowDropdown(false);
+    setShowActions(false);
   }, [compactMode]);
 
-  // Close grid when prompt appears or tasks become empty
   useEffect(() => {
-    if ((showPrompt || tasks.length === 0) && showGrid) {
-      closeGrid();
+    const compactModeChanged =
+      previousCompactModeRef.current !== compactMode;
+    previousCompactModeRef.current = compactMode;
+
+    if (compactModeChanged) {
+      compactPanelExpandedRef.current = false;
+      return;
     }
-  }, [closeGrid, showGrid, showPrompt, tasks.length]);
+
+    const isCompactPanelOpen =
+      compactMode && (showGrid || showDropdown || showActions);
+    const wasCompactPanelOpen = compactPanelExpandedRef.current;
+
+    if (isCompactPanelOpen && !wasCompactPanelOpen) {
+      sendCompactResizeEvent(COMPACT_EXPAND);
+    }
+
+    if (!isCompactPanelOpen && wasCompactPanelOpen && compactMode) {
+      sendCompactResizeEvent(COMPACT_COLLAPSE);
+    }
+
+    compactPanelExpandedRef.current = isCompactPanelOpen;
+  }, [
+    compactMode,
+    sendCompactResizeEvent,
+    showActions,
+    showDropdown,
+    showGrid,
+  ]);
+
+  // Close task panels when prompt appears or tasks become empty
+  useEffect(() => {
+    if (showPrompt || tasks.length === 0) {
+      setShowGrid(false);
+      setShowDropdown(false);
+      setShowActions(false);
+    }
+  }, [showPrompt, tasks.length]);
 
   // Let the focus extension prompt own the compact expansion size.
   useEffect(() => {
-    if (!shouldPromptFocusExtension || !showGrid) {
+    const hasOpenPanel = showGrid || showDropdown || showActions;
+
+    if (!shouldPromptFocusExtension || !hasOpenPanel) {
       return;
     }
 
     setShowGrid(false);
     setShowDropdown(false);
     setShowActions(false);
-  }, [shouldPromptFocusExtension, showGrid]);
+  }, [shouldPromptFocusExtension, showActions, showDropdown, showGrid]);
 
-  // On unmount, collapse compact window if grid was open
+  // On unmount, collapse compact window if any task panel was open.
   useEffect(() => {
     return () => {
-      if (showGrid && compactMode) {
+      if (compactPanelExpandedRef.current) {
         sendCompactResizeEvent(COMPACT_COLLAPSE);
       }
     };
-  }, [sendCompactResizeEvent, showGrid, compactMode]);
+  }, [sendCompactResizeEvent]);
 
   const handleDone = () => {
     if (!currentTask || !displayList) {
@@ -796,6 +847,7 @@ const CompactTaskDisplay: React.FC = () => {
   };
 
   const handleOpenPriorityList = () => {
+    expandCompactPanel();
     closeGrid();
     setShowActions(false);
     setShowDropdown(true);
@@ -810,20 +862,22 @@ const CompactTaskDisplay: React.FC = () => {
       return;
     }
 
+    expandCompactPanel();
     setShowGrid(true);
-    if (compactMode) {
-      sendCompactResizeEvent(COMPACT_EXPAND);
-    }
   };
 
   const handleActionsButtonClick = () => {
     closeGrid();
     if (!currentTask) {
       setShowActions(false);
+      expandCompactPanel();
       setShowDropdown(true);
       return;
     }
     setShowDropdown(false);
+    if (!showActions) {
+      expandCompactPanel();
+    }
     setShowActions((prev) => !prev);
   };
 
@@ -860,6 +914,84 @@ const CompactTaskDisplay: React.FC = () => {
     closeGrid();
   };
 
+  const renderActionsMenu = (compactPanel = false) => (
+    <StyledActionsMenu ref={actionMenuRef} $compactPanel={compactPanel}>
+      <StyledActionsMenuHeader>
+        {t("tasks.actions")}
+      </StyledActionsMenuHeader>
+      <StyledActionsMenuItem
+        variant="neutral"
+        onClick={handleOpenPriorityList}
+      >
+        {t("tasks.priorityList")}
+      </StyledActionsMenuItem>
+      {currentTask ? (
+        <>
+          <StyledActionsMenuItem variant="done" onClick={handleDone}>
+            {t("tasks.done")}
+          </StyledActionsMenuItem>
+          <StyledActionsMenuItem variant="skip" onClick={handleSkip}>
+            {t("tasks.skip")}
+          </StyledActionsMenuItem>
+          <StyledActionsMenuItem
+            variant="delete"
+            onClick={handleDelete}
+          >
+            {t("tasks.delete")}
+          </StyledActionsMenuItem>
+        </>
+      ) : null}
+    </StyledActionsMenu>
+  );
+
+  const renderPriorityDropdown = (compactPanel = false) => (
+    <StyledDropdown
+      className={compactPanel ? "compact-panel" : dropdownDirection}
+      ref={dropdownRef}
+    >
+      {tasks.map((list) => {
+        const notDoneCards = list.cards.filter((c) => !c.done);
+        const hasPendingTask = notDoneCards.length > 0;
+
+        return (
+          <StyledDropdownGroup key={list._id}>
+            <StyledDropdownGroupTitleButton
+              $active={displayList?._id === list._id}
+              disabled={!hasPendingTask}
+              onClick={() => handleSelectList(list)}
+              title={
+                hasPendingTask ? undefined : t("tasks.noPendingTasks")
+              }
+            >
+              <StyledDropdownGroupTitle>
+                {list.title}
+              </StyledDropdownGroupTitle>
+            </StyledDropdownGroupTitleButton>
+
+            {notDoneCards.length ? (
+              notDoneCards.map((card) => (
+                <StyledDropdownItem
+                  key={card._id}
+                  $active={
+                    currentTask?._id === card._id &&
+                    displayList?._id === list._id
+                  }
+                  onClick={() => handleSelect(list, card)}
+                >
+                  {card.text}
+                </StyledDropdownItem>
+              ))
+            ) : (
+              <StyledDropdownEmpty>
+                {t("tasks.noPendingTasks")}
+              </StyledDropdownEmpty>
+            )}
+          </StyledDropdownGroup>
+        );
+      })}
+    </StyledDropdown>
+  );
+
   if (showPrompt && currentTask) {
     return (
       <StyledPromptContainer>
@@ -889,98 +1021,16 @@ const CompactTaskDisplay: React.FC = () => {
   return (
     <StyledCompactTaskBlock ref={containerRef}>
       <StyledCompactTask>
-        {showActions ? (
-          <StyledActionsMenu ref={actionMenuRef} compact={compactMode}>
-            <StyledActionsMenuHeader>
-              {t("tasks.actions")}
-            </StyledActionsMenuHeader>
-            <StyledActionsMenuItem
-              variant="neutral"
-              onClick={handleOpenPriorityList}
-            >
-              {t("tasks.priorityList")}
-            </StyledActionsMenuItem>
-            {currentTask ? (
-              <>
-                <StyledActionsMenuItem
-                  variant="done"
-                  onClick={handleDone}
-                >
-                  {t("tasks.done")}
-                </StyledActionsMenuItem>
-                <StyledActionsMenuItem
-                  variant="skip"
-                  onClick={handleSkip}
-                >
-                  {t("tasks.skip")}
-                </StyledActionsMenuItem>
-                <StyledActionsMenuItem
-                  variant="delete"
-                  onClick={handleDelete}
-                >
-                  {t("tasks.delete")}
-                </StyledActionsMenuItem>
-              </>
-            ) : null}
-          </StyledActionsMenu>
-        ) : null}
-
-        {showDropdown && (
-          <StyledDropdown
-            className={`${dropdownDirection} ${
-              compactMode ? "compact" : ""
-            }`}
-            ref={dropdownRef}
-          >
-            {tasks.map((list) => {
-              const notDoneCards = list.cards.filter((c) => !c.done);
-              const hasPendingTask = notDoneCards.length > 0;
-
-              return (
-                <StyledDropdownGroup key={list._id}>
-                  <StyledDropdownGroupTitleButton
-                    $active={displayList?._id === list._id}
-                    disabled={!hasPendingTask}
-                    onClick={() => handleSelectList(list)}
-                    title={
-                      hasPendingTask
-                        ? undefined
-                        : t("tasks.noPendingTasks")
-                    }
-                  >
-                    <StyledDropdownGroupTitle>
-                      {list.title}
-                    </StyledDropdownGroupTitle>
-                  </StyledDropdownGroupTitleButton>
-
-                  {notDoneCards.length ? (
-                    notDoneCards.map((card) => (
-                      <StyledDropdownItem
-                        key={card._id}
-                        $active={
-                          currentTask?._id === card._id &&
-                          displayList?._id === list._id
-                        }
-                        onClick={() => handleSelect(list, card)}
-                      >
-                        {card.text}
-                      </StyledDropdownItem>
-                    ))
-                  ) : (
-                    <StyledDropdownEmpty>
-                      {t("tasks.noPendingTasks")}
-                    </StyledDropdownEmpty>
-                  )}
-                </StyledDropdownGroup>
-              );
-            })}
-          </StyledDropdown>
-        )}
+        {showActions && !compactMode ? renderActionsMenu() : null}
+        {showDropdown && !compactMode ? renderPriorityDropdown() : null}
 
         <StyledTaskClickable
           onClick={() => {
             closeGrid();
             setShowActions(false);
+            if (!showDropdown) {
+              expandCompactPanel();
+            }
             setShowDropdown(!showDropdown);
           }}
         >
@@ -1016,6 +1066,18 @@ const CompactTaskDisplay: React.FC = () => {
           </StyledNormalGridOverlay>
         ) : null}
       </StyledCompactTask>
+
+      {compactMode && showActions ? (
+        <StyledCompactMenuPanel>
+          {renderActionsMenu(true)}
+        </StyledCompactMenuPanel>
+      ) : null}
+
+      {compactMode && showDropdown ? (
+        <StyledCompactMenuPanel>
+          {renderPriorityDropdown(true)}
+        </StyledCompactMenuPanel>
+      ) : null}
 
       {compactMode && showGrid ? (
         <StyledCompactGridPanel>

@@ -25,35 +25,35 @@ Atualizar este arquivo ao final de cada fase grande, correcao operacional releva
 
 ## Ponto atual
 
-- Ultimo commit conhecido: `0390704 fix(timer): restore compact clock visibility`.
-- Versao atual publicada: `v26.5.2`.
-- Trabalho atual: correcao complementar do Timer compacto apos o prompt `Continuar/Trocar`; o relogio ganhava espaco, mas podia sumir porque o container compacto ainda podia ocultar o conteudo do contador.
-- Estado do repositorio: alterado apenas em `src/styles/routes/timer/counter.ts` para manter altura/overflow estaveis no contador compacto.
+- Ultimo commit conhecido: `3278741 chore(release): v26.5.3`.
+- Versao atual publicada: `v26.5.3`.
+- Trabalho atual: correcao dos menus de tarefa do Timer; no modo normal, grid/acoes voltaram a abrir acima do rodape sem recorte; no modo compacto, acoes e lista de prioridade agora abrem como painel expandido abaixo do rodape, igual ao grid. A expansao compacta voltou a ser disparada no clique antes de renderizar o painel, evitando compressao temporaria do relogio/controles durante o resize nativo.
+- Estado do repositorio: alterado em `src/routes/Timer/CompactTaskDisplay.tsx`, `CHANGELOG.md`, `CHANGELOG.pt.md`, `package.json`, `pnpm-lock.yaml` e este `RETOMADA.md`.
 
 ---
 
 ## Intencao de ajuste agora
 
-Correcao visual do Timer compacto concluida e validada; proximo passo e revisar/commitar o diff.
+Correcao visual dos menus de tarefa do Timer concluida e validada; proximo passo e revisar/commitar o diff.
 
 ---
 
 ## Validado
 
-- Reproducao visual em Vite/browser com viewport compacto `340x100`: horario inteiro visivel no footer normal e no prompt `Continuar/Trocar`.
-- Reproducao visual em Vite/browser com titlebar customizada (`340x140`): horario compacto inteiro visivel no prompt `Continuar/Trocar` e rodape permanece no fundo.
+- Reproducao visual em Vite/browser com viewport normal `340x508`: botao de grid abre o painel acima do rodape sem recorte.
+- Reproducao visual em Vite/browser com viewport normal `340x508`: botao de acoes abre o menu acima do rodape sem recorte.
+- Reproducao visual em Vite/browser no modo compacto: botao de acoes abre painel abaixo do rodape.
+- Reproducao visual em Vite/browser no modo compacto: acao `Lista de prioridade` troca para painel abaixo do rodape.
+- Reproducao visual em Vite/browser no modo compacto: botao de grid continua abrindo painel abaixo do rodape.
 - `pnpm lint` passa sem erros.
 - `pnpm typecheck:renderer` passa.
 - `pnpm build:renderer` gera assets sem erros.
-- Scrollbar visivelmente padronizada (fix `0c9521f`).
-- Validacao de changelog por script funcional (fixes `5516ca1`, `e8f2fd5`).
-- v26.5.2 publicada e anotada no CHANGELOG (ambos PT e EN).
 
 ---
 
 ## Estado pendente
 
-- Nenhum item critico aberto no momento; pendente apenas revisar/commitar a correcao complementar.
+- Nenhum item critico aberto no momento; pendente apenas revisar/commitar a correcao.
 - Consultar `docs/IMPROVEMENTS.md` para o roadmap de features e melhorias tecnicas pendentes.
 
 ---
@@ -61,5 +61,5 @@ Correcao visual do Timer compacto concluida e validada; proximo passo e revisar/
 ## Retomar
 
 1. Revisar `git status --short` e `git log --oneline -5`.
-2. Conferir o diff complementar em `src/styles/routes/timer/counter.ts`.
+2. Conferir o diff em `src/routes/Timer/CompactTaskDisplay.tsx`, `CHANGELOG.md`, `CHANGELOG.pt.md`, `package.json`, `pnpm-lock.yaml` e `RETOMADA.md`.
 3. Preparar commit convencional sugerido para a correcao.

@@ -6,6 +6,16 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.5.4] - TBD
+
+### Fixed
+
+- **Timer task controls open in the right direction for each window mode** — normal mode task overlays open above the footer without clipping, and compact mode task actions and priority lists now open in the expanded panel below the footer like the task grid.
+
+### Changed
+
+- **Dependencies were updated in a package refresh** — no functional behavior change is intended.
+
 ## [26.5.3] - 2026-05-05
 
 ### Fixed
