@@ -25,16 +25,17 @@ Atualizar este arquivo ao final de cada fase grande, correcao operacional releva
 
 ## Ponto atual
 
-- Ultimo commit conhecido: `6dd5120 fix(timer): prevent compact panel resize jitter`.
+- Ultimo commit conhecido: `9a07b85 fix(tasks): use existing border for active grid task`.
 - Versao atual publicada: `v26.5.3`.
-- Trabalho atual: correcao dos menus de tarefa do Timer e polimento do destaque da tarefa ativa no grid. No modo normal, grid/acoes voltaram a abrir acima do rodape sem recorte; no modo compacto, acoes abre como painel expandido mais curto abaixo do rodape, enquanto grid/lista de prioridade usam o painel mais alto. O destaque da tarefa em execucao no grid agora altera apenas a cor da borda existente do cartao, sem halo ou sombra extra, no grid normal e compacto.
-- Estado do repositorio: alterado em `src/routes/Timer/CompactTaskDisplay.tsx`, `src/routes/Tasks/TaskListGrid.styles.ts`, `src/ipc/index.ts`, `src/contexts/connectors/TauriInvokeConnector.ts`, `src-tauri/src/commands/window_bridge.rs`, `src-tauri/src/lib.rs`, `CHANGELOG.md`, `CHANGELOG.pt.md` e este `RETOMADA.md`.
+- Trabalho da `26.5.4`: correcao dos menus de tarefa do Timer e polimento do destaque da tarefa ativa no grid ja commitados em `f39b12f` e `9a07b85`.
+- Tentativa de release `26.5.4` falhou no preflight local em `cargo fmt --all -- --check`, por formatacao do bloco `use commands::window_bridge` em `src-tauri/src/lib.rs`.
+- Estado do repositorio: alterado apenas para corrigir a formatacao Rust do gate de release e atualizar este handoff.
 
 ---
 
 ## Intencao de ajuste agora
 
-Correcao visual dos menus de tarefa do Timer e do destaque ativo no grid concluida e validada; changelogs da `26.5.4` datados em `2026-05-06`; proximo passo e revisar/commitar o diff.
+Desbloquear o `release.sh` da `26.5.4`: `cargo fmt --all` aplicado, preflight local validado, proximo passo e revisar/commitar este ajuste operacional e rerodar `./scripts/release.sh 26.5.4`.
 
 ---
 
@@ -50,12 +51,14 @@ Correcao visual dos menus de tarefa do Timer e do destaque ativo no grid conclui
 - `pnpm typecheck:renderer` passa.
 - `pnpm build:renderer` gera assets sem erros.
 - `cargo check --manifest-path src-tauri/Cargo.toml` passa sem erros.
+- `./scripts/validar-tudo.sh --skip-install` passa apos aplicar `cargo fmt --all`; inclui lint, typecheck, Vitest, Rust `fmt + clippy + check` e build Tauri release sem bundle.
 
 ---
 
 ## Estado pendente
 
-- Nenhum item critico aberto no momento; pendente apenas revisar/commitar a correcao.
+- Pendente revisar/commitar `src-tauri/src/lib.rs` e `RETOMADA.md`.
+- Depois do commit, rerodar `./scripts/release.sh 26.5.4`.
 - Consultar `docs/IMPROVEMENTS.md` para o roadmap de features e melhorias tecnicas pendentes.
 
 ---
@@ -63,5 +66,5 @@ Correcao visual dos menus de tarefa do Timer e do destaque ativo no grid conclui
 ## Retomar
 
 1. Revisar `git status --short` e `git log --oneline -5`.
-2. Conferir o diff em `src/routes/Timer/CompactTaskDisplay.tsx`, `src/routes/Tasks/TaskListGrid.styles.ts`, `src/ipc/index.ts`, `src/contexts/connectors/TauriInvokeConnector.ts`, `src-tauri/src/commands/window_bridge.rs`, `src-tauri/src/lib.rs`, `CHANGELOG.md`, `CHANGELOG.pt.md` e `RETOMADA.md`.
-3. Preparar commit convencional sugerido para a correcao.
+2. Conferir o diff em `src-tauri/src/lib.rs` e `RETOMADA.md`.
+3. Commitar o ajuste operacional e executar novamente `./scripts/release.sh 26.5.4`.
