@@ -27,7 +27,7 @@ Atualizar este arquivo ao final de cada fase grande, correcao operacional releva
 
 - Ultimo commit conhecido: `6dd5120 fix(timer): prevent compact panel resize jitter`.
 - Versao atual publicada: `v26.5.3`.
-- Trabalho atual: correcao dos menus de tarefa do Timer e polimento do destaque da tarefa ativa no grid. No modo normal, grid/acoes voltaram a abrir acima do rodape sem recorte; no modo compacto, acoes abre como painel expandido mais curto abaixo do rodape, enquanto grid/lista de prioridade usam o painel mais alto. O destaque da tarefa em execucao no grid agora usa halo mais fino e sem sombra extra no grid normal e compacto.
+- Trabalho atual: correcao dos menus de tarefa do Timer e polimento do destaque da tarefa ativa no grid. No modo normal, grid/acoes voltaram a abrir acima do rodape sem recorte; no modo compacto, acoes abre como painel expandido mais curto abaixo do rodape, enquanto grid/lista de prioridade usam o painel mais alto. O destaque da tarefa em execucao no grid agora altera apenas a cor da borda existente do cartao, sem halo ou sombra extra, no grid normal e compacto.
 - Estado do repositorio: alterado em `src/routes/Timer/CompactTaskDisplay.tsx`, `src/routes/Tasks/TaskListGrid.styles.ts`, `src/ipc/index.ts`, `src/contexts/connectors/TauriInvokeConnector.ts`, `src-tauri/src/commands/window_bridge.rs`, `src-tauri/src/lib.rs`, `CHANGELOG.md`, `CHANGELOG.pt.md` e este `RETOMADA.md`.
 
 ---

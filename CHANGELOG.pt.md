@@ -11,7 +11,7 @@
 ### Corrigido
 
 - **Controles de tarefa do Timer abrem na direção correta em cada modo de janela** — no modo normal, os overlays de tarefa abrem acima do rodapé sem recorte; no modo compacto, ações de tarefa usam um painel expandido mais curto abaixo do rodapé, e listas de prioridade continuam usando o painel mais alto do grid quando mais espaço é útil.
-- **Destaque da tarefa ativa no grid ficou mais sutil** — o marcador da tarefa em execução agora usa um halo mais fino e leve, sem a sombra extra, tanto no grid padrão quanto no grid compacto.
+- **Destaque da tarefa ativa no grid ficou mais sutil** — o marcador da tarefa em execução agora muda apenas a cor da borda existente do cartão, sem adicionar halo extra ou sombra, tanto no grid padrão quanto no grid compacto.
 
 ### Alterado
 
