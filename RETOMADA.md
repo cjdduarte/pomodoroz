@@ -33,14 +33,16 @@ Atualizar este arquivo ao final de cada fase grande, correcao operacional releva
 - O combo de periodo agora fica dentro do cabecalho `Relatorio do periodo`; os cartoes de tempo de foco, pausa, ocioso e ciclos completos continuam visiveis antes do bloco de progresso.
 - O bloco de progresso usa historico local para sequencia, nivel/XP, meta de hoje, marcos explicitos, heatmap de 30 dias e barras dos ultimos 7 dias.
 - Correcoes pos-review locais: janelas de semana/mes alinhadas a dias locais, fluxo diario em ordem cronologica para periodos fixos, atualizacao periodica do "agora" na tela aberta, remocao da chave i18n morta `byTaskList`, remocao dos artefatos `.playwright-mcp/*` e `statistics-period-progress.png`, e ignore de `.playwright-mcp/`.
-- Nao foram adicionadas dependencias nem novos campos de storage.
+- Updates locais aplicados: pnpm `11.0.9`, deps JS/TS patch/minor selecionadas, `lint-staged` `17.0.4`, `tauri` `2.11.1` e `tauri-build` `2.6.1`.
+- `scripts/check-updates.sh` ajustado para preparar todos os pins Rust selecionados no `Cargo.toml` antes de rodar `cargo update`, evitando conflito transitorio em pares com pin exato.
+- Nao foram adicionadas novas dependencias nem novos campos de storage.
 - `CHANGELOG.md` e `CHANGELOG.pt.md` ja registram a mudanca em `26.5.6` como `TBD` / `A definir`.
 
 ---
 
 ## Intencao de ajuste agora
 
-Revisar visualmente a tela de Relatorio no app desktop e commitar o incremento corretivo da `26.5.6` se o layout estiver adequado.
+Revisar visualmente a tela de Relatorio no app desktop e separar commits pequenos: correcoes de Relatorio, tooling/deps, e ajuste do verificador de updates.
 
 ---
 
@@ -55,6 +57,8 @@ Revisar visualmente a tela de Relatorio no app desktop e commitar o incremento c
 - `pnpm typecheck:renderer` passa apos as correcoes pos-review da tela de Relatorio.
 - `pnpm test:run` passa apos as correcoes pos-review da tela de Relatorio.
 - `pnpm build:renderer` passa apos as correcoes pos-review da tela de Relatorio.
+- Apos updates de deps, `pnpm lint`, `pnpm typecheck:renderer`, `pnpm test:run`, `pnpm build:renderer` e `cargo check --manifest-path src-tauri/Cargo.toml` passam.
+- `sh -n scripts/check-updates.sh` passa apos o ajuste do fluxo Rust.
 - Smoke visual anterior via Vite/browser ficou limitado por modal de atualizacao e aviso de IPC fora do runtime Tauri; nao substitui a validacao desktop.
 
 ---
@@ -62,7 +66,7 @@ Revisar visualmente a tela de Relatorio no app desktop e commitar o incremento c
 ## Estado pendente
 
 - Pendente validacao visual/manual da tela de Relatorio no desktop.
-- Pendente commitar as correcoes pos-review da `26.5.6`.
+- Pendente commitar as correcoes pos-review da `26.5.6` em blocos separados.
 
 ---
 
@@ -71,4 +75,4 @@ Revisar visualmente a tela de Relatorio no app desktop e commitar o incremento c
 1. Revisar `git status --short`.
 2. Abrir o app e validar a tela de Relatorio com historico real.
 3. Se necessario, ajustar espacamento/rotulos do resumo gamificado.
-4. Commitar as correcoes com mensagem Conventional Commits em ingles.
+4. Commitar as correcoes em mensagens Conventional Commits em ingles.

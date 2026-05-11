@@ -1367,6 +1367,16 @@ run_rust_updates_for_selected() {
   local -n __rows=$2
   local row ws crate current compat target update_kind
 
+  echo "  Preparando Cargo.toml para os updates Rust selecionados..."
+  for row in "${__rows[@]}"; do
+    IFS=$'\t' read -r ws crate current compat target update_kind <<< "$row"
+    if [ -z "$crate" ] || [ -z "$target" ]; then
+      continue
+    fi
+
+    update_cargo_manifest_dependency_version "$tauri_dir" "$crate" "$target"
+  done
+
   for row in "${__rows[@]}"; do
     IFS=$'\t' read -r ws crate current compat target update_kind <<< "$row"
     if [ -z "$crate" ] || [ -z "$target" ]; then
@@ -1374,7 +1384,6 @@ run_rust_updates_for_selected() {
     fi
 
     echo "  -> [$ws] cargo update -p $crate --precise $target"
-    update_cargo_manifest_dependency_version "$tauri_dir" "$crate" "$target"
     local status=0
     set +e
     (
