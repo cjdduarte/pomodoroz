@@ -23,4 +23,5 @@ yarn-error.log*
 /lerna-debug.log
 /release/
 .claude/
+.playwright-mcp/
 /logs/

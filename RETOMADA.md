@@ -25,13 +25,14 @@ Atualizar este arquivo ao final de cada fase grande, correcao operacional releva
 
 ## Ponto atual
 
-- Ultimo commit conhecido: `170a55a chore(release): v26.5.5`.
+- Ultimo commit conhecido: `9d26df6 feat(statistics): separate period report from progress overview`.
 - Versao atual publicada: `v26.5.5`.
 - A correcao da pausa em tela cheia no Tauri foi finalizada, commitada e tagueada em `v26.5.5`.
 - `CHANGELOG.md` e `CHANGELOG.pt.md` registram a versao `26.5.5` com data `2026-05-06`.
 - Trabalho local da `26.5.6`: tela de Relatorio reorganizada para separar metricas filtradas por periodo de progresso de longo prazo.
 - O combo de periodo agora fica dentro do cabecalho `Relatorio do periodo`; os cartoes de tempo de foco, pausa, ocioso e ciclos completos continuam visiveis antes do bloco de progresso.
 - O bloco de progresso usa historico local para sequencia, nivel/XP, meta de hoje, marcos explicitos, heatmap de 30 dias e barras dos ultimos 7 dias.
+- Correcoes pos-review locais: janelas de semana/mes alinhadas a dias locais, fluxo diario em ordem cronologica para periodos fixos, atualizacao periodica do "agora" na tela aberta, remocao da chave i18n morta `byTaskList`, remocao dos artefatos `.playwright-mcp/*` e `statistics-period-progress.png`, e ignore de `.playwright-mcp/`.
 - Nao foram adicionadas dependencias nem novos campos de storage.
 - `CHANGELOG.md` e `CHANGELOG.pt.md` ja registram a mudanca em `26.5.6` como `TBD` / `A definir`.
 
@@ -39,7 +40,7 @@ Atualizar este arquivo ao final de cada fase grande, correcao operacional releva
 
 ## Intencao de ajuste agora
 
-Revisar visualmente a tela de Relatorio no app desktop e commitar o incremento `26.5.6` se o layout estiver adequado.
+Revisar visualmente a tela de Relatorio no app desktop e commitar o incremento corretivo da `26.5.6` se o layout estiver adequado.
 
 ---
 
@@ -50,17 +51,18 @@ Revisar visualmente a tela de Relatorio no app desktop e commitar o incremento `
 - `./scripts/validar-tudo.sh --skip-install` passa; inclui lint, typecheck, Vitest, Rust `fmt + clippy + check` e build Tauri release sem bundle.
 - Validacao manual confirmada: pausa em tela cheia volta para frente quando a janela esta visivel atras de outros apps.
 - Release `v26.5.5` criada no commit `170a55a`.
-- `pnpm lint` passa apos a separacao entre Relatorio do periodo e Progresso.
-- `pnpm typecheck:renderer` passa apos a separacao entre Relatorio do periodo e Progresso.
-- `pnpm build:renderer` passa apos a separacao entre Relatorio do periodo e Progresso.
-- Smoke visual via Vite/browser em `#/statistics` confirmou o combo dentro de `Relatorio do periodo` e o bloco `Progresso` separado; avisos de IPC eram esperados fora do runtime Tauri.
+- `pnpm lint` passa apos as correcoes pos-review da tela de Relatorio.
+- `pnpm typecheck:renderer` passa apos as correcoes pos-review da tela de Relatorio.
+- `pnpm test:run` passa apos as correcoes pos-review da tela de Relatorio.
+- `pnpm build:renderer` passa apos as correcoes pos-review da tela de Relatorio.
+- Smoke visual anterior via Vite/browser ficou limitado por modal de atualizacao e aviso de IPC fora do runtime Tauri; nao substitui a validacao desktop.
 
 ---
 
 ## Estado pendente
 
 - Pendente validacao visual/manual da tela de Relatorio no desktop.
-- Pendente commitar a mudanca da `26.5.6`.
+- Pendente commitar as correcoes pos-review da `26.5.6`.
 
 ---
 
@@ -69,4 +71,4 @@ Revisar visualmente a tela de Relatorio no app desktop e commitar o incremento `
 1. Revisar `git status --short`.
 2. Abrir o app e validar a tela de Relatorio com historico real.
 3. Se necessario, ajustar espacamento/rotulos do resumo gamificado.
-4. Commitar com mensagem Conventional Commits em ingles.
+4. Commitar as correcoes com mensagem Conventional Commits em ingles.

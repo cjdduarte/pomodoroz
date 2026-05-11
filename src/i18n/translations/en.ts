@@ -232,7 +232,6 @@ export const en = {
     idleTime: "Idle time",
     completedCycles: "Completed cycles",
     dailyFlow: "Daily flow",
-    byTaskList: "By list/task",
     periodReport: "Period report",
     progressOverview: "Progress",
     streak: "Streak",

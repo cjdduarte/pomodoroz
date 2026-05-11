@@ -235,7 +235,6 @@ export const de = {
     idleTime: "Leerlaufzeit",
     completedCycles: "Abgeschlossene Zyklen",
     dailyFlow: "Tagesverlauf",
-    byTaskList: "Nach Liste/Aufgabe",
     periodReport: "Zeitraumbericht",
     progressOverview: "Fortschritt",
     streak: "Serie",

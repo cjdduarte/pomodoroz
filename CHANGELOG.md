@@ -15,6 +15,7 @@
 ### Changed
 
 - **Period selector is scoped to the report section** — the period dropdown now sits inside the period report header, and the objective metric cards remain visible before the progress section to avoid mixing filtered report data with fixed-range habit data.
+- **Daily report windows now align with calendar days** — week and month report data use the same local-day range as the daily flow chart, and the daily flow bars now read oldest to newest for fixed period windows.
 
 ## [26.5.5] - 2026-05-06
 

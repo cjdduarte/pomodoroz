@@ -232,7 +232,6 @@ export const pt = {
     idleTime: "Tempo ocioso",
     completedCycles: "Ciclos completos",
     dailyFlow: "Fluxo diário",
-    byTaskList: "Por lista/tarefa",
     periodReport: "Relatório do período",
     progressOverview: "Progresso",
     streak: "Sequência",

@@ -70,6 +70,7 @@ type DailyTotals = {
 const DAY_MS = 24 * 60 * 60 * 1000;
 const HEATMAP_DAYS = 30;
 const WEEK_DAYS = 7;
+const MONTH_DAYS = 30;
 const TOP_FOCUS_LIMIT = 5;
 const XP_PER_LEVEL = 500;
 
@@ -90,14 +91,21 @@ const toDateKey = (timestamp: number): string => {
 const getTodayStart = (now: Date): number =>
   new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
 
+const getDateStartDaysAgo = (now: Date, daysAgo: number): number =>
+  new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate() - daysAgo
+  ).getTime();
+
 const getPeriodStart = (period: PeriodFilter, now: Date): number => {
   switch (period) {
     case "today":
       return getTodayStart(now);
     case "week":
-      return now.getTime() - 7 * DAY_MS;
+      return getDateStartDaysAgo(now, WEEK_DAYS - 1);
     case "month":
-      return now.getTime() - 30 * DAY_MS;
+      return getDateStartDaysAgo(now, MONTH_DAYS - 1);
     default:
       return 0;
   }
@@ -212,7 +220,11 @@ const createNormalizedDailyRows = (
   const rows: DailyTotals[] = [];
 
   for (let index = days - 1; index >= 0; index -= 1) {
-    const date = new Date(now.getTime() - index * DAY_MS);
+    const date = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() - index
+    );
     const key = toDateKey(date.getTime());
     const existing = sessionsByDate.get(key);
 
@@ -284,7 +296,9 @@ export default function Statistics() {
   const [period, setPeriod] = useState<PeriodFilter>("today");
   const [clearRange, setClearRange] = useState<ClearRange>("all");
   const [isClearArmed, setIsClearArmed] = useState(false);
+  const [nowTimestamp, setNowTimestamp] = useState(() => Date.now());
   const locale = i18n.language || "en";
+  const now = useMemo(() => new Date(nowTimestamp), [nowTimestamp]);
 
   const allDailyRows = useMemo(
     () => createDailyRows(sessions, locale),
@@ -293,24 +307,13 @@ export default function Statistics() {
 
   const heatmapRows = useMemo(
     () =>
-      createNormalizedDailyRows(
-        sessions,
-        HEATMAP_DAYS,
-        new Date(),
-        locale
-      ),
-    [locale, sessions]
+      createNormalizedDailyRows(sessions, HEATMAP_DAYS, now, locale),
+    [locale, now, sessions]
   );
 
   const weekRows = useMemo(
-    () =>
-      createNormalizedDailyRows(
-        sessions,
-        WEEK_DAYS,
-        new Date(),
-        locale
-      ),
-    [locale, sessions]
+    () => createNormalizedDailyRows(sessions, WEEK_DAYS, now, locale),
+    [locale, now, sessions]
   );
 
   const progressSummary = useMemo(() => {
@@ -335,7 +338,6 @@ export default function Statistics() {
       );
     });
 
-    const now = new Date();
     const streak = getCurrentStreak(activeDateKeys, now);
     const totalXp =
       completedCycles * 40 +
@@ -383,15 +385,14 @@ export default function Statistics() {
       today,
       unlockedMilestones: unlockedMilestones.slice(-3),
     };
-  }, [allDailyRows, locale, sessionRounds, sessions]);
+  }, [allDailyRows, locale, now, sessionRounds, sessions]);
 
   const filteredSessions = useMemo(() => {
-    const now = new Date();
     const fromTimestamp = getPeriodStart(period, now);
     return sessions.filter(
       (session) => session.completedAt >= fromTimestamp
     );
-  }, [sessions, period]);
+  }, [sessions, period, now]);
 
   const summary = useMemo(() => {
     return filteredSessions.reduce(
@@ -470,7 +471,6 @@ export default function Statistics() {
   }, [filteredSessions, t]);
 
   const dailyRows = useMemo(() => {
-    const now = new Date();
     const rows = createDailyRows(filteredSessions, locale);
 
     if (period === "all") {
@@ -496,14 +496,14 @@ export default function Statistics() {
       return [today];
     }
 
-    const expectedDays = period === "week" ? 7 : 30;
+    const expectedDays = period === "week" ? WEEK_DAYS : MONTH_DAYS;
     return createNormalizedDailyRows(
       filteredSessions,
       expectedDays,
       now,
       locale
-    ).reverse();
-  }, [filteredSessions, locale, period, t]);
+    );
+  }, [filteredSessions, locale, now, period, t]);
 
   const clearableSessionsCount = useMemo(() => {
     if (!sessions.length) {
@@ -514,13 +514,23 @@ export default function Statistics() {
       return sessions.length;
     }
 
-    const now = Date.now();
+    const cutoffBase = nowTimestamp;
     const cutoff =
-      clearRange === "olderWeek" ? now - 7 * DAY_MS : now - 30 * DAY_MS;
+      clearRange === "olderWeek"
+        ? cutoffBase - 7 * DAY_MS
+        : cutoffBase - 30 * DAY_MS;
 
     return sessions.filter((session) => session.completedAt < cutoff)
       .length;
-  }, [clearRange, sessions]);
+  }, [clearRange, nowTimestamp, sessions]);
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setNowTimestamp(Date.now());
+    }, 60 * 1000);
+
+    return () => window.clearInterval(interval);
+  }, []);
 
   const topActivityRows = useMemo(
     () => activityRows.slice(0, TOP_FOCUS_LIMIT),
