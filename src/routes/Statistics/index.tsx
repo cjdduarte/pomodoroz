@@ -12,7 +12,6 @@ import {
 } from "store";
 import type { StatisticsSessionRecord } from "store";
 import { useAppDispatch, useAppSelector } from "hooks/storeHooks";
-import { Header } from "components";
 import {
   StyledButtonDanger,
   StyledSelect,
@@ -44,12 +43,9 @@ import {
   StyledStatisticsRows,
   StyledStatisticsRowValue,
   StyledStatisticsSection,
-  StyledStatisticsSectionHeader,
   StyledStatisticsSectionHeading,
   StyledStatisticsStackedBar,
   StyledStatisticsSummary,
-  StyledStatisticsToolbar,
-  StyledStatisticsToolbarLabel,
   StyledStatisticsWeekBar,
   StyledStatisticsWeekBars,
 } from "styles";
@@ -598,42 +594,29 @@ export default function Statistics() {
   ]);
 
   return (
-    <StyledStatistics>
-      <StyledStatisticsToolbar>
-        <Header heading={t("statistics.title")} />
-      </StyledStatisticsToolbar>
-
+    <StyledStatistics aria-label={t("statistics.title")}>
       <StyledStatisticsSection>
-        <StyledStatisticsSectionHeader>
-          <StyledStatisticsSectionHeading>
-            {t("statistics.periodReport")}
-          </StyledStatisticsSectionHeading>
-          <StyledStatisticsPeriodControl>
-            <StyledStatisticsToolbarLabel htmlFor="statistics-period">
-              {t("statistics.period")}
-            </StyledStatisticsToolbarLabel>
-            <StyledSelectWrapper>
-              <StyledSelect
-                id="statistics-period"
-                value={period}
-                onChange={(event) =>
-                  setPeriod(event.target.value as PeriodFilter)
-                }
-              >
-                <option value="today">
-                  {t("statistics.periodToday")}
-                </option>
-                <option value="week">
-                  {t("statistics.periodWeek")}
-                </option>
-                <option value="month">
-                  {t("statistics.periodMonth")}
-                </option>
-                <option value="all">{t("statistics.periodAll")}</option>
-              </StyledSelect>
-            </StyledSelectWrapper>
-          </StyledStatisticsPeriodControl>
-        </StyledStatisticsSectionHeader>
+        <StyledStatisticsPeriodControl>
+          <StyledSelectWrapper>
+            <StyledSelect
+              id="statistics-period"
+              aria-label={t("statistics.period")}
+              value={period}
+              onChange={(event) =>
+                setPeriod(event.target.value as PeriodFilter)
+              }
+            >
+              <option value="today">
+                {t("statistics.periodToday")}
+              </option>
+              <option value="week">{t("statistics.periodWeek")}</option>
+              <option value="month">
+                {t("statistics.periodMonth")}
+              </option>
+              <option value="all">{t("statistics.periodAll")}</option>
+            </StyledSelect>
+          </StyledSelectWrapper>
+        </StyledStatisticsPeriodControl>
 
         <StyledStatisticsSummary>
           <StyledStatisticsCard>

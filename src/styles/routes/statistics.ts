@@ -18,17 +18,6 @@ export const StyledStatistics = styled.main`
   ${StyledScrollbar};
 `;
 
-export const StyledStatisticsToolbar = styled.div`
-  margin-top: 1.6rem;
-  margin-bottom: 1.2rem;
-`;
-
-export const StyledStatisticsToolbarLabel = styled.label`
-  font-size: 1rem;
-  color: var(--color-disabled-text);
-  text-transform: uppercase;
-`;
-
 export const StyledStatisticsProgressPanel = styled.section`
   display: grid;
   gap: 1rem;
@@ -140,6 +129,10 @@ export const StyledStatisticsCardValue = styled.h4`
 
 export const StyledStatisticsSection = styled.section`
   margin-top: 1.6rem;
+
+  &:first-of-type {
+    margin-top: 1rem;
+  }
 `;
 
 export const StyledStatisticsSectionHeading = styled.h4`
@@ -151,25 +144,10 @@ export const StyledStatisticsSectionHeading = styled.h4`
   text-transform: uppercase;
 `;
 
-export const StyledStatisticsSectionHeader = styled.div`
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(10rem, 12rem);
-  align-items: end;
-  gap: 1rem;
-  margin-bottom: 1rem;
-
-  ${StyledStatisticsSectionHeading} {
-    margin-bottom: 0;
-  }
-
-  @media (max-width: 420px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
 export const StyledStatisticsPeriodControl = styled.div`
   display: grid;
-  gap: 0.4rem;
+  max-width: 100%;
+  margin-bottom: 1rem;
 `;
 
 export const StyledStatisticsHeatmap = styled.div`

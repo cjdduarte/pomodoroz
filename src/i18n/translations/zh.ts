@@ -223,7 +223,6 @@ export const zh = {
     idleTime: "空闲时间",
     completedCycles: "完成周期",
     dailyFlow: "每日流向",
-    periodReport: "摘要",
     progressOverview: "进度",
     streak: "连续记录",
     daySingular: "天",

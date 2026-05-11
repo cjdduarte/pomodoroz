@@ -232,7 +232,6 @@ export const ja = {
     idleTime: "アイドル時間",
     completedCycles: "完了サイクル",
     dailyFlow: "日別フロー",
-    periodReport: "概要",
     progressOverview: "進捗",
     streak: "連続記録",
     daySingular: "日",

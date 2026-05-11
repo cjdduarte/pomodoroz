@@ -232,7 +232,6 @@ export const en = {
     idleTime: "Idle time",
     completedCycles: "Completed cycles",
     dailyFlow: "Daily flow",
-    periodReport: "Summary",
     progressOverview: "Progress",
     streak: "Streak",
     daySingular: "day",
