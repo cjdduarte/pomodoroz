@@ -221,7 +221,7 @@ export const pt = {
   },
   statistics: {
     title: "Relatório",
-    period: "Período",
+    period: "Filtro",
     periodToday: "Hoje",
     periodWeek: "Semana",
     periodMonth: "Mês",
@@ -232,7 +232,7 @@ export const pt = {
     idleTime: "Tempo ocioso",
     completedCycles: "Ciclos completos",
     dailyFlow: "Fluxo diário",
-    periodReport: "Relatório do período",
+    periodReport: "Resumo",
     progressOverview: "Progresso",
     streak: "Sequência",
     daySingular: "dia",

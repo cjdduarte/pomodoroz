@@ -17,6 +17,7 @@
 - **Period selector is scoped to the report section** — the period dropdown now sits inside the period report header, and the objective metric cards remain visible before the progress section to avoid mixing filtered report data with fixed-range habit data.
 - **Daily report windows now align with calendar days** — week and month report data use the same local-day range as the daily flow chart, and the daily flow bars now read oldest to newest for fixed period windows.
 - **Rust dependency updates prepare selected manifest pins before lockfile updates** — the update checker now adjusts all selected root crate pins in `Cargo.toml` before running `cargo update`, avoiding transient conflicts for exact-pinned dependency pairs such as `tauri` and `tauri-build`.
+- **Report copy is less repetitive** — the period report heading and selector label now use shorter wording, reducing repeated "report/period" labels near the top of the Statistics screen.
 
 ## [26.5.5] - 2026-05-06
 

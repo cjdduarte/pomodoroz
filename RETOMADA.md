@@ -32,7 +32,7 @@ Atualizar este arquivo ao final de cada fase grande, correcao operacional releva
 - Trabalho local da `26.5.6`: tela de Relatorio reorganizada para separar metricas filtradas por periodo de progresso de longo prazo.
 - O combo de periodo agora fica dentro do cabecalho `Relatorio do periodo`; os cartoes de tempo de foco, pausa, ocioso e ciclos completos continuam visiveis antes do bloco de progresso.
 - O bloco de progresso usa historico local para sequencia, nivel/XP, meta de hoje, marcos explicitos, heatmap de 30 dias e barras dos ultimos 7 dias.
-- Correcoes pos-review locais: janelas de semana/mes alinhadas a dias locais, fluxo diario em ordem cronologica para periodos fixos, atualizacao periodica do "agora" na tela aberta, remocao da chave i18n morta `byTaskList`, remocao dos artefatos `.playwright-mcp/*` e `statistics-period-progress.png`, e ignore de `.playwright-mcp/`.
+- Correcoes pos-review locais: janelas de semana/mes alinhadas a dias locais, fluxo diario em ordem cronologica para periodos fixos, textos do topo do Relatorio menos repetitivos, atualizacao periodica do "agora" na tela aberta, remocao da chave i18n morta `byTaskList`, remocao dos artefatos `.playwright-mcp/*` e `statistics-period-progress.png`, e ignore de `.playwright-mcp/`.
 - Updates locais aplicados: pnpm `11.0.9`, deps JS/TS patch/minor selecionadas, `lint-staged` `17.0.4`, `tauri` `2.11.1` e `tauri-build` `2.6.1`.
 - `scripts/check-updates.sh` ajustado para preparar todos os pins Rust selecionados no `Cargo.toml` antes de rodar `cargo update`, evitando conflito transitorio em pares com pin exato.
 - Nao foram adicionadas novas dependencias nem novos campos de storage.

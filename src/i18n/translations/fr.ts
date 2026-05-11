@@ -222,7 +222,7 @@ export const fr = {
   },
   statistics: {
     title: "Rapport",
-    period: "Periode",
+    period: "Filtre",
     periodToday: "Aujourd'hui",
     periodWeek: "Semaine",
     periodMonth: "Mois",
@@ -233,7 +233,7 @@ export const fr = {
     idleTime: "Temps inactif",
     completedCycles: "Cycles termines",
     dailyFlow: "Flux quotidien",
-    periodReport: "Rapport de periode",
+    periodReport: "Resume",
     progressOverview: "Progression",
     streak: "Serie",
     daySingular: "jour",

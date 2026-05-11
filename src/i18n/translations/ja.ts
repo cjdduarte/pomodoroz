@@ -221,7 +221,7 @@ export const ja = {
   },
   statistics: {
     title: "レポート",
-    period: "期間",
+    period: "範囲",
     periodToday: "今日",
     periodWeek: "1週間",
     periodMonth: "1か月",
@@ -232,7 +232,7 @@ export const ja = {
     idleTime: "アイドル時間",
     completedCycles: "完了サイクル",
     dailyFlow: "日別フロー",
-    periodReport: "期間レポート",
+    periodReport: "概要",
     progressOverview: "進捗",
     streak: "連続記録",
     daySingular: "日",

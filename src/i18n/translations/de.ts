@@ -224,7 +224,7 @@ export const de = {
   },
   statistics: {
     title: "Bericht",
-    period: "Zeitraum",
+    period: "Filter",
     periodToday: "Heute",
     periodWeek: "Woche",
     periodMonth: "Monat",
@@ -235,7 +235,7 @@ export const de = {
     idleTime: "Leerlaufzeit",
     completedCycles: "Abgeschlossene Zyklen",
     dailyFlow: "Tagesverlauf",
-    periodReport: "Zeitraumbericht",
+    periodReport: "Zusammenfassung",
     progressOverview: "Fortschritt",
     streak: "Serie",
     daySingular: "Tag",

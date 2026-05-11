@@ -212,7 +212,7 @@ export const zh = {
   },
   statistics: {
     title: "报告",
-    period: "周期",
+    period: "范围",
     periodToday: "今天",
     periodWeek: "一周",
     periodMonth: "一个月",
@@ -223,7 +223,7 @@ export const zh = {
     idleTime: "空闲时间",
     completedCycles: "完成周期",
     dailyFlow: "每日流向",
-    periodReport: "周期报告",
+    periodReport: "摘要",
     progressOverview: "进度",
     streak: "连续记录",
     daySingular: "天",

@@ -17,6 +17,7 @@
 - **Seletor de período ficou escopado à seção do relatório** — o combo de período agora fica no cabeçalho do Relatório do período, e os cartões objetivos de métricas continuam visíveis antes da seção de progresso para evitar misturar dados filtrados do relatório com dados fixos de hábito.
 - **Janelas do relatório diário agora seguem dias de calendário** — os dados de semana e mês usam o mesmo intervalo de dias locais do gráfico de fluxo diário, e as barras do fluxo diário agora aparecem da data mais antiga para a mais recente em janelas de período fixas.
 - **Atualizações Rust preparam os pins selecionados antes do lockfile** — o verificador de updates agora ajusta todos os root crates selecionados no `Cargo.toml` antes de rodar `cargo update`, evitando conflitos transitórios em pares com pin exato como `tauri` e `tauri-build`.
+- **Texto do Relatório ficou menos repetitivo** — o cabeçalho do resumo e o rótulo do seletor agora usam termos mais curtos, reduzindo a repetição de "relatório/período" no topo da tela de Estatísticas.
 
 ## [26.5.5] - 2026-05-06
 
