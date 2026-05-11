@@ -8,6 +8,14 @@
 
 ## [26.5.6] - TBD
 
+### Added
+
+- **Report now separates period metrics from long-term progress** — the Statistics screen keeps the period filter tied to focus time, break time, idle time, completed cycles, top focus areas, and daily flow while showing streak, level, XP progress, today's target, explicit milestones, a 30-day heatmap, and last-7-day focus bars from the existing local history without adding new storage fields.
+
+### Changed
+
+- **Period selector is scoped to the report section** — the period dropdown now sits inside the period report header, and the objective metric cards remain visible before the progress section to avoid mixing filtered report data with fixed-range habit data.
+
 ## [26.5.5] - 2026-05-06
 
 ### Fixed

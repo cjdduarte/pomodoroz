@@ -19,11 +19,6 @@ export const StyledStatistics = styled.main`
 `;
 
 export const StyledStatisticsToolbar = styled.div`
-  display: grid;
-  grid-template-columns: 1fr max-content;
-  align-items: end;
-  gap: 1rem;
-
   margin-top: 1.6rem;
   margin-bottom: 1.2rem;
 `;
@@ -34,12 +29,90 @@ export const StyledStatisticsToolbarLabel = styled.label`
   text-transform: uppercase;
 `;
 
-export const StyledStatisticsSummary = styled.section`
+export const StyledStatisticsProgressPanel = styled.section`
+  display: grid;
+  gap: 1rem;
+
+  padding: 1.2rem;
+
+  border-radius: 3px;
+  border: 1px solid var(--color-border-primary);
+  background-color: var(--color-bg-secondary);
+`;
+
+export const StyledStatisticsProgressHeader = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+
+  small {
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: var(--color-disabled-text);
+  }
+`;
+
+export const StyledStatisticsProgressTrack = styled.div`
+  display: grid;
+  gap: 0.5rem;
+`;
+
+export const StyledStatisticsProgressMetrics = styled.div`
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.8rem;
+`;
 
-  margin-bottom: 1.4rem;
+export const StyledStatisticsProgressMetric = styled.div`
+  display: grid;
+  gap: 0.5rem;
+  min-height: 5.8rem;
+  padding: 0.8rem;
+
+  border-radius: 3px;
+  background-color: var(--color-bg-primary);
+
+  span {
+    font-size: 1rem;
+    color: var(--color-disabled-text);
+    text-transform: uppercase;
+  }
+
+  strong {
+    min-width: 0;
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: var(--color-heading-text);
+    overflow-wrap: anywhere;
+  }
+`;
+
+export const StyledStatisticsMilestones = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  min-height: 2.4rem;
+  align-items: center;
+`;
+
+export const StyledStatisticsMilestone = styled.span`
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.4rem;
+  padding: 0 0.7rem;
+
+  border-radius: 99px;
+  color: var(--color-primary);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.32);
+  background-color: rgba(var(--color-primary-rgb), 0.08);
+  font-size: 1rem;
+  font-weight: 500;
+`;
+
+export const StyledStatisticsSummary = styled.section`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 0.8rem;
 `;
 
 export const StyledStatisticsCard = styled.article`
@@ -76,6 +149,84 @@ export const StyledStatisticsSectionHeading = styled.h4`
   font-weight: 500;
   color: var(--color-disabled-text);
   text-transform: uppercase;
+`;
+
+export const StyledStatisticsSectionHeader = styled.div`
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(10rem, 12rem);
+  align-items: end;
+  gap: 1rem;
+  margin-bottom: 1rem;
+
+  ${StyledStatisticsSectionHeading} {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 420px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+export const StyledStatisticsPeriodControl = styled.div`
+  display: grid;
+  gap: 0.4rem;
+`;
+
+export const StyledStatisticsHeatmap = styled.div`
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 0.5rem;
+`;
+
+const heatmapColors = [
+  "var(--color-border-primary)",
+  "rgba(var(--color-primary-rgb), 0.18)",
+  "rgba(var(--color-primary-rgb), 0.32)",
+  "rgba(var(--color-primary-rgb), 0.48)",
+  "rgba(var(--color-primary-rgb), 0.68)",
+  "rgba(var(--color-primary-rgb), 0.88)",
+];
+
+export const StyledStatisticsHeatmapCell = styled.span<{
+  $intensity: number;
+}>`
+  aspect-ratio: 1;
+  min-width: 0;
+  border-radius: 3px;
+  background-color: ${(p) =>
+    heatmapColors[Math.min(Math.max(p.$intensity, 0), 5)]};
+`;
+
+export const StyledStatisticsWeekBars = styled.div`
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.7rem;
+  align-items: end;
+`;
+
+export const StyledStatisticsWeekBar = styled.div`
+  min-width: 0;
+  display: grid;
+  grid-template-rows: 6rem 1.6rem;
+  gap: 0.5rem;
+  align-items: end;
+
+  span {
+    width: 100%;
+    min-height: 0.2rem;
+    align-self: end;
+    border-radius: 3px 3px 0 0;
+    background-color: var(--color-primary);
+  }
+
+  small {
+    color: var(--color-disabled-text);
+    font-size: 0.9rem;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 `;
 
 export const StyledStatisticsRows = styled.div`

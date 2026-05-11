@@ -8,6 +8,14 @@
 
 ## [26.5.6] - A definir
 
+### Adicionado
+
+- **Relatório agora separa métricas do período de progresso de longo prazo** — a tela de Estatísticas mantém o filtro de período ligado a tempo de foco, tempo de pausa, tempo ocioso, ciclos completos, principais focos e fluxo diário enquanto exibe sequência, nível, progresso de XP, meta de hoje, marcos explícitos, heatmap de 30 dias e barras dos últimos 7 dias a partir do histórico local existente, sem adicionar novos campos de armazenamento.
+
+### Alterado
+
+- **Seletor de período ficou escopado à seção do relatório** — o combo de período agora fica no cabeçalho do Relatório do período, e os cartões objetivos de métricas continuam visíveis antes da seção de progresso para evitar misturar dados filtrados do relatório com dados fixos de hábito.
+
 ## [26.5.5] - 2026-05-06
 
 ### Corrigido

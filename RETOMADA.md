@@ -27,19 +27,19 @@ Atualizar este arquivo ao final de cada fase grande, correcao operacional releva
 
 - Ultimo commit conhecido: `170a55a chore(release): v26.5.5`.
 - Versao atual publicada: `v26.5.5`.
-- Branch `main` alinhada com `origin/main` e sem mudancas locais pendentes na ultima verificacao.
 - A correcao da pausa em tela cheia no Tauri foi finalizada, commitada e tagueada em `v26.5.5`.
 - `CHANGELOG.md` e `CHANGELOG.pt.md` registram a versao `26.5.5` com data `2026-05-06`.
+- Trabalho local da `26.5.6`: tela de Relatorio reorganizada para separar metricas filtradas por periodo de progresso de longo prazo.
+- O combo de periodo agora fica dentro do cabecalho `Relatorio do periodo`; os cartoes de tempo de foco, pausa, ocioso e ciclos completos continuam visiveis antes do bloco de progresso.
+- O bloco de progresso usa historico local para sequencia, nivel/XP, meta de hoje, marcos explicitos, heatmap de 30 dias e barras dos ultimos 7 dias.
+- Nao foram adicionadas dependencias nem novos campos de storage.
+- `CHANGELOG.md` e `CHANGELOG.pt.md` ja registram a mudanca em `26.5.6` como `TBD` / `A definir`.
 
 ---
 
 ## Intencao de ajuste agora
 
-Escolher o proximo bloco de trabalho a partir de `docs/IMPROVEMENTS.md`. Candidatos naturais:
-
-- Ciclo de produto `B1 -> B2 -> B3`.
-- Expansao de cobertura `A6` em pequenos lotes sem novas dependencias.
-- Avaliacao do gate `A10`, sem migracao automatica se o ROI nao for claro.
+Revisar visualmente a tela de Relatorio no app desktop e commitar o incremento `26.5.6` se o layout estiver adequado.
 
 ---
 
@@ -50,19 +50,23 @@ Escolher o proximo bloco de trabalho a partir de `docs/IMPROVEMENTS.md`. Candida
 - `./scripts/validar-tudo.sh --skip-install` passa; inclui lint, typecheck, Vitest, Rust `fmt + clippy + check` e build Tauri release sem bundle.
 - Validacao manual confirmada: pausa em tela cheia volta para frente quando a janela esta visivel atras de outros apps.
 - Release `v26.5.5` criada no commit `170a55a`.
+- `pnpm lint` passa apos a separacao entre Relatorio do periodo e Progresso.
+- `pnpm typecheck:renderer` passa apos a separacao entre Relatorio do periodo e Progresso.
+- `pnpm build:renderer` passa apos a separacao entre Relatorio do periodo e Progresso.
+- Smoke visual via Vite/browser em `#/statistics` confirmou o combo dentro de `Relatorio do periodo` e o bloco `Progresso` separado; avisos de IPC eram esperados fora do runtime Tauri.
 
 ---
 
 ## Estado pendente
 
-- Nao ha pendencia local conhecida da `26.5.5`.
-- Consultar `docs/IMPROVEMENTS.md` para selecionar o proximo incremento.
+- Pendente validacao visual/manual da tela de Relatorio no desktop.
+- Pendente commitar a mudanca da `26.5.6`.
 
 ---
 
 ## Retomar
 
 1. Revisar `git status --short`.
-2. Ler `docs/IMPROVEMENTS.md` e escolher o proximo bloco pequeno.
-3. Antes de nova implementacao, confirmar se o bloco altera timer, tarefas, settings, tray ou compact mode.
-4. Ao finalizar implementacao, atualizar changelogs e `RETOMADA.md` conforme as regras do projeto.
+2. Abrir o app e validar a tela de Relatorio com historico real.
+3. Se necessario, ajustar espacamento/rotulos do resumo gamificado.
+4. Commitar com mensagem Conventional Commits em ingles.

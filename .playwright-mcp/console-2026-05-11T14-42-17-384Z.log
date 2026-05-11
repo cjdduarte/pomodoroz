@@ -1,0 +1,63 @@
+[     808ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/node_modules/.vite/deps/react-dom_client.js?v=4dcff432:14337
+[     923ms] [ERROR] [TAURI IPC] Failed to send command. {event: SET_TRAY_BEHAVIOR, error: TypeError: Cannot read properties of undefined (reading 'invoke')
+    at invoke (http://localhost:3…} @ http://localhost:3001/@vite/client:509
+[     923ms] [ERROR] [TAURI IPC] Failed to send command. {event: SHOW_WINDOW, error: TypeError: Cannot read properties of undefined (reading 'invoke')
+    at invoke (http://localhost:3…} @ http://localhost:3001/@vite/client:509
+[     923ms] [ERROR] [TAURI IPC] Failed to send command. {event: SET_ALWAYS_ON_TOP, error: TypeError: Cannot read properties of undefined (reading 'invoke')
+    at invoke (http://localhost:3…} @ http://localhost:3001/@vite/client:509
+[     924ms] [ERROR] [TAURI IPC] Failed to send command. {event: SET_FULLSCREEN_BREAK, error: TypeError: Cannot read properties of undefined (reading 'invoke')
+    at invoke (http://localhost:3…} @ http://localhost:3001/@vite/client:509
+[     924ms] [ERROR] [TAURI IPC] Failed to send command. {event: SET_COMPACT_MODE, error: TypeError: Cannot read properties of undefined (reading 'invoke')
+    at invoke (http://localhost:3…} @ http://localhost:3001/@vite/client:509
+[     924ms] [ERROR] [TAURI IPC] Failed to send command. {event: SET_UI_THEME, error: TypeError: Cannot read properties of undefined (reading 'invoke')
+    at invoke (http://localhost:3…} @ http://localhost:3001/@vite/client:509
+[     924ms] [ERROR] [TAURI IPC] Failed to send command. {event: SET_NATIVE_TITLEBAR, error: TypeError: Cannot read properties of undefined (reading 'invoke')
+    at invoke (http://localhost:3…} @ http://localhost:3001/@vite/client:509
+[     924ms] [ERROR] [TAURI IPC] Failed to subscribe to window-restored. TypeError: Cannot read properties of undefined (reading 'transformCallback')
+    at transformCallback (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/node_modules/.vite/deps/core-BwUab0Gt.js?v=147390c8:90:36)
+    at listen (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/node_modules/.vite/deps/@tauri-apps_api_event.js?v=edec689f:76:12)
+    at http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/src/contexts/connectors/TauriConnector.tsx:210:8
+    at Object.react_stack_bottom_frame (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/node_modules/.vite/deps/react-dom_client.js?v=4dcff432:12904:13)
+    at runWithFiberInDEV (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/node_modules/.vite/deps/react-dom_client.js?v=4dcff432:851:66)
+    at commitHookEffectListMount (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/node_modules/.vite/deps/react-dom_client.js?v=4dcff432:6617:153)
+    at commitHookPassiveMountEffects (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/node_modules/.vite/deps/react-dom_client.js?v=4dcff432:6652:55)
+    at commitPassiveMountOnFiber (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/node_modules/.vite/deps/react-dom_client.js?v=4dcff432:7618:22)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/node_modules/.vite/deps/react-dom_client.js?v=4dcff432:7606:5)
+    at commitPassiveMountOnFiber (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/node_modules/.vite/deps/react-dom_client.js?v=4dcff432:7617:6) @ http://localhost:3001/@vite/client:509
+[     925ms] [ERROR] [TAURI IPC] Failed to subscribe to event. TypeError: Cannot read properties of undefined (reading 'transformCallback')
+    at transformCallback (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/node_modules/.vite/deps/core-BwUab0Gt.js?v=147390c8:90:36)
+    at listen (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/node_modules/.vite/deps/@tauri-apps_api_event.js?v=edec689f:76:12)
+    at Object.receive (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/src/contexts/connectors/TauriInvokeConnector.ts:348:8)
+    at http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/src/contexts/connectors/TauriConnector.tsx:237:40
+    at Object.react_stack_bottom_frame (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/node_modules/.vite/deps/react-dom_client.js?v=4dcff432:12904:13)
+    at runWithFiberInDEV (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/node_modules/.vite/deps/react-dom_client.js?v=4dcff432:851:66)
+    at commitHookEffectListMount (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/node_modules/.vite/deps/react-dom_client.js?v=4dcff432:6617:153)
+    at commitHookPassiveMountEffects (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/node_modules/.vite/deps/react-dom_client.js?v=4dcff432:6652:55)
+    at commitPassiveMountOnFiber (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/node_modules/.vite/deps/react-dom_client.js?v=4dcff432:7618:22)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/node_modules/.vite/deps/react-dom_client.js?v=4dcff432:7606:5) @ http://localhost:3001/@vite/client:509
+[     925ms] [ERROR] [TAURI IPC] Failed to subscribe to event. TypeError: Cannot read properties of undefined (reading 'transformCallback')
+    at transformCallback (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/node_modules/.vite/deps/core-BwUab0Gt.js?v=147390c8:90:36)
+    at listen (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/node_modules/.vite/deps/@tauri-apps_api_event.js?v=edec689f:76:12)
+    at Object.receive (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/src/contexts/connectors/TauriInvokeConnector.ts:348:8)
+    at http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/src/contexts/CounterContext.tsx:598:47
+    at Object.react_stack_bottom_frame (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/node_modules/.vite/deps/react-dom_client.js?v=4dcff432:12904:13)
+    at runWithFiberInDEV (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/node_modules/.vite/deps/react-dom_client.js?v=4dcff432:851:66)
+    at commitHookEffectListMount (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/node_modules/.vite/deps/react-dom_client.js?v=4dcff432:6617:153)
+    at commitHookPassiveMountEffects (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/node_modules/.vite/deps/react-dom_client.js?v=4dcff432:6652:55)
+    at commitPassiveMountOnFiber (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/node_modules/.vite/deps/react-dom_client.js?v=4dcff432:7618:22)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/node_modules/.vite/deps/react-dom_client.js?v=4dcff432:7606:5) @ http://localhost:3001/@vite/client:509
+[     925ms] [ERROR] [TAURI IPC] Failed to subscribe to event. TypeError: Cannot read properties of undefined (reading 'transformCallback')
+    at transformCallback (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/node_modules/.vite/deps/core-BwUab0Gt.js?v=147390c8:90:36)
+    at listen (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/node_modules/.vite/deps/@tauri-apps_api_event.js?v=edec689f:76:12)
+    at Object.receive (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/src/contexts/connectors/TauriInvokeConnector.ts:348:8)
+    at http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/src/contexts/CounterContext.tsx:601:46
+    at Object.react_stack_bottom_frame (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/node_modules/.vite/deps/react-dom_client.js?v=4dcff432:12904:13)
+    at runWithFiberInDEV (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/node_modules/.vite/deps/react-dom_client.js?v=4dcff432:851:66)
+    at commitHookEffectListMount (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/node_modules/.vite/deps/react-dom_client.js?v=4dcff432:6617:153)
+    at commitHookPassiveMountEffects (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/node_modules/.vite/deps/react-dom_client.js?v=4dcff432:6652:55)
+    at commitPassiveMountOnFiber (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/node_modules/.vite/deps/react-dom_client.js?v=4dcff432:7618:22)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3001/@fs/run/media/cjdduarte/UnidadeD/pomodoroz/node_modules/.vite/deps/react-dom_client.js?v=4dcff432:7606:5) @ http://localhost:3001/@vite/client:509
+[     925ms] [ERROR] [TAURI IPC] Failed to send command. {event: SET_OPEN_AT_LOGIN, error: TypeError: Cannot read properties of undefined (reading 'invoke')
+    at invoke (http://localhost:3…} @ http://localhost:3001/@vite/client:509
+[     926ms] [ERROR] [TAURI IPC] Failed to send command. {event: SET_TRAY_COPY, error: TypeError: Cannot read properties of undefined (reading 'invoke')
+    at invoke (http://localhost:3…} @ http://localhost:3001/@vite/client:509

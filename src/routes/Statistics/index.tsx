@@ -10,6 +10,7 @@ import {
   setStatisticsSessions,
   StatisticsBucket,
 } from "store";
+import type { StatisticsSessionRecord } from "store";
 import { useAppDispatch, useAppSelector } from "hooks/storeHooks";
 import { Header } from "components";
 import {
@@ -25,19 +26,32 @@ import {
   StyledStatisticsCardValue,
   StyledStatisticsCycleBadge,
   StyledStatisticsEmpty,
+  StyledStatisticsHeatmap,
+  StyledStatisticsHeatmapCell,
   StyledStatisticsLegend,
   StyledStatisticsLegendItem,
+  StyledStatisticsMilestone,
+  StyledStatisticsMilestones,
+  StyledStatisticsProgressHeader,
+  StyledStatisticsProgressMetric,
+  StyledStatisticsProgressMetrics,
+  StyledStatisticsProgressPanel,
+  StyledStatisticsProgressTrack,
+  StyledStatisticsPeriodControl,
   StyledStatisticsRow,
   StyledStatisticsRowLabel,
   StyledStatisticsRowMeta,
   StyledStatisticsRows,
   StyledStatisticsRowValue,
   StyledStatisticsSection,
+  StyledStatisticsSectionHeader,
   StyledStatisticsSectionHeading,
   StyledStatisticsStackedBar,
   StyledStatisticsSummary,
   StyledStatisticsToolbar,
   StyledStatisticsToolbarLabel,
+  StyledStatisticsWeekBar,
+  StyledStatisticsWeekBars,
 } from "styles";
 
 type PeriodFilter = "today" | "week" | "month" | "all";
@@ -50,9 +64,21 @@ type DailyTotals = {
   break: number;
   idle: number;
   total: number;
+  cycles: number;
 };
 
 const DAY_MS = 24 * 60 * 60 * 1000;
+const HEATMAP_DAYS = 30;
+const WEEK_DAYS = 7;
+const TOP_FOCUS_LIMIT = 5;
+const XP_PER_LEVEL = 500;
+
+type MilestoneKey =
+  | "firstFocus"
+  | "steadyThree"
+  | "fullWeek"
+  | "immersion"
+  | "deepFocus";
 
 const toDateKey = (timestamp: number): string => {
   const date = new Date(timestamp);
@@ -114,14 +140,250 @@ const createDayLabel = (dateKey: string, locale: string): string => {
   }).format(date);
 };
 
+const createEmptyDailyTotals = (
+  dateKey: string,
+  locale: string
+): DailyTotals => ({
+  date: dateKey,
+  label: createDayLabel(dateKey, locale),
+  focus: 0,
+  break: 0,
+  idle: 0,
+  total: 0,
+  cycles: 0,
+});
+
+const createDailyTotalsMap = (
+  sourceSessions: StatisticsSessionRecord[]
+) => {
+  const sessionsByDate = new Map<
+    string,
+    Omit<DailyTotals, "date" | "label">
+  >();
+
+  sourceSessions.forEach((session) => {
+    const dateKey = session.date || toDateKey(session.completedAt);
+    const existing = sessionsByDate.get(dateKey) || {
+      focus: 0,
+      break: 0,
+      idle: 0,
+      total: 0,
+      cycles: 0,
+    };
+
+    if (session.bucket === StatisticsBucket.FOCUS) {
+      existing.focus += session.durationSeconds;
+      existing.cycles += session.cycleCompleted ? 1 : 0;
+    } else if (session.bucket === StatisticsBucket.BREAK) {
+      existing.break += session.durationSeconds;
+    } else {
+      existing.idle += session.durationSeconds;
+    }
+
+    existing.total += session.durationSeconds;
+    sessionsByDate.set(dateKey, existing);
+  });
+
+  return sessionsByDate;
+};
+
+const createDailyRows = (
+  sourceSessions: StatisticsSessionRecord[],
+  locale: string
+): DailyTotals[] => {
+  const sessionsByDate = createDailyTotalsMap(sourceSessions);
+
+  return Array.from(sessionsByDate.entries())
+    .map(([date, totals]) => ({
+      date,
+      label: createDayLabel(date, locale),
+      ...totals,
+    }))
+    .sort((first, second) => first.date.localeCompare(second.date));
+};
+
+const createNormalizedDailyRows = (
+  sourceSessions: StatisticsSessionRecord[],
+  days: number,
+  now: Date,
+  locale: string
+): DailyTotals[] => {
+  const sessionsByDate = createDailyTotalsMap(sourceSessions);
+  const rows: DailyTotals[] = [];
+
+  for (let index = days - 1; index >= 0; index -= 1) {
+    const date = new Date(now.getTime() - index * DAY_MS);
+    const key = toDateKey(date.getTime());
+    const existing = sessionsByDate.get(key);
+
+    rows.push(
+      existing
+        ? {
+            date: key,
+            label: createDayLabel(key, locale),
+            ...existing,
+          }
+        : createEmptyDailyTotals(key, locale)
+    );
+  }
+
+  return rows;
+};
+
+const parseDateKey = (dateKey: string): Date => {
+  const [year, month, day] = dateKey.split("-").map(Number);
+  return new Date(year, (month || 1) - 1, day || 1);
+};
+
+const getPreviousDateKey = (dateKey: string): string => {
+  const date = parseDateKey(dateKey);
+  date.setDate(date.getDate() - 1);
+  return toDateKey(date.getTime());
+};
+
+const getCurrentStreak = (
+  activeDateKeys: Set<string>,
+  now: Date
+): number => {
+  if (!activeDateKeys.size) {
+    return 0;
+  }
+
+  const todayKey = toDateKey(now.getTime());
+  const yesterdayKey = getPreviousDateKey(todayKey);
+  let cursor = "";
+
+  if (activeDateKeys.has(todayKey)) {
+    cursor = todayKey;
+  } else if (activeDateKeys.has(yesterdayKey)) {
+    cursor = yesterdayKey;
+  }
+
+  if (!cursor) {
+    return 0;
+  }
+
+  let streak = 0;
+
+  while (activeDateKeys.has(cursor)) {
+    streak += 1;
+    cursor = getPreviousDateKey(cursor);
+  }
+
+  return streak;
+};
+
 export default function Statistics() {
   const dispatch = useAppDispatch();
   const { t, i18n } = useTranslation();
   const sessions = useAppSelector((state) => state.statistics.sessions);
+  const sessionRounds = useAppSelector(
+    (state) => state.config.sessionRounds
+  );
 
   const [period, setPeriod] = useState<PeriodFilter>("today");
   const [clearRange, setClearRange] = useState<ClearRange>("all");
   const [isClearArmed, setIsClearArmed] = useState(false);
+  const locale = i18n.language || "en";
+
+  const allDailyRows = useMemo(
+    () => createDailyRows(sessions, locale),
+    [locale, sessions]
+  );
+
+  const heatmapRows = useMemo(
+    () =>
+      createNormalizedDailyRows(
+        sessions,
+        HEATMAP_DAYS,
+        new Date(),
+        locale
+      ),
+    [locale, sessions]
+  );
+
+  const weekRows = useMemo(
+    () =>
+      createNormalizedDailyRows(
+        sessions,
+        WEEK_DAYS,
+        new Date(),
+        locale
+      ),
+    [locale, sessions]
+  );
+
+  const progressSummary = useMemo(() => {
+    const activeDateKeys = new Set<string>();
+    let completedCycles = 0;
+    let focusSeconds = 0;
+
+    sessions.forEach((session) => {
+      if (session.bucket !== StatisticsBucket.FOCUS) {
+        return;
+      }
+
+      focusSeconds += session.durationSeconds;
+
+      if (!session.cycleCompleted) {
+        return;
+      }
+
+      completedCycles += 1;
+      activeDateKeys.add(
+        session.date || toDateKey(session.completedAt)
+      );
+    });
+
+    const now = new Date();
+    const streak = getCurrentStreak(activeDateKeys, now);
+    const totalXp =
+      completedCycles * 40 +
+      Math.floor(focusSeconds / 300) * 5 +
+      activeDateKeys.size * 20;
+    const level = Math.floor(totalXp / XP_PER_LEVEL) + 1;
+    const levelXp = totalXp % XP_PER_LEVEL;
+    const todayKey = toDateKey(now.getTime());
+    const today =
+      allDailyRows.find((row) => row.date === todayKey) ||
+      createEmptyDailyTotals(todayKey, locale);
+    const targetCycles = Math.max(sessionRounds, 1);
+    const targetProgress = Math.min(
+      100,
+      (today.cycles / targetCycles) * 100
+    );
+    const unlockedMilestones: MilestoneKey[] = [];
+
+    if (completedCycles > 0) {
+      unlockedMilestones.push("firstFocus");
+    }
+
+    if (streak >= 3) {
+      unlockedMilestones.push("steadyThree");
+    }
+
+    if (streak >= 7) {
+      unlockedMilestones.push("fullWeek");
+    }
+
+    if (allDailyRows.some((row) => row.focus >= 2 * 60 * 60)) {
+      unlockedMilestones.push("immersion");
+    }
+
+    if (allDailyRows.some((row) => row.cycles >= 4)) {
+      unlockedMilestones.push("deepFocus");
+    }
+
+    return {
+      level,
+      levelXp,
+      streak,
+      targetCycles,
+      targetProgress,
+      today,
+      unlockedMilestones: unlockedMilestones.slice(-3),
+    };
+  }, [allDailyRows, locale, sessionRounds, sessions]);
 
   const filteredSessions = useMemo(() => {
     const now = new Date();
@@ -209,39 +471,7 @@ export default function Statistics() {
 
   const dailyRows = useMemo(() => {
     const now = new Date();
-    const locale = i18n.language || "en";
-    const sessionsByDate = new Map<
-      string,
-      Pick<DailyTotals, "focus" | "break" | "idle" | "total">
-    >();
-
-    filteredSessions.forEach((session) => {
-      const dateKey = session.date || toDateKey(session.completedAt);
-      const existing = sessionsByDate.get(dateKey) || {
-        focus: 0,
-        break: 0,
-        idle: 0,
-        total: 0,
-      };
-
-      if (session.bucket === StatisticsBucket.FOCUS) {
-        existing.focus += session.durationSeconds;
-      } else if (session.bucket === StatisticsBucket.BREAK) {
-        existing.break += session.durationSeconds;
-      } else {
-        existing.idle += session.durationSeconds;
-      }
-
-      existing.total += session.durationSeconds;
-      sessionsByDate.set(dateKey, existing);
-    });
-
-    const dates = Array.from(sessionsByDate.keys()).sort();
-    const rows: DailyTotals[] = dates.map((date) => ({
-      date,
-      label: createDayLabel(date, locale),
-      ...sessionsByDate.get(date)!,
-    }));
+    const rows = createDailyRows(filteredSessions, locale);
 
     if (period === "all") {
       return rows.sort((first, second) =>
@@ -260,33 +490,20 @@ export default function Statistics() {
           break: 0,
           idle: 0,
           total: 0,
+          cycles: 0,
         } as DailyTotals);
 
       return [today];
     }
 
     const expectedDays = period === "week" ? 7 : 30;
-    const normalized: DailyTotals[] = [];
-
-    for (let index = 0; index < expectedDays; index += 1) {
-      const date = new Date(now.getTime() - index * DAY_MS);
-      const key = toDateKey(date.getTime());
-      const existing = rows.find((row) => row.date === key);
-
-      normalized.push(
-        existing || {
-          date: key,
-          label: createDayLabel(key, locale),
-          focus: 0,
-          break: 0,
-          idle: 0,
-          total: 0,
-        }
-      );
-    }
-
-    return normalized;
-  }, [filteredSessions, i18n.language, period, t]);
+    return createNormalizedDailyRows(
+      filteredSessions,
+      expectedDays,
+      now,
+      locale
+    ).reverse();
+  }, [filteredSessions, locale, period, t]);
 
   const clearableSessionsCount = useMemo(() => {
     if (!sessions.length) {
@@ -304,6 +521,21 @@ export default function Statistics() {
     return sessions.filter((session) => session.completedAt < cutoff)
       .length;
   }, [clearRange, sessions]);
+
+  const topActivityRows = useMemo(
+    () => activityRows.slice(0, TOP_FOCUS_LIMIT),
+    [activityRows]
+  );
+
+  const heatmapMaxFocus = useMemo(
+    () => Math.max(...heatmapRows.map((row) => row.focus), 0),
+    [heatmapRows]
+  );
+
+  const weekMaxFocus = useMemo(
+    () => Math.max(...weekRows.map((row) => row.focus), 0),
+    [weekRows]
+  );
 
   useEffect(() => {
     setIsClearArmed(false);
@@ -359,80 +591,90 @@ export default function Statistics() {
     <StyledStatistics>
       <StyledStatisticsToolbar>
         <Header heading={t("statistics.title")} />
-        <div>
-          <StyledStatisticsToolbarLabel htmlFor="statistics-period">
-            {t("statistics.period")}
-          </StyledStatisticsToolbarLabel>
-          <StyledSelectWrapper>
-            <StyledSelect
-              id="statistics-period"
-              value={period}
-              onChange={(event) =>
-                setPeriod(event.target.value as PeriodFilter)
-              }
-            >
-              <option value="today">
-                {t("statistics.periodToday")}
-              </option>
-              <option value="week">{t("statistics.periodWeek")}</option>
-              <option value="month">
-                {t("statistics.periodMonth")}
-              </option>
-              <option value="all">{t("statistics.periodAll")}</option>
-            </StyledSelect>
-          </StyledSelectWrapper>
-        </div>
       </StyledStatisticsToolbar>
 
-      <StyledStatisticsSummary>
-        <StyledStatisticsCard>
-          <StyledStatisticsCardLabel>
-            {t("statistics.focusTime")}
-          </StyledStatisticsCardLabel>
-          <StyledStatisticsCardValue>
-            {formatDuration(summary.focusSeconds, t)}
-          </StyledStatisticsCardValue>
-        </StyledStatisticsCard>
+      <StyledStatisticsSection>
+        <StyledStatisticsSectionHeader>
+          <StyledStatisticsSectionHeading>
+            {t("statistics.periodReport")}
+          </StyledStatisticsSectionHeading>
+          <StyledStatisticsPeriodControl>
+            <StyledStatisticsToolbarLabel htmlFor="statistics-period">
+              {t("statistics.period")}
+            </StyledStatisticsToolbarLabel>
+            <StyledSelectWrapper>
+              <StyledSelect
+                id="statistics-period"
+                value={period}
+                onChange={(event) =>
+                  setPeriod(event.target.value as PeriodFilter)
+                }
+              >
+                <option value="today">
+                  {t("statistics.periodToday")}
+                </option>
+                <option value="week">
+                  {t("statistics.periodWeek")}
+                </option>
+                <option value="month">
+                  {t("statistics.periodMonth")}
+                </option>
+                <option value="all">{t("statistics.periodAll")}</option>
+              </StyledSelect>
+            </StyledSelectWrapper>
+          </StyledStatisticsPeriodControl>
+        </StyledStatisticsSectionHeader>
 
-        <StyledStatisticsCard>
-          <StyledStatisticsCardLabel>
-            {t("statistics.breakTime")}
-          </StyledStatisticsCardLabel>
-          <StyledStatisticsCardValue>
-            {formatDuration(summary.breakSeconds, t)}
-          </StyledStatisticsCardValue>
-        </StyledStatisticsCard>
+        <StyledStatisticsSummary>
+          <StyledStatisticsCard>
+            <StyledStatisticsCardLabel>
+              {t("statistics.focusTime")}
+            </StyledStatisticsCardLabel>
+            <StyledStatisticsCardValue>
+              {formatDuration(summary.focusSeconds, t)}
+            </StyledStatisticsCardValue>
+          </StyledStatisticsCard>
 
-        <StyledStatisticsCard>
-          <StyledStatisticsCardLabel>
-            {t("statistics.idleTime")}
-          </StyledStatisticsCardLabel>
-          <StyledStatisticsCardValue>
-            {formatDuration(summary.idleSeconds, t)}
-          </StyledStatisticsCardValue>
-        </StyledStatisticsCard>
+          <StyledStatisticsCard>
+            <StyledStatisticsCardLabel>
+              {t("statistics.breakTime")}
+            </StyledStatisticsCardLabel>
+            <StyledStatisticsCardValue>
+              {formatDuration(summary.breakSeconds, t)}
+            </StyledStatisticsCardValue>
+          </StyledStatisticsCard>
 
-        <StyledStatisticsCard>
-          <StyledStatisticsCardLabel>
-            {t("statistics.completedCycles")}
-          </StyledStatisticsCardLabel>
-          <StyledStatisticsCardValue>
-            {summary.completedCycles}
-          </StyledStatisticsCardValue>
-        </StyledStatisticsCard>
-      </StyledStatisticsSummary>
+          <StyledStatisticsCard>
+            <StyledStatisticsCardLabel>
+              {t("statistics.idleTime")}
+            </StyledStatisticsCardLabel>
+            <StyledStatisticsCardValue>
+              {formatDuration(summary.idleSeconds, t)}
+            </StyledStatisticsCardValue>
+          </StyledStatisticsCard>
+
+          <StyledStatisticsCard>
+            <StyledStatisticsCardLabel>
+              {t("statistics.completedCycles")}
+            </StyledStatisticsCardLabel>
+            <StyledStatisticsCardValue>
+              {summary.completedCycles}
+            </StyledStatisticsCardValue>
+          </StyledStatisticsCard>
+        </StyledStatisticsSummary>
+      </StyledStatisticsSection>
 
       <StyledStatisticsSection>
         <StyledStatisticsSectionHeading>
-          {t("statistics.byTaskList")}
+          {t("statistics.topFocus")}
         </StyledStatisticsSectionHeading>
-        {!activityRows.length ? (
+        {!topActivityRows.length ? (
           <StyledStatisticsEmpty>
             {t("statistics.noFocusData")}
           </StyledStatisticsEmpty>
         ) : (
           <StyledStatisticsRows>
-            {activityRows.map((row) => {
+            {topActivityRows.map((row) => {
               const width =
                 summary.focusSeconds > 0
                   ? (row.seconds / summary.focusSeconds) * 100
@@ -517,6 +759,149 @@ export default function Statistics() {
             );
           })}
         </StyledStatisticsRows>
+      </StyledStatisticsSection>
+
+      <StyledStatisticsSection>
+        <StyledStatisticsSectionHeading>
+          {t("statistics.progressOverview")}
+        </StyledStatisticsSectionHeading>
+        <StyledStatisticsProgressPanel>
+          <StyledStatisticsProgressHeader>
+            <div>
+              <StyledStatisticsCardLabel>
+                {t("statistics.streak")}
+              </StyledStatisticsCardLabel>
+              <StyledStatisticsCardValue>
+                {progressSummary.streak}{" "}
+                <small>
+                  {progressSummary.streak === 1
+                    ? t("statistics.daySingular")
+                    : t("statistics.dayPlural")}
+                </small>
+              </StyledStatisticsCardValue>
+            </div>
+            <div>
+              <StyledStatisticsCardLabel>
+                {t("statistics.level")}
+              </StyledStatisticsCardLabel>
+              <StyledStatisticsCardValue>
+                {progressSummary.level}
+              </StyledStatisticsCardValue>
+            </div>
+          </StyledStatisticsProgressHeader>
+
+          <StyledStatisticsProgressTrack>
+            <StyledStatisticsRowMeta>
+              <StyledStatisticsRowLabel>
+                {t("statistics.xp")}
+              </StyledStatisticsRowLabel>
+              <StyledStatisticsRowValue>
+                {progressSummary.levelXp}/{XP_PER_LEVEL}
+              </StyledStatisticsRowValue>
+            </StyledStatisticsRowMeta>
+            <StyledStatisticsBar>
+              <StyledStatisticsBarFill
+                $variant="focus"
+                style={{
+                  width: `${(progressSummary.levelXp / XP_PER_LEVEL) * 100}%`,
+                }}
+              />
+            </StyledStatisticsBar>
+          </StyledStatisticsProgressTrack>
+
+          <StyledStatisticsProgressMetrics>
+            <StyledStatisticsProgressMetric>
+              <span>{t("statistics.today")}</span>
+              <strong>
+                {progressSummary.today.cycles}{" "}
+                {progressSummary.today.cycles === 1
+                  ? t("units.round")
+                  : t("units.rounds")}{" "}
+                - {formatDuration(progressSummary.today.focus, t)}
+              </strong>
+            </StyledStatisticsProgressMetric>
+
+            <StyledStatisticsProgressMetric>
+              <span>{t("statistics.dailyTarget")}</span>
+              <strong>
+                {progressSummary.today.cycles}/
+                {progressSummary.targetCycles}
+              </strong>
+              <StyledStatisticsBar>
+                <StyledStatisticsBarFill
+                  $variant="focus"
+                  style={{
+                    width: `${progressSummary.targetProgress}%`,
+                  }}
+                />
+              </StyledStatisticsBar>
+            </StyledStatisticsProgressMetric>
+          </StyledStatisticsProgressMetrics>
+
+          <StyledStatisticsMilestones>
+            {progressSummary.unlockedMilestones.length ? (
+              progressSummary.unlockedMilestones.map((milestone) => (
+                <StyledStatisticsMilestone key={milestone}>
+                  {t(`statistics.milestones.${milestone}`)}
+                </StyledStatisticsMilestone>
+              ))
+            ) : (
+              <StyledStatisticsEmpty>
+                {t("statistics.noMilestones")}
+              </StyledStatisticsEmpty>
+            )}
+          </StyledStatisticsMilestones>
+        </StyledStatisticsProgressPanel>
+      </StyledStatisticsSection>
+
+      <StyledStatisticsSection>
+        <StyledStatisticsSectionHeading>
+          {t("statistics.last30Days")}
+        </StyledStatisticsSectionHeading>
+        <StyledStatisticsHeatmap>
+          {heatmapRows.map((day) => {
+            const intensity =
+              heatmapMaxFocus > 0 && day.focus > 0
+                ? Math.max(
+                    1,
+                    Math.ceil((day.focus / heatmapMaxFocus) * 5)
+                  )
+                : 0;
+
+            return (
+              <StyledStatisticsHeatmapCell
+                key={day.date}
+                $intensity={intensity}
+                aria-label={`${day.label}: ${formatDuration(day.focus, t)}`}
+                title={`${day.label}: ${formatDuration(day.focus, t)}`}
+              />
+            );
+          })}
+        </StyledStatisticsHeatmap>
+      </StyledStatisticsSection>
+
+      <StyledStatisticsSection>
+        <StyledStatisticsSectionHeading>
+          {t("statistics.week")}
+        </StyledStatisticsSectionHeading>
+        <StyledStatisticsWeekBars>
+          {weekRows.map((day) => {
+            const height =
+              weekMaxFocus > 0 && day.focus > 0
+                ? Math.max(10, (day.focus / weekMaxFocus) * 100)
+                : 0;
+
+            return (
+              <StyledStatisticsWeekBar
+                key={day.date}
+                title={`${day.label}: ${formatDuration(day.focus, t)}`}
+              >
+                <span style={{ height: `${height}%` }} />
+                <small>{day.label}</small>
+              </StyledStatisticsWeekBar>
+            );
+          })}
+        </StyledStatisticsWeekBars>
       </StyledStatisticsSection>
 
       <StyledStatisticsSection>
