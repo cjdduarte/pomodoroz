@@ -25,18 +25,21 @@ Atualizar este arquivo ao final de cada fase grande, correcao operacional releva
 
 ## Ponto atual
 
-- Ultimo commit conhecido: `6e3848c chore(release): v26.5.4`.
-- Versao atual publicada: `v26.5.4`.
-- Trabalho local da `26.5.5`: correcao da pausa em tela cheia no Tauri quando a janela estava minimizada fora da bandeja ou visivel atras de outros apps.
-- Causa encontrada: o restore via tray usava `unminimize()` + `show()` + `set_focus()` e workaround Linux; o comando generico `show_window`, usado antes do fullscreen break, fazia apenas `show()` + `set_focus()`. Alem disso, o proprio `set_fullscreen_break` nao restaurava/focava a janela ao entrar, e no Linux faltava o ciclo `hide()` -> `show()` para janela visivel sem foco.
-- Correcao aplicada em `src-tauri/src/commands/window_bridge.rs`: `show_window` agora restaura a janela com `unminimize()` antes do foco, aplica o workaround Linux para janela visivel sem foco, e `set_fullscreen_break` faz esse restore ao entrar, forca `always_on_top` temporario durante a pausa e restaura o ajuste do usuario ao sair.
-- `CHANGELOG.md` e `CHANGELOG.pt.md` ja registram a versao `26.5.5` com data `2026-05-06`.
+- Ultimo commit conhecido: `170a55a chore(release): v26.5.5`.
+- Versao atual publicada: `v26.5.5`.
+- Branch `main` alinhada com `origin/main` e sem mudancas locais pendentes na ultima verificacao.
+- A correcao da pausa em tela cheia no Tauri foi finalizada, commitada e tagueada em `v26.5.5`.
+- `CHANGELOG.md` e `CHANGELOG.pt.md` registram a versao `26.5.5` com data `2026-05-06`.
 
 ---
 
 ## Intencao de ajuste agora
 
-Finalizar a correcao da pausa em tela cheia, validar o caminho Rust e pedir validacao manual no desktop para os estados: janela minimizada fora do tray, janela oculta no tray e janela visivel/compacta atras de outras janelas.
+Escolher o proximo bloco de trabalho a partir de `docs/IMPROVEMENTS.md`. Candidatos naturais:
+
+- Ciclo de produto `B1 -> B2 -> B3`.
+- Expansao de cobertura `A6` em pequenos lotes sem novas dependencias.
+- Avaliacao do gate `A10`, sem migracao automatica se o ROI nao for claro.
 
 ---
 
@@ -46,19 +49,20 @@ Finalizar a correcao da pausa em tela cheia, validar o caminho Rust e pedir vali
 - `cargo check --manifest-path src-tauri/Cargo.toml` passa.
 - `./scripts/validar-tudo.sh --skip-install` passa; inclui lint, typecheck, Vitest, Rust `fmt + clippy + check` e build Tauri release sem bundle.
 - Validacao manual confirmada: pausa em tela cheia volta para frente quando a janela esta visivel atras de outros apps.
+- Release `v26.5.5` criada no commit `170a55a`.
 
 ---
 
 ## Estado pendente
 
-- Pendente commitar a correcao e preparar release `26.5.5` se necessario.
-- Consultar `docs/IMPROVEMENTS.md` para o roadmap de features e melhorias tecnicas pendentes.
+- Nao ha pendencia local conhecida da `26.5.5`.
+- Consultar `docs/IMPROVEMENTS.md` para selecionar o proximo incremento.
 
 ---
 
 ## Retomar
 
 1. Revisar `git status --short`.
-2. Conferir o diff em `src-tauri/src/commands/window_bridge.rs`, `CHANGELOG.md`, `CHANGELOG.pt.md` e `RETOMADA.md`.
-3. Commitar com mensagem Conventional Commits em ingles.
-4. Preparar release `26.5.5` se necessario.
+2. Ler `docs/IMPROVEMENTS.md` e escolher o proximo bloco pequeno.
+3. Antes de nova implementacao, confirmar se o bloco altera timer, tarefas, settings, tray ou compact mode.
+4. Ao finalizar implementacao, atualizar changelogs e `RETOMADA.md` conforme as regras do projeto.
