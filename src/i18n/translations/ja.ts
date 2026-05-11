@@ -259,7 +259,6 @@ export const ja = {
     clearAll: "すべてのデータを削除",
     clearAction: "削除",
     clearActionConfirm: "もう一度クリックして確認",
-    clearConfirm: "選択したレポートデータを本当に削除しますか？",
     units: {
       h: "時間",
       m: "分",

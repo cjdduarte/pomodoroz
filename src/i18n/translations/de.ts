@@ -262,8 +262,6 @@ export const de = {
     clearAll: "Alle Daten entfernen",
     clearAction: "Loeschen",
     clearActionConfirm: "Zum Bestaetigen erneut klicken",
-    clearConfirm:
-      "Moechtest du die ausgewaehlten Berichtsdaten wirklich loeschen?",
     units: {
       h: "h",
       m: "m",

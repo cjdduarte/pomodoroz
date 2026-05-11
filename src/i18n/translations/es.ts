@@ -260,8 +260,6 @@ export const es = {
     clearAll: "Eliminar todos los datos",
     clearAction: "Limpiar",
     clearActionConfirm: "Haz clic de nuevo para confirmar",
-    clearConfirm:
-      "¿Seguro que deseas limpiar los datos seleccionados del informe?",
     units: {
       h: "h",
       m: "m",

@@ -260,8 +260,6 @@ export const fr = {
     clearAll: "Supprimer toutes les donnees",
     clearAction: "Effacer",
     clearActionConfirm: "Clique encore pour confirmer",
-    clearConfirm:
-      "Veux-tu vraiment supprimer les donnees de rapport selectionnees ?",
     units: {
       h: "h",
       m: "m",

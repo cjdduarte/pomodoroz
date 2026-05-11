@@ -250,7 +250,6 @@ export const zh = {
     clearAll: "删除全部数据",
     clearAction: "清理",
     clearActionConfirm: "再次点击以确认",
-    clearConfirm: "确定要清理所选报告数据吗？",
     units: {
       h: "小时",
       m: "分",

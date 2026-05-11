@@ -259,8 +259,6 @@ export const en = {
     clearAll: "Remove all data",
     clearAction: "Clear",
     clearActionConfirm: "Click again to confirm",
-    clearConfirm:
-      "Do you really want to clear the selected report data?",
     units: {
       h: "h",
       m: "m",
