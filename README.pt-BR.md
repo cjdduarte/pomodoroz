@@ -61,8 +61,8 @@ O objetivo do Pomodoroz não é "corrigir flexibilidade", e sim adicionar recurs
 | Arquitetura de runtime          | Workspace misto (`app/electron` + `app/tauri`) com scripts legados de Electron ainda presentes | Runtime Tauri-only com `src-tauri/` dedicado e sem caminho de execução Electron                 |
 | Base de frontend                | React 16                                                                                       | React 19                                                                                        |
 | Gerenciador de pacotes          | Yarn (histórico)                                                                               | pnpm                                                                                            |
-| Base Tauri                      | Tauri 2 (alpha)                                                                                | Tauri `2.10.x`, com capabilities explícitas e plugins pinados                                   |
-| Estatísticas                    | Não                                                                                            | Sim (filtros por período, detalhamentos e limpeza de histórico)                                 |
+| Base Tauri                      | Tauri 2 (alpha)                                                                                | Tauri `2.11.x`, com capabilities explícitas e plugins pinados                                   |
+| Estatísticas                    | Não                                                                                            | Sim (relatório por período, progresso de longo prazo, detalhamentos e limpeza de histórico)     |
 | Visualização em grade (grid)    | Não                                                                                            | Sim (**Grade de Rotação de Estudos** com ciclo diário, Sortear e clique direito para Timer)     |
 | Rodapé da grade (status atual)  | Não                                                                                            | Sim (contadores de total, visitadas e restantes)                                                |
 | Importação/Exportação de listas | Não                                                                                            | Sim (**importação/exportação JSON de listas/cartões** com validação e modos merge/substituição) |
@@ -105,7 +105,9 @@ O objetivo do Pomodoroz não é "corrigir flexibilidade", e sim adicionar recurs
 
 **Visibilidade de progresso**
 
-- **Módulo de Estatísticas** (gráfico diário, tempo por tarefa, foco/pausa/ocioso por período).
+- **Módulo de Estatísticas** com relatório por período separado do progresso de longo prazo.
+- **Métricas por período** para foco, pausa, ocioso, ciclos completos, principais focos e fluxo diário.
+- **Visão de progresso** com sequência, nível/XP, meta de hoje, marcos, heatmap de 30 dias e barras dos últimos 7 dias.
 - **Detalhamento por lista de tarefas** com tempo acumulado e ciclos completos.
 
 **Qualidade de vida**
@@ -157,7 +159,8 @@ O objetivo do Pomodoroz não é "corrigir flexibilidade", e sim adicionar recurs
 ### Estatísticas
 
 - **Períodos**: Hoje, Semana (7d), Mês (30d), Tudo.
-- Cartões resumo: tempo de foco, pausa, ocioso e ciclos completos.
+- **Relatório por período**: tempo de foco, pausa, ocioso, ciclos completos, principais focos e fluxo diário.
+- **Progresso de longo prazo**: sequência, nível/XP, meta de hoje, marcos explícitos, heatmap de 30 dias e barras dos últimos 7 dias.
 - **Gráfico diário** (foco/pausa/ocioso empilhados).
 - **Detalhamento por lista de tarefas** com tempo e ciclos.
 - Limpeza de dados com confirmação (semana, mês ou tudo).
@@ -243,7 +246,7 @@ pnpm tauri build --bundles nsis
 ### Requisitos
 
 - Node.js v24
-- pnpm v10
+- pnpm v11
 
 ### Comandos
 
@@ -251,12 +254,15 @@ pnpm tauri build --bundles nsis
 pnpm dev:app          # Tauri + Vite renderer
 pnpm lint             # Lint (renderer)
 pnpm typecheck:renderer
+pnpm test:run
+pnpm build:renderer
 pnpm tauri build --no-bundle
+cargo check --manifest-path src-tauri/Cargo.toml
 ```
 
 ### Stack
 
-- Tauri 2
+- Tauri 2.11
 - React 19 + Vite 8 + TypeScript 6
 - React Router 7 + Redux Toolkit 2
 - @dnd-kit (arrastar e soltar)

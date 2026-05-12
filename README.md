@@ -61,8 +61,8 @@ Pomodoroz is not about "fixing flexibility"; it focuses on adding workflow featu
 | Runtime architecture         | Mixed workspace (`app/electron` + `app/tauri`) with legacy Electron scripts still present | Tauri-only runtime with dedicated `src-tauri/` and no Electron runtime path                 |
 | Frontend base                | React 16                                                                                  | React 19                                                                                    |
 | Package manager              | Yarn (historical)                                                                         | pnpm                                                                                        |
-| Tauri baseline               | Tauri 2 (alpha)                                                                           | Tauri `2.10.x` with explicit capabilities and pinned plugins                                |
-| Statistics                   | No                                                                                        | Yes (period filters, breakdowns, and history cleanup)                                       |
+| Tauri baseline               | Tauri 2 (alpha)                                                                           | Tauri `2.11.x` with explicit capabilities and pinned plugins                                |
+| Statistics                   | No                                                                                        | Yes (period report, long-term progress, breakdowns, and history cleanup)                    |
 | Grid view                    | No                                                                                        | Yes (**Study Rotation Grid** with daily color cycle, Draw button, and right-click to Timer) |
 | Grid footer (current status) | No                                                                                        | Yes (total, visited, and remaining counters)                                                |
 | Task-list import/export      | No                                                                                        | Yes (**JSON import/export for task lists/cards** with validation and merge/replace modes)   |
@@ -105,7 +105,9 @@ Pomodoroz is not about "fixing flexibility"; it focuses on adding workflow featu
 
 **Progress visibility**
 
-- **Statistics module** (daily chart, per-task time, focus/break/idle by period).
+- **Statistics module** with period report separated from long-term progress.
+- **Period metrics** for focus, break, idle, completed cycles, top focus areas, and daily flow.
+- **Progress overview** with streak, level/XP, today's target, milestones, 30-day heatmap, and last-7-day focus bars.
 - **Per-task-list breakdown** with accumulated time and completed cycles.
 
 **Quality of life**
@@ -157,7 +159,8 @@ Pomodoroz is not about "fixing flexibility"; it focuses on adding workflow featu
 ### Statistics
 
 - **Periods**: Today, Week (7d), Month (30d), All.
-- Summary cards: focus time, break time, idle time, and completed cycles.
+- **Period report**: focus time, break time, idle time, completed cycles, top focus areas, and daily flow.
+- **Long-term progress**: streak, level/XP, today's target, explicit milestones, 30-day heatmap, and last-7-day focus bars.
 - **Daily flow chart** (stacked focus/break/idle).
 - **Per-task-list breakdown** with time and cycles.
 - Data clearing with confirmation (week, month, or all).
@@ -243,7 +246,7 @@ pnpm tauri build --bundles nsis
 ### Requirements
 
 - Node.js v24
-- pnpm v10
+- pnpm v11
 
 ### Commands
 
@@ -251,12 +254,15 @@ pnpm tauri build --bundles nsis
 pnpm dev:app          # Tauri + Vite renderer
 pnpm lint             # Lint (renderer)
 pnpm typecheck:renderer
+pnpm test:run
+pnpm build:renderer
 pnpm tauri build --no-bundle
+cargo check --manifest-path src-tauri/Cargo.toml
 ```
 
 ### Stack
 
-- Tauri 2
+- Tauri 2.11
 - React 19 + Vite 8 + TypeScript 6
 - React Router 7 + Redux Toolkit 2
 - @dnd-kit (drag-and-drop)
