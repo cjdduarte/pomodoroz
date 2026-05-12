@@ -25,21 +25,22 @@ Atualizar este arquivo ao final de cada fase grande, correcao operacional releva
 
 ## Ponto atual
 
-- Ultimo commit conhecido: `275f849 chore(release): v26.5.6`.
+- Ultimo commit conhecido: `36dc4ea fix: let compact task grid grow without stretching menus`.
 - Versao atual publicada/tagueada: `v26.5.6`.
-- `CHANGELOG.md` e `CHANGELOG.pt.md` abriram a versao `26.5.7` com data `2026-05-12`.
-- Ajuste local em andamento: no modo compacto, ao abrir o grid de tarefas e aumentar a altura da janela, o espaco extra agora deve ir para a area do grid em vez de esticar a area do timer.
-- Arquivos alterados no ajuste: `src/styles/routes/timer/timer.ts` e `src/routes/Timer/CompactTaskDisplay.tsx`.
+- `CHANGELOG.md` e `CHANGELOG.pt.md` mantem a versao aberta `26.5.7` como `TBD` / `A definir` ate release.
+- Ajuste local em andamento: no modo compacto, ao abrir o grid de tarefas, aumentar a altura da janela, fechar e reabrir o grid, a janela deve voltar para a ultima altura manual da sessao sem crescimento cumulativo.
+- Arquivos alterados no ajuste atual: `src/routes/Timer/CompactTaskDisplay.tsx`, `src/ipc/index.ts`, `src/contexts/connectors/TauriInvokeConnector.ts`, `src-tauri/src/commands/window_bridge.rs`, `src-tauri/src/lib.rs`, `CHANGELOG.md`, `CHANGELOG.pt.md` e `RETOMADA.md`.
 - O layout compacto agora usa uma linha superior estavel para timer/controles e uma linha inferior flexivel para rodape + painel de tarefas.
 - O painel compacto do grid deixou de ter altura rigida e passou a crescer dentro do bloco compacto quando houver altura disponivel.
-- Nao foram adicionadas novas dependencias nem novos campos de storage.
+- A memoria da altura manual fica somente no renderer durante a sessao, usando a altura real do webview (`window.innerHeight`); o Rust apenas aplica essa altura total via IPC, sem recalcular painel + base.
+- Nao foram adicionadas novas dependencias nem novos campos de storage persistente.
 - `RETOMADA.md` foi revisado porque ainda apontava uma pendencia documental antiga de README.
 
 ---
 
 ## Intencao de ajuste agora
 
-Finalizar o bloco pequeno de UI para o redimensionamento do grid compacto e commitar se a revisao do diff estiver ok.
+Finalizar o bloco pequeno de UI/IPCs para restaurar a altura manual do grid compacto sem acumulacao e commitar se a revisao do diff estiver ok.
 
 ---
 
@@ -48,8 +49,8 @@ Finalizar o bloco pequeno de UI para o redimensionamento do grid compacto e comm
 - `pnpm typecheck:renderer` passa.
 - `pnpm lint` passa.
 - `pnpm build:renderer` passa.
-- Smoke visual via Vite/Playwright: com viewport compacto `340x760`, grid aberto e 17 tarefas, a linha do timer permanece estavel e o painel do grid cresce ate o rodape.
-- Limite do smoke visual: fora do runtime Tauri aparece o aviso esperado de integracao nativa quando o renderer tenta enviar o evento de redimensionamento compacto.
+- `cargo fmt --all --manifest-path src-tauri/Cargo.toml -- --check` passa.
+- `cargo check --manifest-path src-tauri/Cargo.toml` passa.
 
 ---
 
@@ -57,13 +58,13 @@ Finalizar o bloco pequeno de UI para o redimensionamento do grid compacto e comm
 
 - Pendente revisao final do diff.
 - Opcional: validar manualmente no app Tauri desktop arrastando a borda inferior da janela compacta com o grid aberto.
-- Pendente commit do ajuste de UI.
+- Pendente commit do ajuste de UI/IPC.
 
 ---
 
 ## Retomar
 
 1. Revisar `git status --short`.
-2. Revisar `git diff -- src/styles/routes/timer/timer.ts src/routes/Timer/CompactTaskDisplay.tsx CHANGELOG.md CHANGELOG.pt.md RETOMADA.md`.
+2. Revisar `git diff -- src/routes/Timer/CompactTaskDisplay.tsx src/ipc/index.ts src/contexts/connectors/TauriInvokeConnector.ts src-tauri/src/commands/window_bridge.rs src-tauri/src/lib.rs CHANGELOG.md CHANGELOG.pt.md RETOMADA.md`.
 3. Se desejar validacao desktop, rodar `pnpm dev:app` e testar o redimensionamento compacto com o grid aberto.
 4. Commitar o ajuste com mensagem Conventional Commits em ingles.

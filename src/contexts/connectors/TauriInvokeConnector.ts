@@ -25,6 +25,7 @@ import {
   CLOSE_WINDOW,
   COMPACT_COLLAPSE,
   COMPACT_EXPAND,
+  COMPACT_EXPAND_TO_HEIGHT,
   COMPACT_EXPAND_ACTIONS,
   COMPACT_EXPAND_FOCUS_EXTENSION,
   EXPORT_TASKS_DIALOG,
@@ -408,6 +409,14 @@ const sendToTauri = async <C extends ToMainChannel>(
 
     case COMPACT_EXPAND: {
       await invoke("compact_expand");
+      return;
+    }
+
+    case COMPACT_EXPAND_TO_HEIGHT: {
+      await invoke(
+        "compact_expand_to_height",
+        toInvokeArgs(payload[0])
+      );
       return;
     }
 

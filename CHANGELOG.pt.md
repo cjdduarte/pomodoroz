@@ -6,11 +6,11 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
-## [26.5.7] - 2026-05-12
+## [26.5.7] - A definir
 
 ### Corrigido
 
-- **Grid de tarefas compacto agora cresce ao aumentar a altura da janela compacta** — ao arrastar a borda inferior da janela com o grid compacto aberto, a altura extra passa para o grid de tarefas em vez de esticar a área do timer.
+- **Grid de tarefas compacto agora cresce ao aumentar a altura da janela compacta** — ao arrastar a borda inferior da janela com o grid compacto aberto, a altura extra passa para o grid de tarefas em vez de esticar a área do timer, e ao reabrir o grid a altura ajustada manualmente é mantida durante a sessão atual.
 
 ## [26.5.6] - 2026-05-11
 

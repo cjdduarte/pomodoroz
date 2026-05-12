@@ -225,6 +225,21 @@ pub fn compact_expand(window: Window) -> Result<(), String> {
         .map_err(map_error)
 }
 
+#[tauri::command(rename_all = "camelCase")]
+pub fn compact_expand_to_height(window: Window, height: f64) -> Result<(), String> {
+    let compact_height = get_compact_height(&window)?;
+    let min_height = compact_height + WINDOW_COMPACT_GRID_HEIGHT;
+    let height = if height.is_finite() {
+        height.max(min_height)
+    } else {
+        min_height
+    };
+
+    window
+        .set_size(LogicalSize::new(WINDOW_WIDTH, height))
+        .map_err(map_error)
+}
+
 #[tauri::command]
 pub fn compact_expand_actions(window: Window) -> Result<(), String> {
     let compact_height = get_compact_height(&window)?;

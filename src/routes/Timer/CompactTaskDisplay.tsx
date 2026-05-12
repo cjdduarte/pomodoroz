@@ -30,6 +30,7 @@ import {
   COMPACT_COLLAPSE,
   COMPACT_EXPAND,
   COMPACT_EXPAND_ACTIONS,
+  COMPACT_EXPAND_TO_HEIGHT,
 } from "ipc";
 import { CounterContext, getInvokeConnector } from "contexts";
 
@@ -40,6 +41,7 @@ type TimerLocationState = {
 const COMPACT_TASK_FOOTER_HEIGHT = "2.8rem";
 const COMPACT_PANEL_HEIGHT = 320;
 const COMPACT_ACTIONS_PANEL_HEIGHT = 160;
+const MIN_COMPACT_GRID_WINDOW_HEIGHT = COMPACT_PANEL_HEIGHT + 80;
 
 type CompactPanelSize = "collapsed" | "actions" | "full";
 
@@ -476,6 +478,7 @@ const CompactTaskDisplay: React.FC = () => {
   const actionMenuRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const compactPanelSizeRef = useRef<CompactPanelSize>("collapsed");
+  const lastCompactGridWindowHeightRef = useRef<number | null>(null);
   const previousCompactModeRef = useRef(compactMode);
   const consumedSelectionNavigationKeyRef = useRef<string | null>(null);
 
@@ -543,18 +546,61 @@ const CompactTaskDisplay: React.FC = () => {
     []
   );
 
+  const sendCompactExpandToHeightEvent = useCallback(
+    (height: number) => {
+      const invokeConnector = getInvokeConnector();
+
+      try {
+        invokeConnector.send(COMPACT_EXPAND_TO_HEIGHT, { height });
+      } catch (error) {
+        console.error(
+          "[CompactTaskDisplay] Failed to restore compact grid height.",
+          error
+        );
+      }
+    },
+    []
+  );
+
   const expandCompactPanel = useCallback(
-    (size: Exclude<CompactPanelSize, "collapsed">) => {
-      if (!compactMode || compactPanelSizeRef.current === size) {
+    (
+      size: Exclude<CompactPanelSize, "collapsed">,
+      options?: { restoreGridHeight?: boolean }
+    ) => {
+      const shouldRestoreGridHeight =
+        size === "full" && options?.restoreGridHeight;
+
+      if (
+        !compactMode ||
+        (compactPanelSizeRef.current === size &&
+          !shouldRestoreGridHeight)
+      ) {
         return;
       }
 
       compactPanelSizeRef.current = size;
+      if (shouldRestoreGridHeight) {
+        const rememberedHeight = lastCompactGridWindowHeightRef.current;
+
+        if (
+          rememberedHeight !== null &&
+          Number.isFinite(rememberedHeight) &&
+          rememberedHeight >= MIN_COMPACT_GRID_WINDOW_HEIGHT
+        ) {
+          sendCompactExpandToHeightEvent(rememberedHeight);
+          return;
+        }
+      }
+
       sendCompactResizeEvent(
         size === "actions" ? COMPACT_EXPAND_ACTIONS : COMPACT_EXPAND
       );
     },
-    [compactMode, sendCompactResizeEvent]
+    [
+      compactMode,
+      sendCompactExpandToHeightEvent,
+      sendCompactResizeEvent,
+    ]
   );
 
   const collapseCompactPanel = useCallback(() => {
@@ -570,6 +616,30 @@ const CompactTaskDisplay: React.FC = () => {
     if (!showGrid) return;
     setShowGrid(false);
   }, [showGrid]);
+
+  useEffect(() => {
+    if (!compactMode || !showGrid) {
+      return;
+    }
+
+    const rememberCurrentHeight = () => {
+      const currentHeight = window.innerHeight;
+
+      if (
+        Number.isFinite(currentHeight) &&
+        currentHeight >= MIN_COMPACT_GRID_WINDOW_HEIGHT
+      ) {
+        lastCompactGridWindowHeightRef.current = currentHeight;
+      }
+    };
+
+    rememberCurrentHeight();
+    window.addEventListener("resize", rememberCurrentHeight);
+
+    return () => {
+      window.removeEventListener("resize", rememberCurrentHeight);
+    };
+  }, [compactMode, showGrid]);
 
   // Consume selection sent by grid navigation (Tasks -> Timer) exactly once per location key.
   useEffect(() => {
@@ -711,7 +781,9 @@ const CompactTaskDisplay: React.FC = () => {
       return;
     }
 
-    expandCompactPanel(desiredPanelSize);
+    expandCompactPanel(desiredPanelSize, {
+      restoreGridHeight: showGrid,
+    });
   }, [
     collapseCompactPanel,
     compactMode,
@@ -898,7 +970,7 @@ const CompactTaskDisplay: React.FC = () => {
       return;
     }
 
-    expandCompactPanel("full");
+    expandCompactPanel("full", { restoreGridHeight: true });
     setShowGrid(true);
   };
 

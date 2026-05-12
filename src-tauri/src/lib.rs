@@ -3,10 +3,11 @@ mod constants;
 
 use commands::window_bridge::{
     close_window, compact_collapse, compact_expand, compact_expand_actions,
-    compact_expand_focus_extension, is_updater_channel_supported, minimize_window,
-    play_notification_sound, read_text_file, restart_app, set_always_on_top, set_compact_mode,
-    set_fullscreen_break, set_native_titlebar, set_tray_behavior, set_tray_copy, set_tray_icon,
-    set_ui_theme, show_window, start_window_drag, write_text_file, TrayBehaviorState,
+    compact_expand_focus_extension, compact_expand_to_height, is_updater_channel_supported,
+    minimize_window, play_notification_sound, read_text_file, restart_app, set_always_on_top,
+    set_compact_mode, set_fullscreen_break, set_native_titlebar, set_tray_behavior, set_tray_copy,
+    set_tray_icon, set_ui_theme, show_window, start_window_drag, write_text_file,
+    TrayBehaviorState,
 };
 #[cfg(target_os = "linux")]
 use constants::WINDOW_RESTORED_EVENT;
@@ -255,6 +256,7 @@ pub fn run() {
             set_fullscreen_break,
             set_compact_mode,
             compact_expand,
+            compact_expand_to_height,
             compact_expand_actions,
             compact_expand_focus_extension,
             compact_collapse,
