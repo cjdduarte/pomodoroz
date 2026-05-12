@@ -25,15 +25,16 @@ Atualizar este arquivo ao final de cada fase grande, correcao operacional releva
 
 ## Ponto atual
 
-- Ultimo commit conhecido: `36dc4ea fix: let compact task grid grow without stretching menus`.
+- Ultimo commit conhecido: `11ddcc9 fix(compact): restore manual grid height without cumulative growth`.
 - Versao atual publicada/tagueada: `v26.5.6`.
-- `CHANGELOG.md` e `CHANGELOG.pt.md` mantem a versao aberta `26.5.7` como `TBD` / `A definir` ate release.
-- Ajuste local em andamento: no modo compacto, ao abrir o grid de tarefas, aumentar a altura da janela, fechar e reabrir o grid, a janela deve voltar para a ultima altura manual da sessao sem crescimento cumulativo.
-- Arquivos alterados no ajuste atual: `src/routes/Timer/CompactTaskDisplay.tsx`, `src/ipc/index.ts`, `src/contexts/connectors/TauriInvokeConnector.ts`, `src-tauri/src/commands/window_bridge.rs`, `src-tauri/src/lib.rs`, `CHANGELOG.md`, `CHANGELOG.pt.md` e `RETOMADA.md`.
+- `CHANGELOG.md` e `CHANGELOG.pt.md` registram a versao `26.5.7` com data `2026-05-12`.
+- Ajuste compacto ja commitado: no modo compacto, ao abrir o grid de tarefas, aumentar a altura da janela, fechar e reabrir o grid, a janela volta para a ultima altura manual da sessao sem crescimento cumulativo.
+- Trabalho local atual: refresh de dependencias e pins de workflow, com changelogs atualizados sem listar pacotes individualmente.
+- Arquivos alterados no ajuste atual: `package.json`, `pnpm-lock.yaml`, `.github/workflows/ci.yml`, `.github/workflows/release-autoupdate.yml`, `CHANGELOG.md`, `CHANGELOG.pt.md` e `RETOMADA.md`.
 - O layout compacto agora usa uma linha superior estavel para timer/controles e uma linha inferior flexivel para rodape + painel de tarefas.
 - O painel compacto do grid deixou de ter altura rigida e passou a crescer dentro do bloco compacto quando houver altura disponivel.
 - A memoria da altura manual fica somente no renderer durante a sessao, usando a altura real do webview (`window.innerHeight`); o Rust apenas aplica essa altura total via IPC, sem recalcular painel + base.
-- Nao foram adicionadas novas dependencias nem novos campos de storage persistente.
+- Nao foram adicionados novos campos de storage persistente.
 - `RETOMADA.md` foi revisado porque ainda apontava uma pendencia documental antiga de README.
 
 ---
@@ -46,25 +47,23 @@ Finalizar o bloco pequeno de UI/IPCs para restaurar a altura manual do grid comp
 
 ## Validado
 
-- `pnpm typecheck:renderer` passa.
-- `pnpm lint` passa.
-- `pnpm build:renderer` passa.
-- `cargo fmt --all --manifest-path src-tauri/Cargo.toml -- --check` passa.
-- `cargo check --manifest-path src-tauri/Cargo.toml` passa.
+- `./scripts/validar-tudo.sh`, opcao 5, passa apos o refresh de dependencias: install, lint, typecheck, Vitest, Rust fmt/clippy/check e build Tauri release sem bundle.
+- O binario release foi iniciado pelo fluxo da opcao 5 e interrompido manualmente com `Ctrl+C`.
+- `./scripts/validar-tudo.sh`, opcao 1, tambem passou em execucoes de quick run com Tauri dev.
 
 ---
 
 ## Estado pendente
 
-- Pendente revisao final do diff.
+- Pendente revisao final do diff de dependencias.
 - Opcional: validar manualmente no app Tauri desktop arrastando a borda inferior da janela compacta com o grid aberto.
-- Pendente commit do ajuste de UI/IPC.
+- Pendente commit do refresh de dependencias.
 
 ---
 
 ## Retomar
 
 1. Revisar `git status --short`.
-2. Revisar `git diff -- src/routes/Timer/CompactTaskDisplay.tsx src/ipc/index.ts src/contexts/connectors/TauriInvokeConnector.ts src-tauri/src/commands/window_bridge.rs src-tauri/src/lib.rs CHANGELOG.md CHANGELOG.pt.md RETOMADA.md`.
-3. Se desejar validacao desktop, rodar `pnpm dev:app` e testar o redimensionamento compacto com o grid aberto.
-4. Commitar o ajuste com mensagem Conventional Commits em ingles.
+2. Revisar `git diff -- package.json pnpm-lock.yaml .github/workflows/ci.yml .github/workflows/release-autoupdate.yml CHANGELOG.md CHANGELOG.pt.md RETOMADA.md`.
+3. Se desejar validacao desktop adicional, rodar `pnpm dev:app` e testar o redimensionamento compacto com o grid aberto.
+4. Commitar o refresh de dependencias com mensagem Conventional Commits em ingles.

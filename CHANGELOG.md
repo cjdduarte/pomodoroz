@@ -6,11 +6,15 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
-## [26.5.7] - TBD
+## [26.5.7] - 2026-05-12
 
 ### Fixed
 
 - **Compact task grid now grows when the compact window is resized taller** — dragging the lower window edge while the compact grid is open gives the extra height to the task grid, and reopening the grid keeps the manually adjusted height during the current app session.
+
+### Changed
+
+- **Dependencies were refreshed** — project dependency pins were updated without intentional behavior changes.
 
 ## [26.5.6] - 2026-05-11
 
