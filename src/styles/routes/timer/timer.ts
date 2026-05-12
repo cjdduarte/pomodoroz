@@ -92,12 +92,14 @@ export const StyledTimer = styled.main`
     flex: 1 1 auto;
     display: grid;
     grid-template-columns: 8rem minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-rows: 7.2rem minmax(0, 1fr);
     align-content: stretch;
-    align-items: center;
+    align-items: stretch;
 
     & > :last-child {
       grid-column: 1 / -1;
+      min-height: 0;
+      align-self: stretch;
     }
 
     ${StyledFocusExtensionPrompt} {

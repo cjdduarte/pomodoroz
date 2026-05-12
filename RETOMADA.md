@@ -27,46 +27,43 @@ Atualizar este arquivo ao final de cada fase grande, correcao operacional releva
 
 - Ultimo commit conhecido: `275f849 chore(release): v26.5.6`.
 - Versao atual publicada/tagueada: `v26.5.6`.
-- `CHANGELOG.md` e `CHANGELOG.pt.md` registram a versao `26.5.6` com data `2026-05-11`.
-- A tela de Relatorio foi reorganizada para separar metricas filtradas por periodo de progresso de longo prazo.
-- O combo de periodo fica dentro do cabecalho `Relatorio do periodo`; os cartoes de tempo de foco, pausa, ocioso e ciclos completos continuam visiveis antes do bloco de progresso.
-- O bloco de progresso usa historico local para sequencia, nivel/XP, meta de hoje, marcos explicitos, heatmap de 30 dias e barras dos ultimos 7 dias.
-- Janelas de semana/mes foram alinhadas a dias locais, o fluxo diario usa ordem cronologica em periodos fixos, e a tela aberta atualiza o "agora" periodicamente.
-- Updates aplicados na `26.5.6`: pnpm `11.0.9`, deps JS/TS patch/minor selecionadas, `lint-staged` `17.0.4`, `tauri` `2.11.1` e `tauri-build` `2.6.1`.
-- `scripts/check-updates.sh` prepara todos os pins Rust selecionados no `Cargo.toml` antes de rodar `cargo update`, evitando conflito transitorio em pares com pin exato.
+- `CHANGELOG.md` e `CHANGELOG.pt.md` abriram a versao `26.5.7` com data `2026-05-12`.
+- Ajuste local em andamento: no modo compacto, ao abrir o grid de tarefas e aumentar a altura da janela, o espaco extra agora deve ir para a area do grid em vez de esticar a area do timer.
+- Arquivos alterados no ajuste: `src/styles/routes/timer/timer.ts` e `src/routes/Timer/CompactTaskDisplay.tsx`.
+- O layout compacto agora usa uma linha superior estavel para timer/controles e uma linha inferior flexivel para rodape + painel de tarefas.
+- O painel compacto do grid deixou de ter altura rigida e passou a crescer dentro do bloco compacto quando houver altura disponivel.
 - Nao foram adicionadas novas dependencias nem novos campos de storage.
-- Trabalho local atual: sincronizacao documental de `README.md`, `README.pt-BR.md` e deste handoff com o estado da `26.5.6`.
+- `RETOMADA.md` foi revisado porque ainda apontava uma pendencia documental antiga de README.
 
 ---
 
 ## Intencao de ajuste agora
 
-Finalizar a sincronizacao documental dos READMEs e commitar em um bloco pequeno de docs.
+Finalizar o bloco pequeno de UI para o redimensionamento do grid compacto e commitar se a revisao do diff estiver ok.
 
 ---
 
 ## Validado
 
-- `cargo fmt --all --manifest-path src-tauri/Cargo.toml -- --check` passa.
-- `cargo check --manifest-path src-tauri/Cargo.toml` passa.
-- `./scripts/validar-tudo.sh --skip-install` passa; inclui lint, typecheck, Vitest, Rust `fmt + clippy + check` e build Tauri release sem bundle.
-- Validacao manual confirmada: pausa em tela cheia volta para frente quando a janela esta visivel atras de outros apps.
-- Apos as correcoes de Relatorio e updates de deps da `26.5.6`, `pnpm lint`, `pnpm typecheck:renderer`, `pnpm test:run`, `pnpm build:renderer` e `cargo check --manifest-path src-tauri/Cargo.toml` passam.
-- `sh -n scripts/check-updates.sh` passa apos o ajuste do fluxo Rust.
-- Smoke visual anterior via Vite/browser ficou limitado por modal de atualizacao e aviso de IPC fora do runtime Tauri; nao substitui a validacao desktop.
-- Release `v26.5.6` criada no commit `275f849`.
+- `pnpm typecheck:renderer` passa.
+- `pnpm lint` passa.
+- `pnpm build:renderer` passa.
+- Smoke visual via Vite/Playwright: com viewport compacto `340x760`, grid aberto e 17 tarefas, a linha do timer permanece estavel e o painel do grid cresce ate o rodape.
+- Limite do smoke visual: fora do runtime Tauri aparece o aviso esperado de integracao nativa quando o renderer tenta enviar o evento de redimensionamento compacto.
 
 ---
 
 ## Estado pendente
 
-- Pendente revisar `git diff` da sincronizacao documental.
-- Pendente commitar o ajuste documental.
+- Pendente revisao final do diff.
+- Opcional: validar manualmente no app Tauri desktop arrastando a borda inferior da janela compacta com o grid aberto.
+- Pendente commit do ajuste de UI.
 
 ---
 
 ## Retomar
 
 1. Revisar `git status --short`.
-2. Revisar `git diff -- README.md README.pt-BR.md RETOMADA.md`.
-3. Commitar a sincronizacao documental com mensagem Conventional Commits em ingles.
+2. Revisar `git diff -- src/styles/routes/timer/timer.ts src/routes/Timer/CompactTaskDisplay.tsx CHANGELOG.md CHANGELOG.pt.md RETOMADA.md`.
+3. Se desejar validacao desktop, rodar `pnpm dev:app` e testar o redimensionamento compacto com o grid aberto.
+4. Commitar o ajuste com mensagem Conventional Commits em ingles.

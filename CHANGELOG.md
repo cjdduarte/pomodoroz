@@ -6,6 +6,12 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.5.7] - 2026-05-12
+
+### Fixed
+
+- **Compact task grid now grows when the compact window is resized taller** — dragging the lower window edge while the compact grid is open now gives the extra height to the task grid instead of stretching the timer area.
+
 ## [26.5.6] - 2026-05-11
 
 ### Added

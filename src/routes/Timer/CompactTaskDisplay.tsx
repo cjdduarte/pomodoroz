@@ -60,9 +60,10 @@ const StyledCompactTask = styled.div`
   z-index: 20;
 `;
 
-const StyledCompactTaskBlock = styled.div`
+const StyledCompactTaskBlock = styled.div<{ $compact?: boolean }>`
   width: 100%;
   min-width: 0;
+  height: ${(p) => (p.$compact ? "100%" : "auto")};
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -70,7 +71,7 @@ const StyledCompactTaskBlock = styled.div`
 
 const StyledCompactGridPanel = styled.div`
   width: 100%;
-  height: ${COMPACT_PANEL_HEIGHT}px;
+  flex: 1 1 ${COMPACT_PANEL_HEIGHT}px;
   display: flex;
   min-height: 0;
   border-top: 1px solid var(--color-border-primary);
@@ -102,7 +103,7 @@ const StyledCompactMenuPanel = styled(StyledCompactGridPanel)<{
   $height?: number;
 }>`
   background-color: var(--color-bg-primary);
-  height: ${(p) => p.$height ?? COMPACT_PANEL_HEIGHT}px;
+  flex: 0 0 ${(p) => p.$height ?? COMPACT_PANEL_HEIGHT}px;
 `;
 
 const StyledNormalGridOverlay = styled.div`
@@ -1054,7 +1055,7 @@ const CompactTaskDisplay: React.FC = () => {
   }
 
   return (
-    <StyledCompactTaskBlock ref={containerRef}>
+    <StyledCompactTaskBlock ref={containerRef} $compact={compactMode}>
       <StyledCompactTask>
         {showActions && !compactMode ? renderActionsMenu() : null}
         {showDropdown && !compactMode ? renderPriorityDropdown() : null}
