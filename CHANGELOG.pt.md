@@ -11,6 +11,7 @@
 ### Adicionado
 
 - **Prioridades no grid de tarefas** — cartões agora podem ser marcados como prioridade diretamente no grid, prioridades pendentes aparecem em uma seção superior dedicada tanto no grid normal quanto no compacto, a barra do grid pode alternar para o modo somente priorizadas, e a importação/exportação de tarefas preserva o novo marcador de prioridade mantendo compatibilidade com arquivos antigos.
+- **Cartões de prioridade mantêm tamanho estável ao alternar agrupamento** — alternar o modo Agrupar/Desagrupar do grid não muda mais o tamanho dos cartões dentro da seção `Prioridades`, enquanto os demais grupos de tarefas continuam seguindo o layout selecionado.
 
 ## [26.5.7] - 2026-05-12
 

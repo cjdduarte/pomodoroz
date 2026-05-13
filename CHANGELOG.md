@@ -11,6 +11,7 @@
 ### Added
 
 - **Task grid priorities** — task cards can now be marked as priorities from the grid, pending priorities appear in a dedicated top section in both normal and compact grids, the grid toolbar can switch to prioritized-only mode, and task import/export preserves the new priority flag while remaining compatible with older task files.
+- **Priority cards keep stable sizing while grouping changes** — toggling the grid group mode no longer changes the size of cards inside the `Priorities` section, while the remaining task groups still follow the selected grouping layout.
 
 ## [26.5.7] - 2026-05-12
 

@@ -30,6 +30,7 @@ Atualizar este arquivo ao final de cada fase grande, correcao operacional releva
 - Primeiro corte de `B1 — Task priorities in grid` implementado e registrado em `docs/IMPROVEMENTS.md` como `Implemented`, pendente validacao manual desktop antes de marcar `Done`.
 - Prioridade agora e campo novo no cartao (`Task.prioritized: boolean`), nao reaproveitamento de `TaskList.priority`, `taskSelection`, `done` ou `dayColor`.
 - UX entregue no renderer: tarefas priorizadas pendentes aparecem no topo do grid normal e do grid compacto, em uma secao/titulo `Priorities` / `Prioridades`, com alternancia para ver somente priorizadas.
+- Ajuste posterior aplicado: cards da secao de prioridades mantem tamanho estavel ao alternar Agrupar/Desagrupar; o agrupamento continua afetando apenas a area inferior do grid.
 - Import/export de tarefas foi atualizado para `TASKS_TRANSFER_VERSION = 2`, mantendo compatibilidade com arquivos antigos sem campo `prioritized`.
 - `CHANGELOG.md` e `CHANGELOG.pt.md` receberam a nova secao `26.5.8` (`TBD` / `A definir`).
 
