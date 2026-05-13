@@ -159,6 +159,7 @@ export const es = {
     alwaysOnTop: "Siempre arriba",
     compactMode: "Modo compacto",
     showGridRandomButton: "Mostrar botón Sortear en el grid",
+    drawOnlyPrioritizedTasks: "Sortear solo priorizadas",
     gridColorLoop: "Rotar colores en el grid",
     fullscreenBreak: "Pausa en pantalla completa",
     strictMode: "Modo sin interrupciones",

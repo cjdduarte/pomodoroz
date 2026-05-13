@@ -6,6 +6,7 @@ export type SettingTypes = {
   alwaysOnTop: boolean;
   compactMode: boolean;
   showGridRandomButton: boolean;
+  drawOnlyPrioritizedTasks: boolean;
   enableGridColorLoop: boolean;
   enableFullscreenBreak: boolean;
   enableDarkTheme: boolean;

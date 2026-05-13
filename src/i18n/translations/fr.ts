@@ -159,6 +159,7 @@ export const fr = {
     alwaysOnTop: "Toujours au premier plan",
     compactMode: "Mode compact",
     showGridRandomButton: "Afficher le bouton Tirer dans le grid",
+    drawOnlyPrioritizedTasks: "Tirer seulement les priorites",
     gridColorLoop: "Faire tourner les couleurs du grid",
     fullscreenBreak: "Pause en plein ecran",
     strictMode: "Mode sans interruptions",

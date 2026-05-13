@@ -160,6 +160,7 @@ export const de = {
     alwaysOnTop: "Immer im Vordergrund",
     compactMode: "Kompaktmodus",
     showGridRandomButton: "Zieh-Button im Grid anzeigen",
+    drawOnlyPrioritizedTasks: "Nur priorisierte Aufgaben ziehen",
     gridColorLoop: "Grid-Farben rotieren",
     fullscreenBreak: "Vollbildpause",
     strictMode: "Keine-Unterbrechungen-Modus",

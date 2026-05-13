@@ -63,6 +63,12 @@ type GridItem = {
 
 type GridColumnsMode = "auto" | "1" | "2" | "3";
 type PriorityFilterMode = "all" | "prioritized";
+type DrawCandidate = {
+  listId: string;
+  cardId: string;
+  dayColor: DayColor;
+  isPrioritized: boolean;
+};
 
 const GRID_COLUMNS_STORAGE_KEY = "tasks-grid-columns";
 const GRID_GROUPED_STORAGE_KEY = "tasks-grid-grouped";
@@ -105,6 +111,9 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
   const selectedTask = useAppSelector((state) => state.taskSelection);
   const showGridRandomButton = useAppSelector(
     (state) => state.settings.showGridRandomButton
+  );
+  const drawOnlyPrioritizedTasks = useAppSelector(
+    (state) => state.settings.drawOnlyPrioritizedTasks
   );
   const compactModeEnabled = useAppSelector(
     (state) => state.settings.compactMode
@@ -380,27 +389,35 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
     dispatch(resetAllDayColors());
   }, [collapseCompact, dispatch]);
 
-  const randomWhiteCandidates = useMemo(() => {
-    return gridItems.filter(
-      (item) =>
-        !item.isSeparator &&
-        !item.isPlaceholder &&
-        !item.isDone &&
-        item.dayColor === null &&
-        item.cardId !== null
+  const randomCandidates = useMemo<DrawCandidate[]>(() => {
+    const eligibleCards = tasks.flatMap((list) =>
+      list.cards
+        .filter((card) => !card.done && card.dayColor !== "red")
+        .map((card) => ({
+          listId: list._id,
+          cardId: card._id,
+          dayColor: card.dayColor ?? null,
+          isPrioritized: card.prioritized,
+        }))
     );
-  }, [gridItems]);
+    const prioritizedCards = eligibleCards.filter(
+      (card) => card.isPrioritized
+    );
+
+    if (drawOnlyPrioritizedTasks && prioritizedCards.length > 0) {
+      return prioritizedCards;
+    }
+
+    return eligibleCards;
+  }, [drawOnlyPrioritizedTasks, tasks]);
+
+  const randomWhiteCandidates = useMemo(() => {
+    return randomCandidates.filter((item) => item.dayColor === null);
+  }, [randomCandidates]);
 
   const randomGreenCandidates = useMemo(() => {
-    return gridItems.filter(
-      (item) =>
-        !item.isSeparator &&
-        !item.isPlaceholder &&
-        !item.isDone &&
-        item.dayColor === "green" &&
-        item.cardId !== null
-    );
-  }, [gridItems]);
+    return randomCandidates.filter((item) => item.dayColor === "green");
+  }, [randomCandidates]);
 
   const canRandomDraw =
     randomWhiteCandidates.length > 0 ||

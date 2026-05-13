@@ -18,6 +18,7 @@ import {
   setEnableCompactMode,
   setEnableGridColorLoop,
   setShowGridRandomButton,
+  setDrawOnlyPrioritizedTasks,
   setOpenAtLogin,
   setEnableInAppAutoUpdate,
   setFollowSystemTheme,
@@ -77,6 +78,19 @@ const FeatureSection: React.FC = () => {
           setShowGridRandomButton(!settings.showGridRandomButton)
         );
       }, [dispatch, settings.showGridRandomButton]),
+    },
+    {
+      id: "grid-draw-only-prioritized",
+      label: t("settings.drawOnlyPrioritizedTasks"),
+      checked: settings.drawOnlyPrioritizedTasks,
+      disabled: !settings.showGridRandomButton,
+      onChange: useCallback(() => {
+        dispatch(
+          setDrawOnlyPrioritizedTasks(
+            !settings.drawOnlyPrioritizedTasks
+          )
+        );
+      }, [dispatch, settings.drawOnlyPrioritizedTasks]),
     },
     {
       id: "grid-color-loop",

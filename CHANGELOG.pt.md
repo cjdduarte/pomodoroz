@@ -12,6 +12,7 @@
 
 - **Prioridades no grid de tarefas** — cartões agora podem ser marcados como prioridade diretamente no grid, prioridades pendentes aparecem em uma seção superior dedicada tanto no grid normal quanto no compacto, a barra do grid pode alternar para o modo somente priorizadas, e a importação/exportação de tarefas preserva o novo marcador de prioridade mantendo compatibilidade com arquivos antigos.
 - **Cartões de prioridade mantêm tamanho estável ao alternar agrupamento** — alternar o modo Agrupar/Desagrupar do grid não muda mais o tamanho dos cartões dentro da seção `Prioridades`, enquanto os demais grupos de tarefas continuam seguindo o layout selecionado.
+- **Sorteio pode ser limitado a tarefas priorizadas** — Ajustes agora inclui a opção `Sortear apenas priorizadas` abaixo do toggle do botão Sortear no grid; quando ligada, o Sorteio usa somente cartões priorizados elegíveis e volta automaticamente ao conjunto normal quando não houver priorizados disponíveis.
 
 ## [26.5.7] - 2026-05-12
 

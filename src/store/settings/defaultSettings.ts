@@ -9,6 +9,7 @@ export const defaultSettings: Readonly<SettingTypes> = Object.freeze({
   alwaysOnTop: false,
   compactMode: false,
   showGridRandomButton: true,
+  drawOnlyPrioritizedTasks: false,
   enableGridColorLoop: true,
   ignoreUpdate: "",
   enableFullscreenBreak: false,

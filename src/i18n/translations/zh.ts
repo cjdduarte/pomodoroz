@@ -154,6 +154,7 @@ export const zh = {
     alwaysOnTop: "始终置顶",
     compactMode: "紧凑模式",
     showGridRandomButton: "在网格中显示随机按钮",
+    drawOnlyPrioritizedTasks: "仅随机优先任务",
     gridColorLoop: "循环网格颜色",
     fullscreenBreak: "全屏休息",
     strictMode: "免打扰模式",

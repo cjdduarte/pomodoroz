@@ -158,6 +158,7 @@ export const ja = {
     alwaysOnTop: "常に最前面",
     compactMode: "コンパクトモード",
     showGridRandomButton: "グリッドに抽選ボタンを表示",
+    drawOnlyPrioritizedTasks: "優先タスクのみ抽選",
     gridColorLoop: "グリッドの色を循環",
     fullscreenBreak: "フルスクリーン休憩",
     strictMode: "中断なしモード",

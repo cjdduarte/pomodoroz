@@ -220,6 +220,13 @@ const settingsSlice = createSlice({
       state.showGridRandomButton = action.payload;
     },
 
+    setDrawOnlyPrioritizedTasks(
+      state,
+      action: SettingsPayload<"drawOnlyPrioritizedTasks">
+    ) {
+      state.drawOnlyPrioritizedTasks = action.payload;
+    },
+
     setEnableGridColorLoop(
       state,
       action: SettingsPayload<"enableGridColorLoop">
@@ -354,6 +361,7 @@ export const {
   setEnableDarkTheme,
   setEnableGridColorLoop,
   setShowGridRandomButton,
+  setDrawOnlyPrioritizedTasks,
   setFollowSystemTheme,
   setEnableFullscreenBreak,
   setEnableFocusExtension,

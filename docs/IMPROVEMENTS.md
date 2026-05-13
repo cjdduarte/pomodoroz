@@ -674,7 +674,8 @@ Scope checklist:
 - [x] Add a persisted all/prioritized-only toolbar control.
 - [x] Add mark/unmark priority to the grid card flow using an overlaid star action.
 - [x] Keep current Timer selection unchanged in the first slice.
-- [x] Make the Draw button respect the visible grid pool, including prioritized-only mode.
+- [x] Add a Settings option to limit Draw to prioritized eligible cards with automatic fallback to the normal draw pool.
+- [x] Keep Draw behavior independent from the visual prioritized-only grid filter.
 
 Deferred follow-up:
 
@@ -696,6 +697,8 @@ Validation checklist:
 - [ ] Manual: left-click grid color cycling still works.
 - [ ] Manual: right-click Timer selection still works and ignores completed cards.
 - [ ] Manual: active task highlight remains visible when the active task is prioritized.
+- [ ] Manual: with `Draw only prioritized tasks` enabled and at least one prioritized eligible card, Draw uses only prioritized cards.
+- [ ] Manual: with `Draw only prioritized tasks` enabled and no prioritized eligible cards, Draw falls back to the normal eligible pool.
 - [x] `pnpm lint`
 - [x] `pnpm typecheck:renderer`
 - [x] `pnpm test:run`
