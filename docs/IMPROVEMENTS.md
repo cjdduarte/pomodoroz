@@ -671,6 +671,7 @@ Scope checklist:
 - [x] Bump `TASKS_TRANSFER_VERSION` to `2` while keeping older imports valid.
 - [x] Build priority-first grid items in `TaskListGrid`.
 - [x] Add the top `Priorities` / `Prioridades` separator only when at least one pending prioritized task exists.
+- [x] Add a divider between the ungrouped priority section and the remaining grid cards.
 - [x] Add a persisted all/prioritized-only toolbar control.
 - [x] Add mark/unmark priority to the grid card flow using an overlaid star action.
 - [x] Add mark/unmark priority to List view task cards using a star action near the drag handle and away from edit/delete actions.
@@ -694,6 +695,7 @@ Validation checklist:
 - [x] Draw candidate selection is covered for visible priority filtering, prioritized-only settings, and fallback.
 - [x] Dragging a prioritized card between lists preserves priority state.
 - [ ] Manual: normal grid shows pending priorities first under `Priorities`.
+- [x] Renderer check: ungrouped priority section shows a divider before the remaining cards.
 - [ ] Manual: compact grid shows the same priority section without clipping or resizing regressions.
 - [ ] Manual: priority-only mode hides non-priority cards and keeps completed-card guards.
 - [ ] Manual: left-click grid color cycling still works.

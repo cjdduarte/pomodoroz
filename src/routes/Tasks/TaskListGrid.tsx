@@ -30,6 +30,7 @@ import {
   StyledGridCards,
   StyledGridCardShell,
   StyledGridSeparator,
+  StyledGridDivider,
   StyledGridCard,
   StyledGridPriorityButton,
   StyledGridCardTitle,
@@ -63,6 +64,7 @@ type GridItem = {
   isPlaceholder: boolean;
   dayColor: DayColor;
   isSeparator: boolean;
+  isDivider: boolean;
 };
 
 type GridColumnsMode = "auto" | "1" | "2" | "3";
@@ -179,6 +181,22 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
       isPlaceholder: false,
       dayColor: null,
       isSeparator: true,
+      isDivider: false,
+    };
+
+    const priorityDividerItem: GridItem = {
+      key: "sep:after-priorities",
+      listId: "priorities",
+      cardId: null,
+      listTitle: "",
+      taskText: "",
+      isDone: false,
+      isPrioritized: false,
+      isPriorityItem: false,
+      isPlaceholder: false,
+      dayColor: null,
+      isSeparator: true,
+      isDivider: true,
     };
 
     const createSeparatorItem = (
@@ -195,6 +213,7 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
       isPlaceholder: false,
       dayColor: null,
       isSeparator: true,
+      isDivider: false,
     });
 
     const createCardItem = (
@@ -215,6 +234,7 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
       isPlaceholder: false,
       dayColor: card.dayColor ?? null,
       isSeparator: false,
+      isDivider: false,
     });
 
     const createEmptyItem = (
@@ -231,6 +251,7 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
       isPlaceholder: true,
       dayColor: null,
       isSeparator: false,
+      isDivider: false,
     });
 
     const createListItems = (
@@ -289,6 +310,9 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
       return [
         prioritySeparatorItem,
         ...priorityItems,
+        ...(!grouped && remainingItems.length
+          ? [priorityDividerItem]
+          : []),
         ...remainingItems,
       ];
     }
@@ -623,6 +647,15 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
         <StyledGridCards $columns={columns} $compact={compact}>
           {gridItems.map((item) => {
             if (item.isSeparator) {
+              if (item.isDivider) {
+                return (
+                  <StyledGridDivider
+                    key={item.key}
+                    aria-hidden="true"
+                  />
+                );
+              }
+
               return (
                 <StyledGridSeparator key={item.key}>
                   {item.listTitle}

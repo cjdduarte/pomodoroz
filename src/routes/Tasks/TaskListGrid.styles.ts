@@ -125,6 +125,12 @@ export const StyledGridSeparator = styled.div`
   }
 `;
 
+export const StyledGridDivider = styled.div`
+  grid-column: 1 / -1;
+  min-height: 0.3rem;
+  border-bottom: 1px solid var(--color-border-primary);
+`;
+
 type CardColorVariant = "green" | "red" | "neutral";
 
 export const StyledGridCard = styled.button<{

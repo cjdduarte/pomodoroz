@@ -34,6 +34,7 @@ Atualizar este arquivo ao final de cada fase grande, correcao operacional releva
 - Ajuste posterior aplicado: Ajustes ganhou `Sortear apenas priorizadas`; quando ativo no modo todas as tarefas, o botao Sortear usa somente cards priorizados elegiveis e volta ao sorteio normal se nao houver priorizados disponiveis. Com filtro visual somente priorizadas ativo, o Sorteio fica limitado ao pool visivel do grid.
 - Ajuste posterior aplicado: a tela Lista tambem ganhou estrela para marcar/desmarcar prioridade no card, posicionada perto do handle de arraste e afastada das acoes de editar/excluir; arrastar card priorizado entre listas preserva `prioritized`.
 - Ajuste posterior aplicado: a estrela de prioridade do grid foi alinhada ao visual da Lista, sem caixa/borda propria e com o mesmo tamanho de icone.
+- Ajuste posterior aplicado: no grid desagrupado, quando ha prioridades pendentes e tarefas restantes abaixo, uma linha divisoria separa a secao `Prioridades` dos demais cards.
 - Import/export de tarefas foi atualizado para `TASKS_TRANSFER_VERSION = 2`, mantendo compatibilidade com arquivos antigos sem campo `prioritized`.
 - `CHANGELOG.md` e `CHANGELOG.pt.md` receberam a nova secao `26.5.8` (`TBD` / `A definir`).
 - Ajustes operacionais pendentes em scripts: `version.sh --dry-run` e
@@ -92,6 +93,10 @@ Validar manualmente o B1 no app desktop e, se estiver confirmado, marcar o check
 - Apos alinhamento visual da estrela no grid: `pnpm typecheck:renderer`,
   `pnpm lint`; verificacao Playwright no renderer em `/#/task-list` confirmou
   botao sem borda/fundo proprio e SVG de 12px.
+- Apos linha divisoria das prioridades: `pnpm typecheck:renderer`,
+  `pnpm lint`, `pnpm build:renderer`; verificacao Playwright no renderer em
+  `/#/task-list` confirmou linha full-width apos prioridades e remocao do
+  titulo/linha ao desmarcar todas as prioridades.
 
 ---
 
