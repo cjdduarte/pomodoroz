@@ -61,13 +61,11 @@ When an item is released:
 
 ### Next execution order
 
-1. **Product validation (B1)**
-   - Manually validate task priorities in the normal and compact grids before marking B1 as `Done`.
-2. **Remaining product cycle (B2 -> B4)**
+1. **Remaining product cycle (B2 -> B4)**
    - Cadence presets and break suggestion prompts.
-3. **A6 test coverage expansion**
+2. **A6 test coverage expansion**
    - Expand Vitest coverage in small no-new-dependency batches before considering React/component test tooling.
-4. **A10 dependency rationalization gate**
+3. **A10 dependency rationalization gate**
    - Evaluate necessity first; execute only if metrics and maintenance ROI are clear.
 
 ---
@@ -601,19 +599,19 @@ Suggested commit:
 
 ## 3. Track B — Product Features
 
-| ID  | Feature                                  | Status      | Priority | Effort |
-| --- | ---------------------------------------- | ----------- | -------- | ------ |
-| B1  | Task priorities in grid                  | Implemented | High     | Medium |
-| B2  | Cadence presets (5/1, 10/3, 25/5, 50/10) | Open        | High     | Low    |
-| B3  | Extend session (+5 / +10)                | Done        | High     | Medium |
-| B4  | Break suggestion prompts                 | Open        | High     | Low    |
-| B5  | Global play/pause hotkey                 | Open        | Medium   | Low    |
-| B6  | Cadence insights in statistics           | Open        | Medium   | Medium |
-| B7  | Motivational completion messages         | Open        | Medium   | Low    |
-| B8  | Reverse Pomodoro mode                    | Open        | Low      | Medium |
-| B9  | Ambient sounds                           | Open        | Low      | High   |
-| B10 | No-judgment mode                         | Open        | Low      | Low    |
-| B11 | Timer circle small-window layout fix     | Done        | Medium   | Low    |
+| ID  | Feature                                  | Status | Priority | Effort |
+| --- | ---------------------------------------- | ------ | -------- | ------ |
+| B1  | Task priorities in grid                  | Done   | High     | Medium |
+| B2  | Cadence presets (5/1, 10/3, 25/5, 50/10) | Open   | High     | Low    |
+| B3  | Extend session (+5 / +10)                | Done   | High     | Medium |
+| B4  | Break suggestion prompts                 | Open   | High     | Low    |
+| B5  | Global play/pause hotkey                 | Open   | Medium   | Low    |
+| B6  | Cadence insights in statistics           | Open   | Medium   | Medium |
+| B7  | Motivational completion messages         | Open   | Medium   | Low    |
+| B8  | Reverse Pomodoro mode                    | Open   | Low      | Medium |
+| B9  | Ambient sounds                           | Open   | Low      | High   |
+| B10 | No-judgment mode                         | Open   | Low      | Low    |
+| B11 | Timer circle small-window layout fix     | Done   | Medium   | Low    |
 
 Current product baseline:
 
@@ -681,29 +679,29 @@ Scope checklist:
 
 Deferred follow-up:
 
-- [ ] Manual desktop validation: verify priority section layout in normal and compact grids.
+- [x] Manual desktop validation: verify priority section layout in normal and compact grids.
 - [ ] Evaluate whether the Timer dropdown should sort prioritized pending tasks first.
 
 Validation checklist:
 
 - [x] Existing tasks from old storage load with `prioritized: false`.
 - [x] New task cards default to non-priority.
-- [ ] Manual: priority toggle persists after app restart.
+- [x] Manual: priority toggle persists after app restart.
 - [x] Undo/redo restores priority state correctly.
 - [x] Exported JSON includes priority state.
 - [x] Imported older JSON without priority fields remains valid.
 - [x] Draw candidate selection is covered for visible priority filtering, prioritized-only settings, and fallback.
 - [x] Dragging a prioritized card between lists preserves priority state.
-- [ ] Manual: normal grid shows pending priorities first under `Priorities`.
+- [x] Manual: normal grid shows pending priorities first under `Priorities`.
 - [x] Renderer check: ungrouped priority section shows a divider before the remaining cards.
-- [ ] Manual: compact grid shows the same priority section without clipping or resizing regressions.
-- [ ] Manual: priority-only mode hides non-priority cards and keeps completed-card guards.
-- [ ] Manual: left-click grid color cycling still works.
-- [ ] Manual: right-click Timer selection still works and ignores completed cards.
-- [ ] Manual: active task highlight remains visible when the active task is prioritized.
-- [ ] Manual: with `Draw only prioritized tasks` enabled and at least one prioritized eligible card, Draw uses only prioritized cards.
-- [ ] Manual: with `Draw only prioritized tasks` enabled and no prioritized eligible cards, Draw falls back to the normal eligible pool.
-- [ ] Manual: with the visual prioritized-only filter active, Draw does not change hidden non-priority cards.
+- [x] Manual: compact grid shows the same priority section without clipping or resizing regressions.
+- [x] Manual: priority-only mode hides non-priority cards and keeps completed-card guards.
+- [x] Manual: left-click grid color cycling still works.
+- [x] Manual: right-click Timer selection still works and ignores completed cards.
+- [x] Manual: active task highlight remains visible when the active task is prioritized.
+- [x] Manual: with `Draw only prioritized tasks` enabled and at least one prioritized eligible card, Draw uses only prioritized cards.
+- [x] Manual: with `Draw only prioritized tasks` enabled and no prioritized eligible cards, Draw falls back to the normal eligible pool.
+- [x] Manual: with the visual prioritized-only filter active, Draw does not change hidden non-priority cards.
 - [x] `pnpm lint`
 - [x] `pnpm typecheck:renderer`
 - [x] `pnpm test:run`

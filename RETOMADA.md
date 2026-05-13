@@ -27,7 +27,7 @@ Atualizar este arquivo ao final de cada fase grande, correcao operacional releva
 
 - Ultimo commit conhecido: `83d9b0b fix(scripts): abort test runtime when local install is running chore(deps): refresh js and rust dependencies`.
 - Versao atual publicada/tagueada: `v26.5.7`.
-- Primeiro corte de `B1 — Task priorities in grid` implementado e registrado em `docs/IMPROVEMENTS.md` como `Implemented`, pendente validacao manual desktop antes de marcar `Done`.
+- `B1 — Task priorities in grid` foi implementado, validado manualmente no desktop e marcado como `Done` em `docs/IMPROVEMENTS.md`.
 - Prioridade agora e campo novo no cartao (`Task.prioritized: boolean`), nao reaproveitamento de `TaskList.priority`, `taskSelection`, `done` ou `dayColor`.
 - UX entregue no renderer: tarefas priorizadas pendentes aparecem no topo do grid normal e do grid compacto, em uma secao/titulo `Priorities` / `Prioridades`, com alternancia para ver somente priorizadas.
 - Ajuste posterior aplicado: cards da secao de prioridades mantem tamanho estavel ao alternar Agrupar/Desagrupar; o agrupamento continua afetando apenas a area inferior do grid.
@@ -60,7 +60,7 @@ Atualizar este arquivo ao final de cada fase grande, correcao operacional releva
 
 ## Intencao de ajuste agora
 
-Validar manualmente o B1 no app desktop e, se estiver confirmado, marcar o checkpoint correspondente em `docs/IMPROVEMENTS.md`.
+Revisar o diff final e commitar o fechamento do B1 com mensagem Conventional Commits em ingles.
 
 ---
 
@@ -97,12 +97,14 @@ Validar manualmente o B1 no app desktop e, se estiver confirmado, marcar o check
   `pnpm lint`, `pnpm build:renderer`; verificacao Playwright no renderer em
   `/#/task-list` confirmou linha full-width apos prioridades e remocao do
   titulo/linha ao desmarcar todas as prioridades.
+- Validacao manual desktop do B1 confirmada pelo usuario; `docs/IMPROVEMENTS.md`
+  foi atualizado com B1 como `Done` e checkboxes manuais concluidos.
 
 ---
 
 ## Estado pendente
 
-- Confirmar se a validacao manual desktop do B1 ja pode ser marcada como concluida.
+- Revisar diff final e commitar o fechamento do B1.
 - Refinamento futuro opcional: ordenar o dropdown do Timer por priorizadas.
 
 ---
@@ -111,5 +113,4 @@ Validar manualmente o B1 no app desktop e, se estiver confirmado, marcar o check
 
 1. Revisar `git status --short`.
 2. Revisar `git diff`.
-3. Se desejar validacao manual, rodar `pnpm dev:app` e testar prioridades no grid normal, grid compacto e tela Lista.
-4. Se a revisao estiver ok, commitar com mensagem Conventional Commits em ingles.
+3. Se a revisao estiver ok, commitar com mensagem Conventional Commits em ingles.
