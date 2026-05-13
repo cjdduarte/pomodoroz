@@ -21,6 +21,7 @@ describe("task utilities", () => {
       text: "Focus session",
       description: "",
       done: false,
+      prioritized: false,
       dayColor: null,
       dayColorDate: null,
     });
@@ -32,6 +33,7 @@ describe("task utilities", () => {
       text: "Focus session",
       description: "",
       done: false,
+      prioritized: false,
       dayColor: null,
       dayColorDate: null,
     };
@@ -41,12 +43,14 @@ describe("task utilities", () => {
         text: "Review plan",
         description: "Check reducer coverage",
         done: true,
+        prioritized: true,
       })
     ).toEqual({
       _id: "task-id-1",
       text: "Review plan",
       description: "Check reducer coverage",
       done: true,
+      prioritized: true,
       dayColor: null,
       dayColorDate: null,
     });

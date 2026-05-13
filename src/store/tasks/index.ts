@@ -1,6 +1,6 @@
 import type { PayloadAction, UnknownAction } from "@reduxjs/toolkit";
 import { createAction, createSlice } from "@reduxjs/toolkit";
-import { getFromStorage } from "utils";
+import { getFromStorage } from "../../utils/storage";
 import type { Task, TaskList, ListPayload, DayColor } from "./types";
 import {
   addTaskToList,
@@ -40,6 +40,7 @@ const initialState: TaskList[] = tasks.map((list) => ({
   dayColorDate: list.dayColorDate ?? null,
   cards: list.cards.map((card) => ({
     ...card,
+    prioritized: Boolean(card.prioritized),
     dayColor: normalizeDayColor(card.dayColor),
     dayColorDate: card.dayColorDate ?? null,
   })),
@@ -243,6 +244,29 @@ const tasksSlice = createSlice({
       return newState;
     },
 
+    setTaskCardPriority: (
+      state,
+      action: PayloadAction<{
+        listId: TaskList["_id"];
+        cardId: Task["_id"];
+        prioritized: Task["prioritized"];
+      }>
+    ) => {
+      return state.map((list) => {
+        if (list._id !== action.payload.listId) return list;
+
+        const newCards = list.cards.map((card) => {
+          if (card._id !== action.payload.cardId) return card;
+
+          return editTask(card, {
+            prioritized: action.payload.prioritized,
+          });
+        });
+
+        return { ...list, cards: newCards };
+      });
+    },
+
     skipTaskCard: (
       state,
       action: PayloadAction<{
@@ -408,6 +432,7 @@ export const {
   setTaskDayColor,
   setTaskCardDone,
   setTaskCardNotDone,
+  setTaskCardPriority,
   setTaskListPriority,
   skipTaskCard,
   appendTaskLists,

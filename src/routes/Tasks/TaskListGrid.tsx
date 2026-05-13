@@ -11,7 +11,11 @@ import {
   useAppSelector,
   useCompactAutoExpand,
 } from "hooks";
-import { resetAllDayColors, setTaskDayColor } from "store";
+import {
+  resetAllDayColors,
+  setTaskCardPriority,
+  setTaskDayColor,
+} from "store";
 import type { DayColor } from "store/tasks/types";
 import {
   getFromStorage,
@@ -24,8 +28,10 @@ import {
   StyledGridToolbarButton,
   StyledGridContent,
   StyledGridCards,
+  StyledGridCardShell,
   StyledGridSeparator,
   StyledGridCard,
+  StyledGridPriorityButton,
   StyledGridCardTitle,
   StyledGridCardTask,
   StyledGridFooter,
@@ -48,15 +54,19 @@ type GridItem = {
   listTitle: string;
   taskText: string;
   isDone: boolean;
+  isPrioritized: boolean;
+  isPriorityItem: boolean;
   isPlaceholder: boolean;
   dayColor: DayColor;
   isSeparator: boolean;
 };
 
 type GridColumnsMode = "auto" | "1" | "2" | "3";
+type PriorityFilterMode = "all" | "prioritized";
 
 const GRID_COLUMNS_STORAGE_KEY = "tasks-grid-columns";
 const GRID_GROUPED_STORAGE_KEY = "tasks-grid-grouped";
+const GRID_PRIORITY_FILTER_STORAGE_KEY = "tasks-grid-priority-filter";
 
 const getTodayDateKey = (): string => {
   const now = new Date();
@@ -80,6 +90,14 @@ const getInitialGrouped = (): boolean => {
   return storedValue === true;
 };
 
+const getInitialPriorityFilterMode = (): PriorityFilterMode => {
+  const storedValue = getFromStorage<string>(
+    GRID_PRIORITY_FILTER_STORAGE_KEY
+  );
+
+  return storedValue === "prioritized" ? "prioritized" : "all";
+};
+
 const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
@@ -98,6 +116,8 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
     getInitialColumnsMode
   );
   const [grouped, setGrouped] = useState<boolean>(getInitialGrouped);
+  const [priorityFilterMode, setPriorityFilterMode] =
+    useState<PriorityFilterMode>(getInitialPriorityFilterMode);
   const [showResetDialog, setShowResetDialog] = useState(false);
   const { maybeExpandCompact, collapseCompact } = useCompactAutoExpand({
     compactModeEnabled,
@@ -135,59 +155,139 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
     saveToStorage(GRID_GROUPED_STORAGE_KEY, grouped);
   }, [grouped]);
 
-  const gridItems = useMemo<GridItem[]>(() => {
-    return tasks.flatMap((list): GridItem[] => {
-      const separatorItem: GridItem = {
-        key: `sep:${list._id}`,
-        listId: list._id,
-        cardId: null,
-        listTitle: list.title,
-        taskText: "",
-        isDone: false,
-        isPlaceholder: false,
-        dayColor: null,
-        isSeparator: true,
-      };
+  useEffect(() => {
+    saveToStorage(GRID_PRIORITY_FILTER_STORAGE_KEY, priorityFilterMode);
+  }, [priorityFilterMode]);
 
-      if (!list.cards.length) {
-        const emptyItem: GridItem = {
-          key: `${list._id}:empty`,
-          listId: list._id,
-          cardId: null,
-          listTitle: list.title,
-          taskText: t("tasks.noTasks"),
-          isDone: false,
-          isPlaceholder: true,
-          dayColor: null,
-          isSeparator: false,
-        };
+  const gridItems = useMemo<GridItem[]>(() => {
+    const prioritySeparatorItem: GridItem = {
+      key: "sep:priorities",
+      listId: "priorities",
+      cardId: null,
+      listTitle: t("grid.priorities"),
+      taskText: "",
+      isDone: false,
+      isPrioritized: false,
+      isPriorityItem: false,
+      isPlaceholder: false,
+      dayColor: null,
+      isSeparator: true,
+    };
+
+    const createSeparatorItem = (
+      list: (typeof tasks)[number]
+    ): GridItem => ({
+      key: `sep:${list._id}`,
+      listId: list._id,
+      cardId: null,
+      listTitle: list.title,
+      taskText: "",
+      isDone: false,
+      isPrioritized: false,
+      isPriorityItem: false,
+      isPlaceholder: false,
+      dayColor: null,
+      isSeparator: true,
+    });
+
+    const createCardItem = (
+      list: (typeof tasks)[number],
+      card: (typeof list.cards)[number],
+      isPriorityItem = false
+    ): GridItem => ({
+      key: `${isPriorityItem ? "priority" : "card"}:${list._id}:${
+        card._id
+      }`,
+      listId: list._id,
+      cardId: card._id,
+      listTitle: list.title,
+      taskText: card.text,
+      isDone: card.done,
+      isPrioritized: card.prioritized,
+      isPriorityItem,
+      isPlaceholder: false,
+      dayColor: card.dayColor ?? null,
+      isSeparator: false,
+    });
+
+    const createEmptyItem = (
+      list: (typeof tasks)[number]
+    ): GridItem => ({
+      key: `${list._id}:empty`,
+      listId: list._id,
+      cardId: null,
+      listTitle: list.title,
+      taskText: t("tasks.noTasks"),
+      isDone: false,
+      isPrioritized: false,
+      isPriorityItem: false,
+      isPlaceholder: true,
+      dayColor: null,
+      isSeparator: false,
+    });
+
+    const createListItems = (
+      list: (typeof tasks)[number],
+      cards: (typeof list.cards)[number][],
+      includeEmptyPlaceholder: boolean
+    ): GridItem[] => {
+      if (!cards.length) {
+        if (!includeEmptyPlaceholder) {
+          return [];
+        }
+
+        const emptyItem = createEmptyItem(list);
 
         if (grouped) {
-          return [separatorItem, emptyItem];
+          return [createSeparatorItem(list), emptyItem];
         }
 
         return [emptyItem];
       }
 
-      const cardItems = list.cards.map((card) => ({
-        key: `${list._id}:${card._id}`,
-        listId: list._id,
-        cardId: card._id,
-        listTitle: list.title,
-        taskText: card.text,
-        isDone: card.done,
-        isPlaceholder: false,
-        dayColor: card.dayColor ?? null,
-        isSeparator: false,
-      }));
+      const cardItems = cards.map((card) => createCardItem(list, card));
 
       if (grouped) {
-        return [separatorItem, ...cardItems];
+        return [createSeparatorItem(list), ...cardItems];
       }
 
       return cardItems;
+    };
+
+    const priorityItems = tasks.flatMap((list): GridItem[] =>
+      list.cards
+        .filter((card) => card.prioritized && !card.done)
+        .map((card) => createCardItem(list, card, true))
+    );
+
+    if (priorityFilterMode === "prioritized") {
+      return priorityItems.length
+        ? [prioritySeparatorItem, ...priorityItems]
+        : [];
+    }
+
+    const remainingItems = tasks.flatMap((list): GridItem[] => {
+      const remainingCards = list.cards.filter(
+        (card) => !(card.prioritized && !card.done)
+      );
+
+      return createListItems(
+        list,
+        remainingCards,
+        list.cards.length === 0
+      );
     });
-  }, [grouped, tasks, t]);
+
+    if (priorityItems.length) {
+      return [
+        prioritySeparatorItem,
+        ...priorityItems,
+        ...remainingItems,
+      ];
+    }
+
+    return remainingItems;
+  }, [grouped, priorityFilterMode, tasks, t]);
 
   const handleCardClick = useCallback(
     (listId: string, cardId: string | null, currentColor: DayColor) => {
@@ -216,6 +316,37 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
     },
     [dispatch, enableGridColorLoop]
   );
+
+  const handlePriorityToggle = useCallback(
+    (
+      event: React.MouseEvent<HTMLButtonElement>,
+      listId: string,
+      cardId: string | null,
+      isPrioritized: boolean
+    ) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (!cardId) {
+        return;
+      }
+
+      dispatch(
+        setTaskCardPriority({
+          listId,
+          cardId,
+          prioritized: !isPrioritized,
+        })
+      );
+    },
+    [dispatch]
+  );
+
+  const handlePriorityFilterToggle = useCallback(() => {
+    setPriorityFilterMode((current) =>
+      current === "prioritized" ? "all" : "prioritized"
+    );
+  }, []);
 
   const handleCardContextMenu = useCallback(
     (
@@ -316,20 +447,17 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
   );
 
   const stats = useMemo(() => {
-    const total = tasks.reduce(
-      (count, list) => count + list.cards.length,
-      0
+    const visibleCards = gridItems.filter(
+      (item) =>
+        !item.isSeparator && !item.isPlaceholder && item.cardId !== null
     );
-    const visited = tasks.reduce(
-      (count, list) =>
-        count +
-        list.cards.filter((card) => (card.dayColor ?? null) !== null)
-          .length,
-      0
-    );
+    const total = visibleCards.length;
+    const visited = visibleCards.filter(
+      (item) => (item.dayColor ?? null) !== null
+    ).length;
     const remaining = total - visited;
     return { total, visited, remaining };
-  }, [tasks]);
+  }, [gridItems]);
 
   const getColorVariant = (
     color: DayColor
@@ -354,6 +482,12 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
   const groupToggleLabel = grouped
     ? t("grid.ungroupLabel")
     : t("grid.groupLabel");
+  const priorityFilterLabel =
+    priorityFilterMode === "prioritized"
+      ? t("grid.showAllTasks")
+      : t("grid.showPrioritizedOnly");
+  const markPriorityLabel = t("grid.markPriority");
+  const unmarkPriorityLabel = t("grid.unmarkPriority");
 
   return (
     <StyledGridWrapper>
@@ -443,6 +577,30 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
             <path d="M2.5 3v10" />
           </svg>
         </StyledGridToolbarButton>
+        <StyledGridToolbarButton
+          $iconOnly
+          $active={priorityFilterMode === "prioritized"}
+          onClick={handlePriorityFilterToggle}
+          title={priorityFilterLabel}
+          aria-label={priorityFilterLabel}
+        >
+          <svg
+            viewBox="0 0 16 16"
+            fill={
+              priorityFilterMode === "prioritized"
+                ? "currentColor"
+                : "none"
+            }
+            stroke="currentColor"
+            strokeWidth="1.25"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path d="M8 2.4 9.7 5.8l3.8.6-2.8 2.7.7 3.8L8 11.1l-3.4 1.8.7-3.8-2.8-2.7 3.8-.6L8 2.4Z" />
+          </svg>
+        </StyledGridToolbarButton>
         <StyledGridFooterControls>
           <StyledGridColumns>
             <StyledGridColumnsLabel htmlFor="task-grid-columns">
@@ -477,44 +635,77 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
               item.cardId !== null &&
               activeTaskSelection?.listId === item.listId &&
               activeTaskSelection.cardId === item.cardId;
+            const priorityLabel = item.isPrioritized
+              ? unmarkPriorityLabel
+              : markPriorityLabel;
 
             return (
-              <StyledGridCard
-                key={item.key}
-                $color={getColorVariant(item.dayColor)}
-                $compact={compact}
-                $active={isCurrentTask}
-                $grouped={grouped}
-                onClick={() =>
-                  handleCardClick(
-                    item.listId,
-                    item.cardId,
-                    item.dayColor
-                  )
-                }
-                onContextMenu={(event) =>
-                  handleCardContextMenu(
-                    event,
-                    item.listId,
-                    item.cardId,
-                    item.isDone
-                  )
-                }
-                title={selectHint}
-                aria-current={isCurrentTask ? "true" : undefined}
-              >
-                {!grouped ? (
-                  <StyledGridCardTitle>
-                    {item.listTitle}
-                  </StyledGridCardTitle>
-                ) : null}
-                <StyledGridCardTask
-                  $done={item.isDone}
-                  $placeholder={item.isPlaceholder}
+              <StyledGridCardShell key={item.key}>
+                <StyledGridCard
+                  $color={getColorVariant(item.dayColor)}
+                  $compact={compact}
+                  $active={isCurrentTask}
+                  $grouped={grouped}
+                  $withPriorityAction={!item.isPlaceholder}
+                  onClick={() =>
+                    handleCardClick(
+                      item.listId,
+                      item.cardId,
+                      item.dayColor
+                    )
+                  }
+                  onContextMenu={(event) =>
+                    handleCardContextMenu(
+                      event,
+                      item.listId,
+                      item.cardId,
+                      item.isDone
+                    )
+                  }
+                  title={selectHint}
+                  aria-current={isCurrentTask ? "true" : undefined}
                 >
-                  {item.taskText}
-                </StyledGridCardTask>
-              </StyledGridCard>
+                  {!grouped || item.isPriorityItem ? (
+                    <StyledGridCardTitle>
+                      {item.listTitle}
+                    </StyledGridCardTitle>
+                  ) : null}
+                  <StyledGridCardTask
+                    $done={item.isDone}
+                    $placeholder={item.isPlaceholder}
+                  >
+                    {item.taskText}
+                  </StyledGridCardTask>
+                </StyledGridCard>
+                {!item.isPlaceholder && item.cardId ? (
+                  <StyledGridPriorityButton
+                    $active={item.isPrioritized}
+                    $compact={compact}
+                    onClick={(event) =>
+                      handlePriorityToggle(
+                        event,
+                        item.listId,
+                        item.cardId,
+                        item.isPrioritized
+                      )
+                    }
+                    title={priorityLabel}
+                    aria-label={priorityLabel}
+                    aria-pressed={item.isPrioritized}
+                  >
+                    <svg
+                      viewBox="0 0 16 16"
+                      strokeWidth="1.3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                      focusable="false"
+                    >
+                      <path d="M8 2.4 9.7 5.8l3.8.6-2.8 2.7.7 3.8L8 11.1l-3.4 1.8.7-3.8-2.8-2.7 3.8-.6L8 2.4Z" />
+                    </svg>
+                  </StyledGridPriorityButton>
+                ) : null}
+              </StyledGridCardShell>
             );
           })}
         </StyledGridCards>

@@ -59,13 +59,15 @@ When an item is released:
   - `26.4.37` draft contains `A15` renderer CSP hardening and an IPC warning refinement so optional background sync failures do not show the generic native warning banner.
   - `26.4.38` draft contains updater prompt state simplification and `A3` shortcut persistence for the app-owned toggle-theme shortcut.
 
-### Next execution order (after 26.4.38)
+### Next execution order
 
-1. **Product cycle (B1 -> B2 -> B3)**
-   - Cadence presets, session extension, break suggestion prompts.
-2. **A6 test coverage expansion**
+1. **Product validation (B1)**
+   - Manually validate task priorities in the normal and compact grids before marking B1 as `Done`.
+2. **Remaining product cycle (B2 -> B4)**
+   - Cadence presets and break suggestion prompts.
+3. **A6 test coverage expansion**
    - Expand Vitest coverage in small no-new-dependency batches before considering React/component test tooling.
-3. **A10 dependency rationalization gate**
+4. **A10 dependency rationalization gate**
    - Evaluate necessity first; execute only if metrics and maintenance ROI are clear.
 
 ---
@@ -599,32 +601,118 @@ Suggested commit:
 
 ## 3. Track B — Product Features
 
-| ID  | Feature                                  | Status | Priority | Effort |
-| --- | ---------------------------------------- | ------ | -------- | ------ |
-| B1  | Cadence presets (5/1, 10/3, 25/5, 50/10) | Open   | High     | Low    |
-| B2  | Extend session (+5 / +10)                | Done   | High     | Medium |
-| B3  | Break suggestion prompts                 | Open   | High     | Low    |
-| B4  | Global play/pause hotkey                 | Open   | Medium   | Low    |
-| B5  | Cadence insights in statistics           | Open   | Medium   | Medium |
-| B6  | Motivational completion messages         | Open   | Medium   | Low    |
-| B7  | Reverse Pomodoro mode                    | Open   | Low      | Medium |
-| B8  | Ambient sounds                           | Open   | Low      | High   |
-| B9  | No-judgment mode                         | Open   | Low      | Low    |
-| B10 | Timer circle small-window layout fix     | Done   | Medium   | Low    |
+| ID  | Feature                                  | Status      | Priority | Effort |
+| --- | ---------------------------------------- | ----------- | -------- | ------ |
+| B1  | Task priorities in grid                  | Implemented | High     | Medium |
+| B2  | Cadence presets (5/1, 10/3, 25/5, 50/10) | Open        | High     | Low    |
+| B3  | Extend session (+5 / +10)                | Done        | High     | Medium |
+| B4  | Break suggestion prompts                 | Open        | High     | Low    |
+| B5  | Global play/pause hotkey                 | Open        | Medium   | Low    |
+| B6  | Cadence insights in statistics           | Open        | Medium   | Medium |
+| B7  | Motivational completion messages         | Open        | Medium   | Low    |
+| B8  | Reverse Pomodoro mode                    | Open        | Low      | Medium |
+| B9  | Ambient sounds                           | Open        | Low      | High   |
+| B10 | No-judgment mode                         | Open        | Low      | Low    |
+| B11 | Timer circle small-window layout fix     | Done        | Medium   | Low    |
 
 Current product baseline:
 
 - Manual cadence configuration already exists via config sliders (`stayFocus`, `shortBreak`, `longBreak`, `sessionRounds`).
 - Global shortcuts already exist for hide/show app (`Alt+Shift+H` / `Alt+Shift+S`); play/pause is still pending.
+- Existing `TaskList.priority` is list-level, single-selection behavior used by the Timer flow. It must not be reused for multi-card priorities.
+- Existing grid `dayColor` is a daily rotation/status marker (`white/green/red`) and may reset by date. It must not be reused for persistent task priority.
+- Normal grid and compact grid both render through `TaskListGrid`; priority behavior should be implemented once there and verified in both window modes.
 
-### B10 bug note
+### B1 — Task priorities in grid
+
+Decision checkpoint:
+
+- Add a new persistent field on each task card, not on the list:
+  - `prioritized: boolean`
+- Keep the existing meanings separate:
+  - `done`: task completion.
+  - `taskSelection`: the single active task currently linked to the Timer.
+  - `TaskList.priority`: the current single priority/active list behavior used by Timer selection.
+  - `dayColor`: daily grid rotation/status.
+  - `prioritized`: user-selected cards that should be surfaced first.
+- The first implementation should not add a library. Use existing store/UI patterns and local SVG/icon conventions if a new icon is needed.
+
+UX target:
+
+- The main surface is the Tasks grid.
+- The same behavior must apply to:
+  - normal Tasks grid;
+  - Timer grid overlay in normal mode;
+  - compact-mode grid panel.
+- Prioritized pending tasks should render above the rest of the grid as a first full-width section titled `Priorities` / `Prioridades`.
+- When priority filtering is off, prioritized pending tasks appear only in the priority section and are not duplicated in the lower task area.
+- The lower task area keeps the existing grid behavior for all non-priority pending tasks plus completed tasks.
+- A completed prioritized task should leave the active priority section automatically because the section is for pending priorities. The field may remain stored so unchecking `done` can restore the task to the priority section.
+- Add a grid toolbar control to show all tasks or only prioritized pending tasks.
+- Empty priority state should be quiet: do not add a large empty panel when no task is prioritized.
+- In grouped mode, the priority section stays above all list groups. The remaining groups continue to use list separators.
+- The grid card should expose a clear action to mark/unmark priority without interfering with:
+  - left-click daily color cycling;
+  - right-click Timer selection;
+  - active task highlight;
+  - completed-card selection guard.
+
+Scope checklist:
+
+- [x] Add `prioritized: boolean` to `Task`.
+- [x] Default new tasks to `false`.
+- [x] Normalize old persisted tasks to `false` during tasks state hydration.
+- [x] Keep all data local-only in the existing root state persistence.
+- [x] Add a reducer action to toggle or set card priority by `listId` + `cardId`.
+- [x] Preserve undo/redo behavior through the existing tasks history reducer.
+- [x] Add Vitest coverage for defaults, migration/normalization, toggle behavior, and undo/redo.
+- [x] Include `prioritized` in exported task JSON.
+- [x] Accept missing `prioritized` during import as `false` for backward compatibility.
+- [x] Bump `TASKS_TRANSFER_VERSION` to `2` while keeping older imports valid.
+- [x] Build priority-first grid items in `TaskListGrid`.
+- [x] Add the top `Priorities` / `Prioridades` separator only when at least one pending prioritized task exists.
+- [x] Add a persisted all/prioritized-only toolbar control.
+- [x] Add mark/unmark priority to the grid card flow using an overlaid star action.
+- [x] Keep current Timer selection unchanged in the first slice.
+- [x] Make the Draw button respect the visible grid pool, including prioritized-only mode.
+
+Deferred follow-up:
+
+- [ ] Manual desktop validation: verify priority section layout in normal and compact grids.
+- [ ] Consider list-mode priority visibility only after the grid behavior is stable.
+- [ ] Evaluate whether the Timer dropdown should sort prioritized pending tasks first.
+
+Validation checklist:
+
+- [x] Existing tasks from old storage load with `prioritized: false`.
+- [x] New task cards default to non-priority.
+- [ ] Manual: priority toggle persists after app restart.
+- [x] Undo/redo restores priority state correctly.
+- [x] Exported JSON includes priority state.
+- [x] Imported older JSON without priority fields remains valid.
+- [ ] Manual: normal grid shows pending priorities first under `Priorities`.
+- [ ] Manual: compact grid shows the same priority section without clipping or resizing regressions.
+- [ ] Manual: priority-only mode hides non-priority cards and keeps completed-card guards.
+- [ ] Manual: left-click grid color cycling still works.
+- [ ] Manual: right-click Timer selection still works and ignores completed cards.
+- [ ] Manual: active task highlight remains visible when the active task is prioritized.
+- [x] `pnpm lint`
+- [x] `pnpm typecheck:renderer`
+- [x] `pnpm test:run`
+- [x] `pnpm build:renderer`
+
+Suggested commit:
+
+- `feat(tasks): add task priorities to the grid`
+
+### B11 bug note
 
 - In normal mode, when the user resizes the app by dragging the window border to a smaller width or height, the main timer circle can overflow its intended area and overlap the navigation area, session label, and timer controls.
 - Reproduce on the Timer route by dragging the window border inward until the circle touches or covers the top navigation and bottom controls.
 - Fixed by enforcing the normal-mode native minimum window size, keeping the control row from shrinking vertically, and retaining width-aware timer-circle scaling for narrower supported layouts.
 - Validation target: timer circle must remain fully visible and must not overlap navigation, titlebar, session label, play/skip/volume/fullscreen controls, or compact task footer in small windows.
 
-### B2 decision notes
+### B3 decision notes
 
 - Session extension must be optional. Add a settings toggle for the feature; when disabled, the app must behave exactly as it does today.
 - Current baseline to preserve: when focus reaches zero, the app automatically transitions into the next short/long break and the break starts counting immediately.
@@ -639,13 +727,13 @@ Current product baseline:
 - The hidden-app reminder must align with the existing notification setting: `none` means no native reminder; `normal` and `extra` may show the extension reminder.
 - In `extra` notification mode, accepting an extension may allow the standard 30-second focus warning to appear again near the end of the extended focus. This is intentional: the hidden-app extension reminder only suppresses the simultaneous standard 30-second warning at the original extension window.
 - The prompt is non-modal. It disappears when the user pauses the timer or when focus ends.
-- Do not rewind an already-started break in the first B2 implementation.
+- Do not rewind an already-started break in the first B3 implementation.
 - Extending focus keeps the same focus session and round. It must not create a new pomodoro/session count.
 - Statistics should record one focus block with the real final duration, including the extension.
 - The next break keeps its configured duration; focus extension must not scale short/long break length.
-- Defer native notification action buttons and keyboard shortcuts for the first B2 implementation.
+- Defer native notification action buttons and keyboard shortcuts for the first B3 implementation.
 
-### B1/B2/B3 (next cycle)
+### B2/B3/B4 (timer/cadence cycle)
 
 - Scope checklist:
   - [ ] Implement presets UI in settings.

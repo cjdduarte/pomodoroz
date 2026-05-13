@@ -26,6 +26,7 @@ export const StyledGridToolbar = styled.div<{ $compact?: boolean }>`
 
 export const StyledGridToolbarButton = styled.button<{
   $iconOnly?: boolean;
+  $active?: boolean;
 }>`
   display: flex;
   align-items: center;
@@ -35,8 +36,10 @@ export const StyledGridToolbarButton = styled.button<{
   min-width: ${(p) => (p.$iconOnly ? "2rem" : "auto")};
   border: 1px solid var(--color-border-primary);
   border-radius: 3px;
-  background-color: var(--color-bg-primary);
-  color: var(--color-body-text);
+  background-color: ${(p) =>
+    p.$active ? "var(--color-primary)" : "var(--color-bg-primary)"};
+  color: ${(p) =>
+    p.$active ? "var(--color-bg-primary)" : "var(--color-body-text)"};
   font-size: 1.1rem;
   line-height: 1;
   cursor: pointer;
@@ -49,7 +52,8 @@ export const StyledGridToolbarButton = styled.button<{
   }
 
   &:hover {
-    color: var(--color-primary);
+    color: ${(p) =>
+      p.$active ? "var(--color-bg-primary)" : "var(--color-primary)"};
     border-color: var(--color-primary);
   }
 
@@ -64,6 +68,11 @@ export const StyledGridToolbarButton = styled.button<{
     color: var(--color-disabled-text);
     border-color: var(--color-border-primary);
   }
+`;
+
+export const StyledGridCardShell = styled.div`
+  position: relative;
+  min-width: 0;
 `;
 
 export const StyledGridContent = styled.div<{ $compact?: boolean }>`
@@ -122,6 +131,7 @@ export const StyledGridCard = styled.button<{
   $compact?: boolean;
   $active?: boolean;
   $grouped?: boolean;
+  $withPriorityAction?: boolean;
 }>`
   display: flex;
   flex-direction: column;
@@ -133,6 +143,14 @@ export const StyledGridCard = styled.button<{
         ? "0.55rem 0.72rem"
         : "0.62rem 0.8rem"
       : "0.78rem 0.95rem"};
+  padding-right: ${(p) =>
+    p.$withPriorityAction
+      ? p.$grouped
+        ? p.$compact
+          ? "2.35rem"
+          : "2.45rem"
+        : "2.65rem"
+      : undefined};
   border-radius: 4px;
   cursor: pointer;
   transition: ${themes.transition};
@@ -176,6 +194,49 @@ export const StyledGridCard = styled.button<{
       css`
         border-color: var(--color-primary);
       `}
+  }
+`;
+
+export const StyledGridPriorityButton = styled.button<{
+  $active?: boolean;
+  $compact?: boolean;
+}>`
+  position: absolute;
+  top: ${(p) => (p.$compact ? "0.32rem" : "0.38rem")};
+  right: ${(p) => (p.$compact ? "0.32rem" : "0.38rem")};
+  z-index: 1;
+  width: ${(p) => (p.$compact ? "1.55rem" : "1.7rem")};
+  height: ${(p) => (p.$compact ? "1.55rem" : "1.7rem")};
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  border: 1px solid
+    ${(p) =>
+      p.$active
+        ? "var(--color-yellow)"
+        : "var(--color-border-primary)"};
+  background-color: ${(p) =>
+    p.$active
+      ? "rgba(var(--color-yellow-rgb), 0.18)"
+      : "var(--color-bg-primary)"};
+  color: ${(p) =>
+    p.$active ? "var(--color-yellow)" : "var(--color-disabled-text)"};
+  cursor: pointer;
+  transition: ${themes.transition};
+
+  svg {
+    width: 0.95rem;
+    height: 0.95rem;
+    display: block;
+    fill: ${(p) => (p.$active ? "currentColor" : "none")};
+    stroke: currentColor;
+  }
+
+  &:hover {
+    color: var(--color-yellow);
+    border-color: var(--color-yellow);
   }
 `;
 

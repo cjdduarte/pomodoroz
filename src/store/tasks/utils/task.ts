@@ -14,6 +14,7 @@ export const createTask = ({
     text,
     description,
     done: false,
+    prioritized: false,
     dayColor: null,
     dayColorDate: null,
   };

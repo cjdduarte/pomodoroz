@@ -10,6 +10,7 @@ export type Task = {
   text: string;
   description: string;
   done: boolean;
+  prioritized: boolean;
   dayColor?: DayColor;
   dayColorDate?: string | null;
 };

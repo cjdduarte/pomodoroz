@@ -6,6 +6,12 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.5.8] - TBD
+
+### Added
+
+- **Task grid priorities** — task cards can now be marked as priorities from the grid, pending priorities appear in a dedicated top section in both normal and compact grids, the grid toolbar can switch to prioritized-only mode, and task import/export preserves the new priority flag while remaining compatible with older task files.
+
 ## [26.5.7] - 2026-05-12
 
 ### Fixed

@@ -10,6 +10,7 @@ describe("task list utilities", () => {
       text: "Review plan",
       description: "",
       done: false,
+      prioritized: false,
       dayColor: null,
       dayColorDate: null,
     };

@@ -6,6 +6,12 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.5.8] - A definir
+
+### Adicionado
+
+- **Prioridades no grid de tarefas** — cartões agora podem ser marcados como prioridade diretamente no grid, prioridades pendentes aparecem em uma seção superior dedicada tanto no grid normal quanto no compacto, a barra do grid pode alternar para o modo somente priorizadas, e a importação/exportação de tarefas preserva o novo marcador de prioridade mantendo compatibilidade com arquivos antigos.
+
 ## [26.5.7] - 2026-05-12
 
 ### Corrigido

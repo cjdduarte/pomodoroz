@@ -1,12 +1,13 @@
 import { v4 as uuid } from "uuid";
 import type { TaskList } from "store/tasks/types";
 
-export const TASKS_TRANSFER_VERSION = 1;
+export const TASKS_TRANSFER_VERSION = 2;
 
 type TransferTaskCard = {
   text: string;
   description: string;
   done: boolean;
+  prioritized: boolean;
 };
 
 type TransferTaskList = {
@@ -72,12 +73,15 @@ const parseTransferCard = (value: unknown) => {
   const description =
     typeof value.description === "string" ? value.description : "";
   const done = typeof value.done === "boolean" ? value.done : false;
+  const prioritized =
+    typeof value.prioritized === "boolean" ? value.prioritized : false;
 
   return {
     _id: uuid(),
     text,
     description,
     done,
+    prioritized,
     dayColor: null,
     dayColorDate: null,
   } as TaskList["cards"][number];
@@ -128,6 +132,7 @@ export const buildTasksTransferFile = (
         text: card.text,
         description: card.description ?? "",
         done: card.done,
+        prioritized: card.prioritized,
       })),
     })),
   };

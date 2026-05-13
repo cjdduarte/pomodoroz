@@ -25,45 +25,44 @@ Atualizar este arquivo ao final de cada fase grande, correcao operacional releva
 
 ## Ponto atual
 
-- Ultimo commit conhecido: `11ddcc9 fix(compact): restore manual grid height without cumulative growth`.
-- Versao atual publicada/tagueada: `v26.5.6`.
-- `CHANGELOG.md` e `CHANGELOG.pt.md` registram a versao `26.5.7` com data `2026-05-12`.
-- Ajuste compacto ja commitado: no modo compacto, ao abrir o grid de tarefas, aumentar a altura da janela, fechar e reabrir o grid, a janela volta para a ultima altura manual da sessao sem crescimento cumulativo.
-- Trabalho local atual: refresh de dependencias e pins de workflow, com changelogs atualizados sem listar pacotes individualmente.
-- Arquivos alterados no ajuste atual: `package.json`, `pnpm-lock.yaml`, `.github/workflows/ci.yml`, `.github/workflows/release-autoupdate.yml`, `CHANGELOG.md`, `CHANGELOG.pt.md` e `RETOMADA.md`.
-- O layout compacto agora usa uma linha superior estavel para timer/controles e uma linha inferior flexivel para rodape + painel de tarefas.
-- O painel compacto do grid deixou de ter altura rigida e passou a crescer dentro do bloco compacto quando houver altura disponivel.
-- A memoria da altura manual fica somente no renderer durante a sessao, usando a altura real do webview (`window.innerHeight`); o Rust apenas aplica essa altura total via IPC, sem recalcular painel + base.
-- Nao foram adicionados novos campos de storage persistente.
-- `RETOMADA.md` foi revisado porque ainda apontava uma pendencia documental antiga de README.
+- Ultimo commit conhecido: `f450860 chore(release): v26.5.7`.
+- Versao atual publicada/tagueada: `v26.5.7`.
+- Primeiro corte de `B1 — Task priorities in grid` implementado e registrado em `docs/IMPROVEMENTS.md` como `Implemented`, pendente validacao manual desktop antes de marcar `Done`.
+- Prioridade agora e campo novo no cartao (`Task.prioritized: boolean`), nao reaproveitamento de `TaskList.priority`, `taskSelection`, `done` ou `dayColor`.
+- UX entregue no renderer: tarefas priorizadas pendentes aparecem no topo do grid normal e do grid compacto, em uma secao/titulo `Priorities` / `Prioridades`, com alternancia para ver somente priorizadas.
+- Import/export de tarefas foi atualizado para `TASKS_TRANSFER_VERSION = 2`, mantendo compatibilidade com arquivos antigos sem campo `prioritized`.
+- `CHANGELOG.md` e `CHANGELOG.pt.md` receberam a nova secao `26.5.8` (`TBD` / `A definir`).
 
 ---
 
 ## Intencao de ajuste agora
 
-Finalizar o bloco pequeno de UI/IPCs para restaurar a altura manual do grid compacto sem acumulacao e commitar se a revisao do diff estiver ok.
+Validar manualmente o B1 no app desktop, principalmente grid normal, grid compacto, filtro somente priorizadas, clique esquerdo de cores, clique direito para Timer e destaque da tarefa ativa.
 
 ---
 
 ## Validado
 
-- `./scripts/validar-tudo.sh`, opcao 5, passa apos o refresh de dependencias: install, lint, typecheck, Vitest, Rust fmt/clippy/check e build Tauri release sem bundle.
-- O binario release foi iniciado pelo fluxo da opcao 5 e interrompido manualmente com `Ctrl+C`.
-- `./scripts/validar-tudo.sh`, opcao 1, tambem passou em execucoes de quick run com Tauri dev.
+- Revisado fluxo atual de tarefas, `done`, `TaskList.priority`, `taskSelection`, grid normal e grid compacto.
+- `docs/IMPROVEMENTS.md` atualizado com escopo/checklist/status do B1.
+- `pnpm test:run`
+- `pnpm typecheck:renderer`
+- `pnpm lint`
+- `pnpm build:renderer`
 
 ---
 
 ## Estado pendente
 
-- Pendente revisao final do diff de dependencias.
-- Opcional: validar manualmente no app Tauri desktop arrastando a borda inferior da janela compacta com o grid aberto.
-- Pendente commit do refresh de dependencias.
+- Validacao manual desktop do B1 ainda pendente.
+- Refinamento futuro opcional: visibilidade de prioridade no modo lista.
+- Refinamento futuro opcional: ordenar o dropdown do Timer por priorizadas.
 
 ---
 
 ## Retomar
 
 1. Revisar `git status --short`.
-2. Revisar `git diff -- package.json pnpm-lock.yaml .github/workflows/ci.yml .github/workflows/release-autoupdate.yml CHANGELOG.md CHANGELOG.pt.md RETOMADA.md`.
-3. Se desejar validacao desktop adicional, rodar `pnpm dev:app` e testar o redimensionamento compacto com o grid aberto.
-4. Commitar o refresh de dependencias com mensagem Conventional Commits em ingles.
+2. Revisar `git diff`.
+3. Se desejar validacao manual, rodar `pnpm dev:app` e testar prioridades no grid normal e compacto.
+4. Se a revisao estiver ok, commitar com mensagem Conventional Commits em ingles.
