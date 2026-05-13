@@ -46,6 +46,12 @@ Atualizar este arquivo ao final de cada fase grande, correcao operacional releva
   `pnpm tauri dev` ou executar o binario release local, o script aborta com
   `Instancia ja executando. Abortado.` quando a instalacao local em
   `~/.local/opt/pomodoroz/pomodoroz_tauri` ja esta aberta.
+- Refresh transitive Rust aplicado em `src-tauri/Cargo.lock`: `rand`
+  0.9.2 -> 0.9.3 e `rustls-webpki` 0.103.12 -> 0.103.13 para resolver os
+  erros atuais do `cargo audit`.
+- Refresh JS ja presente no worktree: `@eslint-react/eslint-plugin`
+  5.7.6 -> 5.7.7 e `@types/node` 25.6.2 -> 25.7.0 em `package.json` /
+  `pnpm-lock.yaml`.
 
 ---
 
@@ -71,6 +77,12 @@ Validar manualmente o B1 no app desktop, principalmente grid normal, grid compac
   janela compacta preserva a altura do prompt.
 - `bash -n scripts/validar-tudo.sh` apos ajuste de bloqueio do dev/binario
   local quando a instalacao local ja esta em execucao.
+- `cargo check --all-targets --all-features` em `src-tauri` apos refresh Rust.
+- `cargo audit` em `src-tauri` apos refresh Rust: sem vulnerabilidades
+  bloqueantes; permanecem apenas warnings permitidos ja existentes.
+- `pnpm install --frozen-lockfile`
+- `pnpm lint`
+- `pnpm typecheck:renderer`
 
 ---
 

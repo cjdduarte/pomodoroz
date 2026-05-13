@@ -48,13 +48,13 @@
     ]
   },
   "devDependencies": {
-    "@eslint-react/eslint-plugin": "5.7.6",
+    "@eslint-react/eslint-plugin": "5.7.7",
     "@eslint/js": "^10.0.1",
     "@rollup/plugin-typescript": "^12.3.0",
     "@tauri-apps/api": "2.11.0",
     "@tauri-apps/cli": "2.11.1",
     "@types/lodash.debounce": "^4.0.9",
-    "@types/node": "25.6.2",
+    "@types/node": "25.7.0",
     "@typescript-eslint/eslint-plugin": "^8.59.3",
     "@typescript-eslint/parser": "^8.59.3",
     "@vitejs/plugin-react": "^6.0.0",

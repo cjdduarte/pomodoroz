@@ -14,6 +14,10 @@
 - **Cartões de prioridade mantêm tamanho estável ao alternar agrupamento** — alternar o modo Agrupar/Desagrupar do grid não muda mais o tamanho dos cartões dentro da seção `Prioridades`, enquanto os demais grupos de tarefas continuam seguindo o layout selecionado.
 - **Sorteio pode ser limitado a tarefas priorizadas** — Ajustes agora inclui a opção `Sortear apenas priorizadas` abaixo do toggle do botão Sortear no grid; quando ligada no modo todas as tarefas, o Sorteio usa somente cartões priorizados elegíveis e volta automaticamente ao conjunto normal quando não houver priorizados disponíveis. O filtro visual somente priorizadas mantém o Sorteio limitado ao pool visível do grid.
 
+### Alterado
+
+- **Dependências foram atualizadas** — pins selecionados de tooling JS e pins transitivos de dependências Rust foram atualizados, incluindo updates Rust que resolvem os erros atuais de vulnerabilidade do `cargo audit`, sem mudanças intencionais de comportamento.
+
 ### Corrigido
 
 - **Dry-runs de versão e release não pedem mais versão** — `scripts/version.sh --dry-run` e `scripts/release.sh --dry-run` agora usam a versão sugerida automaticamente quando nenhuma versão é informada.

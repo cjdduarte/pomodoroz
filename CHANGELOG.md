@@ -14,6 +14,10 @@
 - **Priority cards keep stable sizing while grouping changes** — toggling the grid group mode no longer changes the size of cards inside the `Priorities` section, while the remaining task groups still follow the selected grouping layout.
 - **Draw can be limited to prioritized tasks** — Settings now includes a `Draw only prioritized tasks` option below the grid Draw button toggle; when enabled in all-task mode, Draw uses only prioritized eligible cards and falls back to the normal draw pool when no prioritized card is available. The visual prioritized-only filter keeps Draw limited to the visible grid pool.
 
+### Changed
+
+- **Dependencies were refreshed** — selected JS tooling pins and transitive Rust dependency pins were updated, including Rust updates that resolve current `cargo audit` vulnerability errors, without intentional behavior changes.
+
 ### Fixed
 
 - **Version and release dry-runs no longer prompt for a version** — `scripts/version.sh --dry-run` and `scripts/release.sh --dry-run` now use the suggested version automatically when no version is provided.
