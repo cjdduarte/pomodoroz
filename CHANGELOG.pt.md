@@ -19,6 +19,7 @@
 - **Dry-runs de versão e release não pedem mais versão** — `scripts/version.sh --dry-run` e `scripts/release.sh --dry-run` agora usam a versão sugerida automaticamente quando nenhuma versão é informada.
 - **Checks de update Cargo encontram ferramentas instaladas pelo usuario de forma consistente** — `scripts/check-updates.sh` agora adiciona `$CARGO_HOME/bin` ou `~/.cargo/bin` ao `PATH` local antes de verificar `cargo-audit` e `cargo-outdated`.
 - **Prompt compacto de extensão de foco mantém a altura ao clicar nos controles de tarefa** — quando `Continuar focando?` está visível no modo compacto, os controles de painel do rodapé ficam bloqueados para que grid/ações/dropdown não colapsem a janela do prompt.
+- **Validação em desenvolvimento aborta quando a instalação local já está em execução** — `scripts/validar-tudo.sh` agora para antes de abrir o runtime dev ou o binário release local se o binário local instalado do Pomodoroz estiver aberto, evitando confundir a janela instalada com o runtime em teste.
 
 ## [26.5.7] - 2026-05-12
 

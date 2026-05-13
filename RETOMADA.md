@@ -25,7 +25,7 @@ Atualizar este arquivo ao final de cada fase grande, correcao operacional releva
 
 ## Ponto atual
 
-- Ultimo commit conhecido: `3a03434 feat(settings): add prioritized-only task draw option`.
+- Ultimo commit conhecido: `95c64c0 ix(scripts): make dry-runs non-interactive and find cargo tools`.
 - Versao atual publicada/tagueada: `v26.5.7`.
 - Primeiro corte de `B1 — Task priorities in grid` implementado e registrado em `docs/IMPROVEMENTS.md` como `Implemented`, pendente validacao manual desktop antes de marcar `Done`.
 - Prioridade agora e campo novo no cartao (`Task.prioritized: boolean`), nao reaproveitamento de `TaskList.priority`, `taskSelection`, `done` ou `dayColor`.
@@ -42,6 +42,10 @@ Atualizar este arquivo ao final de cada fase grande, correcao operacional releva
   da extensao de foco esta visivel, os controles de painel do rodape
   (grid/dropdown/acoes) ficam bloqueados e a logica do painel nao envia
   `COMPACT_COLLAPSE`, evitando que a janela perca a altura do prompt.
+- Ajuste operacional aplicado em `scripts/validar-tudo.sh`: antes de iniciar
+  `pnpm tauri dev` ou executar o binario release local, o script aborta com
+  `Instancia ja executando. Abortado.` quando a instalacao local em
+  `~/.local/opt/pomodoroz/pomodoroz_tauri` ja esta aberta.
 
 ---
 
@@ -65,6 +69,8 @@ Validar manualmente o B1 no app desktop, principalmente grid normal, grid compac
 - Validacao manual do prompt `Continuar focando?` no Timer compacto:
   enquanto o prompt esta visivel, grid/dropdown/acoes ficam bloqueados e a
   janela compacta preserva a altura do prompt.
+- `bash -n scripts/validar-tudo.sh` apos ajuste de bloqueio do dev/binario
+  local quando a instalacao local ja esta em execucao.
 
 ---
 

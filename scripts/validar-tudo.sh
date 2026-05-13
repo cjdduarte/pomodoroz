@@ -4,6 +4,11 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 APP_DIR="$ROOT"
 SCRIPT_INSTALL="$ROOT/scripts/install.sh"
+LOCAL_INSTALL_BINARY=""
+
+if [[ -n "${HOME:-}" ]]; then
+  LOCAL_INSTALL_BINARY="${HOME}/.local/opt/pomodoroz/pomodoroz_tauri"
+fi
 
 SKIP_INSTALL=0
 RUN_DEV=0
@@ -29,9 +34,40 @@ die() {
   exit 1
 }
 
+local_install_runtime_is_running() {
+  local exe_link=""
+  local exe_path=""
+
+  [[ "$(uname -s)" == "Linux" ]] || return 1
+  [[ -n "$LOCAL_INSTALL_BINARY" ]] || return 1
+
+  for exe_link in /proc/[0-9]*/exe; do
+    [[ -L "$exe_link" ]] || continue
+
+    exe_path="$(readlink "$exe_link" 2>/dev/null || true)"
+    exe_path="${exe_path% (deleted)}"
+
+    if [[ "$exe_path" == "$LOCAL_INSTALL_BINARY" ]]; then
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+abort_if_local_install_runtime_is_running() {
+  if local_install_runtime_is_running; then
+    printf "Instancia ja executando. Abortado.\n" >&2
+    printf "Feche o aplicativo instalado antes de iniciar esta execucao.\n" >&2
+    exit 1
+  fi
+}
+
 run_dev_runtime_allow_interrupt() {
   local interrupted=0
   local rc=0
+
+  abort_if_local_install_runtime_is_running
 
   trap 'interrupted=1' INT
   set +e
@@ -405,6 +441,10 @@ if (( RUN_QUICK_DEV == 1 )); then
   if (( RUN_DEV == 1 || RUN_PACKED == 1 || RUN_INSTALLERS == 1 )); then
     die "--quick-dev nao pode ser combinado com --dev, --run-packed ou --installers."
   fi
+fi
+
+if (( RUN_QUICK_DEV == 1 || RUN_DEV == 1 || RUN_PACKED == 1 )); then
+  abort_if_local_install_runtime_is_running
 fi
 
 step "Verificando ambiente (Node + pnpm)"

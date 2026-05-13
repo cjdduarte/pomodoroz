@@ -19,6 +19,7 @@
 - **Version and release dry-runs no longer prompt for a version** — `scripts/version.sh --dry-run` and `scripts/release.sh --dry-run` now use the suggested version automatically when no version is provided.
 - **Cargo update checks find user-installed tools consistently** — `scripts/check-updates.sh` now adds `$CARGO_HOME/bin` or `~/.cargo/bin` to its local `PATH` before checking for `cargo-audit` and `cargo-outdated`.
 - **Compact focus-extension prompt keeps its expanded height while task controls are clicked** — when `Continue focusing?` is visible in compact mode, task footer panel controls are disabled so the grid/actions/dropdown cannot collapse the prompt-sized window.
+- **Development validation aborts when the local install is already running** — `scripts/validar-tudo.sh` now stops before opening the dev runtime or local release binary if the locally installed Pomodoroz binary is open, preventing the installed window from being mistaken for the test runtime.
 
 ## [26.5.7] - 2026-05-12
 
