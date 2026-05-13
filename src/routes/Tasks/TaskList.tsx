@@ -13,6 +13,7 @@ import {
   editTaskCardText,
   removeTaskList,
   setTaskListPriority,
+  setTaskCardPriority,
   setTaskSelection,
   removeTaskCard,
 } from "store";
@@ -120,13 +121,14 @@ const TaskList: React.FC<Props> = ({
               items={cards.map((card) => `card:${card._id}`)}
               strategy={verticalListSortingStrategy}
             >
-              {cards.map(({ _id, text, done }) => (
+              {cards.map(({ _id, text, done, prioritized }) => (
                 <TaskCard
                   key={_id}
                   text={text}
                   id={_id}
                   listId={listId}
                   done={done}
+                  prioritized={prioritized}
                   onClick={() => {
                     setCardId(_id);
                     setShowDetails(true);
@@ -142,6 +144,15 @@ const TaskList: React.FC<Props> = ({
                   }
                   onDeleteCard={() =>
                     dispatch(removeTaskCard({ listId, cardId: _id }))
+                  }
+                  onTogglePriority={(nextPrioritized) =>
+                    dispatch(
+                      setTaskCardPriority({
+                        listId,
+                        cardId: _id,
+                        prioritized: nextPrioritized,
+                      })
+                    )
                   }
                   onContextMenu={() => {
                     onCardContextMenu?.(listId, _id);

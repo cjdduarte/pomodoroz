@@ -65,6 +65,7 @@ Pomodoroz is not about "fixing flexibility"; it focuses on adding workflow featu
 | Statistics                   | No                                                                                        | Yes (period report, long-term progress, breakdowns, and history cleanup)                    |
 | Grid view                    | No                                                                                        | Yes (**Study Rotation Grid** with daily color cycle, Draw button, and right-click to Timer) |
 | Grid footer (current status) | No                                                                                        | Yes (total, visited, and remaining counters)                                                |
+| Task priorities              | No                                                                                        | Yes (priority star in List/Grid, priority section, and prioritized Draw option)             |
 | Task-list import/export      | No                                                                                        | Yes (**JSON import/export for task lists/cards** with validation and merge/replace modes)   |
 | Focus extension              | No                                                                                        | Yes (optional short/long focus extension with configurable durations and tray reminder)     |
 | 0-minute breaks              | No                                                                                        | Yes (auto-skip breaks when short/long break duration is set to zero)                        |
@@ -86,6 +87,7 @@ Pomodoroz is not about "fixing flexibility"; it focuses on adding workflow featu
 
 - **Study Rotation Grid** with daily card status.
 - **Draw button** to pick the next task when you get stuck on "where do I start?".
+- **Task priorities** to mark important cards from List or Grid, surface pending priorities first, and optionally limit Draw to prioritized tasks.
 
 **Time awareness**
 
@@ -143,6 +145,7 @@ Pomodoroz is not about "fixing flexibility"; it focuses on adding workflow featu
 - Create lists and tasks with descriptions.
 - Drag-and-drop reordering (lists and cards).
 - Mark as done, skip, or delete.
+- **Task priorities** — mark/unmark important cards from List or Grid; pending priorities are surfaced first in the Study Rotation Grid.
 - **Undo/Redo** (Ctrl+Z / Ctrl+Shift+Z).
 - **Import/Export** in JSON with validation, ID regeneration, and merge or replace options.
 
@@ -151,6 +154,7 @@ Pomodoroz is not about "fixing flexibility"; it focuses on adding workflow featu
 - Toggle between **list** and **grid** view.
 - Daily card status: white → green → red.
 - **Draw button** — random phase-based selection (white→green, then green→red).
+- **Priority section and filter** — pending priorities appear first, and Draw can be limited to prioritized tasks.
 - **Columns**: Auto / 1 / 2 / 3 (persistent preference).
 - **Grouped mode** — list separators with Group/Ungroup toggle.
 - **Color reset** with confirmation and automatic daily reset.

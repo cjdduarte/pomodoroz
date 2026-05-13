@@ -65,6 +65,7 @@ O objetivo do Pomodoroz não é "corrigir flexibilidade", e sim adicionar recurs
 | Estatísticas                    | Não                                                                                            | Sim (relatório por período, progresso de longo prazo, detalhamentos e limpeza de histórico)     |
 | Visualização em grade (grid)    | Não                                                                                            | Sim (**Grade de Rotação de Estudos** com ciclo diário, Sortear e clique direito para Timer)     |
 | Rodapé da grade (status atual)  | Não                                                                                            | Sim (contadores de total, visitadas e restantes)                                                |
+| Prioridades de tarefas          | Não                                                                                            | Sim (estrela na Lista/Grade, seção de prioridades e opção de Sortear priorizadas)               |
 | Importação/Exportação de listas | Não                                                                                            | Sim (**importação/exportação JSON de listas/cartões** com validação e modos merge/substituição) |
 | Extensão de foco                | Não                                                                                            | Sim (extensão curta/longa opcional com durações configuráveis e aviso no tray)                  |
 | Pausas de 0 minuto              | Não                                                                                            | Sim (pula pausas quando a duração da pausa curta/longa é definida como zero)                    |
@@ -86,6 +87,7 @@ O objetivo do Pomodoroz não é "corrigir flexibilidade", e sim adicionar recurs
 
 - **Grade de Rotação de Estudos** com status diário por cartão.
 - **Botão Sortear** para escolher a próxima tarefa quando você trava no "por onde começo?".
+- **Prioridades de tarefas** para marcar cartões importantes pela Lista ou Grade, mostrar prioridades pendentes primeiro e opcionalmente limitar o Sorteio a tarefas priorizadas.
 
 **Noção de tempo**
 
@@ -143,6 +145,7 @@ O objetivo do Pomodoroz não é "corrigir flexibilidade", e sim adicionar recurs
 - Criar listas e tarefas com descrição.
 - Arrastar e soltar para reordenar (listas e cartões).
 - Marcar como concluído, pular ou excluir.
+- **Prioridades de tarefas** — marcar/desmarcar cartões importantes pela Lista ou Grade; prioridades pendentes aparecem primeiro na Grade de Rotação de Estudos.
 - **Desfazer/Refazer** (Ctrl+Z / Ctrl+Shift+Z).
 - **Importação/Exportação** em JSON com validação, regeneração de IDs e opção merge ou substituição.
 
@@ -151,6 +154,7 @@ O objetivo do Pomodoroz não é "corrigir flexibilidade", e sim adicionar recurs
 - Alternância entre visualização em **lista** e **grade**.
 - Status diário por cartão: branco → verde → vermelho.
 - **Botão Sortear** — seleção aleatória por fase (branco→verde, depois verde→vermelho).
+- **Seção e filtro de prioridades** — prioridades pendentes aparecem primeiro, e o Sorteio pode ser limitado a tarefas priorizadas.
 - **Colunas**: Auto / 1 / 2 / 3 (preferência persistente).
 - **Modo agrupado** — separadores por lista com toggle Agrupar/Desagrupar.
 - **Reset de cores** com confirmação e reset automático diário.

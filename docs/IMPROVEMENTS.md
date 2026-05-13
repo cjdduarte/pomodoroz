@@ -673,6 +673,7 @@ Scope checklist:
 - [x] Add the top `Priorities` / `Prioridades` separator only when at least one pending prioritized task exists.
 - [x] Add a persisted all/prioritized-only toolbar control.
 - [x] Add mark/unmark priority to the grid card flow using an overlaid star action.
+- [x] Add mark/unmark priority to List view task cards using a star action near the drag handle and away from edit/delete actions.
 - [x] Keep current Timer selection unchanged in the first slice.
 - [x] Add a Settings option to limit Draw to prioritized eligible cards with automatic fallback to the normal draw pool in all-task mode.
 - [x] Keep Draw tied to the visible grid pool when the visual prioritized-only filter is active.
@@ -680,7 +681,6 @@ Scope checklist:
 Deferred follow-up:
 
 - [ ] Manual desktop validation: verify priority section layout in normal and compact grids.
-- [ ] Consider list-mode priority visibility only after the grid behavior is stable.
 - [ ] Evaluate whether the Timer dropdown should sort prioritized pending tasks first.
 
 Validation checklist:
@@ -692,6 +692,7 @@ Validation checklist:
 - [x] Exported JSON includes priority state.
 - [x] Imported older JSON without priority fields remains valid.
 - [x] Draw candidate selection is covered for visible priority filtering, prioritized-only settings, and fallback.
+- [x] Dragging a prioritized card between lists preserves priority state.
 - [ ] Manual: normal grid shows pending priorities first under `Priorities`.
 - [ ] Manual: compact grid shows the same priority section without clipping or resizing regressions.
 - [ ] Manual: priority-only mode hides non-priority cards and keeps completed-card guards.

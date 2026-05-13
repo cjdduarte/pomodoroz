@@ -68,6 +68,26 @@ export const StyledCardEditButton = styled(StyledButton)`
   ${ButtonCardStyles};
 `;
 
+export const StyledCardPriorityButton = styled(StyledButton)<{
+  $active?: boolean;
+}>`
+  ${ButtonCardStyles};
+  flex: 0 0 2.4rem;
+  margin-right: 0.35rem;
+  color: ${(p) =>
+    p.$active ? "var(--color-yellow)" : "var(--color-disabled-text)"};
+
+  & > svg {
+    fill: ${(p) => (p.$active ? "currentColor" : "none")};
+    stroke: currentColor;
+  }
+
+  &:hover,
+  &:focus {
+    color: var(--color-yellow);
+  }
+`;
+
 export const StyledCardDeleteButton = styled(StyledButton)`
   ${ButtonCardStyles};
 

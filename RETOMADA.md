@@ -25,13 +25,15 @@ Atualizar este arquivo ao final de cada fase grande, correcao operacional releva
 
 ## Ponto atual
 
-- Ultimo commit conhecido: `95c64c0 ix(scripts): make dry-runs non-interactive and find cargo tools`.
+- Ultimo commit conhecido: `83d9b0b fix(scripts): abort test runtime when local install is running chore(deps): refresh js and rust dependencies`.
 - Versao atual publicada/tagueada: `v26.5.7`.
 - Primeiro corte de `B1 — Task priorities in grid` implementado e registrado em `docs/IMPROVEMENTS.md` como `Implemented`, pendente validacao manual desktop antes de marcar `Done`.
 - Prioridade agora e campo novo no cartao (`Task.prioritized: boolean`), nao reaproveitamento de `TaskList.priority`, `taskSelection`, `done` ou `dayColor`.
 - UX entregue no renderer: tarefas priorizadas pendentes aparecem no topo do grid normal e do grid compacto, em uma secao/titulo `Priorities` / `Prioridades`, com alternancia para ver somente priorizadas.
 - Ajuste posterior aplicado: cards da secao de prioridades mantem tamanho estavel ao alternar Agrupar/Desagrupar; o agrupamento continua afetando apenas a area inferior do grid.
 - Ajuste posterior aplicado: Ajustes ganhou `Sortear apenas priorizadas`; quando ativo no modo todas as tarefas, o botao Sortear usa somente cards priorizados elegiveis e volta ao sorteio normal se nao houver priorizados disponiveis. Com filtro visual somente priorizadas ativo, o Sorteio fica limitado ao pool visivel do grid.
+- Ajuste posterior aplicado: a tela Lista tambem ganhou estrela para marcar/desmarcar prioridade no card, posicionada perto do handle de arraste e afastada das acoes de editar/excluir; arrastar card priorizado entre listas preserva `prioritized`.
+- Ajuste posterior aplicado: a estrela de prioridade do grid foi alinhada ao visual da Lista, sem caixa/borda propria e com o mesmo tamanho de icone.
 - Import/export de tarefas foi atualizado para `TASKS_TRANSFER_VERSION = 2`, mantendo compatibilidade com arquivos antigos sem campo `prioritized`.
 - `CHANGELOG.md` e `CHANGELOG.pt.md` receberam a nova secao `26.5.8` (`TBD` / `A definir`).
 - Ajustes operacionais pendentes em scripts: `version.sh --dry-run` e
@@ -57,7 +59,7 @@ Atualizar este arquivo ao final de cada fase grande, correcao operacional releva
 
 ## Intencao de ajuste agora
 
-Validar manualmente o B1 no app desktop, principalmente grid normal, grid compacto, filtro somente priorizadas, clique esquerdo de cores, clique direito para Timer, destaque da tarefa ativa, sorteio limitado a priorizadas com fallback normal no modo todas as tarefas e sorteio limitado ao pool visivel no filtro somente priorizadas.
+Validar manualmente o B1 no app desktop e, se estiver confirmado, marcar o checkpoint correspondente em `docs/IMPROVEMENTS.md`.
 
 ---
 
@@ -83,13 +85,19 @@ Validar manualmente o B1 no app desktop, principalmente grid normal, grid compac
 - `pnpm install --frozen-lockfile`
 - `pnpm lint`
 - `pnpm typecheck:renderer`
+- `pnpm test:run src/store/tasks/index.test.ts`
+- Apos estrela na Lista: `pnpm typecheck:renderer`, `pnpm lint`,
+  `pnpm test:run src/store/tasks/index.test.ts src/utils/tasksTransfer.test.ts src/routes/Tasks/taskGridDraw.test.ts`,
+  `pnpm build:renderer`, `pnpm test:run`
+- Apos alinhamento visual da estrela no grid: `pnpm typecheck:renderer`,
+  `pnpm lint`; verificacao Playwright no renderer em `/#/task-list` confirmou
+  botao sem borda/fundo proprio e SVG de 12px.
 
 ---
 
 ## Estado pendente
 
-- Validacao manual desktop do B1 ainda pendente.
-- Refinamento futuro opcional: visibilidade de prioridade no modo lista.
+- Confirmar se a validacao manual desktop do B1 ja pode ser marcada como concluida.
 - Refinamento futuro opcional: ordenar o dropdown do Timer por priorizadas.
 
 ---
@@ -98,5 +106,5 @@ Validar manualmente o B1 no app desktop, principalmente grid normal, grid compac
 
 1. Revisar `git status --short`.
 2. Revisar `git diff`.
-3. Se desejar validacao manual, rodar `pnpm dev:app` e testar prioridades no grid normal e compacto.
+3. Se desejar validacao manual, rodar `pnpm dev:app` e testar prioridades no grid normal, grid compacto e tela Lista.
 4. Se a revisao estiver ok, commitar com mensagem Conventional Commits em ingles.

@@ -1,6 +1,7 @@
 import styled, { css } from "styled-components";
 import { themes } from "styles/themes";
 import { StyledScrollbar } from "styles/mixins";
+import { StyledButton } from "styles";
 
 export const StyledGridWrapper = styled.div`
   display: flex;
@@ -197,7 +198,7 @@ export const StyledGridCard = styled.button<{
   }
 `;
 
-export const StyledGridPriorityButton = styled.button<{
+export const StyledGridPriorityButton = styled(StyledButton)<{
   $active?: boolean;
   $compact?: boolean;
 }>`
@@ -212,31 +213,25 @@ export const StyledGridPriorityButton = styled.button<{
   align-items: center;
   justify-content: center;
   border-radius: 3px;
-  border: 1px solid
-    ${(p) =>
-      p.$active
-        ? "var(--color-yellow)"
-        : "var(--color-border-primary)"};
-  background-color: ${(p) =>
-    p.$active
-      ? "rgba(var(--color-yellow-rgb), 0.18)"
-      : "var(--color-bg-primary)"};
+  border: none;
+  background-color: transparent;
   color: ${(p) =>
     p.$active ? "var(--color-yellow)" : "var(--color-disabled-text)"};
   cursor: pointer;
   transition: ${themes.transition};
 
-  svg {
-    width: 0.95rem;
-    height: 0.95rem;
+  & > svg {
+    width: 1.2rem;
+    height: 1.2rem;
+    margin: 0;
     display: block;
     fill: ${(p) => (p.$active ? "currentColor" : "none")};
     stroke: currentColor;
   }
 
-  &:hover {
+  &:hover,
+  &:focus {
     color: var(--color-yellow);
-    border-color: var(--color-yellow);
   }
 `;
 

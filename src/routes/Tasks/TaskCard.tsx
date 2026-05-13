@@ -8,6 +8,7 @@ import {
   StyledCardMain,
   StyledCardText,
   StyledCardEditButton,
+  StyledCardPriorityButton,
   StyledCardSaveButton,
   StyledCardTextArea,
   StyledCardActionWrapper,
@@ -22,11 +23,13 @@ type Props = {
   listId: string;
   text: string;
   done: boolean;
+  prioritized: boolean;
   onClick?:
     | ((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void)
     | undefined;
   onSaveCardText?: (text: string) => void;
   onDeleteCard?: () => void;
+  onTogglePriority?: (prioritized: boolean) => void;
   onContextMenu?:
     | ((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void)
     | undefined;
@@ -37,9 +40,11 @@ const TaskCard: React.FC<Props> = ({
   listId,
   text,
   done,
+  prioritized,
   onClick,
   onDeleteCard,
   onSaveCardText,
+  onTogglePriority,
   onContextMenu,
 }) => {
   const { t } = useTranslation();
@@ -93,6 +98,16 @@ const TaskCard: React.FC<Props> = ({
     }
   };
 
+  const onTogglePriorityAction = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.stopPropagation();
+
+    if (onTogglePriority) {
+      onTogglePriority(!prioritized);
+    }
+  };
+
   const onSaveCardAction = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
@@ -136,6 +151,9 @@ const TaskCard: React.FC<Props> = ({
     );
 
   const contextMenuHint = done ? undefined : t("grid.selectHint");
+  const priorityLabel = prioritized
+    ? t("grid.unmarkPriority")
+    : t("grid.markPriority");
 
   return (
     <StyledCard
@@ -170,6 +188,27 @@ const TaskCard: React.FC<Props> = ({
         >
           <SVG name="option-y" />
         </StyledCardDragHandle>
+        {!editing ? (
+          <StyledCardPriorityButton
+            type="button"
+            $active={prioritized}
+            onClick={onTogglePriorityAction}
+            title={priorityLabel}
+            aria-label={priorityLabel}
+            aria-pressed={prioritized}
+          >
+            <svg
+              viewBox="0 0 16 16"
+              strokeWidth="1.3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path d="M8 2.4 9.7 5.8l3.8.6-2.8 2.7.7 3.8L8 11.1l-3.4 1.8.7-3.8-2.8-2.7 3.8-.6L8 2.4Z" />
+            </svg>
+          </StyledCardPriorityButton>
+        ) : null}
         {renderCardText()}
       </StyledCardMain>
       {renderActionButton()}

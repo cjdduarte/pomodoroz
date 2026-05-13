@@ -22,14 +22,14 @@ const storedTaskLists = [
   },
 ];
 
-const setupLocalStorage = () => {
+const setupLocalStorage = (taskLists: unknown = storedTaskLists) => {
   vi.stubGlobal("localStorage", {
     getItem: vi.fn((key: string) => {
       if (key !== "state") {
         return null;
       }
 
-      return JSON.stringify({ tasks: storedTaskLists });
+      return JSON.stringify({ tasks: taskLists });
     }),
     setItem: vi.fn(),
     removeItem: vi.fn(),
@@ -80,5 +80,53 @@ describe("tasks reducer", () => {
 
     state = reducer(state, redoTasks());
     expect(state.present[0]?.cards[0]?.prioritized).toBe(true);
+  });
+
+  it("preserves card priority when dragging a card to another list", async () => {
+    setupLocalStorage([
+      {
+        _id: "list-id-1",
+        title: "FOCUS",
+        priority: true,
+        dayColor: null,
+        dayColorDate: null,
+        cards: [
+          {
+            _id: "task-id-1",
+            text: "Review plan",
+            description: "",
+            done: false,
+            prioritized: true,
+            dayColor: null,
+            dayColorDate: null,
+          },
+        ],
+      },
+      {
+        _id: "list-id-2",
+        title: "BACKLOG",
+        priority: false,
+        dayColor: null,
+        dayColorDate: null,
+        cards: [],
+      },
+    ]);
+
+    const { default: reducer, dragList } = await import("./index");
+
+    const state = reducer(
+      reducer(undefined, { type: "@@INIT" }),
+      dragList({
+        sourceId: "list-id-1",
+        destinationId: "list-id-2",
+        sourceIndex: 0,
+        destinationIndex: 0,
+        draggableId: "task-id-1",
+        type: "card",
+      })
+    );
+
+    expect(state.present[0]?.cards).toEqual([]);
+    expect(state.present[1]?.cards[0]?.prioritized).toBe(true);
   });
 });
