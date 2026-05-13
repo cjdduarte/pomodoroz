@@ -34,6 +34,14 @@ Atualizar este arquivo ao final de cada fase grande, correcao operacional releva
 - Ajuste posterior aplicado: Ajustes ganhou `Sortear apenas priorizadas`; quando ativo no modo todas as tarefas, o botao Sortear usa somente cards priorizados elegiveis e volta ao sorteio normal se nao houver priorizados disponiveis. Com filtro visual somente priorizadas ativo, o Sorteio fica limitado ao pool visivel do grid.
 - Import/export de tarefas foi atualizado para `TASKS_TRANSFER_VERSION = 2`, mantendo compatibilidade com arquivos antigos sem campo `prioritized`.
 - `CHANGELOG.md` e `CHANGELOG.pt.md` receberam a nova secao `26.5.8` (`TBD` / `A definir`).
+- Ajustes operacionais pendentes em scripts: `version.sh --dry-run` e
+  `release.sh --dry-run` usam a versao sugerida sem prompt; `check-updates.sh`
+  adiciona `$CARGO_HOME/bin` ou `~/.cargo/bin` ao `PATH` local antes de
+  procurar `cargo-audit` e `cargo-outdated`.
+- Correcao aplicada no Timer compacto: enquanto o prompt `Continuar focando?`
+  da extensao de foco esta visivel, os controles de painel do rodape
+  (grid/dropdown/acoes) ficam bloqueados e a logica do painel nao envia
+  `COMPACT_COLLAPSE`, evitando que a janela perca a altura do prompt.
 
 ---
 
@@ -52,6 +60,11 @@ Validar manualmente o B1 no app desktop, principalmente grid normal, grid compac
 - `pnpm typecheck:renderer`
 - `pnpm lint`
 - `pnpm build:renderer`
+- Apos a correcao do prompt compacto: `pnpm typecheck:renderer`, `pnpm lint`,
+  `pnpm build:renderer`
+- Validacao manual do prompt `Continuar focando?` no Timer compacto:
+  enquanto o prompt esta visivel, grid/dropdown/acoes ficam bloqueados e a
+  janela compacta preserva a altura do prompt.
 
 ---
 

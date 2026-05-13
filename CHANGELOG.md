@@ -14,6 +14,12 @@
 - **Priority cards keep stable sizing while grouping changes** — toggling the grid group mode no longer changes the size of cards inside the `Priorities` section, while the remaining task groups still follow the selected grouping layout.
 - **Draw can be limited to prioritized tasks** — Settings now includes a `Draw only prioritized tasks` option below the grid Draw button toggle; when enabled in all-task mode, Draw uses only prioritized eligible cards and falls back to the normal draw pool when no prioritized card is available. The visual prioritized-only filter keeps Draw limited to the visible grid pool.
 
+### Fixed
+
+- **Version and release dry-runs no longer prompt for a version** — `scripts/version.sh --dry-run` and `scripts/release.sh --dry-run` now use the suggested version automatically when no version is provided.
+- **Cargo update checks find user-installed tools consistently** — `scripts/check-updates.sh` now adds `$CARGO_HOME/bin` or `~/.cargo/bin` to its local `PATH` before checking for `cargo-audit` and `cargo-outdated`.
+- **Compact focus-extension prompt keeps its expanded height while task controls are clicked** — when `Continue focusing?` is visible in compact mode, task footer panel controls are disabled so the grid/actions/dropdown cannot collapse the prompt-sized window.
+
 ## [26.5.7] - 2026-05-12
 
 ### Fixed

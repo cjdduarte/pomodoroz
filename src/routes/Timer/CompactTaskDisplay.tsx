@@ -159,6 +159,19 @@ const StyledTaskClickable = styled.button`
   &:hover > span:last-child {
     color: var(--color-primary);
   }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.65;
+  }
+
+  &:disabled:hover > span:first-child {
+    color: var(--color-body-text);
+  }
+
+  &:disabled:hover > span:last-child {
+    color: var(--color-heading-text);
+  }
 `;
 
 const StyledTaskText = styled.span`
@@ -196,6 +209,15 @@ const StyledTaskButton = styled.button`
 
   &:hover {
     color: var(--color-primary);
+  }
+
+  &:disabled {
+    color: var(--color-disabled-text);
+    cursor: default;
+  }
+
+  &:disabled:hover {
+    color: var(--color-disabled-text);
   }
 
   & > svg {
@@ -481,6 +503,8 @@ const CompactTaskDisplay: React.FC = () => {
   const lastCompactGridWindowHeightRef = useRef<number | null>(null);
   const previousCompactModeRef = useRef(compactMode);
   const consumedSelectionNavigationKeyRef = useRef<string | null>(null);
+  const shouldBlockCompactTaskPanels =
+    compactMode && shouldPromptFocusExtension;
 
   const activeTaskSelection = useMemo(
     () =>
@@ -764,6 +788,11 @@ const CompactTaskDisplay: React.FC = () => {
       return;
     }
 
+    if (shouldBlockCompactTaskPanels) {
+      compactPanelSizeRef.current = "collapsed";
+      return;
+    }
+
     const desiredPanelSize: CompactPanelSize =
       compactMode && showActions
         ? "actions"
@@ -788,6 +817,7 @@ const CompactTaskDisplay: React.FC = () => {
     collapseCompactPanel,
     compactMode,
     expandCompactPanel,
+    shouldBlockCompactTaskPanels,
     showActions,
     showDropdown,
     showGrid,
@@ -806,14 +836,19 @@ const CompactTaskDisplay: React.FC = () => {
   useEffect(() => {
     const hasOpenPanel = showGrid || showDropdown || showActions;
 
-    if (!shouldPromptFocusExtension || !hasOpenPanel) {
+    if (!shouldBlockCompactTaskPanels || !hasOpenPanel) {
       return;
     }
 
     setShowGrid(false);
     setShowDropdown(false);
     setShowActions(false);
-  }, [shouldPromptFocusExtension, showActions, showDropdown, showGrid]);
+  }, [
+    shouldBlockCompactTaskPanels,
+    showActions,
+    showDropdown,
+    showGrid,
+  ]);
 
   // On unmount, collapse compact window if any task panel was open.
   useEffect(() => {
@@ -955,6 +990,10 @@ const CompactTaskDisplay: React.FC = () => {
   };
 
   const handleOpenPriorityList = () => {
+    if (shouldBlockCompactTaskPanels) {
+      return;
+    }
+
     expandCompactPanel("full");
     closeGrid();
     setShowActions(false);
@@ -962,6 +1001,10 @@ const CompactTaskDisplay: React.FC = () => {
   };
 
   const handleToggleGrid = () => {
+    if (shouldBlockCompactTaskPanels) {
+      return;
+    }
+
     setShowDropdown(false);
     setShowActions(false);
 
@@ -975,6 +1018,10 @@ const CompactTaskDisplay: React.FC = () => {
   };
 
   const handleActionsButtonClick = () => {
+    if (shouldBlockCompactTaskPanels) {
+      return;
+    }
+
     closeGrid();
     if (!currentTask) {
       setShowActions(false);
@@ -1133,7 +1180,12 @@ const CompactTaskDisplay: React.FC = () => {
         {showDropdown && !compactMode ? renderPriorityDropdown() : null}
 
         <StyledTaskClickable
+          disabled={shouldBlockCompactTaskPanels}
           onClick={() => {
+            if (shouldBlockCompactTaskPanels) {
+              return;
+            }
+
             closeGrid();
             setShowActions(false);
             if (!showDropdown) {
@@ -1156,6 +1208,7 @@ const CompactTaskDisplay: React.FC = () => {
 
         <StyledTaskButton
           onClick={handleToggleGrid}
+          disabled={shouldBlockCompactTaskPanels}
           title={t("grid.title")}
         >
           <StyledTaskButtonGlyph>{"▦"}</StyledTaskButtonGlyph>
@@ -1163,6 +1216,7 @@ const CompactTaskDisplay: React.FC = () => {
 
         <StyledActionsTaskButton
           onClick={handleActionsButtonClick}
+          disabled={shouldBlockCompactTaskPanels}
           title={t("tasks.actions")}
         >
           <SVG name="option-x" />
@@ -1175,19 +1229,19 @@ const CompactTaskDisplay: React.FC = () => {
         ) : null}
       </StyledCompactTask>
 
-      {compactMode && showActions ? (
+      {compactMode && !shouldBlockCompactTaskPanels && showActions ? (
         <StyledCompactMenuPanel $height={COMPACT_ACTIONS_PANEL_HEIGHT}>
           {renderActionsMenu(true)}
         </StyledCompactMenuPanel>
       ) : null}
 
-      {compactMode && showDropdown ? (
+      {compactMode && !shouldBlockCompactTaskPanels && showDropdown ? (
         <StyledCompactMenuPanel>
           {renderPriorityDropdown(true)}
         </StyledCompactMenuPanel>
       ) : null}
 
-      {compactMode && showGrid ? (
+      {compactMode && !shouldBlockCompactTaskPanels && showGrid ? (
         <StyledCompactGridPanel>
           <TaskListGrid compact onSelectList={handleGridSelect} />
         </StyledCompactGridPanel>

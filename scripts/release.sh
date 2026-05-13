@@ -270,7 +270,9 @@ refresh_local_tags
 SUGGESTED_VERSION="$(get_suggested_version)"
 
 if [[ -z "$INPUT_VERSION" ]]; then
-  if [[ -t 0 ]]; then
+  if (( DRY_RUN == 1 )); then
+    INPUT_VERSION="$SUGGESTED_VERSION"
+  elif [[ -t 0 ]]; then
     read -r -p "Versao [$SUGGESTED_VERSION]: " INPUT_VERSION
     VERSION_FROM_PROMPT=1
   fi

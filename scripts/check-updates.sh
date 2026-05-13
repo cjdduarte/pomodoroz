@@ -33,6 +33,17 @@ LOG_TIMESTAMP=""
 GENERAL_LOG_FILE=""
 CARGO_OUTDATED_LOG_FILE=""
 CARGO_AUDIT_LOG_FILE=""
+CARGO_BIN_DIR=""
+
+if [[ -n "${CARGO_HOME:-}" ]]; then
+  CARGO_BIN_DIR="$CARGO_HOME/bin"
+elif [[ -n "${HOME:-}" ]]; then
+  CARGO_BIN_DIR="$HOME/.cargo/bin"
+fi
+
+if [[ -n "$CARGO_BIN_DIR" && -d "$CARGO_BIN_DIR" ]]; then
+  export PATH="$CARGO_BIN_DIR:$PATH"
+fi
 
 if [[ $# -gt 0 ]]; then
   case "$1" in
