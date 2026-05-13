@@ -12,7 +12,7 @@
 
 - **Task grid priorities** — task cards can now be marked as priorities from the grid, pending priorities appear in a dedicated top section in both normal and compact grids, the grid toolbar can switch to prioritized-only mode, and task import/export preserves the new priority flag while remaining compatible with older task files.
 - **Priority cards keep stable sizing while grouping changes** — toggling the grid group mode no longer changes the size of cards inside the `Priorities` section, while the remaining task groups still follow the selected grouping layout.
-- **Draw can be limited to prioritized tasks** — Settings now includes a `Draw only prioritized tasks` option below the grid Draw button toggle; when enabled, Draw uses only prioritized eligible cards and falls back to the normal draw pool when no prioritized card is available.
+- **Draw can be limited to prioritized tasks** — Settings now includes a `Draw only prioritized tasks` option below the grid Draw button toggle; when enabled in all-task mode, Draw uses only prioritized eligible cards and falls back to the normal draw pool when no prioritized card is available. The visual prioritized-only filter keeps Draw limited to the visible grid pool.
 
 ## [26.5.7] - 2026-05-12
 

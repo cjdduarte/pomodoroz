@@ -41,6 +41,10 @@ import {
   StyledGridColumnsLabel,
   StyledGridColumnsSelect,
 } from "./TaskListGrid.styles";
+import {
+  buildTaskGridDrawCandidates,
+  type TaskGridPriorityFilterMode,
+} from "./taskGridDraw";
 
 type Props = {
   onSelectList: (listId: string, cardId?: string) => void;
@@ -62,13 +66,7 @@ type GridItem = {
 };
 
 type GridColumnsMode = "auto" | "1" | "2" | "3";
-type PriorityFilterMode = "all" | "prioritized";
-type DrawCandidate = {
-  listId: string;
-  cardId: string;
-  dayColor: DayColor;
-  isPrioritized: boolean;
-};
+type PriorityFilterMode = TaskGridPriorityFilterMode;
 
 const GRID_COLUMNS_STORAGE_KEY = "tasks-grid-columns";
 const GRID_GROUPED_STORAGE_KEY = "tasks-grid-grouped";
@@ -389,27 +387,15 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
     dispatch(resetAllDayColors());
   }, [collapseCompact, dispatch]);
 
-  const randomCandidates = useMemo<DrawCandidate[]>(() => {
-    const eligibleCards = tasks.flatMap((list) =>
-      list.cards
-        .filter((card) => !card.done && card.dayColor !== "red")
-        .map((card) => ({
-          listId: list._id,
-          cardId: card._id,
-          dayColor: card.dayColor ?? null,
-          isPrioritized: card.prioritized,
-        }))
-    );
-    const prioritizedCards = eligibleCards.filter(
-      (card) => card.isPrioritized
-    );
-
-    if (drawOnlyPrioritizedTasks && prioritizedCards.length > 0) {
-      return prioritizedCards;
-    }
-
-    return eligibleCards;
-  }, [drawOnlyPrioritizedTasks, tasks]);
+  const randomCandidates = useMemo(
+    () =>
+      buildTaskGridDrawCandidates({
+        drawOnlyPrioritizedTasks,
+        gridItems,
+        priorityFilterMode,
+      }),
+    [drawOnlyPrioritizedTasks, gridItems, priorityFilterMode]
+  );
 
   const randomWhiteCandidates = useMemo(() => {
     return randomCandidates.filter((item) => item.dayColor === null);
@@ -434,10 +420,6 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
 
     const randomIndex = Math.floor(Math.random() * pool.length);
     const selected = pool[randomIndex];
-
-    if (!selected.cardId) {
-      return;
-    }
 
     dispatch(
       setTaskDayColor({

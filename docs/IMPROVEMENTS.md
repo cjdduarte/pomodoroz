@@ -674,8 +674,8 @@ Scope checklist:
 - [x] Add a persisted all/prioritized-only toolbar control.
 - [x] Add mark/unmark priority to the grid card flow using an overlaid star action.
 - [x] Keep current Timer selection unchanged in the first slice.
-- [x] Add a Settings option to limit Draw to prioritized eligible cards with automatic fallback to the normal draw pool.
-- [x] Keep Draw behavior independent from the visual prioritized-only grid filter.
+- [x] Add a Settings option to limit Draw to prioritized eligible cards with automatic fallback to the normal draw pool in all-task mode.
+- [x] Keep Draw tied to the visible grid pool when the visual prioritized-only filter is active.
 
 Deferred follow-up:
 
@@ -691,6 +691,7 @@ Validation checklist:
 - [x] Undo/redo restores priority state correctly.
 - [x] Exported JSON includes priority state.
 - [x] Imported older JSON without priority fields remains valid.
+- [x] Draw candidate selection is covered for visible priority filtering, prioritized-only settings, and fallback.
 - [ ] Manual: normal grid shows pending priorities first under `Priorities`.
 - [ ] Manual: compact grid shows the same priority section without clipping or resizing regressions.
 - [ ] Manual: priority-only mode hides non-priority cards and keeps completed-card guards.
@@ -699,6 +700,7 @@ Validation checklist:
 - [ ] Manual: active task highlight remains visible when the active task is prioritized.
 - [ ] Manual: with `Draw only prioritized tasks` enabled and at least one prioritized eligible card, Draw uses only prioritized cards.
 - [ ] Manual: with `Draw only prioritized tasks` enabled and no prioritized eligible cards, Draw falls back to the normal eligible pool.
+- [ ] Manual: with the visual prioritized-only filter active, Draw does not change hidden non-priority cards.
 - [x] `pnpm lint`
 - [x] `pnpm typecheck:renderer`
 - [x] `pnpm test:run`
