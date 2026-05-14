@@ -102,7 +102,8 @@ Revisar o diff final e commitar o fechamento do B1 com mensagem Conventional Com
 - Correcao pre-release aplicada no helper do Sorteio do grid: no filtro visual
   somente priorizadas, `buildTaskGridDrawCandidates` agora filtra
   defensivamente por `isPrioritized` e os testes cobrem ausencia de fallback
-  para cards normais.
+  para cards normais, incluindo a invariancia de resultado entre
+  `drawOnlyPrioritizedTasks` ligado/desligado nesse modo visual.
 - Apos correcao pre-release do Sorteio do grid:
   `pnpm test:run src/routes/Tasks/taskGridDraw.test.ts`,
   `pnpm typecheck:renderer`, `pnpm lint`, `pnpm build:renderer`.

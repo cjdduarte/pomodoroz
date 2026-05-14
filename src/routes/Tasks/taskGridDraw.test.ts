@@ -47,6 +47,33 @@ describe("task grid draw candidates", () => {
     ]);
   });
 
+  it("keeps prioritized visual mode independent from the draw-only-prioritized setting", () => {
+    const gridItems = [
+      createItem({
+        listId: "priority-list",
+        cardId: "priority-card",
+        isPrioritized: true,
+      }),
+      createItem({
+        listId: "normal-list",
+        cardId: "normal-card",
+        dayColor: "green",
+      }),
+    ];
+    const withSettingEnabled = buildTaskGridDrawCandidates({
+      drawOnlyPrioritizedTasks: true,
+      priorityFilterMode: "prioritized",
+      gridItems,
+    });
+    const withSettingDisabled = buildTaskGridDrawCandidates({
+      drawOnlyPrioritizedTasks: false,
+      priorityFilterMode: "prioritized",
+      gridItems,
+    });
+
+    expect(withSettingDisabled).toEqual(withSettingEnabled);
+  });
+
   it("does not fall back to normal cards in prioritized visual mode", () => {
     const candidates = buildTaskGridDrawCandidates({
       drawOnlyPrioritizedTasks: true,
