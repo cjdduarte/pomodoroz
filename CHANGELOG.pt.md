@@ -6,6 +6,12 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.5.9] - A definir
+
+### Alterado
+
+- **Handoff de sessão agora é local-only** — `RETOMADA.md` fica ignorado pelo Git, `RETOMADA.example.md` fornece o template versionado, e a orientação dos agentes agora instrui recriar o handoff local a partir do template quando ele estiver ausente.
+
 ## [26.5.8] - 2026-05-14
 
 ### Adicionado

@@ -6,6 +6,12 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.5.9] - TBD
+
+### Changed
+
+- **Session handoff is now local-only** — `RETOMADA.md` is ignored by Git, `RETOMADA.example.md` provides the versioned template, and agent guidance now instructs agents to recreate the local handoff from the template when missing.
+
 ## [26.5.8] - 2026-05-14
 
 ### Added
