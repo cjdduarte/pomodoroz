@@ -99,6 +99,13 @@ Revisar o diff final e commitar o fechamento do B1 com mensagem Conventional Com
   titulo/linha ao desmarcar todas as prioridades.
 - Validacao manual desktop do B1 confirmada pelo usuario; `docs/IMPROVEMENTS.md`
   foi atualizado com B1 como `Done` e checkboxes manuais concluidos.
+- Correcao pre-release aplicada no helper do Sorteio do grid: no filtro visual
+  somente priorizadas, `buildTaskGridDrawCandidates` agora filtra
+  defensivamente por `isPrioritized` e os testes cobrem ausencia de fallback
+  para cards normais.
+- Apos correcao pre-release do Sorteio do grid:
+  `pnpm test:run src/routes/Tasks/taskGridDraw.test.ts`,
+  `pnpm typecheck:renderer`, `pnpm lint`, `pnpm build:renderer`.
 
 ---
 

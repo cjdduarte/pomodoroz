@@ -19,7 +19,35 @@ const createItem = (
 });
 
 describe("task grid draw candidates", () => {
-  it("uses the visible prioritized-only grid pool without normal fallback", () => {
+  it("limits prioritized visual mode to prioritized eligible cards", () => {
+    const candidates = buildTaskGridDrawCandidates({
+      drawOnlyPrioritizedTasks: true,
+      priorityFilterMode: "prioritized",
+      gridItems: [
+        createItem({
+          listId: "priority-list",
+          cardId: "priority-card",
+          isPrioritized: true,
+        }),
+        createItem({
+          listId: "normal-list",
+          cardId: "normal-card",
+          dayColor: "green",
+        }),
+      ],
+    });
+
+    expect(candidates).toEqual([
+      {
+        listId: "priority-list",
+        cardId: "priority-card",
+        dayColor: null,
+        isPrioritized: true,
+      },
+    ]);
+  });
+
+  it("does not fall back to normal cards in prioritized visual mode", () => {
     const candidates = buildTaskGridDrawCandidates({
       drawOnlyPrioritizedTasks: true,
       priorityFilterMode: "prioritized",
@@ -29,6 +57,11 @@ describe("task grid draw candidates", () => {
           cardId: "priority-card",
           isPrioritized: true,
           dayColor: "red",
+        }),
+        createItem({
+          listId: "normal-list",
+          cardId: "normal-card",
+          dayColor: "green",
         }),
       ],
     });

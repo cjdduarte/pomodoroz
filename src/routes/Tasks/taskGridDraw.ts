@@ -51,13 +51,14 @@ export const buildTaskGridDrawCandidates = ({
     ];
   });
 
-  if (priorityFilterMode === "prioritized") {
-    return eligibleCards;
-  }
-
   const prioritizedCards = eligibleCards.filter(
     (card) => card.isPrioritized
   );
+
+  if (priorityFilterMode === "prioritized") {
+    // The visual prioritized-only filter must never fall back to normal cards.
+    return prioritizedCards;
+  }
 
   if (drawOnlyPrioritizedTasks && prioritizedCards.length > 0) {
     return prioritizedCards;
