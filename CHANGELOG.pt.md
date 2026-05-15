@@ -13,6 +13,7 @@
 - **Controle de colunas do grid de tarefas permanece alinhado à direita em layouts estreitos** — a barra do grid agora mantém o seletor de colunas alinhado à borda direita em vez de posicioná-lo ao lado das ações à esquerda.
 - **Ação de reset do grid de tarefas fica depois do sorteio e do agrupamento** — o botão de resetar cores agora aparece como terceiro ícone da barra em vez de ser o primeiro.
 - **Estatísticas abertas pelo modo compacto retornam ao Timer compacto** — ao voltar do relatório para o Timer, o app agora restaura o modo compacto em vez de permanecer no layout normal.
+- **Reducers de conclusão de tarefas agora tratam IDs ausentes de forma consistente** — os reducers de marcar como concluída e não concluída passam a ter o mesmo comportamento sem efeito quando o ID do cartão está ausente.
 
 ## [26.5.8] - 2026-05-14
 

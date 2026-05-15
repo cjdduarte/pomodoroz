@@ -129,4 +129,23 @@ describe("tasks reducer", () => {
     expect(state.present[0]?.cards).toEqual([]);
     expect(state.present[1]?.cards[0]?.prioritized).toBe(true);
   });
+
+  it("keeps state unchanged when marking done without a card id", async () => {
+    setupLocalStorage();
+
+    const { default: reducer, setTaskCardNotDone } =
+      await import("./index");
+
+    const state = reducer(undefined, { type: "@@INIT" });
+    const nextState = reducer(
+      state,
+      setTaskCardNotDone({
+        listId: "list-id-1",
+      })
+    );
+
+    expect(nextState).toBe(state);
+    expect(nextState.past).toEqual([]);
+    expect(nextState.present[0]?.cards[0]?.done).toBe(false);
+  });
 });

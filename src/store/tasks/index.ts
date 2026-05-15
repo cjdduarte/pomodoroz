@@ -227,7 +227,7 @@ const tasksSlice = createSlice({
         cardId?: Task["_id"];
       }>
     ) => {
-      if (!action.payload.cardId) return;
+      if (!action.payload.cardId) return state;
 
       const newState = state.map((list) => {
         if (list._id !== action.payload.listId) return list;
