@@ -130,7 +130,7 @@ describe("tasks reducer", () => {
     expect(state.present[1]?.cards[0]?.prioritized).toBe(true);
   });
 
-  it("keeps state unchanged when marking done without a card id", async () => {
+  it("keeps state unchanged when marking not-done without a card id", async () => {
     setupLocalStorage();
 
     const { default: reducer, setTaskCardNotDone } =
