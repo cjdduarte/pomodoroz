@@ -1,7 +1,7 @@
 {
   "name": "pomodoroz",
   "private": true,
-  "version": "26.5.8",
+  "version": "26.5.9",
   "packageManager": "pnpm@11.1.1",
   "license": "MIT",
   "author": {
