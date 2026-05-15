@@ -8,9 +8,10 @@
 
 ## [26.5.9] - TBD
 
-### Changed
+### Fixed
 
-- **Session handoff is now local-only** — `RETOMADA.md` is ignored by Git, `RETOMADA.example.md` provides the versioned template, and agent guidance now instructs agents to recreate the local handoff from the template when missing.
+- **Task grid columns control stays right-aligned on narrow layouts** — the grid toolbar now keeps the columns selector aligned to the right edge instead of placing it beside the left toolbar actions.
+- **Task grid reset action is ordered after draw and grouping** — the reset-colors button now appears as the third toolbar icon instead of the first.
 
 ## [26.5.8] - 2026-05-14
 

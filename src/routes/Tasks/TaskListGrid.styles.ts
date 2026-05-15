@@ -313,13 +313,10 @@ export const StyledGridHint = styled.span`
 export const StyledGridFooterControls = styled.div`
   display: inline-flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 0.75rem;
   margin-left: auto;
   flex-wrap: wrap;
-
-  @media (max-width: 38rem) {
-    margin-left: 0;
-  }
 `;
 
 export const StyledGridColumns = styled.div`

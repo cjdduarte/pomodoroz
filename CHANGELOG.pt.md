@@ -8,9 +8,10 @@
 
 ## [26.5.9] - A definir
 
-### Alterado
+### Corrigido
 
-- **Handoff de sessão agora é local-only** — `RETOMADA.md` fica ignorado pelo Git, `RETOMADA.example.md` fornece o template versionado, e a orientação dos agentes agora instrui recriar o handoff local a partir do template quando ele estiver ausente.
+- **Controle de colunas do grid de tarefas permanece alinhado à direita em layouts estreitos** — a barra do grid agora mantém o seletor de colunas alinhado à borda direita em vez de posicioná-lo ao lado das ações à esquerda.
+- **Ação de reset do grid de tarefas fica depois do sorteio e do agrupamento** — o botão de resetar cores agora aparece como terceiro ícone da barra em vez de ser o primeiro.
 
 ## [26.5.8] - 2026-05-14
 
