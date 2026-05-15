@@ -12,6 +12,7 @@
 
 - **Task grid columns control stays right-aligned on narrow layouts** — the grid toolbar now keeps the columns selector aligned to the right edge instead of placing it beside the left toolbar actions.
 - **Task grid reset action is ordered after draw and grouping** — the reset-colors button now appears as the third toolbar icon instead of the first.
+- **Statistics opened from compact mode return to compact Timer** — returning from the report to the Timer now restores compact mode instead of leaving the app in the normal layout.
 
 ## [26.5.8] - 2026-05-14
 

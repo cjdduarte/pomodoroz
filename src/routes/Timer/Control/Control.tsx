@@ -47,6 +47,12 @@ type Props = {
 };
 
 type ResetPromptStep = "hidden" | "confirmReset" | "confirmReclassify";
+type TimerNavigationState = {
+  enableCompactMode: boolean;
+};
+type StatisticsNavigationState = {
+  restoreCompactModeOnTimer: boolean;
+};
 
 const Control: React.FC<Props> = ({
   resetTimerAction,
@@ -186,8 +192,21 @@ const Control: React.FC<Props> = ({
   }, [dispatch, settings.compactMode]);
 
   const onOpenStatisticsCallback = useCallback(() => {
+    if (settings.compactMode) {
+      const timerState: TimerNavigationState = {
+        enableCompactMode: true,
+      };
+      const statisticsState: StatisticsNavigationState = {
+        restoreCompactModeOnTimer: true,
+      };
+
+      navigate("/", { replace: true, state: timerState });
+      navigate("/statistics", { state: statisticsState });
+      return;
+    }
+
     navigate("/statistics");
-  }, [navigate]);
+  }, [navigate, settings.compactMode]);
 
   const onSkipAction = useCallback(() => {
     if (timer.playing && settings.enableStrictMode) {
