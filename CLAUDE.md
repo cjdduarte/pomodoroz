@@ -123,7 +123,7 @@ State persistence is local (`localStorage` + native layer where applicable).
 - **Release Notes Source of Truth**: GitHub Release title/notes are generated from `CHANGELOG.md` section `## [x.y.z]`.
 - **Changelog Fill Rule**: never add new items to a published version; keep next version at top as `A definir` (PT) / `TBD` (EN), set date only on release day.
 - **Agent Release Prompt Rule**: before suggesting `./scripts/release.sh` or `./scripts/release.ps1`, the agent must set `YYYY-MM-DD` in both changelog headers of the target version.
-- **Session handoff**: `RETOMADA.md` is local-only and ignored; if it is missing, copy `RETOMADA.example.md` to `RETOMADA.md` before updating session state.
+- **Session handoff**: update `RETOMADA.md` when current operational handoff changes, using `RETOMADA.example.md` only as a reset template.
 - **Language**: code in English; logs/comments in Portuguese (PT-BR) where appropriate.
 - **Commits**: commit messages and PR titles in English (Conventional Commits).
 - **AI Finalization Output**: after each finalized implementation, suggest a ready-to-use Conventional Commit message in English.

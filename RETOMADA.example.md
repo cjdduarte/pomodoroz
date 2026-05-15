@@ -1,12 +1,12 @@
 # RETOMADA.md
 
-Status: **handoff operacional local**.
+Status: **handoff operacional**.
 
-Este arquivo e um template versionado. Para retomar uma sessao local:
+Este arquivo e um template. Para redefinir `RETOMADA.md`:
 
-1. Copie este arquivo para `RETOMADA.md` se ele nao existir.
+1. Copie a estrutura deste arquivo para `RETOMADA.md` somente quando precisar recriar ou resetar o handoff.
 2. Preencha `RETOMADA.md` com o estado operacional atual.
-3. Nao commite `RETOMADA.md`; ele e local-only e ignorado pelo Git.
+3. Substitua contexto antigo pelo estado atual; nao acumule historico.
 
 `RETOMADA.md` nao substitui `AGENTS.md` como fonte de verdade de governanca/fluxo e nao substitui `docs/IMPROVEMENTS.md` como planejamento.
 

@@ -46,20 +46,20 @@
 | Release/update operations    | `docs/RELEASE_OPERATIONS.md`                   |
 | Agent operational rules      | This file (`AGENTS.md`)                        |
 | Claude Code guide            | `CLAUDE.md`                                    |
+| Session handoff state        | `RETOMADA.md`                                  |
 | Session handoff template     | `RETOMADA.example.md`                          |
 
 Do not create loose specs/checklists for topics already covered in the documents above.
 
 ### RETOMADA.md Rules
 
-`RETOMADA.md` is a local-only operational handoff document — a lean snapshot to resume work in a new chat without rebuilding context. It is **not** a source of truth for governance (that is `AGENTS.md`) and **not** a planning document (that is `docs/IMPROVEMENTS.md`).
+`RETOMADA.md` is an operational handoff document — a lean snapshot to resume work in a new chat without rebuilding context. It is **not** a source of truth for governance (that is `AGENTS.md`) and **not** a planning document (that is `docs/IMPROVEMENTS.md`).
 
-1. Do not commit `RETOMADA.md`; it is ignored by Git.
-2. If `RETOMADA.md` is missing, copy `RETOMADA.example.md` to `RETOMADA.md` and fill only the current operational state.
-3. Update `RETOMADA.md` at the end of each major phase, relevant operational fix, or real/manual validation that changes the next step.
-4. Replace old context with current context; **do not accumulate history**.
-5. Keep it lean — it should contain only what the next session needs to pick up where work stopped.
-6. Do not store secrets, tokens, credentials, private endpoints, or personal data in `RETOMADA.md`.
+1. Update `RETOMADA.md` at the end of each major phase, relevant operational fix, or real/manual validation that changes the next step.
+2. Use `RETOMADA.example.md` only as the reset template if `RETOMADA.md` needs to be recreated.
+3. Replace old context with current context; **do not accumulate history**.
+4. Keep it lean — it should contain only what the next session needs to pick up where work stopped.
+5. Do not store secrets, tokens, credentials, private endpoints, or personal data in `RETOMADA.md`.
 
 ### Changelog Rules
 

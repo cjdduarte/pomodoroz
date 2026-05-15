@@ -83,7 +83,7 @@ export const StyledGridContent = styled.div<{ $compact?: boolean }>`
   overflow-x: hidden;
   scrollbar-gutter: stable;
   padding: ${(p) =>
-    p.$compact ? "0.5rem 1rem 0.4rem" : "0.9rem 2rem 0.7rem"};
+    p.$compact ? "0.5rem 1rem 0.4rem" : "0.9rem 1rem 0.7rem"};
   background-color: var(--color-bg-primary);
 
   ${StyledScrollbar};
@@ -103,10 +103,7 @@ export const StyledGridCards = styled.div<{
           grid-template-columns: repeat(${p.$columns}, minmax(0, 1fr));
         `
       : css`
-          grid-template-columns: repeat(
-            auto-fit,
-            minmax(${p.$compact ? "8.8rem" : "12rem"}, 1fr)
-          );
+          grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
         `};
 `;
 

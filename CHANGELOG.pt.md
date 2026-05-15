@@ -6,6 +6,12 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.5.10] - A definir
+
+### Alterado
+
+- **Colunas Auto do grid de tarefas usam a mesma largura minima de cartao** — os grids normal e compacto agora usam o mesmo limite Auto de `11rem` e o mesmo padding horizontal de conteudo, reduzindo diferencas de layout entre as duas visualizacoes.
+
 ## [26.5.9] - 2026-05-15
 
 ### Corrigido

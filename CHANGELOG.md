@@ -6,6 +6,12 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.5.10] - TBD
+
+### Changed
+
+- **Task grid Auto columns use a shared minimum card width** — normal and compact grids now use the same `11rem` Auto column threshold and horizontal content padding, reducing layout differences between the two views.
+
 ## [26.5.9] - 2026-05-15
 
 ### Fixed
