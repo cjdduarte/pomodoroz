@@ -515,26 +515,6 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
   return (
     <StyledGridWrapper>
       <StyledGridToolbar $compact={compact}>
-        <StyledGridToolbarButton
-          $iconOnly
-          onClick={handleReset}
-          title={resetLabel}
-          aria-label={resetLabel}
-        >
-          <svg
-            viewBox="0 0 16 16"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.4"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-            focusable="false"
-          >
-            <path d="M13 8A5 5 0 1 1 8 3" />
-            <path d="M13 3v3h-3" />
-          </svg>
-        </StyledGridToolbarButton>
         {showGridRandomButton ? (
           <StyledGridToolbarButton
             $iconOnly
@@ -598,6 +578,26 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
             <path d="M5.5 8h7.5" />
             <path d="M8 13h5" />
             <path d="M2.5 3v10" />
+          </svg>
+        </StyledGridToolbarButton>
+        <StyledGridToolbarButton
+          $iconOnly
+          onClick={handleReset}
+          title={resetLabel}
+          aria-label={resetLabel}
+        >
+          <svg
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path d="M13 8A5 5 0 1 1 8 3" />
+            <path d="M13 3v3h-3" />
           </svg>
         </StyledGridToolbarButton>
         <StyledGridToolbarButton
