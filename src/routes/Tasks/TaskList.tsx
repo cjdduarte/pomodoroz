@@ -12,6 +12,7 @@ import {
   editTaskTitle,
   editTaskCardText,
   removeTaskList,
+  reorderTaskListByPriority,
   setTaskCardPriority,
   removeTaskCard,
 } from "store";
@@ -71,6 +72,10 @@ const TaskList: React.FC<Props> = ({
     dispatch(removeTaskList(listId));
   };
 
+  const onReorderByPriorityAction = () => {
+    dispatch(reorderTaskListByPriority({ listId }));
+  };
+
   return (
     <>
       <div
@@ -90,6 +95,7 @@ const TaskList: React.FC<Props> = ({
             title={title}
             onEditTitle={onEditListTitle}
             onRemoveList={onRemoveListAction}
+            onReorderByPriority={onReorderByPriorityAction}
             dragHandleAttributes={attributes}
             dragHandleListeners={listeners}
             setDragHandleRef={setActivatorNodeRef}

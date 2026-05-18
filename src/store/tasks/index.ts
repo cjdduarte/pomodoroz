@@ -267,6 +267,42 @@ const tasksSlice = createSlice({
       });
     },
 
+    reorderTaskListByPriority: (
+      state,
+      action: PayloadAction<{ listId: TaskList["_id"] }>
+    ) => {
+      const targetList = state.find(
+        (list) => list._id === action.payload.listId
+      );
+
+      if (!targetList) return state;
+
+      const prioritizedCards = targetList.cards.filter(
+        (card) => card.prioritized
+      );
+
+      if (!prioritizedCards.length) return state;
+
+      const regularCards = targetList.cards.filter(
+        (card) => !card.prioritized
+      );
+      const reorderedCards = [...prioritizedCards, ...regularCards];
+      const hasOrderChanged = reorderedCards.some(
+        (card, index) => card._id !== targetList.cards[index]?._id
+      );
+
+      if (!hasOrderChanged) return state;
+
+      return state.map((list) => {
+        if (list._id !== action.payload.listId) return list;
+
+        return {
+          ...list,
+          cards: reorderedCards,
+        };
+      });
+    },
+
     skipTaskCard: (
       state,
       action: PayloadAction<{
@@ -427,6 +463,7 @@ export const {
   editTaskTitle,
   removeTaskCard,
   removeTaskList,
+  reorderTaskListByPriority,
   replaceTaskLists,
   resetAllDayColors,
   setTaskDayColor,

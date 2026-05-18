@@ -53,20 +53,9 @@ export const StyledOptionList = styled.ul`
   }
 `;
 
-export const StyledOptionPriority = styled.li`
-  &[aria-disabled="true"] {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  &:not([aria-disabled="true"]):hover {
-    color: var(--color-yellow);
-  }
-`;
-
-export const StyledOptionDone = styled.li`
+export const StyledOptionReorder = styled.li`
   &:hover {
-    color: var(--color-green);
+    color: var(--color-primary);
   }
 `;
 

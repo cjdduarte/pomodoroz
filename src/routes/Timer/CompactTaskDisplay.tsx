@@ -1078,7 +1078,7 @@ const CompactTaskDisplay: React.FC = () => {
         variant="neutral"
         onClick={handleOpenPriorityList}
       >
-        {t("tasks.priorityList")}
+        {t("tasks.selectTask")}
       </StyledActionsMenuItem>
       {currentTask ? (
         <>

@@ -14,6 +14,7 @@ import {
   StyledPopperContent,
   StyledPopperHeader,
   StyledOptionDelete,
+  StyledOptionReorder,
 } from "styles";
 import { SVG } from "components";
 import { useTargetOutside } from "hooks";
@@ -23,6 +24,7 @@ type Props = {
 
   onEditTitle?: (title: string) => void;
   onRemoveList?: () => void;
+  onReorderByPriority?: () => void;
   dragHandleAttributes?: DraggableAttributes;
   dragHandleListeners?: DraggableSyntheticListeners;
   setDragHandleRef?: (node: HTMLElement | null) => void;
@@ -32,6 +34,7 @@ const TaskHeader: React.FC<Props> = ({
   title,
   onEditTitle,
   onRemoveList,
+  onReorderByPriority,
   dragHandleAttributes,
   dragHandleListeners,
   setDragHandleRef,
@@ -120,6 +123,15 @@ const TaskHeader: React.FC<Props> = ({
           </StyledPopperHeader>
 
           <StyledOptionList>
+            <StyledOptionReorder
+              onClick={() => {
+                if (onReorderByPriority) onReorderByPriority();
+                setShowOptions(false);
+              }}
+            >
+              {t("tasks.reorderByPriority")}
+            </StyledOptionReorder>
+
             <StyledOptionDelete
               onClick={() => {
                 if (onRemoveList) onRemoveList();

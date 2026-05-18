@@ -130,6 +130,108 @@ describe("tasks reducer", () => {
     expect(state.present[1]?.cards[0]?.prioritized).toBe(true);
   });
 
+  it("reorders one list by starred task priority", async () => {
+    setupLocalStorage([
+      {
+        _id: "list-id-1",
+        title: "FOCUS",
+        priority: true,
+        dayColor: null,
+        dayColorDate: null,
+        cards: [
+          {
+            _id: "task-id-1",
+            text: "First regular",
+            description: "",
+            done: false,
+            prioritized: false,
+            dayColor: null,
+            dayColorDate: null,
+          },
+          {
+            _id: "task-id-2",
+            text: "First priority",
+            description: "",
+            done: false,
+            prioritized: true,
+            dayColor: null,
+            dayColorDate: null,
+          },
+          {
+            _id: "task-id-3",
+            text: "Second regular",
+            description: "",
+            done: false,
+            prioritized: false,
+            dayColor: null,
+            dayColorDate: null,
+          },
+          {
+            _id: "task-id-4",
+            text: "Second priority",
+            description: "",
+            done: false,
+            prioritized: true,
+            dayColor: null,
+            dayColorDate: null,
+          },
+        ],
+      },
+      {
+        _id: "list-id-2",
+        title: "BACKLOG",
+        priority: false,
+        dayColor: null,
+        dayColorDate: null,
+        cards: [
+          {
+            _id: "task-id-5",
+            text: "Other list",
+            description: "",
+            done: false,
+            prioritized: false,
+            dayColor: null,
+            dayColorDate: null,
+          },
+        ],
+      },
+    ]);
+
+    const { default: reducer, reorderTaskListByPriority } =
+      await import("./index");
+
+    const state = reducer(
+      reducer(undefined, { type: "@@INIT" }),
+      reorderTaskListByPriority({ listId: "list-id-1" })
+    );
+
+    expect(state.present[0]?.cards.map((card) => card._id)).toEqual([
+      "task-id-2",
+      "task-id-4",
+      "task-id-1",
+      "task-id-3",
+    ]);
+    expect(state.present[1]?.cards.map((card) => card._id)).toEqual([
+      "task-id-5",
+    ]);
+  });
+
+  it("keeps state unchanged when reordering a list without starred tasks", async () => {
+    setupLocalStorage();
+
+    const { default: reducer, reorderTaskListByPriority } =
+      await import("./index");
+
+    const state = reducer(undefined, { type: "@@INIT" });
+    const nextState = reducer(
+      state,
+      reorderTaskListByPriority({ listId: "list-id-1" })
+    );
+
+    expect(nextState).toBe(state);
+    expect(nextState.past).toEqual([]);
+  });
+
   it("keeps state unchanged when marking not-done without a card id", async () => {
     setupLocalStorage();
 
