@@ -608,10 +608,10 @@ Suggested commit:
 | B5  | Global play/pause hotkey                 | Open   | Medium   | Low    |
 | B6  | Cadence insights in statistics           | Open   | Medium   | Medium |
 | B7  | Motivational completion messages         | Open   | Medium   | Low    |
-| B8  | Reverse Pomodoro mode                    | Open   | Low      | Medium |
-| B9  | Ambient sounds                           | Open   | Low      | High   |
-| B10 | No-judgment mode                         | Open   | Low      | Low    |
-| B11 | Timer circle small-window layout fix     | Done   | Medium   | Low    |
+| B8  | Ambient sounds                           | Open   | Low      | High   |
+| B9  | No-judgment mode                         | Open   | Low      | Low    |
+| B10 | Timer circle small-window layout fix     | Done   | Medium   | Low    |
+| B11 | Optional window focus on timer end       | Open   | Medium   | Low    |
 
 Current product baseline:
 
@@ -711,12 +711,52 @@ Suggested commit:
 
 - `feat(tasks): add task priorities to the grid`
 
-### B11 bug note
+### B10 bug note
 
 - In normal mode, when the user resizes the app by dragging the window border to a smaller width or height, the main timer circle can overflow its intended area and overlap the navigation area, session label, and timer controls.
 - Reproduce on the Timer route by dragging the window border inward until the circle touches or covers the top navigation and bottom controls.
 - Fixed by enforcing the normal-mode native minimum window size, keeping the control row from shrinking vertically, and retaining width-aware timer-circle scaling for narrower supported layouts.
 - Validation target: timer circle must remain fully visible and must not overlap navigation, titlebar, session label, play/skip/volume/fullscreen controls, or compact task footer in small windows.
+
+### B11 — Optional window focus on timer end
+
+Decision checkpoint:
+
+- Origin: upstream parity request [Pomatez #689](https://github.com/zidoro/pomatez/issues/689) ("add an option to control window show/focus behavior at timer end").
+- Current behavior in this fork (Tauri-only): the native layer calls `unminimize()` + `set_focus()` so the window is brought to front and steals OS focus when a timer ends. Confirmed in `src-tauri/src/lib.rs` and `src-tauri/src/commands/window_bridge.rs`.
+- Problem: stealing keyboard/mouse focus mid-task interrupts the user working in another app, which contradicts the Pomodoro goal. The visual/native alert is still wanted; only the forced focus steal is unwanted.
+- Direction:
+  - Add a settings boolean (e.g. `focusWindowOnTimerEnd`) following the existing toggle pattern in `SettingTypes`.
+  - Default must preserve today's behavior (focus the window on timer end) so there is zero regression for satisfied users; users who dislike it opt out.
+  - Gate **only** the timer-end focus path. User-initiated show paths (tray click, `Alt+Shift+S` show shortcut, fullscreen-break flow) must still focus normally. The setting must distinguish "user asked to show" from "timer ended automatically".
+  - Native notification/sound at timer end stays unchanged regardless of this setting.
+- Out of scope:
+  - Changing the notification system or fullscreen-break behavior.
+  - Per-event granularity (focus on break-end but not focus-end, etc.) — single global toggle for the first slice.
+
+Scope checklist:
+
+- [ ] Add `focusWindowOnTimerEnd` (default `true`) to settings types and defaults.
+- [ ] Add a Settings toggle with localized copy for all supported languages (`en`, `pt`, `es`, `ja`, `zh`, `de`, `fr`).
+- [ ] Identify every native `set_focus()` call reachable from an automatic timer-end transition versus a user-initiated show path.
+- [ ] Suppress only the automatic timer-end focus when the setting is `false`; keep `unminimize()`/visibility behavior decisions explicit.
+- [ ] Keep all user-initiated show paths (tray, show shortcut, fullscreen break) focusing as today.
+
+Validation checklist:
+
+- [ ] Manual: setting on (default) — timer end still brings window to front as today.
+- [ ] Manual: setting off — timer end does not steal focus from the active app; notification/sound still fire.
+- [ ] Manual: with setting off, tray click and show shortcut still focus the window normally.
+- [ ] Manual: fullscreen break flow unaffected by the setting.
+- [ ] i18n keys render in all supported languages with no fallback/missing-key text.
+- [ ] `pnpm lint`
+- [ ] `pnpm typecheck:renderer`
+- [ ] `pnpm build:renderer`
+- [ ] `cargo check --manifest-path src-tauri/Cargo.toml`
+
+Suggested commit:
+
+- `feat(settings): add optional window focus on timer end`
 
 ### B3 decision notes
 
