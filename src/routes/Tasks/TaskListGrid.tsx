@@ -675,6 +675,9 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
               : markPriorityLabel;
             const useGroupedCardLayout =
               grouped && !item.isPriorityItem;
+            const cardTitle = item.isPlaceholder
+              ? item.taskText
+              : `${item.listTitle}: ${item.taskText}`;
 
             return (
               <StyledGridCardShell key={item.key}>
@@ -699,7 +702,7 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
                       item.isDone
                     )
                   }
-                  title={selectHint}
+                  title={cardTitle}
                   aria-current={isCurrentTask ? "true" : undefined}
                 >
                   {!useGroupedCardLayout ? (

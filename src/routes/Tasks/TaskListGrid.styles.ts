@@ -239,12 +239,12 @@ export const StyledGridPriorityButton = styled(StyledButton)<{
 `;
 
 export const StyledGridCardTitle = styled.span`
-  font-size: 1.2rem;
-  font-weight: 500;
-  color: var(--color-heading-text);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-disabled-text);
   text-transform: uppercase;
   text-shadow: none;
-  line-height: 1.2;
+  line-height: 1.15;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -255,9 +255,10 @@ export const StyledGridCardTask = styled.span<{
   $done?: boolean;
   $placeholder?: boolean;
 }>`
-  font-size: 1.05rem;
-  color: var(--color-body-text);
-  line-height: 1.35;
+  font-size: 1.08rem;
+  font-weight: 500;
+  color: var(--color-heading-text);
+  line-height: 1.25;
   width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
