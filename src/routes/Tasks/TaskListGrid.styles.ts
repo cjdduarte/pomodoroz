@@ -256,8 +256,9 @@ export const StyledGridCardTask = styled.span<{
   $placeholder?: boolean;
 }>`
   font-size: 1.08rem;
-  font-weight: 500;
-  color: var(--color-heading-text);
+  font-family: inherit;
+  font-weight: 400;
+  color: var(--color-body-text);
   line-height: 1.25;
   width: 100%;
   overflow: hidden;

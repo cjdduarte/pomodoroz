@@ -11,12 +11,12 @@
 ### Alterado
 
 - **Grid de tarefas pode ser configurado com quatro colunas** — o seletor compartilhado de colunas agora inclui a opcao `4` tanto no grid normal quanto no compacto.
-- **Cartoes do grid de tarefas ficam mais legiveis em layouts densos** — nomes de listas agora aparecem como rotulos mais discretos, o texto da tarefa recebe o destaque principal, e os cartoes exibem o texto completo de lista/tarefa no tooltip.
+- **Cartoes do grid de tarefas ficam mais legiveis em layouts densos** — nomes de listas agora aparecem como rotulos mais discretos, o texto da tarefa mantem o estilo normal de texto do app, e os cartoes exibem o texto completo de lista/tarefa no tooltip.
 - **Texto morto de dica do grid e logs de debug do renderer foram limpos** — uma traducao sem uso da dica do grid compacto e um log de console do renderer versionado foram removidos, e o nome do log agora fica ignorado.
 - **Listas de tarefas podem ser reordenadas por prioridade** — cada menu de acoes da tela Lista pode mover tarefas com estrela para o topo daquela lista, mantendo listas sem tarefas priorizadas sem alteracao.
 - **Checks de update Rust ignoram placeholders invalidos de compatibilidade** — `scripts/check-updates.sh` agora trata valores de compatibilidade do `cargo outdated`, como `---`, como indisponiveis, impedindo que eles sejam oferecidos como alvo de update Rust.
 - **Acoes da lista de tarefas nao mostram mais o atalho legado de lista de prioridade** — a acao obsoleta por lista foi removida do menu de acoes da tela Lista, estilos de opcao sem uso foram removidos, e o seletor de tarefa do Timer nao usa mais texto de lista de prioridade.
-- **Dependencias de tooling foram atualizadas** — os pins do gerenciador de pacotes e do tooling de lint foram atualizados sem mudancas intencionais de comportamento.
+- **Dependencias de tooling foram atualizadas** — os pins de tooling do projeto foram atualizados sem mudancas intencionais de comportamento.
 
 ## [26.5.10] - 2026-05-18
 
