@@ -112,7 +112,6 @@ export const ja = {
     markPriority: "優先にする",
     unmarkPriority: "優先を解除",
     selectHint: "右クリックでタイマーを開く",
-    selectHintCompact: "右クリックで現在のタスクに設定",
   },
   shortcuts: {
     localHeading: "ローカルショートカット",

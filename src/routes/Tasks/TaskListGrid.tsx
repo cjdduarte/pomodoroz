@@ -496,9 +496,6 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
     return Number(columnsMode);
   }, [columnsMode]);
 
-  const selectHint = compact
-    ? t("grid.selectHintCompact")
-    : t("grid.selectHint");
   const resetLabel = t("grid.reset");
   const randomLabel = t("grid.random");
   const randomTooltip = canRandomDraw

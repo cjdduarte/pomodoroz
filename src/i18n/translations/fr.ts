@@ -113,7 +113,6 @@ export const fr = {
     markPriority: "Marquer comme priorite",
     unmarkPriority: "Retirer la priorite",
     selectHint: "Clic droit pour ouvrir dans le minuteur",
-    selectHintCompact: "Clic droit pour definir la tache active",
   },
   shortcuts: {
     localHeading: "Raccourcis locaux",

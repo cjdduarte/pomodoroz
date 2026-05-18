@@ -112,7 +112,6 @@ export const en = {
     markPriority: "Mark as priority",
     unmarkPriority: "Remove priority",
     selectHint: "Right click to open in Timer",
-    selectHintCompact: "Right click to set active task",
   },
   shortcuts: {
     localHeading: "Local Shortcut Keys",

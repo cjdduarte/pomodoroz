@@ -113,7 +113,6 @@ export const es = {
     markPriority: "Marcar como prioridad",
     unmarkPriority: "Quitar prioridad",
     selectHint: "Clic derecho para abrir en Timer",
-    selectHintCompact: "Clic derecho para definir la tarea activa",
   },
   shortcuts: {
     localHeading: "Atajos locales",

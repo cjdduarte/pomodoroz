@@ -108,7 +108,6 @@ export const zh = {
     markPriority: "标记为优先",
     unmarkPriority: "取消优先",
     selectHint: "右键在计时器中打开",
-    selectHintCompact: "右键设为当前任务",
   },
   shortcuts: {
     localHeading: "本地快捷键",

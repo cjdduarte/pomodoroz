@@ -114,7 +114,6 @@ export const de = {
     markPriority: "Als Prioritaet markieren",
     unmarkPriority: "Prioritaet entfernen",
     selectHint: "Rechtsklick: im Timer oeffnen",
-    selectHintCompact: "Rechtsklick: als aktive Aufgabe setzen",
   },
   shortcuts: {
     localHeading: "Lokale Tastenkombinationen",

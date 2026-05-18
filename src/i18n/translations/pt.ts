@@ -112,7 +112,6 @@ export const pt = {
     markPriority: "Marcar como prioridade",
     unmarkPriority: "Remover prioridade",
     selectHint: "Botão direito: selecionar como tarefa ativa.",
-    selectHintCompact: "Botão direito: selecionar como tarefa ativa.",
   },
   shortcuts: {
     localHeading: "Atalhos locais",
