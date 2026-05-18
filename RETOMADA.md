@@ -22,7 +22,7 @@ Revisar e substituir contexto antigo; **nao acumular historico**.
 
 - Removida a regra `/RETOMADA.md` de `.gitignore`.
 - Atualizadas as orientacoes em `AGENTS.md`, `CLAUDE.md`, `RETOMADA.example.md` e neste arquivo para tratar `RETOMADA.md` como handoff operacional.
-- Mantida a secao `26.5.10` aberta em `CHANGELOG.md` e `CHANGELOG.pt.md`.
+- Definida a data `2026-05-18` na secao `26.5.10` de `CHANGELOG.md` e `CHANGELOG.pt.md`.
 - Padronizados a largura minima do modo `Auto` para `11rem` e o padding horizontal do conteudo do grid tanto no modo normal quanto no compacto.
 
 ---
@@ -34,7 +34,7 @@ Revisar e substituir contexto antigo; **nao acumular historico**.
 - `RETOMADA.md` nao esta mais listado no `.gitignore`.
 - Working tree esperado desta sessao: `.gitignore`, `AGENTS.md`, `CLAUDE.md`, `RETOMADA.md`, `RETOMADA.example.md`, `CHANGELOG.md`, `CHANGELOG.pt.md` e `src/routes/Tasks/TaskListGrid.styles.ts` modificados.
 - Proximo trabalho planejado em `docs/IMPROVEMENTS.md`: ciclo de produto `B2 -> B4`, depois expansao de testes `A6`, depois gate `A10`.
-- Changelog de `26.5.10` esta aberto como `TBD`/`A definir` e registra a padronizacao do grid Auto; a data deve ser definida somente no dia do release.
+- Changelog de `26.5.10` registra a padronizacao do grid Auto e esta datado como `2026-05-18`.
 
 ---
 
