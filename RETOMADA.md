@@ -20,31 +20,23 @@ Revisar e substituir contexto antigo; **nao acumular historico**.
 
 ## Sessao atual
 
-- Removida a regra `/RETOMADA.md` de `.gitignore`.
-- Atualizadas as orientacoes em `AGENTS.md`, `CLAUDE.md`, `RETOMADA.example.md` e neste arquivo para tratar `RETOMADA.md` como handoff operacional.
-- Definida a data `2026-05-18` na secao `26.5.10` de `CHANGELOG.md` e `CHANGELOG.pt.md`.
-- Padronizados a largura minima do modo `Auto` para `11rem` e o padding horizontal do conteudo do grid tanto no modo normal quanto no compacto.
-- Aberta a secao `26.5.11` em `CHANGELOG.md` e `CHANGELOG.pt.md` para a opcao de quatro colunas no grid.
-- Ajustada a hierarquia visual dos cartoes do grid para melhorar legibilidade em quatro colunas e adicionado tooltip com lista/tarefa completa.
-- Removidos `selectHintCompact` sem uso e `console-errors-renderer.log` versionado; o log agora esta no `.gitignore`.
-- Adicionada a opcao `Reordenar Tarefas (Prior.)` no menu de acoes de cada lista para mover tarefas com estrela ao topo da lista selecionada.
-- Corrigido `scripts/check-updates.sh` para tratar placeholders invalidos do `cargo outdated`, como `compat: "---"`, como versao indisponivel.
-- Removida a acao legada `Lista de prioridade` do menu de acoes da tela Lista, junto com estilos sem uso e o texto legado no seletor de tarefa do Timer.
+- Avaliado este handoff e removido o contexto antigo que nao refletia mais o working tree atual.
+- Atualizacao de tooling em andamento: pins do gerenciador de pacotes e do tooling de lint atualizados em `package.json`, `pnpm-lock.yaml` e nos setups Corepack dos workflows.
+- Registrada a atualizacao de tecnologia na secao aberta `26.5.11` de `CHANGELOG.md` e `CHANGELOG.pt.md`, sem mudancas intencionais de comportamento.
 
 ---
 
 ## Estado atual
 
-- Versao atual publicada/tagueada: `v26.5.9`.
-- `B1 - Task priorities in grid` esta fechado e publicado em `26.5.8`.
-- `RETOMADA.md` nao esta mais listado no `.gitignore`.
-- Working tree esperado desta sessao: `.gitignore`, `AGENTS.md`, `CLAUDE.md`, `RETOMADA.md`, `RETOMADA.example.md`, `CHANGELOG.md`, `CHANGELOG.pt.md` e `src/routes/Tasks/TaskListGrid.styles.ts` modificados.
-- Proximo trabalho planejado em `docs/IMPROVEMENTS.md`: ciclo de produto `B2 -> B4`, depois expansao de testes `A6`, depois gate `A10`.
-- Changelog de `26.5.11` esta aberto como `TBD`/`A definir` e registra a opcao de quatro colunas no grid normal e compacto, melhora de legibilidade dos cartoes densos, limpeza de texto/log morto, a opcao de reordenar tarefas por prioridade e a limpeza da acao/nomenclatura legada de lista de prioridade.
+- Branch atual: `main`.
+- Ultima tag local: `v26.5.10`.
+- Manifesto do app ainda esta em `26.5.10`; changelog de `26.5.11` segue aberto como `TBD`/`A definir`.
+- Working tree esperado desta etapa: `.github/workflows/ci.yml`, `.github/workflows/release-autoupdate.yml`, `package.json`, `pnpm-lock.yaml`, `CHANGELOG.md`, `CHANGELOG.pt.md` e `RETOMADA.md` modificados.
+- Validacao automatizada ainda nao foi executada nesta etapa.
 
 ---
 
 ## Proximos passos
 
-1. Revisar visualmente o comportamento do grid Auto no modo normal e compacto.
-2. Para a proxima implementacao de produto, seguir `docs/IMPROVEMENTS.md`: iniciar por `B2 - Cadence presets` ou `B4 - Break suggestion prompts`.
+1. Validar a atualizacao de tooling com o gate local relevante.
+2. Revisar o diff final antes do commit/release.

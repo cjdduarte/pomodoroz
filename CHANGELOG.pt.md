@@ -16,6 +16,7 @@
 - **Listas de tarefas podem ser reordenadas por prioridade** — cada menu de acoes da tela Lista pode mover tarefas com estrela para o topo daquela lista, mantendo listas sem tarefas priorizadas sem alteracao.
 - **Checks de update Rust ignoram placeholders invalidos de compatibilidade** — `scripts/check-updates.sh` agora trata valores de compatibilidade do `cargo outdated`, como `---`, como indisponiveis, impedindo que eles sejam oferecidos como alvo de update Rust.
 - **Acoes da lista de tarefas nao mostram mais o atalho legado de lista de prioridade** — a acao obsoleta por lista foi removida do menu de acoes da tela Lista, estilos de opcao sem uso foram removidos, e o seletor de tarefa do Timer nao usa mais texto de lista de prioridade.
+- **Dependencias de tooling foram atualizadas** — os pins do gerenciador de pacotes e do tooling de lint foram atualizados sem mudancas intencionais de comportamento.
 
 ## [26.5.10] - 2026-05-18
 

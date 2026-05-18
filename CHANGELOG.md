@@ -16,6 +16,7 @@
 - **Task lists can be reordered by priority** — each List view action menu can move starred tasks to the top of that list while leaving lists without starred tasks unchanged.
 - **Task list actions no longer show the legacy priority-list shortcut** — the obsolete list-level action was removed from the List view actions menu, unused option styles were removed, and the Timer task picker no longer uses priority-list wording.
 - **Rust update checks ignore invalid compatibility placeholders** — `scripts/check-updates.sh` now treats `cargo outdated` compatibility values such as `---` as unavailable, preventing them from being offered as Rust update targets.
+- **Tooling dependencies were refreshed** — package manager and lint tooling pins were updated without intentional behavior changes.
 
 ## [26.5.10] - 2026-05-18
 
