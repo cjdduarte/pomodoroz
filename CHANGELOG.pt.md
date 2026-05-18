@@ -11,6 +11,7 @@
 ### Alterado
 
 - **Colunas Auto do grid de tarefas usam a mesma largura minima de cartao** — os grids normal e compacto agora usam o mesmo limite Auto de `11rem` e o mesmo padding horizontal de conteudo, reduzindo diferencas de layout entre as duas visualizacoes.
+- **Bibliotecas foram atualizadas** — os pins de bibliotecas do projeto foram atualizados sem mudancas intencionais de comportamento.
 
 ## [26.5.9] - 2026-05-15
 

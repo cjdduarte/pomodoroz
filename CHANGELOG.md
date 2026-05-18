@@ -11,6 +11,7 @@
 ### Changed
 
 - **Task grid Auto columns use a shared minimum card width** — normal and compact grids now use the same `11rem` Auto column threshold and horizontal content padding, reducing layout differences between the two views.
+- **Libraries were updated** — project library pins were refreshed without intentional behavior changes.
 
 ## [26.5.9] - 2026-05-15
 

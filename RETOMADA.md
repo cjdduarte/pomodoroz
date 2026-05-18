@@ -34,7 +34,7 @@ Revisar e substituir contexto antigo; **nao acumular historico**.
 - `RETOMADA.md` nao esta mais listado no `.gitignore`.
 - Working tree esperado desta sessao: `.gitignore`, `AGENTS.md`, `CLAUDE.md`, `RETOMADA.md`, `RETOMADA.example.md`, `CHANGELOG.md`, `CHANGELOG.pt.md` e `src/routes/Tasks/TaskListGrid.styles.ts` modificados.
 - Proximo trabalho planejado em `docs/IMPROVEMENTS.md`: ciclo de produto `B2 -> B4`, depois expansao de testes `A6`, depois gate `A10`.
-- Changelog de `26.5.10` registra a padronizacao do grid Auto e esta datado como `2026-05-18`.
+- Changelog de `26.5.10` registra a padronizacao do grid Auto, uma atualizacao generica de bibliotecas e esta datado como `2026-05-18`.
 
 ---
 
