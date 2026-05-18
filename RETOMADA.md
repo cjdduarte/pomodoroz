@@ -20,24 +20,26 @@ Revisar e substituir contexto antigo; **nao acumular historico**.
 
 ## Sessao atual
 
-- Avaliado este handoff e removido o contexto antigo que nao refletia mais o working tree atual.
-- Atualizacao de tooling em andamento: pins de tooling do projeto atualizados nos manifests e workflows.
-- Texto das tarefas nos cartoes do grid ajustado para manter estilo normal de texto do app, preservando o tamanho atual.
-- Registrada a atualizacao de tecnologia na secao aberta `26.5.11` de `CHANGELOG.md` e `CHANGELOG.pt.md`, sem mudancas intencionais de comportamento.
+- Avaliado este handoff e confirmado que o working tree estava limpo antes desta atualizacao.
+- Atualizacao de tooling ja commitada em `f775590` (`chore(deps): refresh tooling pins`).
+- Correcao da tipografia/fonte do texto das tarefas no grid ja commitada em `f193ffb` (`fix(tasks): align grid task text styling`).
+- A correcao manteve `font-size: 1.08rem` e alinhou `StyledGridCardTask` ao texto normal do app com `font-family: inherit`, `font-weight: 400` e `color: var(--color-body-text)`.
+- `CHANGELOG.md` e `CHANGELOG.pt.md` ja registram a correcao na secao aberta `26.5.11`.
 
 ---
 
 ## Estado atual
 
 - Branch atual: `main`.
+- `main` esta alinhada com `origin/main`.
 - Ultima tag local: `v26.5.10`.
 - Manifesto do app ainda esta em `26.5.10`; changelog de `26.5.11` segue aberto como `TBD`/`A definir`.
-- Working tree esperado desta etapa: `.github/workflows/ci.yml`, `.github/workflows/release-autoupdate.yml`, `package.json`, `pnpm-lock.yaml`, `src/routes/Tasks/TaskListGrid.styles.ts`, `CHANGELOG.md`, `CHANGELOG.pt.md` e `RETOMADA.md` modificados.
-- Validacao automatizada ainda nao foi executada nesta etapa.
+- Working tree esperado apos esta atualizacao: somente `RETOMADA.md` modificado.
+- Validacao automatizada nao foi reexecutada apos a correcao de tipografia.
 
 ---
 
 ## Proximos passos
 
-1. Validar a atualizacao de tooling com o gate local relevante.
+1. Se necessario, executar o gate local relevante antes do proximo release.
 2. Revisar o diff final antes do commit/release.
