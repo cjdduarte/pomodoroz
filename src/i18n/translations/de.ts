@@ -68,7 +68,7 @@ export const de = {
     addList: "Liste hinzufuegen",
     addCard: "Karte hinzufuegen",
     actions: "Aktionen",
-    reorderByPriority: "Aufgaben neu ordnen (Prior.)",
+    reorderByPriority: "Nach Prioritaeten sortieren",
     selectTask: "Aufgabe auswaehlen",
     dragList: "Liste ziehen",
     dragTask: "Aufgabe ziehen",

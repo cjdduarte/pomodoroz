@@ -63,7 +63,7 @@ export const zh = {
     addList: "添加列表",
     addCard: "添加卡片",
     actions: "操作",
-    reorderByPriority: "重新排序任务（优先）",
+    reorderByPriority: "按优先级排序",
     selectTask: "选择任务",
     dragList: "拖动列表",
     dragTask: "拖动任务",

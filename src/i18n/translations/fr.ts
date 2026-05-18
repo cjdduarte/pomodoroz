@@ -67,7 +67,7 @@ export const fr = {
     addList: "Ajouter une liste",
     addCard: "Ajouter une carte",
     actions: "Actions",
-    reorderByPriority: "Reordonner les taches (Prior.)",
+    reorderByPriority: "Trier par priorites",
     selectTask: "Selectionner une tache",
     dragList: "Deplacer la liste",
     dragTask: "Deplacer la tache",

@@ -67,7 +67,7 @@ export const es = {
     addList: "Agregar lista",
     addCard: "Agregar tarjeta",
     actions: "Acciones",
-    reorderByPriority: "Reordenar tareas (Prior.)",
+    reorderByPriority: "Ordenar por prioridades",
     selectTask: "Seleccionar tarea",
     dragList: "Arrastrar lista",
     dragTask: "Arrastrar tarea",

@@ -67,7 +67,7 @@ export const ja = {
     addList: "リストを追加",
     addCard: "カードを追加",
     actions: "操作",
-    reorderByPriority: "タスクを並べ替え (優先)",
+    reorderByPriority: "優先度で並べ替え",
     selectTask: "タスクを選択",
     dragList: "リストをドラッグ",
     dragTask: "タスクをドラッグ",
