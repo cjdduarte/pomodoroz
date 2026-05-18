@@ -67,7 +67,7 @@ type GridItem = {
   isDivider: boolean;
 };
 
-type GridColumnsMode = "auto" | "1" | "2" | "3";
+type GridColumnsMode = "auto" | "1" | "2" | "3" | "4";
 type PriorityFilterMode = TaskGridPriorityFilterMode;
 
 const GRID_COLUMNS_STORAGE_KEY = "tasks-grid-columns";
@@ -86,6 +86,7 @@ const getInitialColumnsMode = (): GridColumnsMode => {
   return storedValue === "1" ||
     storedValue === "2" ||
     storedValue === "3" ||
+    storedValue === "4" ||
     storedValue === "auto"
     ? storedValue
     : "auto";
@@ -461,7 +462,8 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
         value === "auto" ||
         value === "1" ||
         value === "2" ||
-        value === "3"
+        value === "3" ||
+        value === "4"
       ) {
         setColumnsMode(value);
       }
@@ -638,6 +640,7 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
               <option value="1">1</option>
               <option value="2">2</option>
               <option value="3">3</option>
+              <option value="4">4</option>
             </StyledGridColumnsSelect>
           </StyledGridColumns>
         </StyledGridFooterControls>

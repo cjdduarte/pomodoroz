@@ -6,6 +6,13 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.5.11] - A definir
+
+### Alterado
+
+- **Grid de tarefas pode ser configurado com quatro colunas** — o seletor compartilhado de colunas agora inclui a opcao `4` tanto no grid normal quanto no compacto.
+- **Acoes da lista de tarefas nao mostram mais o atalho legado de lista de prioridade** — a acao obsoleta por lista foi removida do menu de acoes da tela Lista para evitar confusao com prioridades por cartao.
+
 ## [26.5.10] - 2026-05-18
 
 ### Alterado

@@ -6,6 +6,14 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.5.11] - TBD
+
+### Changed
+
+- **Task grid columns can be set to four** — the shared grid columns selector now includes a `4` option for both normal and compact task grids.
+- **Task list actions no longer show the legacy priority-list shortcut** — the obsolete list-level action was removed from the List view actions menu to avoid confusing it with card priorities.
+- **Rust update checks ignore invalid compatibility placeholders** — `scripts/check-updates.sh` now treats `cargo outdated` compatibility values such as `---` as unavailable, preventing them from being offered as Rust update targets.
+
 ## [26.5.10] - 2026-05-18
 
 ### Changed

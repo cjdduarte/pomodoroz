@@ -1362,12 +1362,16 @@ try {
 }
 
 const deps = Array.isArray(data.dependencies) ? data.dependencies : [];
+const cleanVersion = (value) => {
+  const text = String(value ?? "n/a").trim();
+  return !text || text === "---" || text === "--" || text === "-" ? "n/a" : text;
+};
 for (const dep of deps) {
   const name = String(dep.name ?? dep.crate ?? dep.package ?? "").trim();
   if (!name) continue;
-  const project = String(dep.project ?? dep.current ?? dep.version ?? "n/a").trim();
-  const compat = String(dep.compat ?? dep.wanted ?? dep.compatible ?? "n/a").trim();
-  const latest = String(dep.latest ?? dep.newest ?? dep.target ?? "n/a").trim();
+  const project = cleanVersion(dep.project ?? dep.current ?? dep.version);
+  const compat = cleanVersion(dep.compat ?? dep.wanted ?? dep.compatible);
+  const latest = cleanVersion(dep.latest ?? dep.newest ?? dep.target);
   process.stdout.write([name, project, compat, latest].join("\t") + "\n");
 }
 '

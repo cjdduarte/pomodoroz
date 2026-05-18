@@ -24,6 +24,8 @@ Revisar e substituir contexto antigo; **nao acumular historico**.
 - Atualizadas as orientacoes em `AGENTS.md`, `CLAUDE.md`, `RETOMADA.example.md` e neste arquivo para tratar `RETOMADA.md` como handoff operacional.
 - Definida a data `2026-05-18` na secao `26.5.10` de `CHANGELOG.md` e `CHANGELOG.pt.md`.
 - Padronizados a largura minima do modo `Auto` para `11rem` e o padding horizontal do conteudo do grid tanto no modo normal quanto no compacto.
+- Aberta a secao `26.5.11` em `CHANGELOG.md` e `CHANGELOG.pt.md` para a opcao de quatro colunas no grid.
+- Removida a acao legada `Lista de prioridade` do menu de acoes da tela Lista.
 
 ---
 
@@ -34,7 +36,7 @@ Revisar e substituir contexto antigo; **nao acumular historico**.
 - `RETOMADA.md` nao esta mais listado no `.gitignore`.
 - Working tree esperado desta sessao: `.gitignore`, `AGENTS.md`, `CLAUDE.md`, `RETOMADA.md`, `RETOMADA.example.md`, `CHANGELOG.md`, `CHANGELOG.pt.md` e `src/routes/Tasks/TaskListGrid.styles.ts` modificados.
 - Proximo trabalho planejado em `docs/IMPROVEMENTS.md`: ciclo de produto `B2 -> B4`, depois expansao de testes `A6`, depois gate `A10`.
-- Changelog de `26.5.10` registra a padronizacao do grid Auto, uma atualizacao generica de bibliotecas e esta datado como `2026-05-18`.
+- Changelog de `26.5.11` esta aberto como `TBD`/`A definir` e registra a opcao de quatro colunas no grid normal e compacto e a remocao da acao legada de lista de prioridade.
 
 ---
 

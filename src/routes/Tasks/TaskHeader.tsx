@@ -14,7 +14,6 @@ import {
   StyledPopperContent,
   StyledPopperHeader,
   StyledOptionDelete,
-  StyledOptionPriority,
 } from "styles";
 import { SVG } from "components";
 import { useTargetOutside } from "hooks";
@@ -24,8 +23,6 @@ type Props = {
 
   onEditTitle?: (title: string) => void;
   onRemoveList?: () => void;
-  onMakeListPriority?: () => void;
-  canMakeListPriority?: boolean;
   dragHandleAttributes?: DraggableAttributes;
   dragHandleListeners?: DraggableSyntheticListeners;
   setDragHandleRef?: (node: HTMLElement | null) => void;
@@ -35,8 +32,6 @@ const TaskHeader: React.FC<Props> = ({
   title,
   onEditTitle,
   onRemoveList,
-  onMakeListPriority,
-  canMakeListPriority = true,
   dragHandleAttributes,
   dragHandleListeners,
   setDragHandleRef,
@@ -125,22 +120,6 @@ const TaskHeader: React.FC<Props> = ({
           </StyledPopperHeader>
 
           <StyledOptionList>
-            <StyledOptionPriority
-              aria-disabled={!canMakeListPriority}
-              title={
-                canMakeListPriority
-                  ? undefined
-                  : t("tasks.noPendingTasks")
-              }
-              onClick={() => {
-                if (!canMakeListPriority) return;
-                if (onMakeListPriority) onMakeListPriority();
-                setShowOptions(false);
-              }}
-            >
-              {t("tasks.priorityList")}
-            </StyledOptionPriority>
-
             <StyledOptionDelete
               onClick={() => {
                 if (onRemoveList) onRemoveList();

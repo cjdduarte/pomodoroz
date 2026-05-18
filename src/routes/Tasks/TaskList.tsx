@@ -12,9 +12,7 @@ import {
   editTaskTitle,
   editTaskCardText,
   removeTaskList,
-  setTaskListPriority,
   setTaskCardPriority,
-  setTaskSelection,
   removeTaskCard,
 } from "store";
 import { StyledTaskSectionItem, StyledCardWrapper } from "styles";
@@ -60,7 +58,6 @@ const TaskList: React.FC<Props> = ({
     id: `card-container:${listId}`,
     data: { type: "card-container", listId },
   });
-  const hasPendingCards = cards.some((card) => !card.done);
 
   const onCardAdd = (cardText: string) => {
     dispatch(addTaskCard({ listId, cardText }));
@@ -72,22 +69,6 @@ const TaskList: React.FC<Props> = ({
 
   const onRemoveListAction = () => {
     dispatch(removeTaskList(listId));
-  };
-
-  const onSetListPriorityAction = () => {
-    if (!hasPendingCards) return;
-
-    const firstPendingTask = cards.find((card) => !card.done) || null;
-
-    if (!firstPendingTask) return;
-
-    dispatch(setTaskListPriority(listId));
-    dispatch(
-      setTaskSelection({
-        listId,
-        cardId: firstPendingTask._id,
-      })
-    );
   };
 
   return (
@@ -109,8 +90,6 @@ const TaskList: React.FC<Props> = ({
             title={title}
             onEditTitle={onEditListTitle}
             onRemoveList={onRemoveListAction}
-            onMakeListPriority={onSetListPriorityAction}
-            canMakeListPriority={hasPendingCards}
             dragHandleAttributes={attributes}
             dragHandleListeners={listeners}
             setDragHandleRef={setActivatorNodeRef}
