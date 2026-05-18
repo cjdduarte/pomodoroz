@@ -25,7 +25,7 @@ Revisar e substituir contexto antigo; **nao acumular historico**.
 - Correcao da tipografia/fonte do texto das tarefas no grid ja commitada em `f193ffb` (`fix(tasks): align grid task text styling`).
 - A correcao manteve `font-size: 1.08rem` e alinhou `StyledGridCardTask` ao texto normal do app com `font-family: inherit`, `font-weight: 400` e `color: var(--color-body-text)`.
 - Ajuste posterior escureceu o titulo/rotulo da lista em `StyledGridCardTitle`, trocando `--color-disabled-text` por `--color-body-text`.
-- `CHANGELOG.md` e `CHANGELOG.pt.md` ja registram a correcao na secao aberta `26.5.11`.
+- `CHANGELOG.md` e `CHANGELOG.pt.md` ja registram a correcao e fecharam a data da versao `26.5.11` como `2026-05-18`.
 
 ---
 
@@ -34,7 +34,7 @@ Revisar e substituir contexto antigo; **nao acumular historico**.
 - Branch atual: `main`.
 - `main` esta alinhada com `origin/main`.
 - Ultima tag local: `v26.5.10`.
-- Manifesto do app ainda esta em `26.5.10`; changelog de `26.5.11` segue aberto como `TBD`/`A definir`.
+- Manifesto do app ainda esta em `26.5.10`; changelog de `26.5.11` esta datado como `2026-05-18`.
 - Working tree esperado apos esta atualizacao: `src/routes/Tasks/TaskListGrid.styles.ts`, `CHANGELOG.md`, `CHANGELOG.pt.md` e `RETOMADA.md` modificados.
 - Validacao automatizada nao foi reexecutada apos os ajustes visuais do grid.
 

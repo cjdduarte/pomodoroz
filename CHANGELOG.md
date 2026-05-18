@@ -6,7 +6,7 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
-## [26.5.11] - TBD
+## [26.5.11] - 2026-05-18
 
 ### Changed
 
