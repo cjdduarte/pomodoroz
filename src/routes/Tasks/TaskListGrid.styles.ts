@@ -241,7 +241,7 @@ export const StyledGridPriorityButton = styled(StyledButton)<{
 export const StyledGridCardTitle = styled.span`
   font-size: 0.88rem;
   font-weight: 600;
-  color: var(--color-disabled-text);
+  color: var(--color-body-text);
   text-transform: uppercase;
   text-shadow: none;
   line-height: 1.15;
