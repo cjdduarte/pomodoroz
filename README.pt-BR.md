@@ -72,7 +72,7 @@ O objetivo do Pomodoroz não é "corrigir flexibilidade", e sim adicionar recurs
 | Contagem de ociosidade          | Não                                                                                            | Sim (tempo ocioso por período + opção de mover foco para Ocioso no reset)                       |
 | Idiomas suportados              | 4                                                                                              | 7 suportados                                                                                    |
 
-> Data da comparação: 2026-04-27.
+> Data da comparação: 2026-05-18.
 
 ### Começo rápido (sugestões)
 
@@ -144,6 +144,7 @@ O objetivo do Pomodoroz não é "corrigir flexibilidade", e sim adicionar recurs
 
 - Criar listas e tarefas com descrição.
 - Arrastar e soltar para reordenar (listas e cartões).
+- Mover cartões priorizados para o topo pelo menu de ações de cada lista.
 - Marcar como concluído, pular ou excluir.
 - **Prioridades de tarefas** — marcar/desmarcar cartões importantes pela Lista ou Grade; prioridades pendentes aparecem primeiro na Grade de Rotação de Estudos.
 - **Desfazer/Refazer** (Ctrl+Z / Ctrl+Shift+Z).
@@ -155,7 +156,7 @@ O objetivo do Pomodoroz não é "corrigir flexibilidade", e sim adicionar recurs
 - Status diário por cartão: branco → verde → vermelho.
 - **Botão Sortear** — seleção aleatória por fase (branco→verde, depois verde→vermelho).
 - **Seção e filtro de prioridades** — prioridades pendentes aparecem primeiro, e o Sorteio pode ser limitado a tarefas priorizadas.
-- **Colunas**: Auto / 1 / 2 / 3 (preferência persistente).
+- **Colunas**: Auto / 1 / 2 / 3 / 4 (preferência persistente).
 - **Modo agrupado** — separadores por lista com toggle Agrupar/Desagrupar.
 - **Reset de cores** com confirmação e reset automático diário.
 - Clique direito seleciona a tarefa ativa e navega ao Timer.

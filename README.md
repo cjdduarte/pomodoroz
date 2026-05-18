@@ -72,7 +72,7 @@ Pomodoroz is not about "fixing flexibility"; it focuses on adding workflow featu
 | Idle counting                | No                                                                                        | Yes (idle time by period + optional focus-to-idle reclassification on reset)                |
 | Supported languages          | 4                                                                                         | 7                                                                                           |
 
-> Comparison date: 2026-04-27.
+> Comparison date: 2026-05-18.
 
 ### Quick Start (suggested presets)
 
@@ -144,6 +144,7 @@ Pomodoroz is not about "fixing flexibility"; it focuses on adding workflow featu
 
 - Create lists and tasks with descriptions.
 - Drag-and-drop reordering (lists and cards).
+- Move priority cards to the top of a list from each list's action menu.
 - Mark as done, skip, or delete.
 - **Task priorities** — mark/unmark important cards from List or Grid; pending priorities are surfaced first in the Study Rotation Grid.
 - **Undo/Redo** (Ctrl+Z / Ctrl+Shift+Z).
@@ -155,7 +156,7 @@ Pomodoroz is not about "fixing flexibility"; it focuses on adding workflow featu
 - Daily card status: white → green → red.
 - **Draw button** — random phase-based selection (white→green, then green→red).
 - **Priority section and filter** — pending priorities appear first, and Draw can be limited to prioritized tasks.
-- **Columns**: Auto / 1 / 2 / 3 (persistent preference).
+- **Columns**: Auto / 1 / 2 / 3 / 4 (persistent preference).
 - **Grouped mode** — list separators with Group/Ungroup toggle.
 - **Color reset** with confirmation and automatic daily reset.
 - Right-click selects the active task and navigates to Timer.
