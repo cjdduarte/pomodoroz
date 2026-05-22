@@ -6,7 +6,11 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
-## [26.5.12] - A definir
+## [26.5.12] - 2026-05-22
+
+### Alterado
+
+- **Bibliotecas foram atualizadas** — os pins de bibliotecas do projeto foram atualizados sem mudancas intencionais de comportamento.
 
 ### Corrigido
 
