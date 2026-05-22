@@ -20,28 +20,24 @@ Revisar e substituir contexto antigo; **nao acumular historico**.
 
 ## Sessao atual
 
-- Avaliado este handoff e confirmado que o working tree estava limpo antes desta atualizacao.
-- Atualizacao de tooling ja commitada em `f775590` (`chore(deps): refresh tooling pins`).
-- Correcao da tipografia/fonte do texto das tarefas no grid ja commitada em `f193ffb` (`fix(tasks): align grid task text styling`).
-- A correcao manteve `font-size: 1.08rem` e alinhou `StyledGridCardTask` ao texto normal do app com `font-family: inherit`, `font-weight: 400` e `color: var(--color-body-text)`.
-- Ajuste posterior escureceu o titulo/rotulo da lista em `StyledGridCardTitle`, trocando `--color-disabled-text` por `--color-body-text`.
-- `CHANGELOG.md` e `CHANGELOG.pt.md` ja registram a correcao e fecharam a data da versao `26.5.11` como `2026-05-18`.
-- `README.md` e `README.pt-BR.md` foram revisados para cobrir o grid com quatro colunas e a acao de mover tarefas priorizadas para o topo da lista.
+- Avaliado este handoff e confirmado que ele estava desatualizado: a tag local `v26.5.11` ja existe e os manifests ja estao em `26.5.11`.
+- Working tree estava limpo antes desta correcao.
+- Ajuste visual aplicado em `StyledStatisticsMilestones` e `StyledStatisticsMilestone` para alinhar os badges de marcos da tela Estatisticas as mesmas duas colunas dos cartoes de metricas e centralizar o texto dentro de cada badge.
+- `CHANGELOG.md` e `CHANGELOG.pt.md` registram a correcao em `26.5.12` com data `TBD` / `A definir`.
+- Validacao leve executada com `pnpm lint:renderer` e `pnpm typecheck:renderer`.
 
 ---
 
 ## Estado atual
 
 - Branch atual: `main`.
-- `main` esta alinhada com `origin/main`.
-- Ultima tag local: `v26.5.10`.
-- Manifesto do app ainda esta em `26.5.10`; changelog de `26.5.11` esta datado como `2026-05-18`.
-- Working tree esperado apos esta atualizacao: `README.md`, `README.pt-BR.md`, `CHANGELOG.md`, `CHANGELOG.pt.md` e `RETOMADA.md` modificados.
-- Validacao automatizada nao foi reexecutada apos os ajustes documentais/visuais.
+- Ultima tag local observada: `v26.5.11`.
+- Manifestos do app observados em `26.5.11`.
+- Working tree esperado apos esta atualizacao: `src/styles/routes/statistics.ts`, `CHANGELOG.md`, `CHANGELOG.pt.md` e `RETOMADA.md` modificados.
+- Validacao automatizada leve passou para esta correcao visual.
 
 ---
 
 ## Proximos passos
 
-1. Se necessario, executar o gate local relevante antes do proximo release.
-2. Revisar o diff final antes do commit/release.
+1. Revisar o diff final antes do commit.

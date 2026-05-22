@@ -77,9 +77,9 @@ export const StyledStatisticsProgressMetric = styled.div`
 `;
 
 export const StyledStatisticsMilestones = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
   min-height: 2.4rem;
   align-items: center;
 `;
@@ -87,6 +87,7 @@ export const StyledStatisticsMilestones = styled.div`
 export const StyledStatisticsMilestone = styled.span`
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   min-height: 2.4rem;
   padding: 0 0.7rem;
 
@@ -96,6 +97,9 @@ export const StyledStatisticsMilestone = styled.span`
   background-color: rgba(var(--color-primary-rgb), 0.08);
   font-size: 1rem;
   font-weight: 500;
+  justify-self: center;
+  line-height: 1.2;
+  text-align: center;
 `;
 
 export const StyledStatisticsSummary = styled.section`

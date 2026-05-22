@@ -6,6 +6,12 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.5.12] - TBD
+
+### Fixed
+
+- **Statistics milestone badges align with their metric columns** — milestone chips in the progress overview now use the same two-column rhythm as the progress metric cards and center their label text within each rounded badge.
+
 ## [26.5.11] - 2026-05-18
 
 ### Changed

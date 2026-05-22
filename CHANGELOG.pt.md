@@ -6,6 +6,12 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.5.12] - A definir
+
+### Corrigido
+
+- **Badges de marcos das Estatisticas alinham com as colunas das metricas** — os chips de marcos na visao de progresso agora usam o mesmo ritmo de duas colunas dos cartoes de metricas e tambem centralizam o texto dentro de cada badge arredondado.
+
 ## [26.5.11] - 2026-05-18
 
 ### Alterado
