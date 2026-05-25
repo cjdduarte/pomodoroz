@@ -24,7 +24,7 @@ Revisar e substituir contexto antigo; **nao acumular historico**.
 - Alterado o botao de prioridades da toolbar do grid para tres modos ciclicos: `normal`, `first` e `only`.
 - Modo `normal` agora deixa o grid na ordem comum sem promover priorizadas para uma secao superior.
 - Modo `first` preserva o comportamento anterior de mostrar priorizadas pendentes na secao `Prioridades` no topo, sem duplicar os cartoes.
-- Modo `only` preserva o filtro somente priorizadas pendentes.
+- Modo `only` preserva o filtro somente priorizadas pendentes e usa a mesma cor amarela das estrelas dos cartoes no icone da toolbar.
 - O valor legado salvo como `tasks-grid-priority-filter = prioritized` migra para `only`, novos valores usam `tasks-grid-priority-display`, e a chave legada e removida apos a migracao.
 - A regra pura dos modos do grid foi extraida para `src/routes/Tasks/taskGridPriorityDisplay.ts` com testes de migracao e ciclo.
 - `src/routes/Tasks/taskGridDraw.test.ts` agora cobre explicitamente que o modo `first` usa o mesmo contrato de sorteio do modo `normal`.

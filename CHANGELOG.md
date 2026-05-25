@@ -10,7 +10,7 @@
 
 ### Changed
 
-- **Task grid priority view now has three modes** — the priority toolbar button now cycles through normal grid order, prioritized-first layout, and prioritized-only filtering while keeping the grouped/ungrouped control independent.
+- **Task grid priority view now has three modes** — the priority toolbar button now cycles through normal grid order, prioritized-first layout, and prioritized-only filtering while keeping the grouped/ungrouped control independent; the filtered mode uses the same yellow star color as priority cards.
 - **Task grid storage migration is now cleaned up** — the legacy `tasks-grid-priority-filter` value is removed after migrating to the new `tasks-grid-priority-display` key.
 
 ## [26.5.12] - 2026-05-22

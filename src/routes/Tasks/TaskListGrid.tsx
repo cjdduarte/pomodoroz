@@ -644,7 +644,14 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
           >
             <path
               fill={
-                priorityDisplayMode === "only" ? "currentColor" : "none"
+                priorityDisplayMode === "only"
+                  ? "var(--color-yellow)"
+                  : "none"
+              }
+              stroke={
+                priorityDisplayMode === "only"
+                  ? "var(--color-yellow)"
+                  : "currentColor"
               }
               d="M8 2.4 9.7 5.8l3.8.6-2.8 2.7.7 3.8L8 11.1l-3.4 1.8.7-3.8-2.8-2.7 3.8-.6L8 2.4Z"
             />
