@@ -30,7 +30,7 @@ jobs:
       - name: Setup pnpm (Corepack)
         run: |
           corepack enable
-          corepack prepare pnpm@11.2.2 --activate
+          corepack prepare pnpm@11.3.0 --activate
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -61,7 +61,7 @@ jobs:
       - name: Setup pnpm (Corepack)
         run: |
           corepack enable
-          corepack prepare pnpm@11.2.2 --activate
+          corepack prepare pnpm@11.3.0 --activate
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -121,5 +121,6 @@ jobs:
 
       - name: Cargo check
         run: cargo check --manifest-path src-tauri/Cargo.toml
+
 
 

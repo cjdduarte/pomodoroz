@@ -2,7 +2,7 @@
   "name": "pomodoroz",
   "private": true,
   "version": "26.5.12",
-  "packageManager": "pnpm@11.2.2",
+  "packageManager": "pnpm@11.3.0",
   "license": "MIT",
   "author": {
     "name": "Carlos Duarte",
@@ -48,7 +48,7 @@
     ]
   },
   "devDependencies": {
-    "@eslint-react/eslint-plugin": "5.8.3",
+    "@eslint-react/eslint-plugin": "5.8.5",
     "@eslint/js": "^10.0.1",
     "@rollup/plugin-typescript": "^12.3.0",
     "@tauri-apps/api": "2.11.0",
