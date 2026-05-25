@@ -642,6 +642,14 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
             aria-hidden="true"
             focusable="false"
           >
+            {priorityDisplayMode === "only" ? (
+              <path
+                fill="none"
+                stroke="var(--color-primary-button)"
+                strokeWidth="3.1"
+                d="M8 2.4 9.7 5.8l3.8.6-2.8 2.7.7 3.8L8 11.1l-3.4 1.8.7-3.8-2.8-2.7 3.8-.6L8 2.4Z"
+              />
+            ) : null}
             <path
               fill={
                 priorityDisplayMode === "only"
