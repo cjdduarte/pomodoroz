@@ -20,24 +20,32 @@ Revisar e substituir contexto antigo; **nao acumular historico**.
 
 ## Sessao atual
 
-- Avaliado este handoff e confirmado que ele estava desatualizado: a tag local `v26.5.11` ja existe e os manifests ja estao em `26.5.11`.
-- Working tree estava limpo antes desta correcao.
-- Ajuste visual aplicado em `StyledStatisticsMilestones` e `StyledStatisticsMilestone` para alinhar os badges de marcos da tela Estatisticas as mesmas duas colunas dos cartoes de metricas e centralizar o texto dentro de cada badge.
-- `CHANGELOG.md` e `CHANGELOG.pt.md` registram a correcao em `26.5.12` com data `TBD` / `A definir`.
-- Validacao leve executada com `pnpm lint:renderer` e `pnpm typecheck:renderer`.
+- Confirmado que o handoff anterior estava desatualizado: `HEAD` estava em `v26.5.12`, branch `main` sincronizada com `origin/main`, manifests em `26.5.12` e working tree limpo.
+- Alterado o botao de prioridades da toolbar do grid para tres modos ciclicos: `normal`, `first` e `only`.
+- Modo `normal` agora deixa o grid na ordem comum sem promover priorizadas para uma secao superior.
+- Modo `first` preserva o comportamento anterior de mostrar priorizadas pendentes na secao `Prioridades` no topo, sem duplicar os cartoes.
+- Modo `only` preserva o filtro somente priorizadas pendentes.
+- O valor legado salvo como `tasks-grid-priority-filter = prioritized` migra para `only`, novos valores usam `tasks-grid-priority-display`, e a chave legada e removida apos a migracao.
+- A regra pura dos modos do grid foi extraida para `src/routes/Tasks/taskGridPriorityDisplay.ts` com testes de migracao e ciclo.
+- `src/routes/Tasks/taskGridDraw.test.ts` agora cobre explicitamente que o modo `first` usa o mesmo contrato de sorteio do modo `normal`.
+- Traducoes de EN/PT/ES/FR/DE/ZH/JA foram atualizadas e as chaves antigas `showPrioritizedOnly` / `showAllTasks` foram removidas.
+- `CHANGELOG.md` e `CHANGELOG.pt.md` registram a mudanca em `26.5.13` com data `TBD` / `A definir`.
+- Validacoes executadas: `pnpm test:run`, `pnpm typecheck:renderer`, `pnpm lint:renderer`, `pnpm build:renderer` e `git diff --check`.
 
 ---
 
 ## Estado atual
 
 - Branch atual: `main`.
-- Ultima tag local observada: `v26.5.11`.
-- Manifestos do app observados em `26.5.11`.
-- Working tree esperado apos esta atualizacao: `src/styles/routes/statistics.ts`, `CHANGELOG.md`, `CHANGELOG.pt.md` e `RETOMADA.md` modificados.
-- Validacao automatizada leve passou para esta correcao visual.
+- Ultima tag local observada: `v26.5.12`.
+- Manifestos do app observados em `26.5.12`.
+- Working tree esperado apos esta atualizacao: `CHANGELOG.md`, `CHANGELOG.pt.md`, `RETOMADA.md`, traducoes em `src/i18n/translations/*.ts`, `src/utils/storage.ts`, `src/routes/Tasks/TaskListGrid.tsx`, `src/routes/Tasks/taskGridDraw.ts`, `src/routes/Tasks/taskGridDraw.test.ts`, `src/routes/Tasks/taskGridPriorityDisplay.ts` e `src/routes/Tasks/taskGridPriorityDisplay.test.ts` modificados.
+- Validacao automatizada leve passou para esta mudanca.
 
 ---
 
 ## Proximos passos
 
-1. Revisar o diff final antes do commit.
+1. Revisar o diff final.
+2. Fazer validacao manual rapida no grid: ciclo Normal -> Priorizadas primeiro -> Somente priorizadas -> Normal, com Agrupar/Desagrupar independente.
+3. Commitar a mudanca.

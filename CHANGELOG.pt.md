@@ -6,6 +6,13 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.5.13] - A definir
+
+### Alterado
+
+- **Visualização de prioridades do grid agora tem três modos** — o botão de prioridades da barra do grid agora alterna entre ordem normal do grid, layout com priorizadas primeiro e filtro somente priorizadas, mantendo o controle Agrupar/Desagrupar independente.
+- **Migração de storage do grid agora limpa o valor legado** — a chave antiga `tasks-grid-priority-filter` é removida após migrar para a nova chave `tasks-grid-priority-display`.
+
 ## [26.5.12] - 2026-05-22
 
 ### Alterado

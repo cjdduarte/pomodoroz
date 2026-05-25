@@ -1,4 +1,5 @@
 import type { DayColor } from "store/tasks/types";
+import type { TaskGridPriorityDisplayMode } from "./taskGridPriorityDisplay";
 
 export type TaskGridDrawItem = {
   listId: string;
@@ -17,18 +18,16 @@ export type TaskGridDrawCandidate = {
   isPrioritized: boolean;
 };
 
-export type TaskGridPriorityFilterMode = "all" | "prioritized";
-
 type BuildTaskGridDrawCandidatesParams = {
   drawOnlyPrioritizedTasks: boolean;
   gridItems: TaskGridDrawItem[];
-  priorityFilterMode: TaskGridPriorityFilterMode;
+  priorityDisplayMode: TaskGridPriorityDisplayMode;
 };
 
 export const buildTaskGridDrawCandidates = ({
   drawOnlyPrioritizedTasks,
   gridItems,
-  priorityFilterMode,
+  priorityDisplayMode,
 }: BuildTaskGridDrawCandidatesParams): TaskGridDrawCandidate[] => {
   const eligibleCards = gridItems.flatMap((item) => {
     if (
@@ -55,8 +54,8 @@ export const buildTaskGridDrawCandidates = ({
     (card) => card.isPrioritized
   );
 
-  if (priorityFilterMode === "prioritized") {
-    // The visual prioritized-only filter must never fall back to normal cards.
+  if (priorityDisplayMode === "only") {
+    // The visual prioritized-only filter must only use prioritized cards.
     return prioritizedCards;
   }
 

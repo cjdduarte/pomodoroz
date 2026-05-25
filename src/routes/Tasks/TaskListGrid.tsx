@@ -19,6 +19,7 @@ import {
 import type { DayColor } from "store/tasks/types";
 import {
   getFromStorage,
+  removeFromStorage,
   resolveActiveTaskSelection,
   saveToStorage,
 } from "utils";
@@ -42,10 +43,12 @@ import {
   StyledGridColumnsLabel,
   StyledGridColumnsSelect,
 } from "./TaskListGrid.styles";
+import { buildTaskGridDrawCandidates } from "./taskGridDraw";
 import {
-  buildTaskGridDrawCandidates,
-  type TaskGridPriorityFilterMode,
-} from "./taskGridDraw";
+  getNextTaskGridPriorityDisplayMode,
+  resolveInitialTaskGridPriorityDisplayMode,
+  type TaskGridPriorityDisplayMode,
+} from "./taskGridPriorityDisplay";
 
 type Props = {
   onSelectList: (listId: string, cardId?: string) => void;
@@ -68,11 +71,13 @@ type GridItem = {
 };
 
 type GridColumnsMode = "auto" | "1" | "2" | "3" | "4";
-type PriorityFilterMode = TaskGridPriorityFilterMode;
+type PriorityDisplayMode = TaskGridPriorityDisplayMode;
 
 const GRID_COLUMNS_STORAGE_KEY = "tasks-grid-columns";
 const GRID_GROUPED_STORAGE_KEY = "tasks-grid-grouped";
-const GRID_PRIORITY_FILTER_STORAGE_KEY = "tasks-grid-priority-filter";
+const GRID_PRIORITY_DISPLAY_STORAGE_KEY = "tasks-grid-priority-display";
+const LEGACY_GRID_PRIORITY_FILTER_STORAGE_KEY =
+  "tasks-grid-priority-filter";
 
 const getTodayDateKey = (): string => {
   const now = new Date();
@@ -97,12 +102,18 @@ const getInitialGrouped = (): boolean => {
   return storedValue === true;
 };
 
-const getInitialPriorityFilterMode = (): PriorityFilterMode => {
+const getInitialPriorityDisplayMode = (): PriorityDisplayMode => {
   const storedValue = getFromStorage<string>(
-    GRID_PRIORITY_FILTER_STORAGE_KEY
+    GRID_PRIORITY_DISPLAY_STORAGE_KEY
+  );
+  const legacyStoredValue = getFromStorage<string>(
+    LEGACY_GRID_PRIORITY_FILTER_STORAGE_KEY
   );
 
-  return storedValue === "prioritized" ? "prioritized" : "all";
+  return resolveInitialTaskGridPriorityDisplayMode(
+    storedValue,
+    legacyStoredValue
+  );
 };
 
 const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
@@ -126,8 +137,8 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
     getInitialColumnsMode
   );
   const [grouped, setGrouped] = useState<boolean>(getInitialGrouped);
-  const [priorityFilterMode, setPriorityFilterMode] =
-    useState<PriorityFilterMode>(getInitialPriorityFilterMode);
+  const [priorityDisplayMode, setPriorityDisplayMode] =
+    useState<PriorityDisplayMode>(getInitialPriorityDisplayMode);
   const [showResetDialog, setShowResetDialog] = useState(false);
   const { maybeExpandCompact, collapseCompact } = useCompactAutoExpand({
     compactModeEnabled,
@@ -166,8 +177,15 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
   }, [grouped]);
 
   useEffect(() => {
-    saveToStorage(GRID_PRIORITY_FILTER_STORAGE_KEY, priorityFilterMode);
-  }, [priorityFilterMode]);
+    saveToStorage(
+      GRID_PRIORITY_DISPLAY_STORAGE_KEY,
+      priorityDisplayMode
+    );
+  }, [priorityDisplayMode]);
+
+  useEffect(() => {
+    removeFromStorage(LEGACY_GRID_PRIORITY_FILTER_STORAGE_KEY);
+  }, []);
 
   const gridItems = useMemo<GridItem[]>(() => {
     const prioritySeparatorItem: GridItem = {
@@ -289,7 +307,13 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
         .map((card) => createCardItem(list, card, true))
     );
 
-    if (priorityFilterMode === "prioritized") {
+    if (priorityDisplayMode === "normal") {
+      return tasks.flatMap((list): GridItem[] =>
+        createListItems(list, list.cards, list.cards.length === 0)
+      );
+    }
+
+    if (priorityDisplayMode === "only") {
       return priorityItems.length
         ? [prioritySeparatorItem, ...priorityItems]
         : [];
@@ -319,7 +343,7 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
     }
 
     return remainingItems;
-  }, [grouped, priorityFilterMode, tasks, t]);
+  }, [grouped, priorityDisplayMode, tasks, t]);
 
   const handleCardClick = useCallback(
     (listId: string, cardId: string | null, currentColor: DayColor) => {
@@ -374,9 +398,9 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
     [dispatch]
   );
 
-  const handlePriorityFilterToggle = useCallback(() => {
-    setPriorityFilterMode((current) =>
-      current === "prioritized" ? "all" : "prioritized"
+  const handlePriorityDisplayModeToggle = useCallback(() => {
+    setPriorityDisplayMode((current) =>
+      getNextTaskGridPriorityDisplayMode(current)
     );
   }, []);
 
@@ -417,9 +441,9 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
       buildTaskGridDrawCandidates({
         drawOnlyPrioritizedTasks,
         gridItems,
-        priorityFilterMode,
+        priorityDisplayMode,
       }),
-    [drawOnlyPrioritizedTasks, gridItems, priorityFilterMode]
+    [drawOnlyPrioritizedTasks, gridItems, priorityDisplayMode]
   );
 
   const randomWhiteCandidates = useMemo(() => {
@@ -504,10 +528,12 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
   const groupToggleLabel = grouped
     ? t("grid.ungroupLabel")
     : t("grid.groupLabel");
-  const priorityFilterLabel =
-    priorityFilterMode === "prioritized"
-      ? t("grid.showAllTasks")
-      : t("grid.showPrioritizedOnly");
+  const priorityDisplayLabel =
+    priorityDisplayMode === "normal"
+      ? t("grid.priorityModeNormal")
+      : priorityDisplayMode === "first"
+        ? t("grid.priorityModeFirst")
+        : t("grid.priorityModeOnly");
   const markPriorityLabel = t("grid.markPriority");
   const unmarkPriorityLabel = t("grid.unmarkPriority");
 
@@ -601,18 +627,14 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
         </StyledGridToolbarButton>
         <StyledGridToolbarButton
           $iconOnly
-          $active={priorityFilterMode === "prioritized"}
-          onClick={handlePriorityFilterToggle}
-          title={priorityFilterLabel}
-          aria-label={priorityFilterLabel}
+          $active={priorityDisplayMode !== "normal"}
+          onClick={handlePriorityDisplayModeToggle}
+          title={priorityDisplayLabel}
+          aria-label={priorityDisplayLabel}
         >
           <svg
             viewBox="0 0 16 16"
-            fill={
-              priorityFilterMode === "prioritized"
-                ? "currentColor"
-                : "none"
-            }
+            fill="none"
             stroke="currentColor"
             strokeWidth="1.25"
             strokeLinecap="round"
@@ -620,7 +642,18 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
             aria-hidden="true"
             focusable="false"
           >
-            <path d="M8 2.4 9.7 5.8l3.8.6-2.8 2.7.7 3.8L8 11.1l-3.4 1.8.7-3.8-2.8-2.7 3.8-.6L8 2.4Z" />
+            <path
+              fill={
+                priorityDisplayMode === "only" ? "currentColor" : "none"
+              }
+              d="M8 2.4 9.7 5.8l3.8.6-2.8 2.7.7 3.8L8 11.1l-3.4 1.8.7-3.8-2.8-2.7 3.8-.6L8 2.4Z"
+            />
+            {priorityDisplayMode === "first" ? (
+              <>
+                <path d="M12.5 13.1V9.6" />
+                <path d="m11.2 10.9 1.3-1.3 1.3 1.3" />
+              </>
+            ) : null}
           </svg>
         </StyledGridToolbarButton>
         <StyledGridFooterControls>

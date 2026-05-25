@@ -21,3 +21,11 @@ export const getFromStorage = <T = unknown>(
     return undefined;
   }
 };
+
+export const removeFromStorage = (name: string): void => {
+  try {
+    localStorage.removeItem(name);
+  } catch (error) {
+    console.error(error);
+  }
+};

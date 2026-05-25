@@ -19,10 +19,10 @@ const createItem = (
 });
 
 describe("task grid draw candidates", () => {
-  it("limits prioritized visual mode to prioritized eligible cards", () => {
+  it("limits prioritized-only display mode to prioritized eligible cards", () => {
     const candidates = buildTaskGridDrawCandidates({
       drawOnlyPrioritizedTasks: true,
-      priorityFilterMode: "prioritized",
+      priorityDisplayMode: "only",
       gridItems: [
         createItem({
           listId: "priority-list",
@@ -47,7 +47,7 @@ describe("task grid draw candidates", () => {
     ]);
   });
 
-  it("keeps prioritized visual mode independent from the draw-only-prioritized setting", () => {
+  it("keeps prioritized-only display mode independent from the draw-only-prioritized setting", () => {
     const gridItems = [
       createItem({
         listId: "priority-list",
@@ -62,22 +62,22 @@ describe("task grid draw candidates", () => {
     ];
     const withSettingEnabled = buildTaskGridDrawCandidates({
       drawOnlyPrioritizedTasks: true,
-      priorityFilterMode: "prioritized",
+      priorityDisplayMode: "only",
       gridItems,
     });
     const withSettingDisabled = buildTaskGridDrawCandidates({
       drawOnlyPrioritizedTasks: false,
-      priorityFilterMode: "prioritized",
+      priorityDisplayMode: "only",
       gridItems,
     });
 
     expect(withSettingDisabled).toEqual(withSettingEnabled);
   });
 
-  it("does not fall back to normal cards in prioritized visual mode", () => {
+  it("does not include normal cards in prioritized-only display mode", () => {
     const candidates = buildTaskGridDrawCandidates({
       drawOnlyPrioritizedTasks: true,
-      priorityFilterMode: "prioritized",
+      priorityDisplayMode: "only",
       gridItems: [
         createItem({
           listId: "priority-list",
@@ -96,10 +96,10 @@ describe("task grid draw candidates", () => {
     expect(candidates).toEqual([]);
   });
 
-  it("limits all-task mode to prioritized eligible cards when enabled", () => {
+  it("limits normal display mode to prioritized eligible cards when enabled", () => {
     const candidates = buildTaskGridDrawCandidates({
       drawOnlyPrioritizedTasks: true,
-      priorityFilterMode: "all",
+      priorityDisplayMode: "normal",
       gridItems: [
         createItem({
           listId: "priority-list",
@@ -123,10 +123,10 @@ describe("task grid draw candidates", () => {
     ]);
   });
 
-  it("falls back to the visible all-task pool when no prioritized card is eligible", () => {
+  it("uses the visible normal pool when no prioritized card is eligible", () => {
     const candidates = buildTaskGridDrawCandidates({
       drawOnlyPrioritizedTasks: true,
-      priorityFilterMode: "all",
+      priorityDisplayMode: "normal",
       gridItems: [
         createItem({
           listId: "priority-list",
@@ -152,10 +152,67 @@ describe("task grid draw candidates", () => {
     ]);
   });
 
+  it("keeps prioritized-first display mode in the same draw pool as normal mode", () => {
+    const gridItems = [
+      createItem({
+        listId: "priority-list",
+        cardId: "priority-card",
+        isPrioritized: true,
+      }),
+      createItem({
+        listId: "normal-list",
+        cardId: "normal-card",
+        dayColor: "green",
+      }),
+    ];
+
+    expect(
+      buildTaskGridDrawCandidates({
+        drawOnlyPrioritizedTasks: false,
+        priorityDisplayMode: "first",
+        gridItems,
+      })
+    ).toEqual(
+      buildTaskGridDrawCandidates({
+        drawOnlyPrioritizedTasks: false,
+        priorityDisplayMode: "normal",
+        gridItems,
+      })
+    );
+  });
+
+  it("respects draw-only-prioritized in prioritized-first display mode", () => {
+    const candidates = buildTaskGridDrawCandidates({
+      drawOnlyPrioritizedTasks: true,
+      priorityDisplayMode: "first",
+      gridItems: [
+        createItem({
+          listId: "priority-list",
+          cardId: "priority-card",
+          isPrioritized: true,
+        }),
+        createItem({
+          listId: "normal-list",
+          cardId: "normal-card",
+          dayColor: "green",
+        }),
+      ],
+    });
+
+    expect(candidates).toEqual([
+      {
+        listId: "priority-list",
+        cardId: "priority-card",
+        dayColor: null,
+        isPrioritized: true,
+      },
+    ]);
+  });
+
   it("ignores separators, placeholders, completed cards, and red cards", () => {
     const candidates = buildTaskGridDrawCandidates({
       drawOnlyPrioritizedTasks: false,
-      priorityFilterMode: "all",
+      priorityDisplayMode: "normal",
       gridItems: [
         createItem({ isSeparator: true, cardId: null }),
         createItem({ isPlaceholder: true, cardId: null }),

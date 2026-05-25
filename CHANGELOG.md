@@ -6,6 +6,13 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.5.13] - TBD
+
+### Changed
+
+- **Task grid priority view now has three modes** — the priority toolbar button now cycles through normal grid order, prioritized-first layout, and prioritized-only filtering while keeping the grouped/ungrouped control independent.
+- **Task grid storage migration is now cleaned up** — the legacy `tasks-grid-priority-filter` value is removed after migrating to the new `tasks-grid-priority-display` key.
+
 ## [26.5.12] - 2026-05-22
 
 ### Changed
