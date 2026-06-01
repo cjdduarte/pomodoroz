@@ -122,6 +122,29 @@ jobs:
       - name: Cargo check
         run: cargo check --manifest-path src-tauri/Cargo.toml
 
+      - name: Cargo test
+        run: cargo test --manifest-path src-tauri/Cargo.toml
 
+  tauri-rust-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
 
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: "src-tauri -> target"
+
+      - name: Install cargo-audit
+        run: cargo install cargo-audit --locked
+
+      - name: Cargo audit
+        # --deny warnings faz o CI falhar em QUALQUER advisory novo (vuln ou
+        # unmaintained/unsound) que nao esteja na ignore-list de audit.toml.
+        run: cargo audit --no-fetch --deny warnings
+        working-directory: src-tauri
 

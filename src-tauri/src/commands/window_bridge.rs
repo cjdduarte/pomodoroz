@@ -472,3 +472,64 @@ pub fn set_tray_copy(
     tray.set_menu(Some(tray_menu)).map_err(map_error)?;
     tray.set_tooltip(Some(tooltip)).map_err(map_error)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // Barreira de seguranca do import/export: write_text_file/read_text_file
+    // so podem tocar arquivos .json. Estes testes travam esse contrato.
+    #[test]
+    fn validate_json_extension_aceita_json() {
+        assert!(validate_json_extension(Path::new("backup.json")).is_ok());
+    }
+
+    #[test]
+    fn validate_json_extension_e_case_insensitive() {
+        assert!(validate_json_extension(Path::new("BACKUP.JSON")).is_ok());
+        assert!(validate_json_extension(Path::new("backup.Json")).is_ok());
+    }
+
+    #[test]
+    fn validate_json_extension_rejeita_outras_extensoes() {
+        assert!(validate_json_extension(Path::new("backup.txt")).is_err());
+        assert!(validate_json_extension(Path::new("backup.json.exe")).is_err());
+        assert!(validate_json_extension(Path::new("backup")).is_err());
+        assert!(validate_json_extension(Path::new(".json")).is_err());
+    }
+
+    // Limite de tamanho de import: mantem o guard explicito em 5 MiB.
+    // Se alguem mexer na constante sem querer, este teste acende.
+    #[test]
+    fn limite_de_import_e_5_mib() {
+        assert_eq!(MAX_IMPORT_FILE_BYTES, 5 * 1024 * 1024);
+    }
+
+    // Modo compacto: a altura com titlebar nativo nao compensa, e sem
+    // titlebar soma a compensacao. A logica vive em get_compact_height
+    // (que exige Window), entao validamos a relacao entre as constantes.
+    #[test]
+    fn compensacao_compacta_sem_titlebar_nativo() {
+        assert!(WINDOW_COMPACT_TITLEBAR_COMPENSATION > 0.0);
+        assert_eq!(
+            WINDOW_COMPACT_BASE_HEIGHT + WINDOW_COMPACT_TITLEBAR_COMPENSATION,
+            140.0
+        );
+    }
+
+    #[test]
+    fn larguras_e_alturas_de_janela_sao_positivas() {
+        for value in [
+            WINDOW_WIDTH,
+            WINDOW_FRAME_HEIGHT_WINDOWS,
+            WINDOW_FRAME_HEIGHT_NATIVE_TITLEBAR,
+            WINDOW_FRAME_HEIGHT_FRAMELESS,
+            WINDOW_COMPACT_BASE_HEIGHT,
+            WINDOW_COMPACT_GRID_HEIGHT,
+            WINDOW_COMPACT_ACTIONS_HEIGHT,
+            WINDOW_COMPACT_FOCUS_EXTENSION_HEIGHT,
+        ] {
+            assert!(value > 0.0, "constante de dimensao deve ser positiva");
+        }
+    }
+}

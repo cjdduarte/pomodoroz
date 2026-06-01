@@ -20,32 +20,29 @@ Revisar e substituir contexto antigo; **nao acumular historico**.
 
 ## Sessao atual
 
-- Confirmado que o handoff anterior estava desatualizado: `HEAD` estava em `v26.5.12`, branch `main` sincronizada com `origin/main`, manifests em `26.5.12` e working tree limpo.
-- Alterado o botao de prioridades da toolbar do grid para tres modos ciclicos: `normal`, `first` e `only`.
-- Modo `normal` agora deixa o grid na ordem comum sem promover priorizadas para uma secao superior.
-- Modo `first` preserva o comportamento anterior de mostrar priorizadas pendentes na secao `Prioridades` no topo, sem duplicar os cartoes.
-- Modo `only` preserva o filtro somente priorizadas pendentes e usa a mesma cor amarela das estrelas dos cartoes no icone da toolbar, com contorno claro para separar do fundo azul.
-- O valor legado salvo como `tasks-grid-priority-filter = prioritized` migra para `only`, novos valores usam `tasks-grid-priority-display`, e a chave legada e removida apos a migracao.
-- A regra pura dos modos do grid foi extraida para `src/routes/Tasks/taskGridPriorityDisplay.ts` com testes de migracao e ciclo.
-- `src/routes/Tasks/taskGridDraw.test.ts` agora cobre explicitamente que o modo `first` usa o mesmo contrato de sorteio do modo `normal`.
-- Traducoes de EN/PT/ES/FR/DE/ZH/JA foram atualizadas e as chaves antigas `showPrioritizedOnly` / `showAllTasks` foram removidas.
-- `CHANGELOG.md` e `CHANGELOG.pt.md` registram a mudanca em `26.5.13` com data `2026-05-25`.
-- Validacoes executadas: `pnpm test:run`, `pnpm typecheck:renderer`, `pnpm lint:renderer`, `pnpm build:renderer` e `git diff --check`.
+- Foco em manutencao do stack Rust/Tauri (escopo `src-tauri`); nenhum codigo de produto do renderer foi alterado.
+- Criados dois scripts de verificacao de updates Rust para comparacao: `scripts/check_rust.sh` (logica root-deps extraida de `check-updates.sh`) e `scripts/check_rust_2.sh` (porte em bash de `scripts/scripts/check-updates.ps1`).
+- Corrigido no porte o bug de escopo herdado do `.ps1`: ele assumia `Cargo.toml` na raiz; agora resolve `src-tauri/Cargo.toml`.
+- Rodado `cargo update` em `src-tauri/`, atualizando pins transitivos no `Cargo.lock` (deps `tauri*` permanecem pinadas com `=`, entao o core nao mudou).
+- Auditoria do update: `cargo audit` (0 vulnerabilidades), `cargo check`, `cargo clippy`, `cargo build` (219 crates) e smoke test `pnpm dev:app` (subiu sem panic) — todos OK.
+- (a) Adicionado job `tauri-rust-audit` ao `.github/workflows/ci.yml` rodando `cargo audit --no-fetch --deny warnings`; ignore-list dos 17 advisories pre-existentes (GTK3/transitivas) em `src-tauri/.cargo/audit.toml` (caminho exigido pelo cargo-audit 0.22.x).
+- (b) Adicionados os primeiros testes unitarios Rust em `src-tauri/src/commands/window_bridge.rs` (barreira `.json`, limite de 5 MiB, constantes de janela) e step `cargo test` no job `tauri-rust-check`. `cargo test` => 6 passed.
+- `CHANGELOG.md` e `CHANGELOG.pt.md`: criada secao `26.6.1` no topo como `TBD`/`A definir` (virada de mes em 2026-06-01; a `26.5.13` ja esta publicada — Changelog Fill Rule).
 
 ---
 
 ## Estado atual
 
-- Branch atual: `main`.
-- Ultima tag local observada: `v26.5.12`.
-- Manifestos do app observados em `26.5.12`.
-- Working tree esperado apos esta atualizacao: `CHANGELOG.md`, `CHANGELOG.pt.md`, `RETOMADA.md`, traducoes em `src/i18n/translations/*.ts`, `src/utils/storage.ts`, `src/routes/Tasks/TaskListGrid.tsx`, `src/routes/Tasks/taskGridDraw.ts`, `src/routes/Tasks/taskGridDraw.test.ts`, `src/routes/Tasks/taskGridPriorityDisplay.ts` e `src/routes/Tasks/taskGridPriorityDisplay.test.ts` modificados.
-- Validacao automatizada leve passou para esta mudanca.
+- Branch atual: `main` (a frente de `origin/main`; ha commits locais nao enviados desta sessao).
+- Ultima tag local: `v26.5.13`. Manifestos do app em `26.5.13` (proxima versao de changelog: `26.6.1`/TBD, ainda nao bumpada nos manifestos).
+- Commits locais ja feitos nesta sessao: `e704a7f` (scripts + bumps de deps) e `4142c65` (refresh do `Cargo.lock`).
+- Working tree (a commitar): `.github/workflows/ci.yml`, `src-tauri/src/commands/window_bridge.rs`, `src-tauri/.cargo/audit.toml` (novo), `CHANGELOG.md`, `CHANGELOG.pt.md`, `RETOMADA.md`.
+- Validacao Rust local OK (check/test/audit/build/smoke). Renderer nao foi tocado.
 
 ---
 
 ## Proximos passos
 
-1. Revisar o diff final.
-2. Fazer validacao manual rapida no grid: ciclo Normal -> Priorizadas primeiro -> Somente priorizadas -> Normal, com Agrupar/Desagrupar independente.
-3. Commitar a mudanca.
+1. Revisar o diff final dos arquivos acima.
+2. Commitar as mudancas pendentes (sugestao: um commit `ci`/`test` + os docs).
+3. Decidir push para `origin/main` (ha commits locais acumulados) e deixar o CI rodar — em especial os jobs Windows (`tauri-rust-check-windows`) e o novo `tauri-rust-audit`, que nao da para validar localmente no Linux.

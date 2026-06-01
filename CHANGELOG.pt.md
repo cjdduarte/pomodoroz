@@ -6,6 +6,19 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.6.1] - A definir
+
+### Adicionado
+
+- **CI agora audita dependências Rust em busca de advisories** — um novo job `tauri-rust-audit` roda `cargo audit --deny warnings`, falhando em qualquer vulnerabilidade ou advisory `unmaintained`/`unsound` novo; uma lista de ignore em `src-tauri/.cargo/audit.toml` silencia os avisos pré-existentes de GTK3/transitivas que vêm com o Tauri.
+- **Backend Rust ganha seus primeiros testes unitários** — `window_bridge.rs` agora cobre a barreira de extensão `.json` do import/export (case-insensitive, rejeitando outras extensões), o limite de import de 5 MiB e as constantes de dimensão da janela; o job `tauri-rust-check` passa a rodar `cargo test`.
+- **Scripts independentes de verificação de updates Rust** — `scripts/check_rust.sh` (lógica root-deps do `check-updates.sh`) e `scripts/check_rust_2.sh` (porte em bash do verificador PowerShell, com escopo em `src-tauri`).
+
+### Alterado
+
+- **Dependências Rust atualizadas** — `cargo update` atualizou os pins transitivos em `src-tauri/Cargo.lock` sem mudanças intencionais de comportamento (validado com `cargo audit`, `cargo build` e smoke test em runtime).
+- **Pin do pnpm elevado para 11.5.0** — workflows e `packageManager` foram atualizados, e os pins de tooling dev/runtime foram refrescados.
+
 ## [26.5.13] - 2026-05-25
 
 ### Alterado
