@@ -145,6 +145,8 @@ jobs:
       - name: Cargo audit
         # --deny warnings faz o CI falhar em QUALQUER advisory novo (vuln ou
         # unmaintained/unsound) que nao esteja na ignore-list de audit.toml.
-        run: cargo audit --no-fetch --deny warnings
+        # Sem --no-fetch: o runner do CI e' limpo e precisa baixar a
+        # advisory-db; --no-fetch so vale offline com a base ja em cache.
+        run: cargo audit --deny warnings
         working-directory: src-tauri
 
