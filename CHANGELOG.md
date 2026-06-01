@@ -6,7 +6,7 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
-## [26.6.1] - TBD
+## [26.6.1] - 2026-06-01
 
 ### Added
 
@@ -16,8 +16,8 @@
 
 ### Changed
 
-- **Rust dependencies refreshed** — `cargo update` refreshed transitive crate pins in `src-tauri/Cargo.lock` without intentional behavior changes (verified with `cargo audit`, `cargo build` and a runtime smoke test).
-- **pnpm pin bumped to 11.5.0** — workflows and `packageManager` were updated, and dev/runtime tooling pins were refreshed.
+- **Rust dependencies refreshed** — the global-shortcut plugin and transitive crate pins were updated without intentional behavior changes (verified with `cargo fmt`/`clippy`/`check`/`audit` and a runtime smoke test).
+- **Toolchain pins refreshed** — the pnpm pin was bumped across workflows and `packageManager`, and dev/runtime tooling pins were refreshed.
 
 ## [26.5.13] - 2026-05-25
 

@@ -505,21 +505,25 @@ mod tests {
         assert_eq!(MAX_IMPORT_FILE_BYTES, 5 * 1024 * 1024);
     }
 
-    // Modo compacto: a altura com titlebar nativo nao compensa, e sem
-    // titlebar soma a compensacao. A logica vive em get_compact_height
-    // (que exige Window), entao validamos a relacao entre as constantes.
+    // Modo compacto: sem titlebar nativo a altura-base soma a compensacao.
+    // A logica vive em get_compact_height (que exige Window), entao
+    // validamos a relacao numerica que ela usa. Os valores entram via array
+    // (avaliados em runtime) para nao virar uma asbercao sobre constante.
     #[test]
     fn compact_height_compensates_without_native_titlebar() {
-        assert!(WINDOW_COMPACT_TITLEBAR_COMPENSATION > 0.0);
-        assert_eq!(
-            WINDOW_COMPACT_BASE_HEIGHT + WINDOW_COMPACT_TITLEBAR_COMPENSATION,
-            140.0
-        );
+        let [base, compensation] = [
+            WINDOW_COMPACT_BASE_HEIGHT,
+            WINDOW_COMPACT_TITLEBAR_COMPENSATION,
+        ];
+        assert!(compensation > 0.0, "compensation must be positive");
+        assert_eq!(base + compensation, 140.0);
     }
 
     #[test]
     fn window_dimension_constants_are_positive() {
-        for value in [
+        // Passar pelo array forca avaliacao em runtime; sem isso o clippy
+        // trata cada assert como asbercao sobre constante (-D warnings).
+        let dimensions = [
             WINDOW_WIDTH,
             WINDOW_FRAME_HEIGHT_WINDOWS,
             WINDOW_FRAME_HEIGHT_NATIVE_TITLEBAR,
@@ -528,7 +532,8 @@ mod tests {
             WINDOW_COMPACT_GRID_HEIGHT,
             WINDOW_COMPACT_ACTIONS_HEIGHT,
             WINDOW_COMPACT_FOCUS_EXTENSION_HEIGHT,
-        ] {
+        ];
+        for value in dimensions {
             assert!(value > 0.0, "window dimension constant must be positive");
         }
     }

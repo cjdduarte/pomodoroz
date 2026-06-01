@@ -6,7 +6,7 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
-## [26.6.1] - A definir
+## [26.6.1] - 2026-06-01
 
 ### Adicionado
 
@@ -16,8 +16,8 @@
 
 ### Alterado
 
-- **Dependências Rust atualizadas** — `cargo update` atualizou os pins transitivos em `src-tauri/Cargo.lock` sem mudanças intencionais de comportamento (validado com `cargo audit`, `cargo build` e smoke test em runtime).
-- **Pin do pnpm elevado para 11.5.0** — workflows e `packageManager` foram atualizados, e os pins de tooling dev/runtime foram refrescados.
+- **Dependências Rust atualizadas** — o plugin de atalho global e os pins de crates transitivas foram atualizados sem mudanças intencionais de comportamento (validado com `cargo fmt`/`clippy`/`check`/`audit` e smoke test em runtime).
+- **Pins de toolchain refrescados** — o pin do pnpm foi elevado nos workflows e no `packageManager`, e os pins de tooling dev/runtime foram refrescados.
 
 ## [26.5.13] - 2026-05-25
 
