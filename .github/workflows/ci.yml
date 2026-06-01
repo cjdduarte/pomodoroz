@@ -105,6 +105,9 @@ jobs:
 
       - name: Cargo check
         run: cargo check --manifest-path src-tauri/Cargo.toml
+
+      - name: Cargo test
+        run: cargo test --manifest-path src-tauri/Cargo.toml
   tauri-rust-check-windows:
     runs-on: windows-latest
     steps:
@@ -121,9 +124,6 @@ jobs:
 
       - name: Cargo check
         run: cargo check --manifest-path src-tauri/Cargo.toml
-
-      - name: Cargo test
-        run: cargo test --manifest-path src-tauri/Cargo.toml
 
   tauri-rust-audit:
     runs-on: ubuntu-latest

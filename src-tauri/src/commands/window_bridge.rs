@@ -480,18 +480,18 @@ mod tests {
     // Barreira de seguranca do import/export: write_text_file/read_text_file
     // so podem tocar arquivos .json. Estes testes travam esse contrato.
     #[test]
-    fn validate_json_extension_aceita_json() {
+    fn validate_json_extension_accepts_json() {
         assert!(validate_json_extension(Path::new("backup.json")).is_ok());
     }
 
     #[test]
-    fn validate_json_extension_e_case_insensitive() {
+    fn validate_json_extension_is_case_insensitive() {
         assert!(validate_json_extension(Path::new("BACKUP.JSON")).is_ok());
         assert!(validate_json_extension(Path::new("backup.Json")).is_ok());
     }
 
     #[test]
-    fn validate_json_extension_rejeita_outras_extensoes() {
+    fn validate_json_extension_rejects_other_extensions() {
         assert!(validate_json_extension(Path::new("backup.txt")).is_err());
         assert!(validate_json_extension(Path::new("backup.json.exe")).is_err());
         assert!(validate_json_extension(Path::new("backup")).is_err());
@@ -501,7 +501,7 @@ mod tests {
     // Limite de tamanho de import: mantem o guard explicito em 5 MiB.
     // Se alguem mexer na constante sem querer, este teste acende.
     #[test]
-    fn limite_de_import_e_5_mib() {
+    fn import_size_limit_is_5_mib() {
         assert_eq!(MAX_IMPORT_FILE_BYTES, 5 * 1024 * 1024);
     }
 
@@ -509,7 +509,7 @@ mod tests {
     // titlebar soma a compensacao. A logica vive em get_compact_height
     // (que exige Window), entao validamos a relacao entre as constantes.
     #[test]
-    fn compensacao_compacta_sem_titlebar_nativo() {
+    fn compact_height_compensates_without_native_titlebar() {
         assert!(WINDOW_COMPACT_TITLEBAR_COMPENSATION > 0.0);
         assert_eq!(
             WINDOW_COMPACT_BASE_HEIGHT + WINDOW_COMPACT_TITLEBAR_COMPENSATION,
@@ -518,7 +518,7 @@ mod tests {
     }
 
     #[test]
-    fn larguras_e_alturas_de_janela_sao_positivas() {
+    fn window_dimension_constants_are_positive() {
         for value in [
             WINDOW_WIDTH,
             WINDOW_FRAME_HEIGHT_WINDOWS,
@@ -529,7 +529,7 @@ mod tests {
             WINDOW_COMPACT_ACTIONS_HEIGHT,
             WINDOW_COMPACT_FOCUS_EXTENSION_HEIGHT,
         ] {
-            assert!(value > 0.0, "constante de dimensao deve ser positiva");
+            assert!(value > 0.0, "window dimension constant must be positive");
         }
     }
 }

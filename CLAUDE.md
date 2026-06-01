@@ -45,7 +45,7 @@ Pomodoroz is a cross-platform Pomodoro desktop app, forked from [Pomatez](https:
 - **@dnd-kit** — drag-and-drop
 - **i18next** — internationalization (en, pt, es, ja, zh, de, fr)
 - **ESLint 10** + `@eslint-react` + `@typescript-eslint 8` (flat config)
-- **pnpm** `10.x` — package manager
+- **pnpm** `11.x` — package manager
 - **Node.js** `v24` (see `.nvmrc`)
 
 ## Development Commands
