@@ -72,10 +72,12 @@ pnpm release:tag:ps -- -Version 26.4.10
 Validation wrapper scripts:
 
 ```sh
-./scripts/validar-tudo.sh                # Interactive menu
-./scripts/validar-tudo.sh --quick-dev    # Quick lint + typecheck + tauri dev
-./scripts/validar-tudo.sh --run-packed   # Build + run local Tauri release binary
-./scripts/validar-tudo.sh --installers   # Build platform installers
+./scripts/dev-full.sh                    # Rich interactive menu (UnidadeD standard)
+./scripts/dev-full.sh --quick-dev        # Quick lint + typecheck + tauri dev
+./scripts/dev-full.sh --run-packed       # Build + run local Tauri release binary
+./scripts/dev-full.sh --installers       # Build platform installers
+./scripts/validar-tudo.sh [flags]        # Transition alias (non-interactive gate)
+./scripts/dev.sh check                   # Verb contract: setup|up|check|build|update|status|menu
 ```
 
 ## Architecture

@@ -176,7 +176,7 @@ if (( PURGE == 1 )); then
 fi
 
 if (( REMOVE_INSTALLERS == 1 )); then
-  step "Removendo instaladores locais gerados pelo validar-tudo"
+  step "Removendo instaladores locais gerados pelo dev-full (ex-validar-tudo)"
   remove_path_if_exists "$INSTALLERS_BUNDLE_DIR"
 fi
 

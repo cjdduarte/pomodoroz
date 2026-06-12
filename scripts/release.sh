@@ -96,7 +96,7 @@ Fluxo:
   1) valida repo limpo e branch atual
   2) valida changelog da versao
   3) sincroniza versao (package.json raiz + manifests de pacote existentes)
-  4) (opcional) preflight local (validar-tudo --skip-install)
+  4) (opcional) preflight local (dev-full --skip-install)
   5) commit de release
   6) cria tag v<versao>
   7) push branch + tag (opcional)
@@ -348,8 +348,8 @@ run_cmd "cd \"$APP_DIR\" && pnpm version:sync \"$TARGET_VERSION\""
 confirm_skip_validate_if_needed
 
 if (( SKIP_VALIDATE == 0 )); then
-  step "Preflight local (validar-tudo --skip-install)"
-  run_cmd "cd \"$APP_DIR\" && ./scripts/validar-tudo.sh --skip-install"
+  step "Preflight local (dev-full --skip-install)"
+  run_cmd "cd \"$APP_DIR\" && ./scripts/dev-full.sh --skip-install"
 else
   step "Pulando preflight local (--skip-validate)"
 fi

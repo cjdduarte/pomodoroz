@@ -79,19 +79,20 @@ Check GitHub release assets include:
 
 ## 3. Local Validation Commands
 
-Main local validation script:
+Main local validation script (rich menu; `./scripts/validar-tudo.sh` remains as a
+non-interactive transition alias of the same gate):
 
 ```sh
-./scripts/validar-tudo.sh
+./scripts/dev-full.sh
 ```
 
 Useful direct modes:
 
 ```sh
-./scripts/validar-tudo.sh --quick-dev
-./scripts/validar-tudo.sh --run-packed
-./scripts/validar-tudo.sh --installers
-./scripts/validar-tudo.sh --installers --installers-full
+./scripts/dev-full.sh --quick-dev
+./scripts/dev-full.sh --run-packed
+./scripts/dev-full.sh --installers
+./scripts/dev-full.sh --installers --installers-full
 ```
 
 Windows equivalent:

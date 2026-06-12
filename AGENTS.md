@@ -44,6 +44,7 @@
 | Pending improvements roadmap | `docs/IMPROVEMENTS.md`                         |
 | Migration closure reference  | `docs/MIGRATION_TO_TAURI.md`                   |
 | Release/update operations    | `docs/RELEASE_OPERATIONS.md`                   |
+| Versions and update policy   | `docs/VERSIONS.md`                             |
 | Agent operational rules      | This file (`AGENTS.md`)                        |
 | Claude Code guide            | `CLAUDE.md`                                    |
 | Session handoff state        | `RETOMADA.md`                                  |

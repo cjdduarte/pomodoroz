@@ -381,7 +381,7 @@ invoke_safe_updates() {
 
   echo ""
   echo "  Recomendado apos aplicar:"
-  echo "    ./scripts/validar-tudo.sh --quick-dev"
+  echo "    ./scripts/dev-full.sh --quick-dev"
 }
 
 printf "\n===============================================\n"

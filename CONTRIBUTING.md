@@ -40,15 +40,16 @@ Any IDE should work — it will pick up `package.json` in the root folder.
 ### Validation Scripts
 
 ```sh
-./scripts/validar-tudo.sh              # Interactive menu
-./scripts/validar-tudo.sh --dev        # Quick dev validation
+./scripts/dev-full.sh                  # Rich interactive menu
+./scripts/dev-full.sh --dev            # Quick dev validation
+./scripts/validar-tudo.sh [flags]      # Transition alias (non-interactive gate)
 ```
 
 ## Building for Production
 
 ```sh
-./scripts/validar-tudo.sh --installers            # Installers (Linux/macOS/Windows)
-./scripts/validar-tudo.sh --installers --installers-full
+./scripts/dev-full.sh --installers                # Installers (Linux/macOS/Windows)
+./scripts/dev-full.sh --installers --installers-full
 ```
 
 ## Pre-Commit
