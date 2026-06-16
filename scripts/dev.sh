@@ -2,7 +2,7 @@
 # =====================================================================
 # dev.sh — Pomodoroz (Tauri: Rust + TS)
 # Contrato DEV_PROTOCOL (PADRAO_SCRIPTS_SH.md na raiz da UnidadeD):
-#   dev.sh setup|up|check|build|update|status|menu   (sem argumento: menu)
+#   dev.sh setup|up|check|build|update|status|stop|menu   (sem argumento: menu)
 #
 # Delega para os scripts/aliases existentes do projeto:
 #   setup  -> pnpm install
@@ -45,6 +45,7 @@ v_build() {
 }
 
 v_update() { bash "$ROOT_DIR/scripts/check-updates.sh" report; }
+v_stop()   { warn "sem processo gerenciado: Tauri dev roda em foreground; encerre no proprio terminal."; }
 
 v_status() {
   printf 'Node:  %s\n' "$(node --version 2>/dev/null || echo 'ausente')"
@@ -61,7 +62,8 @@ dispatch() {
     build)  v_build ;;
     update) v_update ;;
     status) v_status ;;
-    *) die "verbo desconhecido: $1 (use setup|up|check|build|update|status|menu)" ;;
+    stop)   v_stop ;;
+    *) die "verbo desconhecido: $1 (use setup|up|check|build|update|status|stop|menu)" ;;
   esac
 }
 
