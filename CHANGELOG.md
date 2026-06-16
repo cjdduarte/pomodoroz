@@ -6,6 +6,12 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.6.3] - 2026-06-16
+
+### Fixed
+
+- **Release uploads now use the GitHub Actions token** — the release workflow no longer depends on the custom `GH_TOKEN` secret for GitHub Release uploads, preventing Windows asset upload failures with `HTTP 401: Bad credentials` when that secret is expired or revoked.
+
 ## [26.6.2] - 2026-06-16
 
 ### Added

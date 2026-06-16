@@ -6,6 +6,12 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.6.3] - 2026-06-16
+
+### Corrigido
+
+- **Uploads de release agora usam o token do GitHub Actions** — o workflow de release não depende mais do secret customizado `GH_TOKEN` para enviar arquivos à GitHub Release, evitando falhas no upload dos assets Windows com `HTTP 401: Bad credentials` quando esse secret estiver expirado ou revogado.
+
 ## [26.6.2] - 2026-06-16
 
 ### Adicionado
