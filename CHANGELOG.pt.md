@@ -6,6 +6,19 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.6.2] - 2026-06-16
+
+### Adicionado
+
+- **Contrato dos scripts de desenvolvimento foi padronizado** — `scripts/dev.sh` agora expõe os verbos `setup`, `up`, `check`, `build`, `update`, `status` e `menu`, enquanto o novo `scripts/dev-full.sh` concentra o menu rico de validação local.
+- **Documentação de versões foi adicionada** — `docs/VERSIONS.md` registra a política local de versões de runtime, app e dependências para auditorias futuras de atualização.
+
+### Alterado
+
+- **Entrada legada de validação agora é um alias de transição** — `scripts/validar-tudo.sh` delega para `scripts/dev-full.sh` em modo não interativo para manter chamadas existentes funcionando enquanto a documentação migra para os novos nomes.
+- **Referências de release e tooling local agora usam os novos nomes dos scripts de validação** — documentação de release, verificação de updates, desinstalação, contribuição e agentes agora aponta para `dev-full.sh`/`dev.sh` quando apropriado.
+- **Dependências do projeto foram atualizadas** — pnpm, pacotes JS de tooling/runtime, pins Corepack do CI e a crate Rust `log` foram atualizados sem mudanças intencionais de comportamento.
+
 ## [26.6.1] - 2026-06-01
 
 ### Adicionado

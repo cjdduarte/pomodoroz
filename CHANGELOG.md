@@ -6,6 +6,19 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.6.2] - 2026-06-16
+
+### Added
+
+- **Development script contract was standardized** — `scripts/dev.sh` now exposes the `setup`, `up`, `check`, `build`, `update`, `status`, and `menu` verbs, while the new `scripts/dev-full.sh` owns the rich local validation menu.
+- **Version tracking documentation was added** — `docs/VERSIONS.md` records the local runtime, app, and dependency version policy for future update audits.
+
+### Changed
+
+- **Legacy validation entry point is now a transition alias** — `scripts/validar-tudo.sh` delegates to `scripts/dev-full.sh` in non-interactive mode so existing callers keep working while documentation moves to the new script names.
+- **Release and local tooling references now use the new validation script names** — release, update-check, uninstall, contributor, and agent documentation now point to `dev-full.sh`/`dev.sh` where appropriate.
+- **Project dependencies were refreshed** — pnpm, JS tooling/runtime packages, CI Corepack pins, and the Rust `log` crate were updated without intentional behavior changes.
+
 ## [26.6.1] - 2026-06-01
 
 ### Added
