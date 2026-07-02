@@ -29,7 +29,7 @@ The audit found that several high-risk paths are individually small but cross-cu
    - Alternative considered: never write over corrupted keys. Rejected because it would make subsequent valid edits non-persistent until manual repair.
 
 2. **Harden path handling inside Rust commands, not only in the renderer dialog flow.**
-   - Decision: reject symlink paths, validate `.json` before and after canonicalization where possible, keep the 5 MiB JSON content limit, and use defensive limits for renderer-originated binary/text payloads.
+   - Decision: reject final file symlink targets, validate `.json` before and after canonicalization where possible, keep the 5 MiB JSON content limit, and use defensive limits for renderer-originated binary/text payloads.
    - Rationale: Tauri commands are the trust boundary. Renderer filters are useful UX, but command-level validation must stand alone.
    - Alternative considered: restrict import/export to a fixed app directory. Rejected because the existing UX intentionally lets users import/export backups anywhere selected by native dialogs.
 
@@ -54,7 +54,7 @@ The audit found that several high-risk paths are individually small but cross-cu
 ## Risks / Trade-offs
 
 - **Backup keys can accumulate after repeated corruption** -> keep names deterministic enough to identify and document the behavior; leave cleanup to a future maintenance item if needed.
-- **Rust path canonicalization can reject some edge-case valid paths** -> validate new files through their parent directory and existing files through their canonical path so normal export/import remains supported.
+- **Rust path canonicalization can reject some edge-case valid paths** -> reject only the final file path when it is a symlink, while allowing symlinked parent directories selected by the OS/native dialog.
 - **Partial release dispatch may fail more often** -> this is intentional; failing before uploading a partial updater feed is safer than silently dropping a platform.
 - **Special-break window matching can trigger after app resume inside the configured window** -> this matches the audit recommendation and should happen only once per configured break per day.
 - **CI gets slower with extra Rust gates** -> acceptable because local preflight already expects these checks.

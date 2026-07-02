@@ -84,29 +84,20 @@ fn validate_json_extension(path: &Path) -> Result<(), String> {
     Ok(())
 }
 
-fn reject_symlink_path(path: &Path) -> Result<(), String> {
-    let mut current_path = PathBuf::new();
-
-    for component in path.components() {
-        current_path.push(component.as_os_str());
-
-        match fs::symlink_metadata(&current_path) {
-            Ok(metadata) => {
-                if metadata.file_type().is_symlink() {
-                    return Err("Selected path must not be a symlink.".to_string());
-                }
-            }
-            Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(()),
-            Err(error) => return Err(map_error(error)),
+fn reject_final_symlink_path(path: &Path) -> Result<(), String> {
+    match fs::symlink_metadata(path) {
+        Ok(metadata) if metadata.file_type().is_symlink() => {
+            Err("Selected path must not be a symlink.".to_string())
         }
+        Ok(_) => Ok(()),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(()),
+        Err(error) => Err(map_error(error)),
     }
-
-    Ok(())
 }
 
 fn validate_json_path(path: &Path) -> Result<(), String> {
     validate_json_extension(path)?;
-    reject_symlink_path(path)?;
+    reject_final_symlink_path(path)?;
 
     if let Ok(canonical_path) = path.canonicalize() {
         validate_json_extension(&canonical_path)?;
@@ -620,6 +611,24 @@ mod tests {
         symlink(&target, &link).expect("test symlink should be created");
 
         assert!(validate_existing_json_file(&link).is_err());
+
+        fs::remove_dir_all(&dir).expect("test directory should be removed");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn writable_json_file_accepts_symlinked_parent_directory() {
+        use std::os::unix::fs::symlink;
+
+        let dir = unique_test_path("symlink-parent");
+        let real_parent = dir.join("real-parent");
+        let parent_link = dir.join("parent-link");
+        fs::create_dir_all(&real_parent).expect("test directory should be created");
+        symlink(&real_parent, &parent_link).expect("test parent symlink should be created");
+
+        let path = parent_link.join("backup.json");
+
+        assert!(validate_writable_json_file(&path).is_ok());
 
         fs::remove_dir_all(&dir).expect("test directory should be removed");
     }

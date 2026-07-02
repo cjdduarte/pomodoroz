@@ -11,7 +11,7 @@
 ### Corrigido
 
 - **Hardening da auditoria protege estado local corrompido** — storage `state` ou `statistics` malformado agora é distinguido de dado ausente e preservado em uma chave de backup antes que defaults possam substituí-lo.
-- **Comandos Tauri de import/export JSON ficaram mais restritos** — comandos nativos de arquivo agora rejeitam caminhos com symlink, mantêm barreiras de JSON/tamanho e limitam payloads nativos vindos do renderer.
+- **Comandos Tauri de import/export JSON ficaram mais restritos** — comandos nativos de arquivo agora rejeitam symlink no arquivo final, mantêm barreiras de JSON/tamanho e limitam payloads nativos vindos do renderer.
 - **Automação de release evita feed parcial do updater** — a sincronização de versão inclui a versão do pacote local no Cargo lock, a validação PowerShell segue a mesma ordem do Unix, e `latest.json` exige as duas plataformas ativas de updater.
 - **Regressões de timer/tasks da auditoria foram tratadas** — pausas especiais disparam dentro da janela configurada uma vez por dia, e a limpeza automática de cores diárias não polui mais o histórico de undo das tarefas.
 

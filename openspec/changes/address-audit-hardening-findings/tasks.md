@@ -10,6 +10,7 @@
 - [x] 2.2 Add defensive payload limits for notification sound, tray icon, and tray copy native commands.
 - [x] 2.3 Narrow the opener capability to the URL-opening permission used by the renderer.
 - [x] 2.4 Extend Rust tests for symlink rejection, JSON path validation, and native payload limits.
+- [x] 2.5 Allow symlinked parent directories while still rejecting final file symlinks in JSON import/export validation.
 
 ## 3. Release And CI Integrity
 

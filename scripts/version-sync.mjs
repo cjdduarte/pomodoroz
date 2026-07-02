@@ -70,6 +70,8 @@ if (cargoTomlUpdated !== cargoTomlContent) {
 const cargoLockPath = path.join(repoRoot, "src-tauri/Cargo.lock");
 if (fs.existsSync(cargoLockPath)) {
   const cargoLockContent = fs.readFileSync(cargoLockPath, "utf8");
+  // Apenas sincroniza a versao do pacote local. Mudancas de dependencia ainda
+  // exigem regenerar o lockfile com Cargo.
   const cargoLockUpdated = cargoLockContent.replace(
     /(\[\[package\]\]\s+name = "pomodoroz_tauri"\s+version = ")([^"]+)(")/m,
     (_match, prefix, _currentVersion, suffix) =>

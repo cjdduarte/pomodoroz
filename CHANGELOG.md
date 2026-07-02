@@ -11,7 +11,7 @@
 ### Fixed
 
 - **Audit hardening protects corrupted local state** — malformed `state` or `statistics` storage is now detected distinctly from missing data and preserved under a backup key before defaults can replace it.
-- **Tauri JSON import/export commands are stricter** — native file commands now reject symlink paths, retain JSON/size guardrails, and bound renderer-originated native payloads.
+- **Tauri JSON import/export commands are stricter** — native file commands now reject final file symlinks, retain JSON/size guardrails, and bound renderer-originated native payloads.
 - **Release automation now avoids partial updater feeds** — version sync includes the local Cargo lock package version, PowerShell release validation matches the Unix order, and `latest.json` generation requires both active updater platforms.
 - **Timer/task audit regressions were addressed** — special breaks trigger within their configured window once per day, and automatic daily color cleanup no longer pollutes task undo history.
 

@@ -2,7 +2,7 @@
 
 ### Requirement: JSON file commands reject symlink bypasses
 
-The native `read_text_file` and `write_text_file` commands SHALL reject symlink paths and MUST validate JSON extension constraints at the command boundary.
+The native `read_text_file` and `write_text_file` commands SHALL reject final file symlink paths and MUST validate JSON extension constraints at the command boundary without rejecting legitimate symlinked parent directories.
 
 #### Scenario: Import path is a symlink ending in json
 
@@ -13,6 +13,11 @@ The native `read_text_file` and `write_text_file` commands SHALL reject symlink 
 
 - **WHEN** the renderer invokes `write_text_file` with a path whose final filesystem target does not satisfy the JSON file guardrails
 - **THEN** the native command rejects the request before writing content
+
+#### Scenario: Export path has a symlinked parent directory
+
+- **WHEN** the renderer invokes `write_text_file` for a new `.json` file below a symlinked parent directory selected by the native dialog
+- **THEN** the native command accepts the path if the final file path itself is not a symlink and the JSON guardrails pass
 
 ### Requirement: JSON file commands retain size and file-type guardrails
 
