@@ -18,6 +18,7 @@
 ### Changed
 
 - **CI and operational docs were aligned with audit findings** — Rust CI gates now better match local preflight expectations, release docs no longer require a custom `GH_TOKEN` secret, and version/roadmap/handoff references were refreshed.
+- **Project dependencies were refreshed** — pnpm, JS tooling/runtime packages, and Rust Tauri/log crates were updated without intentional behavior changes.
 
 ## [26.6.3] - 2026-06-16
 
