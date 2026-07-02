@@ -19,6 +19,7 @@
 - [x] 3.3 Update `release-autoupdate.yml` so `latest.json` generation fails instead of uploading a partial Windows-only or Linux-only feed.
 - [x] 3.4 Remove obsolete custom `GH_TOKEN` secret validation language from release workflow/docs while preserving `github.token` for `gh` CLI usage.
 - [x] 3.5 Add Rust fmt/clippy gates to Linux CI and cargo tests to Windows CI.
+- [x] 3.6 Refresh Rust audit transitives where compatible and document temporary quick-xml RustSec ignores blocked by upstream Tauri/plist constraints.
 
 ## 4. Timer And Task Regression Fixes
 

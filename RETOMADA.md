@@ -16,6 +16,7 @@ Nao registrar segredos, tokens, credenciais, endpoints privados, dados pessoais 
 - Caminho usado: OpenSpec, change `address-audit-hardening-findings` em `openspec/changes/address-audit-hardening-findings/`.
 - Implementado ate aqui: resiliencia de storage corrompido, hardening de comandos nativos de arquivo/payload, ajustes de release/CI, janela de pausa especial, reset automatico de cores fora do undo, e atualizacao documental inicial.
 - Revisao posterior corrigida: validacao de import/export JSON agora rejeita symlink no arquivo final, mas permite diretorios-pai symlink legitimos selecionados pelo dialogo nativo.
+- CI cargo-audit corrigido: `anyhow`, `notify-rust`, `mac-notification-sys` e `tauri-winrt-notification` foram atualizados no lockfile; `quick-xml@0.37.5` saiu. Os advisories `RUSTSEC-2026-0194` e `RUSTSEC-2026-0195` seguem ignorados temporariamente porque `quick-xml@0.39.4` vem de `plist -> tauri-utils` sem update compativel nos pins atuais.
 - A politica atual documentada e que estado ativo do timer (`round`, `timerType`, `playing`) reinicia dos defaults apos restart; persistir isso fica fora deste lote.
 
 ---
@@ -25,7 +26,7 @@ Nao registrar segredos, tokens, credenciais, endpoints privados, dados pessoais 
 - Branch atual: `main`.
 - Baseline publicado: `26.6.3`; proximo changelog aberto: `26.7.1` (`TBD` / `A definir`).
 - Ja havia mudancas nao relacionadas/anteriores no worktree antes deste lote: atualizacoes de dependencias/manifests/workflows e `AGENTS.md`/`.opencode/`.
-- Validacoes executadas neste lote: OpenSpec strict, lint/typecheck/test/build renderer, Rust fmt/clippy/check/test. A validacao Rust final apos N1 passou com 12 testes.
+- Validacoes executadas neste lote: OpenSpec strict, lint/typecheck/test/build renderer, Rust fmt/clippy/check/test e `cargo audit --deny warnings` com base RustSec atualizada. A validacao Rust final apos N1 passou com 12 testes.
 
 ---
 

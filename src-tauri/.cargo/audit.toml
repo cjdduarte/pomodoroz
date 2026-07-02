@@ -29,4 +29,8 @@ ignore = [
   "RUSTSEC-2025-0081", # unic-char-property - unmaintained
   "RUSTSEC-2025-0098", # unic-ucd-version - unmaintained
   "RUSTSEC-2025-0100", # unic-ucd-ident - unmaintained
+  # quick-xml <0.41 via plist -> tauri-utils. Sem update compativel nos pins
+  # atuais do Tauri em 2026-07-02; remover quando plist/tauri-utils subirem.
+  "RUSTSEC-2026-0194", # quick-xml - duplicate attribute quadratic runtime
+  "RUSTSEC-2026-0195", # quick-xml - namespace allocation DoS
 ]
