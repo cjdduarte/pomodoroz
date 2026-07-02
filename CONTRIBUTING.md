@@ -18,7 +18,7 @@ Please use conventional commit messages in your PRs (or PR titles for squash mer
 ### Requirements
 
 - Node.js v24
-- pnpm v10
+- pnpm v11
 
 ### Commands
 
@@ -27,6 +27,7 @@ pnpm install              # Install dependencies
 pnpm dev:app              # Tauri + Vite renderer
 pnpm lint                 # Lint (renderer)
 pnpm typecheck:renderer   # Typecheck (renderer)
+pnpm test:run             # Unit tests
 pnpm tauri build --no-bundle  # Build release binary (no installer)
 ```
 
@@ -41,7 +42,7 @@ Any IDE should work — it will pick up `package.json` in the root folder.
 
 ```sh
 ./scripts/dev-full.sh                  # Rich interactive menu
-./scripts/dev-full.sh --dev            # Quick dev validation
+./scripts/dev-full.sh --quick-dev      # Quick lint/typecheck + dev runtime
 ./scripts/validar-tudo.sh [flags]      # Transition alias (non-interactive gate)
 ```
 

@@ -8,6 +8,6 @@ Current state:
 - Implemented history: `CHANGELOG.md` / `CHANGELOG.pt.md`.
 - Pending improvements (technical + product): `docs/IMPROVEMENTS.md`.
 - Release operations: `docs/RELEASE_OPERATIONS.md`.
-- Next execution order after `26.4.27`: `docs/IMPROVEMENTS.md` section **"Next execution order (after 26.4.27)"**.
+- Next execution order: `docs/IMPROVEMENTS.md` section **"Next execution order"**.
 
 This file is kept as a compatibility entry point for historical references in older changelog versions.

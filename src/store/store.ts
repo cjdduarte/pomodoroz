@@ -1,7 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import debounce from "lodash.debounce";
 
-import { saveToStorage, getFromStorage } from "utils";
+import {
+  backupCorruptStorageValue,
+  readFromStorage,
+  saveToStorage,
+} from "utils";
 import configReducer from "./config";
 import settingReducer from "./settings";
 import statisticsReducer from "./statistics";
@@ -26,10 +30,14 @@ const store = configureStore({
   },
 });
 
-const persistedRootState = getFromStorage("state");
-export const isFreshInstallProfile = !persistedRootState;
+const persistedRootStateResult = readFromStorage("state");
+export const isFreshInstallProfile =
+  persistedRootStateResult.status === "missing";
+const canPersistRootState =
+  persistedRootStateResult.status !== "corrupt" ||
+  backupCorruptStorageValue("state") !== null;
 
-if (!persistedRootState) {
+if (canPersistRootState && persistedRootStateResult.status !== "ok") {
   saveToStorage("state", {
     config: store.getState().config,
     settings: store.getState().settings,
@@ -38,18 +46,30 @@ if (!persistedRootState) {
   });
 }
 
-if (!getFromStorage(STATISTICS_STORAGE_KEY)) {
+const persistedStatisticsResult = readFromStorage(
+  STATISTICS_STORAGE_KEY
+);
+const canPersistStatistics =
+  persistedStatisticsResult.status !== "corrupt" ||
+  backupCorruptStorageValue(STATISTICS_STORAGE_KEY) !== null;
+
+if (canPersistStatistics && persistedStatisticsResult.status !== "ok") {
   saveToStorage(STATISTICS_STORAGE_KEY, store.getState().statistics);
 }
 
 const persistRootState = () => {
-  saveToStorage("state", {
-    config: store.getState().config,
-    settings: store.getState().settings,
-    taskSelection: store.getState().taskSelection,
-    tasks: store.getState().tasks.present,
-  });
-  saveToStorage(STATISTICS_STORAGE_KEY, store.getState().statistics);
+  if (canPersistRootState) {
+    saveToStorage("state", {
+      config: store.getState().config,
+      settings: store.getState().settings,
+      taskSelection: store.getState().taskSelection,
+      tasks: store.getState().tasks.present,
+    });
+  }
+
+  if (canPersistStatistics) {
+    saveToStorage(STATISTICS_STORAGE_KEY, store.getState().statistics);
+  }
 };
 
 const debouncedPersistRootState = debounce(persistRootState, 1000);

@@ -30,7 +30,7 @@ jobs:
       - name: Setup pnpm (Corepack)
         run: |
           corepack enable
-          corepack prepare pnpm@11.7.0 --activate
+          corepack prepare pnpm@11.9.0 --activate
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -61,7 +61,7 @@ jobs:
       - name: Setup pnpm (Corepack)
         run: |
           corepack enable
-          corepack prepare pnpm@11.7.0 --activate
+          corepack prepare pnpm@11.9.0 --activate
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -103,11 +103,21 @@ jobs:
             librsvg2-dev \
             patchelf
 
+      - name: Cargo fmt
+        run: cargo fmt --all -- --check
+        working-directory: src-tauri
+
+      - name: Cargo clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings
+        working-directory: src-tauri
+
       - name: Cargo check
-        run: cargo check --manifest-path src-tauri/Cargo.toml
+        run: cargo check --all-targets --all-features
+        working-directory: src-tauri
 
       - name: Cargo test
-        run: cargo test --manifest-path src-tauri/Cargo.toml
+        run: cargo test --all-targets --all-features
+        working-directory: src-tauri
   tauri-rust-check-windows:
     runs-on: windows-latest
     steps:
@@ -124,6 +134,9 @@ jobs:
 
       - name: Cargo check
         run: cargo check --manifest-path src-tauri/Cargo.toml
+
+      - name: Cargo test
+        run: cargo test --manifest-path src-tauri/Cargo.toml
 
   tauri-rust-audit:
     runs-on: ubuntu-latest

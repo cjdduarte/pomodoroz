@@ -6,7 +6,7 @@
   "permissions": [
     "core:default",
     "notification:default",
-    "opener:default",
+    "opener:allow-open-url",
     "autostart:default",
     "dialog:default",
     "os:default",

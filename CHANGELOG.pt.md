@@ -6,6 +6,19 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.7.1] - A definir
+
+### Corrigido
+
+- **Hardening da auditoria protege estado local corrompido** — storage `state` ou `statistics` malformado agora é distinguido de dado ausente e preservado em uma chave de backup antes que defaults possam substituí-lo.
+- **Comandos Tauri de import/export JSON ficaram mais restritos** — comandos nativos de arquivo agora rejeitam caminhos com symlink, mantêm barreiras de JSON/tamanho e limitam payloads nativos vindos do renderer.
+- **Automação de release evita feed parcial do updater** — a sincronização de versão inclui a versão do pacote local no Cargo lock, a validação PowerShell segue a mesma ordem do Unix, e `latest.json` exige as duas plataformas ativas de updater.
+- **Regressões de timer/tasks da auditoria foram tratadas** — pausas especiais disparam dentro da janela configurada uma vez por dia, e a limpeza automática de cores diárias não polui mais o histórico de undo das tarefas.
+
+### Alterado
+
+- **CI e documentação operacional foram alinhados com a auditoria** — gates Rust do CI agora refletem melhor o preflight local, docs de release não exigem mais secret customizado `GH_TOKEN`, e referências de versões/roadmap/handoff foram atualizadas.
+
 ## [26.6.3] - 2026-06-16
 
 ### Corrigido

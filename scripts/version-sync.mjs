@@ -67,6 +67,28 @@ if (cargoTomlUpdated !== cargoTomlContent) {
   updatedFiles.push("src-tauri/Cargo.toml");
 }
 
+const cargoLockPath = path.join(repoRoot, "src-tauri/Cargo.lock");
+if (fs.existsSync(cargoLockPath)) {
+  const cargoLockContent = fs.readFileSync(cargoLockPath, "utf8");
+  const cargoLockUpdated = cargoLockContent.replace(
+    /(\[\[package\]\]\s+name = "pomodoroz_tauri"\s+version = ")([^"]+)(")/m,
+    (_match, prefix, _currentVersion, suffix) =>
+      `${prefix}${targetVersion}${suffix}`
+  );
+
+  if (cargoLockUpdated === cargoLockContent) {
+    if (!cargoLockContent.includes('name = "pomodoroz_tauri"')) {
+      console.error(
+        "Pacote pomodoroz_tauri nao encontrado em src-tauri/Cargo.lock."
+      );
+      process.exit(1);
+    }
+  } else {
+    fs.writeFileSync(cargoLockPath, cargoLockUpdated, "utf8");
+    updatedFiles.push("src-tauri/Cargo.lock");
+  }
+}
+
 if (!updatedFiles.length) {
   console.log(`Versao ja esta sincronizada em ${targetVersion}.`);
   process.exit(0);

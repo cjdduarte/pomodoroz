@@ -328,9 +328,6 @@ if ($LASTEXITCODE -eq 0) {
     Fail "Tag remota $targetTag ja existe em origin."
 }
 
-Step "Sincronizando versao para $targetVersion"
-Invoke-PnpmChecked -Arguments @("version:sync", $targetVersion)
-
 Step "Validando entradas de changelog para $targetVersion"
 $escapedVersion = [regex]::Escape($targetVersion)
 $ptMatch = Select-String -Path (Join-Path $ROOT "CHANGELOG.pt.md") -Pattern "^## \[$escapedVersion\] - (.+)$" | Select-Object -First 1
@@ -354,6 +351,9 @@ if ($enDate -notmatch "^\d{4}-\d{2}-\d{2}$") {
 if ($ptDate -ne $enDate) {
     Fail "Datas divergentes entre CHANGELOG.pt.md ($ptDate) e CHANGELOG.md ($enDate) para [$targetVersion]."
 }
+
+Step "Sincronizando versao para $targetVersion"
+Invoke-PnpmChecked -Arguments @("version:sync", $targetVersion)
 
 Confirm-SkipValidateIfNeeded
 

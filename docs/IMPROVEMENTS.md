@@ -36,28 +36,27 @@ When an item is released:
 2. Add implementation details to `CHANGELOG.md` and `CHANGELOG.pt.md`.
 3. Remove unnecessary detail from this roadmap in the next planning cycle.
 
-### Current checkpoint (2026-04-25)
+### Current checkpoint (2026-07-02)
 
-- Released in `26.4.28` (PT/EN changelogs):
-  - `A0` runtime consolidation to Tauri-only.
-  - `A1` titlebar legacy CSS/changelog consistency (`-webkit-app-region`).
-  - `A4` `check-updates` simplification to root-only narrative.
-  - Linux release pipeline/AppImage hardening and `sync-latest-json` alignment.
-- Current planning baseline:
-  - Releases up to `26.4.36` are already published in EN/PT changelogs.
-  - `26.4.37` changelog entries are open as the next release placeholders (`TBD` / `A definir`).
-  - `26.4.36` changelog entry contains `A14` native IPC error visibility, `A7` renderer version source hardening, and operational guide alignment.
-  - `A2` env hygiene completed (renderer `.env` untracked, no committed `.env.example` required by default).
-  - `A5` dependency modernization major batches are now completed (`eslint`/`@eslint/js` 10.x with `eslint-react`, and `vite-plugin-svgr@5.2.0`) with full validation.
-  - `A6` is now being reopened incrementally: Vitest replaced the idle Jest stack, CI/local validation run `pnpm test:run`, and the next work is prioritized unit coverage without adding React/DOM test dependencies first.
-  - `A9` locale-source unification is now implemented with `@tauri-apps/plugin-os` (renderer) + `tauri_plugin_os::locale()` (native startup).
-  - `A10` opens a dependency-rationalization gate where migration is executed only if measurable ROI justifies the change.
-  - `A11` Windows CI parity gate is now implemented (`ubuntu-latest` + `windows-latest`) and workflow runs completed successfully in both OS lanes.
-  - `A12` write-path hardening is now implemented: `write_text_file` enforces `.json`, rejects existing non-file targets, and caps payload at 5 MB.
-  - `A13` updater channel support memoization is implemented; only manual runtime-channel validation remains.
-  - `A14` native IPC error visibility is implemented; only manual failure-injection validation remains.
-  - `26.4.37` draft contains `A15` renderer CSP hardening and an IPC warning refinement so optional background sync failures do not show the generic native warning banner.
-  - `26.4.38` draft contains updater prompt state simplification and `A3` shortcut persistence for the app-owned toggle-theme shortcut.
+- Published baseline in EN/PT changelogs is `26.6.3`.
+- Next unreleased placeholders are `26.7.1` (`TBD` / `A definir`).
+- Current implementation focus is the audit-hardening batch from
+  `docs/AUDITORIA_2026-07-02.md`, tracked by OpenSpec change
+  `address-audit-hardening-findings`.
+- Audit-hardening scope in progress:
+  - preserve recoverable corrupted `localStorage` payloads before replacement;
+  - harden Tauri JSON import/export and renderer-originated native payloads;
+  - prevent partial updater `latest.json` feeds in release automation;
+  - align Unix/PowerShell release validation order and Cargo lock version sync;
+  - keep automatic day-color cleanup out of task undo/redo history;
+  - make special breaks trigger within their configured time window;
+  - refresh stale operational docs and add focused tests.
+- Active timer session state (`round`, `timerType`, `playing`) is intentionally
+  not persisted in this batch. Persisting it requires a separate design because
+  restart/sleep semantics affect user expectations and statistics.
+- Remaining strategic baseline stays unchanged: finish B2/B4 product cycle,
+  continue A6 coverage expansion, and apply A10 dependency rationalization only
+  when measurable ROI justifies a change.
 
 ### Next execution order
 
@@ -818,4 +817,7 @@ Suggested commit:
 - Keep all data local-only (no cloud/server).
 - New libraries require explicit impact review before adoption.
 - Never edit changelog entries from released versions.
+- Active timer session state currently restarts from defaults after app restart;
+  do not persist it without a dedicated design for sleep/restart/statistics
+  semantics.
 - Every finished implementation should leave a ready-to-use Conventional Commit suggestion.

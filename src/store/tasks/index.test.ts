@@ -250,4 +250,69 @@ describe("tasks reducer", () => {
     expect(nextState.past).toEqual([]);
     expect(nextState.present[0]?.cards[0]?.done).toBe(false);
   });
+
+  it("keeps automatic day-color reset out of undo history", async () => {
+    setupLocalStorage([
+      {
+        _id: "list-id-1",
+        title: "FOCUS",
+        priority: true,
+        dayColor: null,
+        dayColorDate: null,
+        cards: [
+          {
+            _id: "task-id-1",
+            text: "Review plan",
+            description: "",
+            done: false,
+            prioritized: false,
+            dayColor: "green",
+            dayColorDate: "2026-07-01",
+          },
+        ],
+      },
+    ]);
+
+    const { default: reducer, resetAllDayColorsForNewDay } =
+      await import("./index");
+
+    const state = reducer(undefined, { type: "@@INIT" });
+    const nextState = reducer(state, resetAllDayColorsForNewDay());
+
+    expect(nextState.present[0]?.cards[0]?.dayColor).toBeNull();
+    expect(nextState.past).toEqual([]);
+    expect(nextState.future).toEqual([]);
+  });
+
+  it("keeps manual day-color reset in undo history", async () => {
+    setupLocalStorage([
+      {
+        _id: "list-id-1",
+        title: "FOCUS",
+        priority: true,
+        dayColor: null,
+        dayColorDate: null,
+        cards: [
+          {
+            _id: "task-id-1",
+            text: "Review plan",
+            description: "",
+            done: false,
+            prioritized: false,
+            dayColor: "green",
+            dayColorDate: "2026-07-01",
+          },
+        ],
+      },
+    ]);
+
+    const { default: reducer, resetAllDayColors } =
+      await import("./index");
+
+    const state = reducer(undefined, { type: "@@INIT" });
+    const nextState = reducer(state, resetAllDayColors());
+
+    expect(nextState.present[0]?.cards[0]?.dayColor).toBeNull();
+    expect(nextState.past).toEqual([state.present]);
+  });
 });

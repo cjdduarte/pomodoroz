@@ -60,12 +60,17 @@ Updater metadata source:
    - `all`
    - `windows`
    - `linux`
+5. Manual single-platform dispatch is allowed only when the release can still
+   produce a complete `latest.json` containing both Windows and Linux updater
+   platforms.
 
 Required repository secrets:
 
-- `GH_TOKEN`
 - `TAURI_SIGNING_PRIVATE_KEY`
 - `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`
+
+GitHub Release uploads use the automatic GitHub Actions token exposed to `gh` as
+`GH_TOKEN`; no custom repository secret named `GH_TOKEN` is required.
 
 ### Step 3 — Validate Published Release
 

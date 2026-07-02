@@ -13,8 +13,8 @@ documental. Elas nao substituem auditoria oficial em registry/changelog.
 
 | Item         | Versao declarada | Fonte local                            | Data consulta oficial | Status                      |
 | ------------ | ---------------: | -------------------------------------- | --------------------- | --------------------------- |
-| Pomodoroz    |         `26.6.1` | `package.json`, `src-tauri/Cargo.toml` | local                 | versao interna sincronizada |
-| pnpm         |         `11.5.0` | `packageManager` em `package.json`     | pendente              | auditar antes de mudar      |
+| Pomodoroz    |         `26.6.3` | `package.json`, `src-tauri/Cargo.toml` | local                 | versao interna sincronizada |
+| pnpm         |         `11.9.0` | `packageManager` em `package.json`     | pendente              | auditar antes de mudar      |
 | Rust edition |           `2021` | `src-tauri/Cargo.toml`                 | local                 | edicao do projeto           |
 | Rust minimo  |         `1.77.2` | `src-tauri/Cargo.toml`                 | pendente              | auditar antes de mudar      |
 
@@ -22,14 +22,14 @@ documental. Elas nao substituem auditoria oficial em registry/changelog.
 
 | Pacote/crate      | Versao declarada | Fonte local            | Data consulta oficial | Status                 |
 | ----------------- | ---------------: | ---------------------- | --------------------- | ---------------------- |
-| `@tauri-apps/api` |         `2.11.0` | `package.json`         | pendente              | auditar antes de mudar |
-| `@tauri-apps/cli` |         `2.11.2` | `package.json`         | pendente              | auditar antes de mudar |
-| `tauri`           |         `2.11.2` | `src-tauri/Cargo.toml` | pendente              | auditar antes de mudar |
-| `react`           |        `^19.2.6` | `package.json`         | pendente              | auditar antes de mudar |
-| `react-dom`       |        `^19.2.6` | `package.json`         | pendente              | auditar antes de mudar |
-| `react-router`    |         `7.16.0` | `package.json`         | pendente              | auditar antes de mudar |
+| `@tauri-apps/api` |         `2.11.1` | `package.json`         | pendente              | auditar antes de mudar |
+| `@tauri-apps/cli` |         `2.11.4` | `package.json`         | pendente              | auditar antes de mudar |
+| `tauri`           |         `2.11.5` | `src-tauri/Cargo.toml` | pendente              | auditar antes de mudar |
+| `react`           |        `^19.2.7` | `package.json`         | pendente              | auditar antes de mudar |
+| `react-dom`       |        `^19.2.7` | `package.json`         | pendente              | auditar antes de mudar |
+| `react-router`    |         `7.17.0` | `package.json`         | pendente              | auditar antes de mudar |
 | `typescript`      |          `6.0.3` | `package.json`         | pendente              | auditar antes de mudar |
-| `vite`            |        `^8.0.14` | `package.json`         | pendente              | auditar antes de mudar |
+| `vite`            |         `^8.1.2` | `package.json`         | pendente              | auditar antes de mudar |
 | `rodio`           |         `0.22.2` | `src-tauri/Cargo.toml` | pendente              | auditar antes de mudar |
 
 ## Politica de updates
@@ -42,3 +42,5 @@ documental. Elas nao substituem auditoria oficial em registry/changelog.
 
 - 2026-06-12: arquivo criado durante padronizacao documental do Lote 5 com base
   nos manifests locais.
+- 2026-07-02: versoes locais re-sincronizadas durante o hardening da auditoria
+  `docs/AUDITORIA_2026-07-02.md`.

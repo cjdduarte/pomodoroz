@@ -50,7 +50,7 @@ jobs:
       - name: Setup pnpm (Corepack)
         run: |
           corepack enable
-          corepack prepare pnpm@11.7.0 --activate
+          corepack prepare pnpm@11.9.0 --activate
 
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -60,13 +60,9 @@ jobs:
         with:
           workspaces: "src-tauri -> target"
 
-      - name: Validate required secrets
+      - name: Validate required signing secrets
         shell: pwsh
         run: |
-          if (-not $env:GH_TOKEN) {
-            Write-Error "GH_TOKEN secret is required."
-            exit 1
-          }
           if (-not $env:TAURI_SIGNING_PRIVATE_KEY) {
             Write-Error "TAURI_SIGNING_PRIVATE_KEY secret is required."
             exit 1
@@ -201,7 +197,7 @@ jobs:
       - name: Setup pnpm (Corepack)
         run: |
           corepack enable
-          corepack prepare pnpm@11.7.0 --activate
+          corepack prepare pnpm@11.9.0 --activate
 
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -232,12 +228,8 @@ jobs:
             squashfs-tools \
             zsync
 
-      - name: Validate required secrets
+      - name: Validate required signing secrets
         run: |
-          if [ -z "${GH_TOKEN}" ]; then
-            echo "GH_TOKEN secret is required."
-            exit 1
-          fi
           if [ -z "${TAURI_SIGNING_PRIVATE_KEY}" ]; then
             echo "TAURI_SIGNING_PRIVATE_KEY secret is required."
             exit 1
@@ -396,14 +388,8 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref_name }}
+      RELEASE_TARGET: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.target || 'all' }}
     steps:
-      - name: Validate GH_TOKEN
-        run: |
-          if [ -z "${GH_TOKEN}" ]; then
-            echo "GH_TOKEN secret is required."
-            exit 1
-          fi
-
       - name: Build merged latest.json
         run: |
           TAG="${RELEASE_TAG}"
@@ -439,6 +425,15 @@ jobs:
           }
 
           LATEST_JSON="$(jq -n --arg VERSION "${VERSION}" --arg PUB_DATE "${PUB_DATE}" '{ version: $VERSION, notes: "", pub_date: $PUB_DATE, platforms: {} }')"
+          if [ "${RELEASE_TARGET}" != "all" ]; then
+            EXISTING_LATEST_ASSET_ID="$(echo "${RELEASE_JSON}" | jq -r '.assets[] | select(.name == "latest.json") | .id' | head -n1)"
+            if [ -n "${EXISTING_LATEST_ASSET_ID}" ] && [ "${EXISTING_LATEST_ASSET_ID}" != "null" ]; then
+              EXISTING_LATEST_JSON="$(gh api "repos/${GITHUB_REPOSITORY}/releases/assets/${EXISTING_LATEST_ASSET_ID}" -H "Accept: application/octet-stream")"
+              if echo "${EXISTING_LATEST_JSON}" | jq -e '.platforms | type == "object"' >/dev/null; then
+                LATEST_JSON="$(echo "${EXISTING_LATEST_JSON}" | jq --arg VERSION "${VERSION}" --arg PUB_DATE "${PUB_DATE}" '.version = $VERSION | .pub_date = $PUB_DATE | .notes = (.notes // "")')"
+              fi
+            fi
+          fi
 
           WINDOWS_UPDATER="$(echo "${RELEASE_JSON}" | jq -r '
             [.assets[].name] as $names
@@ -486,9 +481,8 @@ jobs:
             add_platform "${LINUX_UPDATER}" "linux-x86_64-appimage"
           fi
 
-          PLATFORM_COUNT="$(echo "${LATEST_JSON}" | jq '.platforms | length')"
-          if [ "${PLATFORM_COUNT}" -eq 0 ]; then
-            echo "No updater platforms were generated for latest.json."
+          if ! echo "${LATEST_JSON}" | jq -e '.platforms["windows-x86_64"] and .platforms["linux-x86_64"]' >/dev/null; then
+            echo "latest.json must include both Windows and Linux updater platforms."
             exit 1
           fi
 

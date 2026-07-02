@@ -26,6 +26,10 @@ const WINDOW_COMPACT_GRID_HEIGHT: f64 = 320.0;
 const WINDOW_COMPACT_ACTIONS_HEIGHT: f64 = 160.0;
 const WINDOW_COMPACT_FOCUS_EXTENSION_HEIGHT: f64 = 76.0;
 const MAX_IMPORT_FILE_BYTES: u64 = 5 * 1024 * 1024;
+const MAX_NATIVE_BINARY_PAYLOAD_BYTES: usize = 5 * 1024 * 1024;
+const MAX_NOTIFICATION_SOUND_DELAY_MS: u64 = 60_000;
+const MAX_TRAY_LABEL_BYTES: usize = 512;
+const MAX_TRAY_TOOLTIP_BYTES: usize = 512;
 
 const EVENT_FULLSCREEN_BREAK_ENTERED: &str = "FULLSCREEN_BREAK_ENTERED";
 const EVENT_FULLSCREEN_BREAK_EXITED: &str = "FULLSCREEN_BREAK_EXITED";
@@ -75,6 +79,76 @@ fn validate_json_extension(path: &Path) -> Result<(), String> {
         .map(|value| value.to_ascii_lowercase());
     if extension.as_deref() != Some("json") {
         return Err("Only .json files are allowed.".to_string());
+    }
+
+    Ok(())
+}
+
+fn reject_symlink_path(path: &Path) -> Result<(), String> {
+    let mut current_path = PathBuf::new();
+
+    for component in path.components() {
+        current_path.push(component.as_os_str());
+
+        match fs::symlink_metadata(&current_path) {
+            Ok(metadata) => {
+                if metadata.file_type().is_symlink() {
+                    return Err("Selected path must not be a symlink.".to_string());
+                }
+            }
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(()),
+            Err(error) => return Err(map_error(error)),
+        }
+    }
+
+    Ok(())
+}
+
+fn validate_json_path(path: &Path) -> Result<(), String> {
+    validate_json_extension(path)?;
+    reject_symlink_path(path)?;
+
+    if let Ok(canonical_path) = path.canonicalize() {
+        validate_json_extension(&canonical_path)?;
+    }
+
+    Ok(())
+}
+
+fn validate_existing_json_file(path: &Path) -> Result<fs::Metadata, String> {
+    validate_json_path(path)?;
+
+    let metadata = fs::metadata(path).map_err(map_error)?;
+    if !metadata.is_file() {
+        return Err("Selected path is not a file.".to_string());
+    }
+
+    Ok(metadata)
+}
+
+fn validate_writable_json_file(path: &Path) -> Result<(), String> {
+    validate_json_path(path)?;
+
+    if let Ok(metadata) = fs::metadata(path) {
+        if !metadata.is_file() {
+            return Err("Selected path is not a file.".to_string());
+        }
+    }
+
+    Ok(())
+}
+
+fn validate_binary_payload_len(len: usize, field_name: &str) -> Result<(), String> {
+    if len > MAX_NATIVE_BINARY_PAYLOAD_BYTES {
+        return Err(format!("{field_name} payload is too large."));
+    }
+
+    Ok(())
+}
+
+fn validate_text_payload_len(value: &str, max_len: usize, field_name: &str) -> Result<(), String> {
+    if value.len() > max_len {
+        return Err(format!("{field_name} is too long."));
     }
 
     Ok(())
@@ -362,16 +436,10 @@ pub fn is_updater_channel_supported() -> bool {
 pub fn write_text_file(file_path: String, content: String) -> Result<(), String> {
     let path = PathBuf::from(file_path);
 
-    validate_json_extension(&path)?;
+    validate_writable_json_file(&path)?;
 
     if content.len() as u64 > MAX_IMPORT_FILE_BYTES {
         return Err("Provided content is too large.".to_string());
-    }
-
-    if let Ok(metadata) = fs::metadata(&path) {
-        if !metadata.is_file() {
-            return Err("Selected path is not a file.".to_string());
-        }
     }
 
     fs::write(path, content).map_err(map_error)
@@ -381,12 +449,7 @@ pub fn write_text_file(file_path: String, content: String) -> Result<(), String>
 pub fn read_text_file(file_path: String) -> Result<String, String> {
     let path = PathBuf::from(file_path);
 
-    validate_json_extension(&path)?;
-
-    let metadata = fs::metadata(&path).map_err(map_error)?;
-    if !metadata.is_file() {
-        return Err("Selected path is not a file.".to_string());
-    }
+    let metadata = validate_existing_json_file(&path)?;
 
     if metadata.len() > MAX_IMPORT_FILE_BYTES {
         return Err("Selected file is too large.".to_string());
@@ -399,6 +462,10 @@ pub fn read_text_file(file_path: String) -> Result<String, String> {
 pub fn play_notification_sound(wav_bytes: Vec<u8>, delay_ms: Option<u64>) -> Result<(), String> {
     if wav_bytes.is_empty() {
         return Err("Notification sound payload is empty.".to_string());
+    }
+    validate_binary_payload_len(wav_bytes.len(), "Notification sound")?;
+    if delay_ms.unwrap_or(0) > MAX_NOTIFICATION_SOUND_DELAY_MS {
+        return Err("Notification sound delay is too long.".to_string());
     }
 
     std::thread::spawn(move || {
@@ -425,6 +492,8 @@ pub fn play_notification_sound(wav_bytes: Vec<u8>, delay_ms: Option<u64>) -> Res
 
 #[tauri::command(rename_all = "camelCase")]
 pub fn set_tray_icon(window: Window, png_bytes: Vec<u8>) -> Result<(), String> {
+    validate_binary_payload_len(png_bytes.len(), "Tray icon")?;
+
     let tray = window
         .app_handle()
         .tray_by_id(MAIN_TRAY_ID)
@@ -453,6 +522,10 @@ pub fn set_tray_copy(
     quit_label: String,
     tooltip: String,
 ) -> Result<(), String> {
+    validate_text_payload_len(&restore_label, MAX_TRAY_LABEL_BYTES, "Tray restore label")?;
+    validate_text_payload_len(&quit_label, MAX_TRAY_LABEL_BYTES, "Tray quit label")?;
+    validate_text_payload_len(&tooltip, MAX_TRAY_TOOLTIP_BYTES, "Tray tooltip")?;
+
     let app_handle = window.app_handle();
     let tray = app_handle
         .tray_by_id(MAIN_TRAY_ID)
@@ -476,6 +549,19 @@ pub fn set_tray_copy(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    fn unique_test_path(name: &str) -> PathBuf {
+        let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("system time should be after unix epoch")
+            .as_nanos();
+
+        std::env::temp_dir().join(format!(
+            "pomodoroz-window-bridge-{name}-{}-{timestamp}",
+            std::process::id()
+        ))
+    }
 
     // Barreira de seguranca do import/export: write_text_file/read_text_file
     // so podem tocar arquivos .json. Estes testes travam esse contrato.
@@ -496,6 +582,58 @@ mod tests {
         assert!(validate_json_extension(Path::new("backup.json.exe")).is_err());
         assert!(validate_json_extension(Path::new("backup")).is_err());
         assert!(validate_json_extension(Path::new(".json")).is_err());
+    }
+
+    #[test]
+    fn writable_json_file_accepts_new_json_path() {
+        let path = unique_test_path("new-json").join("backup.json");
+        fs::create_dir_all(path.parent().expect("test path should have parent"))
+            .expect("test directory should be created");
+
+        assert!(validate_writable_json_file(&path).is_ok());
+
+        fs::remove_dir_all(path.parent().expect("test path should have parent"))
+            .expect("test directory should be removed");
+    }
+
+    #[test]
+    fn existing_json_file_rejects_directories() {
+        let path = unique_test_path("directory-json").join("backup.json");
+        fs::create_dir_all(&path).expect("test directory should be created");
+
+        assert!(validate_existing_json_file(&path).is_err());
+
+        fs::remove_dir_all(path.parent().expect("test path should have parent"))
+            .expect("test directory should be removed");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn json_file_validation_rejects_symlink_path() {
+        use std::os::unix::fs::symlink;
+
+        let dir = unique_test_path("symlink");
+        fs::create_dir_all(&dir).expect("test directory should be created");
+        let target = dir.join("target.txt");
+        let link = dir.join("backup.json");
+        fs::write(&target, "{}").expect("test target should be written");
+        symlink(&target, &link).expect("test symlink should be created");
+
+        assert!(validate_existing_json_file(&link).is_err());
+
+        fs::remove_dir_all(&dir).expect("test directory should be removed");
+    }
+
+    #[test]
+    fn native_binary_payload_limit_rejects_oversized_payloads() {
+        assert!(validate_binary_payload_len(MAX_NATIVE_BINARY_PAYLOAD_BYTES, "test").is_ok());
+        assert!(validate_binary_payload_len(MAX_NATIVE_BINARY_PAYLOAD_BYTES + 1, "test").is_err());
+    }
+
+    #[test]
+    fn native_text_payload_limit_rejects_oversized_payloads() {
+        assert!(validate_text_payload_len("a", 1, "test").is_ok());
+        assert!(validate_text_payload_len("aa", 1, "test").is_err());
     }
 
     // Limite de tamanho de import: mantem o guard explicito em 5 MiB.

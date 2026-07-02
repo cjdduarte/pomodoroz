@@ -17,8 +17,8 @@ import {
 } from "store";
 import { useNotification, useWakeLock } from "hooks";
 import {
+  getSpecialBreakTrigger,
   isEqualToOne,
-  padNum,
   resolveActiveTaskSelection,
   type ResolvedActiveTaskSelection,
 } from "utils";
@@ -218,6 +218,7 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
   const previousTimerTypeRef = useRef(timer.timerType);
   const trackingSegmentRef = useRef<TrackingSegment | null>(null);
   const pendingCycleCompletionRef = useRef(false);
+  const triggeredSpecialBreakKeysRef = useRef(new Set<string>());
   const breakTransitionTimeoutRef = useRef<ReturnType<
     typeof setTimeout
   > | null>(null);
@@ -567,73 +568,29 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
 
-    const { firstBreak, secondBreak, thirdBreak, fourthBreak } =
-      config.specialBreaks;
-
     if (timer.playing) {
       interval = setInterval(() => {
-        const date = new Date();
-        const currentTime =
-          padNum(date.getHours()) + ":" + padNum(date.getMinutes());
+        const specialBreakTrigger = getSpecialBreakTrigger(
+          config.specialBreaks,
+          new Date(),
+          triggeredSpecialBreakKeysRef.current
+        );
 
         if (timer.timerType !== TimerStatus.SPECIAL_BREAK) {
-          if (firstBreak && currentTime === firstBreak.fromTime) {
-            dispatch(setTimerType(TimerStatus.SPECIAL_BREAK));
-            setTimerDuration(firstBreak.duration);
-            notification(
-              t("timer.notifSpecialBreakStartedTitle"),
-              {
-                body: t("timer.notifEnjoySpecialBreakBody", {
-                  duration: firstBreak.duration,
-                  minuteLabel: getMinuteLabel(firstBreak.duration),
-                }),
-              },
-              specialBreakStartedWav
+          if (specialBreakTrigger) {
+            triggeredSpecialBreakKeysRef.current.add(
+              specialBreakTrigger.key
             );
-            return;
-          }
-
-          if (secondBreak && currentTime === secondBreak.fromTime) {
             dispatch(setTimerType(TimerStatus.SPECIAL_BREAK));
-            setTimerDuration(secondBreak.duration);
+            setTimerDuration(specialBreakTrigger.breakConfig.duration);
             notification(
               t("timer.notifSpecialBreakStartedTitle"),
               {
                 body: t("timer.notifEnjoySpecialBreakBody", {
-                  duration: secondBreak.duration,
-                  minuteLabel: getMinuteLabel(secondBreak.duration),
-                }),
-              },
-              specialBreakStartedWav
-            );
-            return;
-          }
-
-          if (thirdBreak && currentTime === thirdBreak.fromTime) {
-            dispatch(setTimerType(TimerStatus.SPECIAL_BREAK));
-            setTimerDuration(thirdBreak.duration);
-            notification(
-              t("timer.notifSpecialBreakStartedTitle"),
-              {
-                body: t("timer.notifEnjoySpecialBreakBody", {
-                  duration: thirdBreak.duration,
-                  minuteLabel: getMinuteLabel(thirdBreak.duration),
-                }),
-              },
-              specialBreakStartedWav
-            );
-            return;
-          }
-
-          if (fourthBreak && currentTime === fourthBreak.fromTime) {
-            dispatch(setTimerType(TimerStatus.SPECIAL_BREAK));
-            setTimerDuration(fourthBreak.duration);
-            notification(
-              t("timer.notifSpecialBreakStartedTitle"),
-              {
-                body: t("timer.notifEnjoySpecialBreakBody", {
-                  duration: fourthBreak.duration,
-                  minuteLabel: getMinuteLabel(fourthBreak.duration),
+                  duration: specialBreakTrigger.breakConfig.duration,
+                  minuteLabel: getMinuteLabel(
+                    specialBreakTrigger.breakConfig.duration
+                  ),
                 }),
               },
               specialBreakStartedWav

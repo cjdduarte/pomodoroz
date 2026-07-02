@@ -13,6 +13,7 @@ import {
 } from "hooks";
 import {
   resetAllDayColors,
+  resetAllDayColorsForNewDay,
   setTaskCardPriority,
   setTaskDayColor,
 } from "store";
@@ -164,7 +165,7 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
     );
 
     if (hasStale) {
-      dispatch(resetAllDayColors());
+      dispatch(resetAllDayColorsForNewDay());
     }
   }, [dispatch, tasks]);
 

@@ -483,6 +483,9 @@ export type TasksState = {
 
 export const undoTasks = createAction("tasks/undo");
 export const redoTasks = createAction("tasks/redo");
+export const resetAllDayColorsForNewDay = createAction(
+  "tasks/resetAllDayColorsForNewDay"
+);
 
 const trackedTaskActionTypes: ReadonlySet<string> = new Set(
   Object.values(tasksSlice.actions).map((action) => action.type)
@@ -521,6 +524,22 @@ const tasksHistoryReducer = (
       past: [...state.past, state.present],
       present: next,
       future: remainingFuture,
+    };
+  }
+
+  if (resetAllDayColorsForNewDay.match(action)) {
+    const nextPresent = tasksSlice.reducer(
+      state.present,
+      resetAllDayColors()
+    );
+
+    if (nextPresent === state.present) {
+      return state;
+    }
+
+    return {
+      ...state,
+      present: nextPresent,
     };
   }
 

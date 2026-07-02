@@ -6,6 +6,19 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.7.1] - TBD
+
+### Fixed
+
+- **Audit hardening protects corrupted local state** — malformed `state` or `statistics` storage is now detected distinctly from missing data and preserved under a backup key before defaults can replace it.
+- **Tauri JSON import/export commands are stricter** — native file commands now reject symlink paths, retain JSON/size guardrails, and bound renderer-originated native payloads.
+- **Release automation now avoids partial updater feeds** — version sync includes the local Cargo lock package version, PowerShell release validation matches the Unix order, and `latest.json` generation requires both active updater platforms.
+- **Timer/task audit regressions were addressed** — special breaks trigger within their configured window once per day, and automatic daily color cleanup no longer pollutes task undo history.
+
+### Changed
+
+- **CI and operational docs were aligned with audit findings** — Rust CI gates now better match local preflight expectations, release docs no longer require a custom `GH_TOKEN` secret, and version/roadmap/handoff references were refreshed.
+
 ## [26.6.3] - 2026-06-16
 
 ### Fixed
