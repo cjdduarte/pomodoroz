@@ -11,6 +11,7 @@
 ### Fixed
 
 - **Task transfer file access is now native-authorized** — task import and export select and access files entirely inside the Tauri backend, removing renderer-controlled generic JSON file commands.
+- **External Settings links open again** — the opener capability now authorizes the existing `http` and `https` URL scope without restoring file-reveal permissions.
 
 ## [26.7.1] - 2026-07-02
 

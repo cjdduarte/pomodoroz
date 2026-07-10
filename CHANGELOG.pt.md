@@ -11,6 +11,7 @@
 ### Corrigido
 
 - **Acesso a arquivos de transferência de tarefas agora é autorizado no nativo** — importação e exportação selecionam e acessam arquivos inteiramente no backend Tauri, removendo comandos JSON genéricos controlados pelo renderer.
+- **Links externos nos Ajustes voltaram a abrir** — a capability do opener agora autoriza o escopo existente de URLs `http` e `https` sem restaurar permissões de revelar arquivos.
 
 ## [26.7.1] - 2026-07-02
 

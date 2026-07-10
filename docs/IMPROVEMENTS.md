@@ -19,12 +19,11 @@ The active baseline is `26.7.1`. The next unreleased changelog sections are
 
 ### P0 — Security and Release Integrity
 
-| ID  | Correction                                                                   | Status      | Next action                                                                                  |
-| --- | ---------------------------------------------------------------------------- | ----------- | -------------------------------------------------------------------------------------------- |
-| C1  | Native authorization for task-transfer files                                 | In progress | Complete `secure-native-file-authorization`, validate, then archive after operator approval. |
-| C2  | Pin release actions and Linux AppImage tooling; verify downloaded checksums  | Open        | Create a release supply-chain OpenSpec change.                                               |
-| C3  | Require release admission checks for tag, manifests, both changelogs, and CI | Open        | Create a release admission OpenSpec change.                                                  |
-| C4  | Keep releases private until all platform assets and `latest.json` validate   | Open        | Include draft-to-publish flow in the release admission change.                               |
+| ID  | Correction                                                                   | Status | Next action                                       |
+| --- | ---------------------------------------------------------------------------- | ------ | ------------------------------------------------- |
+| C2  | Pin release actions and Linux AppImage tooling; verify downloaded checksums  | Open   | Create a release supply-chain OpenSpec change.    |
+| C3  | Require release admission checks for tag, manifests, both changelogs, and CI | Open   | Create a release admission OpenSpec change.       |
+| C4  | Keep releases private until all platform assets and `latest.json` validate   | Open   | Include draft-to-publish flow in the same change. |
 
 ### P1 — Local Data and Core Behavior
 
@@ -56,12 +55,11 @@ The active baseline is `26.7.1`. The next unreleased changelog sections are
 
 ## Execution Order
 
-1. Complete C1 and validate native task-transfer authorization.
-2. Secure release supply chain and release admission (C2-C4, C12).
-3. Protect local data and updater behavior (C5-C7).
-4. Correct timer, task, and notification regressions (C8-C10).
-5. Add cross-platform CI and operational controls (C11, C13).
-6. Expand regression prevention and remove verified maintenance residue (C14-C17).
+1. Secure release supply chain and release admission (C2-C4, C12).
+2. Protect local data and updater behavior (C5-C7).
+3. Correct timer, task, and notification regressions (C8-C10).
+4. Add cross-platform CI and operational controls (C11, C13).
+5. Expand regression prevention and remove verified maintenance residue (C14-C17).
 
 ## Deferred Product Backlog
 
