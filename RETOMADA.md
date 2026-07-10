@@ -22,7 +22,7 @@ Nao registrar segredos, tokens, credenciais, endpoints privados, dados pessoais 
 ## Estado atual
 
 - Branch atual: `main`.
-- Baseline publicado: `26.7.1`; proximos changelogs abertos: `TBD` / `A definir`.
+- Baseline publicado: `26.7.1`; release `26.7.2` esta preparada nos dois changelogs com data `2026-07-10`.
 - `secure-native-file-authorization` foi sincronizada em `openspec/specs/task-transfer-native-authorization/` e arquivada com aprovacao do operador.
 - Validacoes locais aprovadas: lint, typecheck, 36 Vitest, build do renderer, Rust fmt, clippy e 15 testes Rust.
 - A change anterior `address-audit-hardening-findings` tambem esta completa, mas ainda requer revisao guiada e aprovacao explicita antes de arquivamento.
