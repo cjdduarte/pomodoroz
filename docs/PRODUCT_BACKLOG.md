@@ -1,7 +1,7 @@
 # Product Backlog Moved
 
-Product feature backlog now lives in:
+Deferred product feature backlog now lives in:
 
-- `docs/IMPROVEMENTS.md` (Track B — Product Features)
+- `docs/IMPROVEMENTS.md` (Deferred Product Backlog)
 
 This compatibility file is kept for historical links.

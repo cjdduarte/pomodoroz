@@ -4,10 +4,6 @@ import {
   disable as disableAutostart,
   enable as enableAutostart,
 } from "@tauri-apps/plugin-autostart";
-import {
-  open as openDialog,
-  save as saveDialog,
-} from "@tauri-apps/plugin-dialog";
 import { check as checkForUpdates } from "@tauri-apps/plugin-updater";
 import { openExternalUrl } from "utils";
 import type {
@@ -17,8 +13,6 @@ import type {
   SetInAppAutoUpdatePayload,
   ToMainChannel,
   ToMainPayloadMap,
-  TasksExportResultPayload,
-  TasksImportResultPayload,
   UpdateAvailablePayload,
 } from "ipc";
 import {
@@ -226,109 +220,6 @@ const dataUrlToPngBytes = (dataUrl: string): number[] => {
   return bytes;
 };
 
-const emitTasksExportResult = async (
-  payload: TasksExportResultPayload
-) => {
-  await emitFromMain(TASKS_EXPORT_RESULT, payload);
-};
-
-const emitTasksImportResult = async (
-  payload: TasksImportResultPayload
-) => {
-  await emitFromMain(TASKS_IMPORT_RESULT, payload);
-};
-
-const TASK_TRANSFER_FILTERS = [
-  {
-    name: "JSON",
-    extensions: ["json"],
-  },
-];
-
-const exportTasksWithNativeDialog = async (
-  payload: ExportTasksDialogPayload
-) => {
-  try {
-    const filePath = await saveDialog({
-      defaultPath:
-        payload.suggestedFileName || "pomodoroz-tasks-export.json",
-      filters: TASK_TRANSFER_FILTERS,
-    });
-
-    if (!filePath) {
-      await emitTasksExportResult({
-        ok: false,
-        canceled: true,
-      });
-      return;
-    }
-
-    await invoke("write_text_file", {
-      filePath,
-      content: payload.content,
-    });
-
-    await emitTasksExportResult({
-      ok: true,
-      canceled: false,
-      filePath,
-    });
-  } catch (error) {
-    await emitTasksExportResult({
-      ok: false,
-      canceled: false,
-      error: buildErrorMessage(error),
-    });
-  }
-};
-
-const importTasksWithNativeDialog = async () => {
-  try {
-    const selectedPath = await openDialog({
-      multiple: false,
-      directory: false,
-      filters: TASK_TRANSFER_FILTERS,
-    });
-
-    if (!selectedPath) {
-      await emitTasksImportResult({
-        ok: false,
-        canceled: true,
-      });
-      return;
-    }
-
-    const filePath = Array.isArray(selectedPath)
-      ? selectedPath[0]
-      : selectedPath;
-
-    if (!filePath) {
-      await emitTasksImportResult({
-        ok: false,
-        canceled: true,
-      });
-      return;
-    }
-
-    const content = await invoke<string>("read_text_file", {
-      filePath,
-    });
-
-    await emitTasksImportResult({
-      ok: true,
-      canceled: false,
-      filePath,
-      content,
-    });
-  } catch (error) {
-    await emitTasksImportResult({
-      ok: false,
-      canceled: false,
-      error: buildErrorMessage(error),
-    });
-  }
-};
-
 const toUpdateAvailablePayload = (
   version: string
 ): UpdateAvailablePayload => ({
@@ -506,12 +397,15 @@ const sendToTauri = async <C extends ToMainChannel>(
 
     case EXPORT_TASKS_DIALOG: {
       const data = payload[0] as ExportTasksDialogPayload;
-      await exportTasksWithNativeDialog(data);
+      await invoke("export_tasks_json", {
+        content: data.content,
+        suggestedFileName: data.suggestedFileName,
+      });
       return;
     }
 
     case IMPORT_TASKS_DIALOG: {
-      await importTasksWithNativeDialog();
+      await invoke("import_tasks_json");
       return;
     }
 

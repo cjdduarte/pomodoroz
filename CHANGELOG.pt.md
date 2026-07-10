@@ -6,6 +6,12 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [A definir]
+
+### Corrigido
+
+- **Acesso a arquivos de transferência de tarefas agora é autorizado no nativo** — importação e exportação selecionam e acessam arquivos inteiramente no backend Tauri, removendo comandos JSON genéricos controlados pelo renderer.
+
 ## [26.7.1] - 2026-07-02
 
 ### Corrigido

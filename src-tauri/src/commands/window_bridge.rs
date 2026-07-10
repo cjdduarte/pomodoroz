@@ -2,19 +2,15 @@
 use crate::constants::WINDOW_RESTORED_EVENT;
 use crate::constants::{MAIN_TRAY_ID, TRAY_MENU_QUIT_ID, TRAY_MENU_RESTORE_ID};
 use rodio::{play, DeviceSinkBuilder};
-use std::{
-    fs,
-    io::Cursor,
-    path::{Path, PathBuf},
-    sync::Mutex,
-    time::Duration,
-};
+use serde::Serialize;
+use std::{fs, io::Cursor, path::Path, sync::Mutex, time::Duration};
 use tauri::{
     image::Image,
     menu::{MenuBuilder, MenuItemBuilder},
     utils::{config::BundleType, platform::bundle_type},
     AppHandle, Emitter, LogicalSize, Manager, Runtime, State, Theme, Window,
 };
+use tauri_plugin_dialog::DialogExt;
 
 const WINDOW_WIDTH: f64 = 340.0;
 const WINDOW_FRAME_HEIGHT_WINDOWS: f64 = 470.0;
@@ -33,6 +29,27 @@ const MAX_TRAY_TOOLTIP_BYTES: usize = 512;
 
 const EVENT_FULLSCREEN_BREAK_ENTERED: &str = "FULLSCREEN_BREAK_ENTERED";
 const EVENT_FULLSCREEN_BREAK_EXITED: &str = "FULLSCREEN_BREAK_EXITED";
+const EVENT_TASKS_EXPORT_RESULT: &str = "TASKS_EXPORT_RESULT";
+const EVENT_TASKS_IMPORT_RESULT: &str = "TASKS_IMPORT_RESULT";
+
+#[derive(Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct TasksExportResult {
+    ok: bool,
+    canceled: bool,
+    file_path: Option<String>,
+    error: Option<String>,
+}
+
+#[derive(Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct TasksImportResult {
+    ok: bool,
+    canceled: bool,
+    file_path: Option<String>,
+    content: Option<String>,
+    error: Option<String>,
+}
 
 #[derive(Clone, Copy)]
 pub struct TrayBehaviorSettings {
@@ -127,6 +144,46 @@ fn validate_writable_json_file(path: &Path) -> Result<(), String> {
     }
 
     Ok(())
+}
+
+fn task_export_file_name(suggested_file_name: &str) -> String {
+    Path::new(suggested_file_name)
+        .file_name()
+        .and_then(|name| name.to_str())
+        .filter(|name| !name.is_empty())
+        .filter(|name| validate_json_extension(Path::new(name)).is_ok())
+        .unwrap_or("pomodoroz-tasks-export.json")
+        .to_string()
+}
+
+fn read_task_import_file(path: &Path) -> Result<String, String> {
+    let metadata = validate_existing_json_file(path)?;
+    if metadata.len() > MAX_IMPORT_FILE_BYTES {
+        return Err("Selected file is too large.".to_string());
+    }
+
+    fs::read_to_string(path).map_err(map_error)
+}
+
+fn write_task_export_file(path: &Path, content: &str) -> Result<(), String> {
+    validate_writable_json_file(path)?;
+    if content.len() as u64 > MAX_IMPORT_FILE_BYTES {
+        return Err("Provided content is too large.".to_string());
+    }
+
+    fs::write(path, content).map_err(map_error)
+}
+
+fn emit_tasks_export_result<R: Runtime>(app: &AppHandle<R>, result: TasksExportResult) {
+    if let Err(error) = app.emit(EVENT_TASKS_EXPORT_RESULT, result) {
+        log::warn!("[TAURI Task Transfer] Falha ao emitir resultado de exportacao: {error}");
+    }
+}
+
+fn emit_tasks_import_result<R: Runtime>(app: &AppHandle<R>, result: TasksImportResult) {
+    if let Err(error) = app.emit(EVENT_TASKS_IMPORT_RESULT, result) {
+        log::warn!("[TAURI Task Transfer] Falha ao emitir resultado de importacao: {error}");
+    }
 }
 
 fn validate_binary_payload_len(len: usize, field_name: &str) -> Result<(), String> {
@@ -424,29 +481,116 @@ pub fn is_updater_channel_supported() -> bool {
 }
 
 #[tauri::command(rename_all = "camelCase")]
-pub fn write_text_file(file_path: String, content: String) -> Result<(), String> {
-    let path = PathBuf::from(file_path);
-
-    validate_writable_json_file(&path)?;
-
+pub fn export_tasks_json(
+    window: Window,
+    content: String,
+    suggested_file_name: String,
+) -> Result<(), String> {
+    let app = window.app_handle().clone();
     if content.len() as u64 > MAX_IMPORT_FILE_BYTES {
-        return Err("Provided content is too large.".to_string());
+        emit_tasks_export_result(
+            &app,
+            TasksExportResult {
+                ok: false,
+                canceled: false,
+                file_path: None,
+                error: Some("Provided content is too large.".to_string()),
+            },
+        );
+        return Ok(());
     }
 
-    fs::write(path, content).map_err(map_error)
+    let file_name = task_export_file_name(&suggested_file_name);
+    app.dialog()
+        .file()
+        .set_parent(&window)
+        .add_filter("JSON", &["json"])
+        .set_file_name(file_name)
+        .save_file(move |selected_file| {
+            let result = match selected_file {
+                None => TasksExportResult {
+                    ok: false,
+                    canceled: true,
+                    file_path: None,
+                    error: None,
+                },
+                Some(file_path) => match file_path.into_path().map_err(map_error) {
+                    Err(error) => TasksExportResult {
+                        ok: false,
+                        canceled: false,
+                        file_path: None,
+                        error: Some(error),
+                    },
+                    Ok(path) => match write_task_export_file(&path, &content) {
+                        Ok(()) => TasksExportResult {
+                            ok: true,
+                            canceled: false,
+                            file_path: Some(path.to_string_lossy().into_owned()),
+                            error: None,
+                        },
+                        Err(error) => TasksExportResult {
+                            ok: false,
+                            canceled: false,
+                            file_path: None,
+                            error: Some(error),
+                        },
+                    },
+                },
+            };
+
+            emit_tasks_export_result(&app, result);
+        });
+
+    Ok(())
 }
 
-#[tauri::command(rename_all = "camelCase")]
-pub fn read_text_file(file_path: String) -> Result<String, String> {
-    let path = PathBuf::from(file_path);
+#[tauri::command]
+pub fn import_tasks_json(window: Window) -> Result<(), String> {
+    let app = window.app_handle().clone();
+    app.dialog()
+        .file()
+        .set_parent(&window)
+        .add_filter("JSON", &["json"])
+        .pick_file(move |selected_file| {
+            let result = match selected_file {
+                None => TasksImportResult {
+                    ok: false,
+                    canceled: true,
+                    file_path: None,
+                    content: None,
+                    error: None,
+                },
+                Some(file_path) => match file_path.into_path().map_err(map_error) {
+                    Err(error) => TasksImportResult {
+                        ok: false,
+                        canceled: false,
+                        file_path: None,
+                        content: None,
+                        error: Some(error),
+                    },
+                    Ok(path) => match read_task_import_file(&path) {
+                        Ok(content) => TasksImportResult {
+                            ok: true,
+                            canceled: false,
+                            file_path: Some(path.to_string_lossy().into_owned()),
+                            content: Some(content),
+                            error: None,
+                        },
+                        Err(error) => TasksImportResult {
+                            ok: false,
+                            canceled: false,
+                            file_path: None,
+                            content: None,
+                            error: Some(error),
+                        },
+                    },
+                },
+            };
 
-    let metadata = validate_existing_json_file(&path)?;
+            emit_tasks_import_result(&app, result);
+        });
 
-    if metadata.len() > MAX_IMPORT_FILE_BYTES {
-        return Err("Selected file is too large.".to_string());
-    }
-
-    fs::read_to_string(path).map_err(map_error)
+    Ok(())
 }
 
 #[tauri::command(rename_all = "camelCase")]
@@ -540,7 +684,10 @@ pub fn set_tray_copy(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::time::{SystemTime, UNIX_EPOCH};
+    use std::{
+        path::PathBuf,
+        time::{SystemTime, UNIX_EPOCH},
+    };
 
     fn unique_test_path(name: &str) -> PathBuf {
         let timestamp = SystemTime::now()
@@ -554,8 +701,8 @@ mod tests {
         ))
     }
 
-    // Barreira de seguranca do import/export: write_text_file/read_text_file
-    // so podem tocar arquivos .json. Estes testes travam esse contrato.
+    // A transferencia de tarefas so aceita arquivos .json selecionados pelo
+    // dialogo nativo. Estes testes travam os guardrails do caminho final.
     #[test]
     fn validate_json_extension_accepts_json() {
         assert!(validate_json_extension(Path::new("backup.json")).is_ok());
@@ -585,6 +732,45 @@ mod tests {
 
         fs::remove_dir_all(path.parent().expect("test path should have parent"))
             .expect("test directory should be removed");
+    }
+
+    #[test]
+    fn task_export_file_name_removes_path_components_and_invalid_extensions() {
+        assert_eq!(task_export_file_name("../backup.json"), "backup.json");
+        assert_eq!(
+            task_export_file_name("../backup.txt"),
+            "pomodoroz-tasks-export.json"
+        );
+    }
+
+    #[test]
+    fn task_transfer_helpers_only_read_and_write_valid_json_paths() {
+        let dir = unique_test_path("task-transfer");
+        fs::create_dir_all(&dir).expect("test directory should be created");
+        let path = dir.join("backup.json");
+
+        write_task_export_file(&path, "{\"version\":1}")
+            .expect("valid JSON export should be written");
+        assert_eq!(
+            read_task_import_file(&path).expect("valid JSON export should be read"),
+            "{\"version\":1}"
+        );
+        assert!(write_task_export_file(&dir.join("backup.txt"), "{}").is_err());
+
+        fs::remove_dir_all(&dir).expect("test directory should be removed");
+    }
+
+    #[test]
+    fn task_export_rejects_oversized_content_before_writing() {
+        let dir = unique_test_path("oversized-export");
+        fs::create_dir_all(&dir).expect("test directory should be created");
+        let path = dir.join("backup.json");
+        let content = "a".repeat(MAX_IMPORT_FILE_BYTES as usize + 1);
+
+        assert!(write_task_export_file(&path, &content).is_err());
+        assert!(!path.exists());
+
+        fs::remove_dir_all(&dir).expect("test directory should be removed");
     }
 
     #[test]

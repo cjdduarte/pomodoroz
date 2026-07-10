@@ -6,6 +6,12 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [TBD]
+
+### Fixed
+
+- **Task transfer file access is now native-authorized** — task import and export select and access files entirely inside the Tauri backend, removing renderer-controlled generic JSON file commands.
+
 ## [26.7.1] - 2026-07-02
 
 ### Fixed

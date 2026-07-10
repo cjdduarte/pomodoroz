@@ -13,7 +13,7 @@ documental. Elas nao substituem auditoria oficial em registry/changelog.
 
 | Item         | Versao declarada | Fonte local                            | Data consulta oficial | Status                      |
 | ------------ | ---------------: | -------------------------------------- | --------------------- | --------------------------- |
-| Pomodoroz    |         `26.6.3` | `package.json`, `src-tauri/Cargo.toml` | local                 | versao interna sincronizada |
+| Pomodoroz    |         `26.7.1` | `package.json`, `src-tauri/Cargo.toml` | local                 | versao interna sincronizada |
 | pnpm         |         `11.9.0` | `packageManager` em `package.json`     | pendente              | auditar antes de mudar      |
 | Rust edition |           `2021` | `src-tauri/Cargo.toml`                 | local                 | edicao do projeto           |
 | Rust minimo  |         `1.77.2` | `src-tauri/Cargo.toml`                 | pendente              | auditar antes de mudar      |
@@ -44,3 +44,5 @@ documental. Elas nao substituem auditoria oficial em registry/changelog.
   nos manifests locais.
 - 2026-07-02: versoes locais re-sincronizadas durante o hardening da auditoria
   `docs/AUDITORIA_2026-07-02.md`.
+- 2026-07-10: baseline local confirmado como `26.7.1` durante a auditoria
+  geral e a redefinicao do roadmap de correcoes.
