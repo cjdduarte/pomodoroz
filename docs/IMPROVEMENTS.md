@@ -12,8 +12,8 @@ The project is in a correction-first cycle. Work that changes code, data,
 pipelines, or verifiable runtime behavior requires an OpenSpec change before
 implementation. New dependencies still require an explicit impact review.
 
-The active published baseline is `26.7.1`. Version `26.7.2` is prepared in
-both changelogs with the release date `2026-07-10`.
+The active published baseline is `26.7.2`. The next unreleased changelog
+sections are `TBD` / `A definir`.
 
 ## Active Corrections
 

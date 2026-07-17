@@ -25,6 +25,7 @@ RUN_INSTALLERS=0
 INSTALLERS_PROFILE="slim"
 RUN_INSTALL_LOCAL=0
 RUN_QUICK_DEV=0
+RUN_CLEAN=0
 LOG_MODE="none"
 LOG_TIMESTAMP=""
 GENERAL_LOG_FILE=""
@@ -218,7 +219,7 @@ run_tauri_appimage_build() {
 usage() {
   cat <<'EOF2'
 Uso:
-  ./scripts/dev-full.sh [--skip-install] [--dev | --run-packed | --installers [--installers-full|--installers-slim] | --install-local | --quick-dev] [--log-none|--log-full|--log-full-cargo]
+  ./scripts/dev-full.sh [--skip-install] [--dev | --run-packed | --installers [--installers-full|--installers-slim] | --install-local | --quick-dev | --clean] [--log-none|--log-full|--log-full-cargo]
   ./scripts/dev-full.sh                      # menu rico interativo (quando TTY)
   ./scripts/validar-tudo.sh [flags]          # alias de transicao (sempre sem menu)
 
@@ -242,6 +243,7 @@ Opcoes:
   --installers-slim Perfil enxuto (default)
   --install-local  Executa ./scripts/install.sh
   --quick-dev      Fluxo rapido: lint + typecheck renderer + tauri dev
+  --clean          Remove artefatos de build (app/renderer/build e src-tauri/target)
   --log-none       Nao grava logs em arquivo (default)
   --log-full       Grava log geral em logs/validar-tudo-<timestamp>.log
   --log-full-cargo Grava log geral + logs separados do gate Rust (fmt/clippy/check)
@@ -266,6 +268,48 @@ menu_log_label() {
     --log-full)       echo "full" ;;
     --log-full-cargo) echo "full-cargo" ;;
   esac
+}
+
+show_build_artifacts_size() {
+  local path=""
+  local found=0
+
+  printf '\nArtefatos de build que serao removidos:\n'
+  for path in "$APP_DIR/app/renderer/build" "$APP_DIR/src-tauri/target"; do
+    if [[ -e "$path" ]]; then
+      du -sh "$path"
+      found=1
+    fi
+  done
+
+  if (( found == 0 )); then
+    printf '  Nenhum artefato de build encontrado.\n'
+  fi
+}
+
+confirm_clean_build_artifacts() {
+  local confirmation=""
+
+  show_build_artifacts_size
+  printf 'O proximo build do renderer e do Rust sera completo.\n'
+  if ! read -r -p "Confirmar limpeza dos artefatos de build? [y/N]: " confirmation; then
+    return 1
+  fi
+
+  if [[ ! "$confirmation" =~ ^[Yy]$ ]]; then
+    printf 'Limpeza cancelada.\n'
+    return 1
+  fi
+}
+
+clean_build_artifacts() {
+  show_build_artifacts_size
+  step "Limpando artefatos de build"
+  (
+    cd "$APP_DIR" &&
+      pnpm clean
+  )
+  step "Limpeza concluida"
 }
 
 choose_menu_log_mode() {
@@ -320,6 +364,8 @@ show_rich_menu() {
   printf '  [b]  Build release             %b(pnpm run build:tauri, direto sem gate)%b\n' "$menu_gray" "$menu_reset"
   printf '  [v]  Rodar empacotado          %b(preflight completo + executa binario release)%b\n' "$menu_gray" "$menu_reset"
   printf '  [g]  Gerar instaladores        %b(preflight + bundles; pergunta perfil slim/full)%b\n' "$menu_gray" "$menu_reset"
+  printf '\n  %b--- Manutencao ---%b\n' "$menu_gray" "$menu_reset"
+  printf '  [x]  Limpar artefatos de build %b(remove renderer build e target; proximo build completo)%b\n' "$menu_gray" "$menu_reset"
   printf '\n  %b--- Saida ---%b\n' "$menu_gray" "$menu_reset"
   printf '  [0]  Sair                      %b(fecha so o menu)%b\n\n' "$menu_gray" "$menu_reset"
 }
@@ -361,6 +407,11 @@ run_rich_menu() {
       b|B)   bash "$ROOT/scripts/dev.sh" build || menu_warn "build falhou; veja acima" ;;
       v|V)   run_gate_flow --run-packed || menu_warn "rodar empacotado falhou; veja acima" ;;
       g|G)   menu_installers_flow || menu_warn "fluxo de instaladores nao concluido; veja acima" ;;
+      x|X)
+        if confirm_clean_build_artifacts; then
+          run_gate_flow --clean || menu_warn "limpeza falhou; veja acima"
+        fi
+        ;;
       0|q|Q) return 0 ;;
       *)     menu_warn "opcao invalida" ;;
     esac
@@ -431,6 +482,10 @@ while [[ $# -gt 0 ]]; do
       SKIP_INSTALL=1
       shift
       ;;
+    --clean)
+      RUN_CLEAN=1
+      shift
+      ;;
     --log-none)
       LOG_MODE="none"
       shift
@@ -466,6 +521,10 @@ if (( RUN_DEV + RUN_PACKED + RUN_INSTALLERS > 1 )); then
   die "Use apenas uma opcao de execucao final: --dev, --run-packed ou --installers."
 fi
 
+if (( RUN_CLEAN == 1 )) && (( SKIP_INSTALL == 1 || RUN_DEV == 1 || RUN_PACKED == 1 || RUN_INSTALLERS == 1 || RUN_INSTALL_LOCAL == 1 || RUN_QUICK_DEV == 1 )); then
+  die "--clean nao pode ser combinado com outros fluxos de execucao."
+fi
+
 if (( RUN_INSTALL_LOCAL == 1 )) && (( RUN_DEV == 1 || RUN_PACKED == 1 || RUN_INSTALLERS == 1 || SKIP_INSTALL == 1 || RUN_QUICK_DEV == 1 )); then
   die "--install-local nao pode ser combinado com --dev, --run-packed, --installers, --quick-dev ou --skip-install."
 fi
@@ -497,6 +556,11 @@ if (( NODE_MAJOR < 24 )); then
   printf "Use: nvm install 24 && nvm use 24\n"
 else
   printf "Node v%s\n" "$NODE_VERSION"
+fi
+
+if (( RUN_CLEAN == 1 )); then
+  clean_build_artifacts
+  exit 0
 fi
 
 if (( SKIP_INSTALL == 0 )); then

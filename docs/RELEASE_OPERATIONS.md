@@ -31,7 +31,7 @@ Updater metadata source:
 
 ### Step 1 — Prepare Version
 
-1. Define target version (example: `26.4.24`).
+1. Define target version (example: `<version>`).
 2. Update both changelogs for this version:
    - `CHANGELOG.md` (EN)
    - `CHANGELOG.pt.md` (PT)

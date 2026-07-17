@@ -6,6 +6,13 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [TBD]
+
+### Added
+
+- **Build-artifact cleanup is available from the development menu** — `scripts/dev-full.sh` now exposes a confirmed menu action and a non-interactive `--clean` flag that delegate to `pnpm clean` for renderer and Tauri build outputs.
+- **OpenSpec update-plan review is documented** — the canonical agent flow now records experimental `/opsx:update` and `/opsx-update` aliases for reviewing and reconciling an existing operational change without implementation.
+
 ## [26.7.2] - 2026-07-10
 
 ### Fixed

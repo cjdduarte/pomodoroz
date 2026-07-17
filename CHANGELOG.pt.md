@@ -6,6 +6,13 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [A definir]
+
+### Adicionado
+
+- **Limpeza de artefatos de build foi adicionada ao menu de desenvolvimento** — `scripts/dev-full.sh` agora expõe uma ação confirmada no menu e a flag não interativa `--clean`, delegando para `pnpm clean` a remoção das saídas de build do renderer e Tauri.
+- **Revisão de plano com OpenSpec foi documentada** — o fluxo canônico do agente agora registra os aliases experimentais `/opsx:update` e `/opsx-update` para revisar e reconciliar uma change operacional existente sem implementação.
+
 ## [26.7.2] - 2026-07-10
 
 ### Corrigido

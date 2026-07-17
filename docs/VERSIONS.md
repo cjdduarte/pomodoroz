@@ -11,12 +11,13 @@ documental. Elas nao substituem auditoria oficial em registry/changelog.
 
 ## Runtime e app
 
-| Item         | Versao declarada | Fonte local                            | Data consulta oficial | Status                      |
-| ------------ | ---------------: | -------------------------------------- | --------------------- | --------------------------- |
-| Pomodoroz    |         `26.7.1` | `package.json`, `src-tauri/Cargo.toml` | local                 | versao interna sincronizada |
-| pnpm         |         `11.9.0` | `packageManager` em `package.json`     | pendente              | auditar antes de mudar      |
-| Rust edition |           `2021` | `src-tauri/Cargo.toml`                 | local                 | edicao do projeto           |
-| Rust minimo  |         `1.77.2` | `src-tauri/Cargo.toml`                 | pendente              | auditar antes de mudar      |
+| Item         | Versao declarada | Fonte local                                                                          | Data consulta oficial | Status                                                                   |
+| ------------ | ---------------: | ------------------------------------------------------------------------------------ | --------------------- | ------------------------------------------------------------------------ |
+| Pomodoroz    |         `26.7.2` | `package.json`, `src-tauri/Cargo.toml`                                               | local                 | versao interna sincronizada                                              |
+| pnpm         |         `11.9.0` | `packageManager` em `package.json`                                                   | pendente              | auditar antes de mudar                                                   |
+| Rust edition |           `2021` | `src-tauri/Cargo.toml`                                                               | local                 | edicao do projeto                                                        |
+| Rust minimo  |         `1.77.2` | `src-tauri/Cargo.toml`                                                               | pendente              | auditar antes de mudar                                                   |
+| OpenSpec     |          `1.6.0` | [release oficial v1.6.0](https://github.com/Fission-AI/OpenSpec/releases/tag/v1.6.0) | 2026-07-17            | `/opsx:update` experimental para revisar changes operacionais existentes |
 
 ## Dependencias principais declaradas
 
@@ -44,5 +45,6 @@ documental. Elas nao substituem auditoria oficial em registry/changelog.
   nos manifests locais.
 - 2026-07-02: versoes locais re-sincronizadas durante o hardening da auditoria
   `docs/AUDITORIA_2026-07-02.md`.
-- 2026-07-10: baseline local confirmado como `26.7.1` durante a auditoria
+- 2026-07-10: baseline local confirmado como `26.7.2` durante a auditoria
   geral e a redefinicao do roadmap de correcoes.
+- 2026-07-17: OpenSpec 1.6.0 confirmado na [release oficial](https://github.com/Fission-AI/OpenSpec/releases/tag/v1.6.0); aliases e revisao do fluxo atualizados para `/opsx:update` e `/opsx-update`.

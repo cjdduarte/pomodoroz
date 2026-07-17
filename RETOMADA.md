@@ -12,25 +12,25 @@ Nao registrar segredos, tokens, credenciais, endpoints privados, dados pessoais 
 
 ## Sessao atual
 
-- Foco: corrigir a autorizacao de URLs externas no Tauri.
-- Correcao direta: `opener:allow-open-url` habilitava o comando, mas sem o escopo `http`/`https` todas as URLs eram recusadas pelo plugin.
-- Implementado: `opener:allow-default-urls` restaura apenas URLs `http` e `https`, mantendo bloqueada a permissao de revelar arquivos.
-- Planejamento redefinido: `docs/IMPROVEMENTS.md` agora contem apenas correcoes priorizadas; funcionalidades B2-B11 seguem como backlog adiado conforme `docs/decisions/ADR-0001-correction-first-roadmap.md`.
+- Foco: adicionar uma limpeza segura dos artefatos de build locais.
+- Implementado: `scripts/dev-full.sh` agora oferece `[x] Limpar artefatos de build` no menu, com tamanho dos diretórios e confirmação, e a flag não interativa `--clean`.
+- A limpeza delega para `pnpm clean`, removendo `app/renderer/build` e `src-tauri/target`; o próximo build do renderer e Rust será completo.
 
 ---
 
 ## Estado atual
 
 - Branch atual: `main`.
-- Baseline publicado: `26.7.1`; release `26.7.2` esta preparada nos dois changelogs com data `2026-07-10`.
+- Baseline publicado: `26.7.2`; próximos changelogs abertos: `TBD` / `A definir`.
 - `secure-native-file-authorization` foi sincronizada em `openspec/specs/task-transfer-native-authorization/` e arquivada com aprovacao do operador.
-- Validacoes locais aprovadas: lint, typecheck, 36 Vitest, build do renderer, Rust fmt, clippy e 15 testes Rust.
+- Validações desta alteração: `bash -n scripts/dev-full.sh`, `--help`, verificação de flags incompatíveis e `git diff --check` aprovados; a limpeza real não foi executada para preservar os artefatos locais.
 - A change anterior `address-audit-hardening-findings` tambem esta completa, mas ainda requer revisao guiada e aprovacao explicita antes de arquivamento.
 
 ---
 
 ## Proximos passos
 
-1. Validar manualmente os links externos dos Ajustes e a importacao/exportacao de tarefas pelo dialogo nativo.
-2. Priorizar C2-C4 do roadmap: supply chain e admission gate de release.
-3. Revisar o diff e criar o commit quando o operador solicitar.
+1. Executar `./scripts/dev-full.sh --clean` ou a opção `[x]` quando quiser liberar os artefatos locais; o próximo build será mais lento.
+2. Validar manualmente os links externos dos Ajustes e a importacao/exportacao de tarefas pelo dialogo nativo.
+3. Priorizar C2-C4 do roadmap: supply chain e admission gate de release.
+4. Revisar o diff e criar o commit quando o operador solicitar.

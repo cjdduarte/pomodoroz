@@ -64,9 +64,9 @@ pnpm tauri build --no-bundle # Build native release binary
 pnpm format                  # Prettier across all files
 
 # Release helper scripts (version + tag + push)
-pnpm release:tag -- 26.4.10
-pnpm release:tag:dry -- 26.4.10
-pnpm release:tag:ps -- -Version 26.4.10
+pnpm release:tag -- <version>
+pnpm release:tag:dry -- <version>
+pnpm release:tag:ps -- -Version <version>
 ```
 
 Validation wrapper scripts:
