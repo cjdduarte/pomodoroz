@@ -9,16 +9,13 @@
 
 ## 1. Auto-Update Overview
 
-In-app auto-update is currently active for:
+The published signed updater feed currently supports only x86_64:
 
-- **Windows**: NSIS bundle + signature (`.exe` + `.sig`)
-- **Linux**: AppImage + signature (`.AppImage` + `.sig`)
+- **Windows NSIS**: `*.exe` + `*.exe.sig`; CI also publishes the v1-compatible `*.nsis.zip` + `*.nsis.zip.sig` archive.
+- **Linux AppImage**: `*.AppImage.tar.gz` + `*.AppImage.tar.gz.sig`; CI also publishes `*.AppImage` + `*.AppImage.sig`.
 
-Out of in-app auto-update scope:
-
-- Linux `deb` / `rpm` (install/update via distro package manager)
-- macOS (not active in this cycle)
-- Dev environment without release artifacts
+Not published as updater payloads: Windows formats other than x86_64 NSIS,
+Linux `deb` / `rpm` / AUR or non-x86_64 builds, macOS, and development builds.
 
 Updater metadata source:
 
@@ -60,9 +57,10 @@ Updater metadata source:
    - `all`
    - `windows`
    - `linux`
-5. Manual single-platform dispatch is allowed only when the release can still
-   produce a complete `latest.json` containing both Windows and Linux updater
-   platforms.
+5. Manual single-platform dispatch is allowed only when the same release already
+   contains valid signed assets for the other supported channel. `sync-latest-json`
+   preserves an existing feed when available, but fails without uploading when
+   `windows-x86_64` and `linux-x86_64` cannot both be produced.
 
 Required repository secrets:
 
@@ -74,11 +72,12 @@ GitHub Release uploads use the automatic GitHub Actions token exposed to `gh` as
 
 ### Step 3 — Validate Published Release
 
-Check GitHub release assets include:
+Do not consider the release ready until `release-windows`, `release-linux`, and
+`sync-latest-json` have succeeded. Check the GitHub Release contains:
 
-- Windows installer (`*.exe`) and signature (`*.exe.sig`)
-- Linux AppImage (`*.AppImage`) and signature (`*.AppImage.sig`)
-- `latest.json`
+- Windows x86_64 NSIS signed payload (`*.exe` + `*.exe.sig`) and compatibility archive (`*.nsis.zip` + `*.nsis.zip.sig`)
+- Linux x86_64 AppImage signed payload (`*.AppImage.tar.gz` + `*.AppImage.tar.gz.sig`) and raw AppImage pair (`*.AppImage` + `*.AppImage.sig`)
+- `latest.json` with the tag version and non-empty `windows-x86_64` and `linux-x86_64` platform entries whose URLs reference the corresponding release assets
 
 ---
 
@@ -106,6 +105,10 @@ Windows equivalent:
 ./scripts/validar-tudo.ps1
 ```
 
+Local preflight intentionally sets `bundle.createUpdaterArtifacts=false`; it
+does not generate or validate signed updater assets. Validate those assets in
+release CI and through the N -> N+1 E2E gate below.
+
 ---
 
 ## 4. Mandatory E2E Update Gate (N -> N+1)
@@ -120,8 +123,8 @@ Every new public version must be validated from the previous public version:
 
 Minimum required E2E channels:
 
-- Windows NSIS
-- Linux AppImage
+- Windows x86_64 NSIS
+- Linux x86_64 AppImage
 
 ---
 

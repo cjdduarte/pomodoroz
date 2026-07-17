@@ -820,7 +820,6 @@ function Check-FrameworkInventory {
     Write-Host "    @tauri-apps/cli: $(Get-PackageJsonVersion $rootPkg '@tauri-apps/cli')"
     Write-Host "    @tauri-apps/api: $(Get-PackageJsonVersion $rootPkg '@tauri-apps/api')"
     Write-Host "    @tauri-apps/plugin-updater: $(Get-PackageJsonVersion $rootPkg '@tauri-apps/plugin-updater')"
-    Write-Host "    @tauri-apps/plugin-dialog: $(Get-PackageJsonVersion $rootPkg '@tauri-apps/plugin-dialog')"
 
     Write-Host "  [Tooling]"
     Write-Host "    typescript: $(Get-PackageJsonVersion $rootPkg 'typescript')"

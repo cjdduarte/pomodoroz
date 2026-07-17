@@ -1,8 +1,6 @@
 import styled from "styled-components";
 import { themes } from "styles";
 
-export const StyledPopper = styled.div``;
-
 export const StyledPopperContent = styled.div`
   min-width: 12rem;
   min-height: 3.2rem;

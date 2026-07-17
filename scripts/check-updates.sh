@@ -1006,7 +1006,6 @@ check_framework_inventory() {
   echo "    @tauri-apps/cli: $(get_pkg_version "$root_pkg" "@tauri-apps/cli")"
   echo "    @tauri-apps/api: $(get_pkg_version "$root_pkg" "@tauri-apps/api")"
   echo "    @tauri-apps/plugin-updater: $(get_pkg_version "$root_pkg" "@tauri-apps/plugin-updater")"
-  echo "    @tauri-apps/plugin-dialog: $(get_pkg_version "$root_pkg" "@tauri-apps/plugin-dialog")"
 
   echo "  [Tooling]"
   echo "    typescript: $(get_pkg_version "$root_pkg" "typescript")"

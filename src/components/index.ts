@@ -16,7 +16,6 @@ export * from "./SVG";
 export { default as SVG } from "./SVG";
 
 export { default as Portal } from "./Portal";
-export { default as Dimmer } from "./Dimmer";
 
 export { default as Checkbox } from "./Checkbox";
 export { default as Radio } from "./Radio";
@@ -27,6 +26,5 @@ export { default as Alert } from "./Alert";
 export { default as NavNotify } from "./NavNotify";
 export { default as ConfirmDialog } from "./ConfirmDialog";
 
-export * from "./Popper";
 export * from "./Preloader";
 export * from "./TraySVG";

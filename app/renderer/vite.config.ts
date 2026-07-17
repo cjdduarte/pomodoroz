@@ -38,7 +38,6 @@ export default defineConfig({
     strictPort: true,
   },
   resolve: {
-    tsconfigPaths: true,
     alias: {
       assets: `${ROOT_SRC_DIR}/assets`,
       components: `${ROOT_SRC_DIR}/components`,

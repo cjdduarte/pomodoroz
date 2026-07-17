@@ -79,10 +79,6 @@ export const StyledMarkName = styled.h1<{ type?: string }>`
   }
 `;
 
-export const StyledThemeToggler = styled.button`
-  ${TitlebarButton};
-`;
-
 export const StyledWindowActions = styled.div`
   width: max-content;
   height: 100%;

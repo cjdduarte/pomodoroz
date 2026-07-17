@@ -1,6 +1,5 @@
 export * from "./layout";
 export * from "./navigation";
-export * from "./svg";
 export * from "./titlebar";
 export * from "./range";
 export * from "./time";
@@ -12,7 +11,6 @@ export * from "./button";
 export * from "./input";
 export * from "./select";
 export * from "./textarea";
-export * from "./dimmer";
 export * from "./checkbox";
 export * from "./popper";
 export * from "./loaders";

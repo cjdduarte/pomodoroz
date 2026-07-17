@@ -13,6 +13,16 @@
 - **Build-artifact cleanup is available from the development menu** — `scripts/dev-full.sh` now exposes a confirmed menu action and a non-interactive `--clean` flag that delegate to `pnpm clean` for renderer and Tauri build outputs.
 - **OpenSpec update-plan review is documented** — the canonical agent flow now records experimental `/opsx:update` and `/opsx-update` aliases for reviewing and reconciling an existing operational change without implementation.
 
+### Fixed
+
+- **In-app updater eligibility now matches published releases** — only Windows NSIS and Linux AppImage bundles can use the signed updater flow; unsupported channels keep the release-page fallback.
+- **Moving an active task no longer interrupts focus** — cross-list drag-and-drop now preserves the task selection in its destination list.
+
+### Changed
+
+- **Release operations now describe the signed updater payloads actually published by CI** — x86_64 archive assets, feed entry checks, single-platform dispatch conditions, and local preflight limitations are explicit.
+- **Verified maintenance residue was removed** — unused renderer code, direct JavaScript dependencies, stale translations, Yarn artifacts, and obsolete Rust comparison scripts were removed without changing active native plugins.
+
 ## [26.7.2] - 2026-07-10
 
 ### Fixed

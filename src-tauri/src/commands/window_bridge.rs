@@ -465,19 +465,13 @@ pub fn restart_app<R: Runtime>(app: AppHandle<R>) {
     app.restart();
 }
 
+fn is_published_updater_bundle(bundle: Option<BundleType>) -> bool {
+    matches!(bundle, Some(BundleType::AppImage | BundleType::Nsis))
+}
+
 #[tauri::command]
 pub fn is_updater_channel_supported() -> bool {
-    matches!(
-        bundle_type(),
-        Some(
-            BundleType::AppImage
-                | BundleType::Deb
-                | BundleType::Rpm
-                | BundleType::Msi
-                | BundleType::Nsis
-                | BundleType::App
-        )
-    )
+    is_published_updater_bundle(bundle_type())
 }
 
 #[tauri::command(rename_all = "camelCase")]
@@ -836,6 +830,22 @@ mod tests {
     #[test]
     fn import_size_limit_is_5_mib() {
         assert_eq!(MAX_IMPORT_FILE_BYTES, 5 * 1024 * 1024);
+    }
+
+    #[test]
+    fn published_updater_bundle_policy_matches_release_channels() {
+        assert!(is_published_updater_bundle(Some(BundleType::AppImage)));
+        assert!(is_published_updater_bundle(Some(BundleType::Nsis)));
+
+        for bundle in [
+            Some(BundleType::Deb),
+            Some(BundleType::Rpm),
+            Some(BundleType::Msi),
+            Some(BundleType::App),
+            None,
+        ] {
+            assert!(!is_published_updater_bundle(bundle));
+        }
     }
 
     // Modo compacto: sem titlebar nativo a altura-base soma a compensacao.

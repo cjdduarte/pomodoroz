@@ -12,9 +12,9 @@ Nao registrar segredos, tokens, credenciais, endpoints privados, dados pessoais 
 
 ## Sessao atual
 
-- Foco: adicionar uma limpeza segura dos artefatos de build locais.
-- Implementado: `scripts/dev-full.sh` agora oferece `[x] Limpar artefatos de build` no menu, com tamanho dos diretórios e confirmação, e a flag não interativa `--clean`.
-- A limpeza delega para `pnpm clean`, removendo `app/renderer/build` e `src-tauri/target`; o próximo build do renderer e Rust será completo.
+- Foco: aplicar C7, C8, C12 e C16 no OpenSpec `complete-updater-task-cleanup`.
+- Implementado: o updater nativo aceita somente NSIS/AppImage publicados; mover a tarefa ativa entre listas preserva sua seleção; guia de release descreve assets assinados reais; resíduos renderer/dependências/scripts confirmados foram removidos.
+- A change está em 9/10 tarefas: PowerShell não está instalado nesta máquina, então a sintaxe de `scripts/check-updates.ps1` ainda precisa ser validada em ambiente Windows ou com `pwsh`.
 
 ---
 
@@ -22,15 +22,14 @@ Nao registrar segredos, tokens, credenciais, endpoints privados, dados pessoais 
 
 - Branch atual: `main`.
 - Baseline publicado: `26.7.2`; próximos changelogs abertos: `TBD` / `A definir`.
-- `secure-native-file-authorization` foi sincronizada em `openspec/specs/task-transfer-native-authorization/` e arquivada com aprovacao do operador.
-- Validações desta alteração: `bash -n scripts/dev-full.sh`, `--help`, verificação de flags incompatíveis e `git diff --check` aprovados; a limpeza real não foi executada para preservar os artefatos locais.
-- A change anterior `address-audit-hardening-findings` tambem esta completa, mas ainda requer revisao guiada e aprovacao explicita antes de arquivamento.
+- Validações aprovadas: `pnpm install --frozen-lockfile`, lint, typecheck, 38 Vitest, build renderer, Rust fmt/clippy/check/test (16 testes), OpenSpec strict, sintaxe Shell e `check-updates.sh report none`.
+- Pendente: parser PowerShell e validação manual de drag da tarefa ativa, popup de ações de Tasks e updater N->N+1 para NSIS/AppImage.
 
 ---
 
 ## Proximos passos
 
-1. Executar `./scripts/dev-full.sh --clean` ou a opção `[x]` quando quiser liberar os artefatos locais; o próximo build será mais lento.
-2. Validar manualmente os links externos dos Ajustes e a importacao/exportacao de tarefas pelo dialogo nativo.
-3. Priorizar C2-C4 do roadmap: supply chain e admission gate de release.
-4. Revisar o diff e criar o commit quando o operador solicitar.
+1. Validar `scripts/check-updates.ps1` com PowerShell em Windows ou ambiente que tenha `pwsh`.
+2. Validar manualmente drag entre listas durante foco, popup de ações de Tasks e updater N->N+1 para NSIS/AppImage.
+3. Fazer leitura guiada e obter aprovação explícita antes de arquivar `complete-updater-task-cleanup`.
+4. Priorizar C2-C4 do roadmap: supply chain e admission gate de release.

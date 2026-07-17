@@ -13,6 +13,16 @@
 - **Limpeza de artefatos de build foi adicionada ao menu de desenvolvimento** — `scripts/dev-full.sh` agora expõe uma ação confirmada no menu e a flag não interativa `--clean`, delegando para `pnpm clean` a remoção das saídas de build do renderer e Tauri.
 - **Revisão de plano com OpenSpec foi documentada** — o fluxo canônico do agente agora registra os aliases experimentais `/opsx:update` e `/opsx-update` para revisar e reconciliar uma change operacional existente sem implementação.
 
+### Corrigido
+
+- **Elegibilidade do updater agora coincide com as releases publicadas** — somente bundles Windows NSIS e Linux AppImage podem usar o fluxo assinado; canais não suportados mantêm o fallback para a página de releases.
+- **Mover uma tarefa ativa não interrompe mais o foco** — o drag-and-drop entre listas agora preserva a seleção da tarefa na lista de destino.
+
+### Alterado
+
+- **Operações de release agora descrevem os payloads assinados realmente publicados pelo CI** — assets de arquivo x86_64, checagens de feed, condições de dispatch em plataforma única e limites do preflight local estão explícitos.
+- **Resíduos de manutenção verificados foram removidos** — código renderer sem uso, dependências JavaScript diretas, traduções obsoletas, artefatos Yarn e scripts Rust de comparação foram removidos sem alterar plugins nativos ativos.
+
 ## [26.7.2] - 2026-07-10
 
 ### Corrigido
