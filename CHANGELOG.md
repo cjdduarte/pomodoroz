@@ -6,7 +6,7 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
-## [26.7.3] - 2026-07-17
+## [26.7.3] - 2026-07-30
 
 ### Added
 
@@ -22,6 +22,7 @@
 
 - **Release operations now describe the signed updater payloads actually published by CI** — x86_64 archive assets, feed entry checks, single-platform dispatch conditions, and local preflight limitations are explicit.
 - **Verified maintenance residue was removed** — unused renderer code, direct JavaScript dependencies, stale translations, Yarn artifacts, and obsolete Rust comparison scripts were removed without changing active native plugins.
+- **Project dependencies were refreshed** — the pnpm pin, JS runtime/tooling packages, and Rust serialization/dialog crates were updated across the manifests, workflow pins, and lockfiles without intentional behavior changes.
 
 ## [26.7.2] - 2026-07-10
 

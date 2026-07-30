@@ -30,7 +30,7 @@ jobs:
       - name: Setup pnpm (Corepack)
         run: |
           corepack enable
-          corepack prepare pnpm@11.13.1 --activate
+          corepack prepare pnpm@11.18.0 --activate
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -61,7 +61,7 @@ jobs:
       - name: Setup pnpm (Corepack)
         run: |
           corepack enable
-          corepack prepare pnpm@11.13.1 --activate
+          corepack prepare pnpm@11.18.0 --activate
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -162,6 +162,7 @@ jobs:
         # advisory-db; --no-fetch so vale offline com a base ja em cache.
         run: cargo audit --deny warnings
         working-directory: src-tauri
+
 
 
 

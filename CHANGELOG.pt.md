@@ -6,7 +6,7 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
-## [26.7.3] - 2026-07-17
+## [26.7.3] - 2026-07-30
 
 ### Adicionado
 
@@ -22,6 +22,7 @@
 
 - **Operações de release agora descrevem os payloads assinados realmente publicados pelo CI** — assets de arquivo x86_64, checagens de feed, condições de dispatch em plataforma única e limites do preflight local estão explícitos.
 - **Resíduos de manutenção verificados foram removidos** — código renderer sem uso, dependências JavaScript diretas, traduções obsoletas, artefatos Yarn e scripts Rust de comparação foram removidos sem alterar plugins nativos ativos.
+- **Dependências do projeto foram atualizadas** — o pin do pnpm, pacotes JS de runtime/tooling e crates Rust de serialização/diálogo foram atualizados nos manifestos, pins de workflow e lockfiles sem mudanças intencionais de comportamento.
 
 ## [26.7.2] - 2026-07-10
 
