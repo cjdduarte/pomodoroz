@@ -11,13 +11,14 @@ documental. Elas nao substituem auditoria oficial em registry/changelog.
 
 ## Runtime e app
 
-| Item         | Versao declarada | Fonte local                                                                          | Data consulta oficial | Status                                                                   |
-| ------------ | ---------------: | ------------------------------------------------------------------------------------ | --------------------- | ------------------------------------------------------------------------ |
-| Pomodoroz    |         `26.7.2` | `package.json`, `src-tauri/Cargo.toml`                                               | local                 | versao interna sincronizada                                              |
-| pnpm         |         `11.9.0` | `packageManager` em `package.json`                                                   | pendente              | auditar antes de mudar                                                   |
-| Rust edition |           `2021` | `src-tauri/Cargo.toml`                                                               | local                 | edicao do projeto                                                        |
-| Rust minimo  |         `1.77.2` | `src-tauri/Cargo.toml`                                                               | pendente              | auditar antes de mudar                                                   |
-| OpenSpec     |          `1.6.0` | [release oficial v1.6.0](https://github.com/Fission-AI/OpenSpec/releases/tag/v1.6.0) | 2026-07-17            | `/opsx:update` experimental para revisar changes operacionais existentes |
+| Item           | Versao declarada | Fonte local                                                                            | Data consulta oficial | Status                                                                                                       |
+| -------------- | ---------------: | -------------------------------------------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Pomodoroz      |         `26.7.2` | `package.json`, `src-tauri/Cargo.toml`                                                 | local                 | versao interna sincronizada                                                                                  |
+| pnpm           |         `11.9.0` | `packageManager` em `package.json`                                                     | pendente              | auditar antes de mudar                                                                                       |
+| Rust edition   |           `2021` | `src-tauri/Cargo.toml`                                                                 | local                 | edicao do projeto                                                                                            |
+| Rust toolchain |         `1.98.1` | [manifesto stable oficial](https://static.rust-lang.org/dist/channel-rust-stable.toml) | 2026-09-06            | fixada em `rust-toolchain.toml`                                                                              |
+| Rust minimo    |           `1.98` | `src-tauri/Cargo.toml`                                                                 | 2026-09-06            | serie minima suportada                                                                                       |
+| OpenSpec       |         `1.11.0` | [release oficial v1.11.0](https://github.com/Fission-AI/OpenSpec/releases/tag/v1.11.0) | 2026-08-28            | comandos/skills OpenCode regenerados; `.agents/` detectado, mas nao adicionado sem `openspec init` explicito |
 
 ## Dependencias principais declaradas
 
@@ -48,3 +49,5 @@ documental. Elas nao substituem auditoria oficial em registry/changelog.
 - 2026-07-10: baseline local confirmado como `26.7.2` durante a auditoria
   geral e a redefinicao do roadmap de correcoes.
 - 2026-07-17: OpenSpec 1.6.0 confirmado na [release oficial](https://github.com/Fission-AI/OpenSpec/releases/tag/v1.6.0); aliases e revisao do fluxo atualizados para `/opsx:update` e `/opsx-update`.
+- 2026-08-27: OpenSpec 1.11.0 confirmado na [release oficial](https://github.com/Fission-AI/OpenSpec/releases/tag/v1.11.0); instrucoes OpenCode regeneradas e validacao strict passou.
+- 2026-09-06: toolchain fixada em Rust 1.98.1 e MSRV elevado para 1.98.

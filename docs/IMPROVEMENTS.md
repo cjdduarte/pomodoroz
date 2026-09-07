@@ -43,11 +43,11 @@ sections are `TBD` / `A definir`.
 
 ### P3 — Regression Prevention and Maintenance
 
-| ID  | Correction                                                                         | Status | Next action                                                               |
-| --- | ---------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------- |
-| C14 | Add tests for storage, statistics, settings, timer transitions, and task selection | Open   | Expand tests in small no-new-dependency batches.                          |
-| C15 | Restore justified lint coverage for unused code and resource cleanup               | Open   | Audit disabled rules before changing their severity.                      |
-| C17 | Correct remaining operational documentation drift and platform prerequisites       | Open   | Address with the related correction, not as a standalone history rewrite. |
+| ID  | Correction                                                                                                                      | Status | Next action                                                                                |
+| --- | ------------------------------------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------ |
+| C14 | Protect documented storage-corruption, statistics-persistence, timer-transition, and task-selection regressions still uncovered | Open   | Extend existing tests where possible; add a test only for a concrete uncovered regression. |
+| C15 | Restore justified lint coverage for unused code and resource cleanup                                                            | Open   | Audit disabled rules before changing their severity.                                       |
+| C17 | Correct remaining operational documentation drift and platform prerequisites                                                    | Open   | Address with the related correction, not as a standalone history rewrite.                  |
 
 ## Execution Order
 
