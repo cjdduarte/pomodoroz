@@ -20,6 +20,15 @@ documental. Elas nao substituem auditoria oficial em registry/changelog.
 | Rust minimo    |           `1.98` | `src-tauri/Cargo.toml`                                                                 | 2026-09-06            | serie minima suportada                                                                                       |
 | OpenSpec       |         `1.11.0` | [release oficial v1.11.0](https://github.com/Fission-AI/OpenSpec/releases/tag/v1.11.0) | 2026-08-28            | comandos/skills OpenCode regenerados; `.agents/` detectado, mas nao adicionado sem `openspec init` explicito |
 
+## Atualizacoes futuras da toolchain Rust
+
+Este arquivo e o registro canonico da versao efetiva, fonte e data. Cada novo
+bump consulta o manifesto stable e as notas de release oficiais, atualiza
+conjuntamente `rust-toolchain.toml`, o MSRV em `src-tauri/Cargo.toml` e os
+pins de `dtolnay/rust-toolchain` em `.github/workflows/ci.yml` e
+`.github/workflows/release-autoupdate.yml`, e executa o gate Rust/Tauri
+aplicavel. Dependencias, edition e lockfiles nao mudam como efeito colateral.
+
 ## Dependencias principais declaradas
 
 | Pacote/crate      | Versao declarada | Fonte local            | Data consulta oficial | Status                 |

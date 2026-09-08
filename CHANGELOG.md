@@ -6,6 +6,13 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.9.1] - 2026-09-08
+
+### Changed
+
+- **Rust automation now uses the repository toolchain pin** — CI and release jobs use Rust 1.98.1 from `rust-toolchain.toml`; contributor and maintenance documentation describe the requirement and coordinated future update procedure.
+- **Rust toolchain and native libraries were refreshed** — the Rust core and supporting libraries were updated without intentional product behavior changes.
+
 ## [26.7.3] - 2026-07-30
 
 ### Added

@@ -12,24 +12,23 @@ Nao registrar segredos, tokens, credenciais, endpoints privados, dados pessoais 
 
 ## Sessao atual
 
-- Foco: aplicar C7, C8, C12 e C16 no OpenSpec `complete-updater-task-cleanup`.
-- Implementado: o updater nativo aceita somente NSIS/AppImage publicados; mover a tarefa ativa entre listas preserva sua seleção; guia de release descreve assets assinados reais; resíduos renderer/dependências/scripts confirmados foram removidos.
-- A change está em 9/10 tarefas: PowerShell não está instalado nesta máquina, então a sintaxe de `scripts/check-updates.ps1` ainda precisa ser validada em ambiente Windows ou com `pwsh`.
+- Foco: aplicar OpenSpec `align-rust-toolchain-automation`.
+- Implementado: CI e release usam Rust `1.98.1`, igual a `rust-toolchain.toml`; os READMEs declaram o requisito; `docs/VERSIONS.md` exige atualizar toolchain, MSRV e workflows juntos em cada bump.
+- Validado: Rust `1.98.1`; `cargo fmt`, clippy, check e 16 testes passaram; Prettier dos arquivos alterados e `openspec validate --all --strict` passaram.
 
 ---
 
 ## Estado atual
 
 - Branch atual: `main`.
-- Baseline publicado: `26.7.2`; próximos changelogs abertos: `TBD` / `A definir`.
-- Validações aprovadas: `pnpm install --frozen-lockfile`, lint, typecheck, 38 Vitest, build renderer, Rust fmt/clippy/check/test (16 testes), OpenSpec strict, sintaxe Shell e `check-updates.sh report none`.
-- Pendente: parser PowerShell e validação manual de drag da tarefa ativa, popup de ações de Tasks e updater N->N+1 para NSIS/AppImage.
+- Baseline publicado: `26.7.3`; próximos changelogs abertos: `TBD` / `A definir`.
+- Alterações preexistentes no worktree incluem pins de pnpm, manifests e habilidades em `.agents/`; preservá-las ao continuar.
+- A change `complete-updater-task-cleanup` permanece em 9/10 tarefas, aguardando validação de `scripts/check-updates.ps1` em Windows ou com `pwsh`.
 
 ---
 
 ## Proximos passos
 
-1. Validar `scripts/check-updates.ps1` com PowerShell em Windows ou ambiente que tenha `pwsh`.
-2. Validar manualmente drag entre listas durante foco, popup de ações de Tasks e updater N->N+1 para NSIS/AppImage.
-3. Fazer leitura guiada e obter aprovação explícita antes de arquivar `complete-updater-task-cleanup`.
-4. Priorizar C2-C4 do roadmap: supply chain e admission gate de release.
+1. Fazer leitura guiada e obter aprovação explícita antes de arquivar `align-rust-toolchain-automation`.
+2. Validar `scripts/check-updates.ps1` com PowerShell em Windows ou ambiente que tenha `pwsh`.
+3. Validar manualmente drag entre listas durante foco, popup de ações de Tasks e updater N->N+1 para NSIS/AppImage.
