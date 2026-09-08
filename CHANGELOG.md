@@ -12,6 +12,7 @@
 
 - **Rust automation now uses the repository toolchain pin** — CI and release jobs use Rust 1.98.1 from `rust-toolchain.toml`; contributor and maintenance documentation describe the requirement and coordinated future update procedure.
 - **Rust toolchain and native libraries were refreshed** — the Rust core and supporting libraries were updated without intentional product behavior changes.
+- **Frozen pnpm installs now match the package-manager pin** — the lockfile records pnpm 12.3.4 metadata required by CI, preventing frontend jobs from attempting a forbidden lockfile update.
 
 ## [26.7.3] - 2026-07-30
 

@@ -15,6 +15,7 @@ Nao registrar segredos, tokens, credenciais, endpoints privados, dados pessoais 
 - Foco: aplicar OpenSpec `align-rust-toolchain-automation`.
 - Implementado: CI e release usam Rust `1.98.1`, igual a `rust-toolchain.toml`; os READMEs declaram o requisito; `docs/VERSIONS.md` exige atualizar toolchain, MSRV e workflows juntos em cada bump.
 - Validado: Rust `1.98.1`; `cargo fmt`, clippy, check e 16 testes passaram; Prettier dos arquivos alterados e `openspec validate --all --strict` passaram.
+- Correção operacional: `pnpm-lock.yaml` passou a registrar `packageManagerDependencies` do pnpm `12.3.4`; `PNPM_CONFIG_PM_ON_FAIL=download pnpm install --frozen-lockfile` passa, igual ao modo usado pelo CI.
 
 ---
 
