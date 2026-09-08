@@ -13,6 +13,9 @@
 - **Automação Rust agora usa o pin da toolchain do repositório** — jobs de CI e release usam Rust 1.98.1 de `rust-toolchain.toml`; a documentação de contribuição e manutenção descreve o requisito e o procedimento coordenado para futuras atualizações.
 - **Toolchain Rust e bibliotecas nativas foram atualizadas** — o núcleo do Rust e bibliotecas de suporte foram atualizados sem mudanças intencionais no comportamento do produto.
 - **Instalações pnpm congeladas agora coincidem com o pin do gerenciador** — o lockfile registra os metadados do pnpm 12.3.4 exigidos pelo CI, impedindo que jobs frontend tentem uma atualização proibida do lockfile.
+- **Artefatos da versão de release estão sincronizados em 26.9.1** — metadados JavaScript, Tauri, Cargo e lock do Cargo agora declaram a versão de release de forma consistente.
+- **Configuração Vite agora usa carregamento ESM nativo** — a configuração do renderer usa a extensão `.mts`, evitando o aviso de incompatibilidade do futuro carregador nativo do Vite.
+- **Patch de advisory Rust foi aplicado** — a dependência transitiva `event-listener` agora usa sua correção de segurança compatível, permitindo que o gate estrito de audit Rust passe sem nova exceção.
 
 ## [26.7.3] - 2026-07-30
 

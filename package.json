@@ -1,7 +1,7 @@
 {
   "name": "pomodoroz",
   "private": true,
-  "version": "26.7.3",
+  "version": "26.9.1",
   "packageManager": "pnpm@12.3.4",
   "license": "MIT",
   "author": {
@@ -14,7 +14,7 @@
   "scripts": {
     "prepare": "husky .husky",
     "commit": "git-cz",
-    "build:renderer": "node ./node_modules/vite/bin/vite.js build --config app/renderer/vite.config.ts",
+    "build:renderer": "node ./node_modules/vite/bin/vite.js build --config app/renderer/vite.config.mts",
     "typecheck:renderer": "node ./node_modules/typescript/bin/tsc --noEmit -p app/renderer/tsconfig.json",
     "build:tauri": "node ./scripts/pnpmw.mjs tauri build --no-bundle",
     "lint:renderer": "node ./scripts/pnpmw.mjs exec eslint --config app/renderer/eslint.config.mjs \"src/**/*.{js,jsx,ts,tsx}\"",
