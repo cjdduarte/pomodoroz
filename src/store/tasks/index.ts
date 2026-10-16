@@ -69,6 +69,8 @@ const tasksSlice = createSlice({
       const priority = state.length === 0 ? true : false;
 
       const title = action.payload.trim().toUpperCase();
+      // Nome vazio gera lista que o import de JSON rejeita.
+      if (!title) return state;
 
       const taskList = createTaskList({ title, priority });
 
@@ -98,10 +100,11 @@ const tasksSlice = createSlice({
         listTitle: TaskList["title"];
       }>
     ) => {
+      const title = action.payload.listTitle.trim().toUpperCase();
+      if (!title) return state;
+
       return state.map((list) => {
         if (list._id === action.payload.listId) {
-          const title = action.payload.listTitle.trim().toUpperCase();
-
           return editTaskList(list, { title });
         }
         return list;
@@ -116,6 +119,7 @@ const tasksSlice = createSlice({
       }>
     ) => {
       const text = action.payload.cardText.trim().capitalize();
+      if (!text) return state;
 
       const newTask = createTask({ text });
 
@@ -137,13 +141,14 @@ const tasksSlice = createSlice({
         cardText: Task["text"];
       }>
     ) => {
+      const text = action.payload.cardText.trim().capitalize();
+      if (!text) return state;
+
       const newState = state.map((list) => {
         if (list._id !== action.payload.listId) return list;
 
         const newCards = list.cards.map((card) => {
           if (card._id !== action.payload.cardId) return card;
-
-          const text = action.payload.cardText.trim().capitalize();
 
           return editTask(card, { text });
         });
@@ -528,12 +533,22 @@ const tasksHistoryReducer = (
   }
 
   if (resetAllDayColorsForNewDay.match(action)) {
-    const nextPresent = tasksSlice.reducer(
-      state.present,
-      resetAllDayColors()
-    );
+    const today = getTodayDateKey();
+    // Só limpa cores de dias anteriores: a cor marcada hoje sobrevive à virada.
+    const nextPresent = state.present.map((list) => ({
+      ...list,
+      ...(list.dayColorDate !== today && {
+        dayColor: null,
+        dayColorDate: null,
+      }),
+      cards: list.cards.map((card) =>
+        card.dayColorDate === today
+          ? card
+          : { ...card, dayColor: null, dayColorDate: null }
+      ),
+    }));
 
-    if (nextPresent === state.present) {
+    if (JSON.stringify(nextPresent) === JSON.stringify(state.present)) {
       return state;
     }
 
@@ -549,7 +564,12 @@ const tasksHistoryReducer = (
 
   const nextPresent = tasksSlice.reducer(state.present, action);
 
-  if (nextPresent === state.present) {
+  // Reducers sempre alocam novos objetos; ação sem efeito real (ex.:
+  // reselecionar a lista ativa) não pode virar passo de undo nem apagar o redo.
+  if (
+    nextPresent === state.present ||
+    JSON.stringify(nextPresent) === JSON.stringify(state.present)
+  ) {
     return state;
   }
 

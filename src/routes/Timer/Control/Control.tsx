@@ -275,9 +275,19 @@ const Control: React.FC<Props> = ({
   ]);
 
   const onResetSessionCallback = useCallback(() => {
+    if (timer.playing && settings.enableStrictMode) {
+      activateWarning();
+      return;
+    }
+
     dispatch(setTimerType(TimerStatus.STAY_FOCUS));
     dispatch(setRound(1));
-  }, [dispatch]);
+  }, [
+    dispatch,
+    activateWarning,
+    timer.playing,
+    settings.enableStrictMode,
+  ]);
 
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout>;

@@ -6,6 +6,16 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
+## [26.10.1] - TBD
+
+### Fixed
+
+- **Task redo shortcut works again** — `Ctrl+Shift+Z` now redoes the last undone task change instead of undoing another one, and `Cmd+Z` / `Cmd+Shift+Z` follow the same rule shown in Settings.
+- **Grid day colors reset when the day changes with the grid open** — stale colors from yesterday are cleared within a minute after midnight, and the automatic reset no longer wipes a color or draw made today.
+- **Task lists and cards can no longer get blank names** — whitespace-only titles and texts are ignored, so new task exports stay importable; existing blank-named items must be renamed before exporting.
+- **Unchanged task actions no longer pollute undo history** — reselecting a task or leaving a title unchanged no longer adds empty undo steps or clears redo.
+- **No Interruptions Mode also guards the session reset** — the rounds reset button is blocked while the timer runs, so it can no longer skip an active break.
+
 ## [26.9.2] - 2026-09-09
 
 ### Fixed

@@ -6,6 +6,16 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.10.1] - A definir
+
+### Corrigido
+
+- **Atalho de refazer em Tarefas voltou a funcionar** — `Ctrl+Shift+Z` agora refaz a última alteração desfeita em vez de desfazer outra, e `Cmd+Z` / `Cmd+Shift+Z` seguem a mesma regra exibida em Ajustes.
+- **Cores do dia na grade resetam na virada do dia com a grade aberta** — cores de ontem são limpas em até um minuto após a meia-noite, e o reset automático não apaga mais uma cor ou sorteio feitos hoje.
+- **Listas e cartões não aceitam mais nomes em branco** — títulos e textos só com espaços são ignorados, mantendo importáveis as novas exportações de tarefas; itens já existentes com nome em branco precisam ser renomeados antes de exportar.
+- **Ações de tarefa sem mudança não poluem mais o histórico de desfazer** — reselecionar uma tarefa ou sair de um título sem alterá-lo não cria mais passos vazios de desfazer nem apaga o refazer.
+- **Modo sem interrupções também protege o reset de sessões** — o botão de reset de rodadas fica bloqueado com o timer rodando e não pula mais uma pausa ativa.
+
 ## [26.9.2] - 2026-09-09
 
 ### Corrigido

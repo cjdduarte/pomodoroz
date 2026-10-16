@@ -141,6 +141,8 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
   const [priorityDisplayMode, setPriorityDisplayMode] =
     useState<PriorityDisplayMode>(getInitialPriorityDisplayMode);
   const [showResetDialog, setShowResetDialog] = useState(false);
+  // Com o grid aberto na virada do dia, nenhuma ação dispara o reset diário.
+  const [todayKey, setTodayKey] = useState(getTodayDateKey);
   const { maybeExpandCompact, collapseCompact } = useCompactAutoExpand({
     compactModeEnabled,
   });
@@ -155,19 +157,26 @@ const TaskListGrid: React.FC<Props> = ({ onSelectList, compact }) => {
   );
 
   useEffect(() => {
-    const today = getTodayDateKey();
+    const interval = window.setInterval(() => {
+      setTodayKey(getTodayDateKey());
+    }, 60 * 1000);
+
+    return () => window.clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
     const hasStale = tasks.some(
       (list) =>
-        (list.dayColorDate && list.dayColorDate !== today) ||
+        (list.dayColorDate && list.dayColorDate !== todayKey) ||
         list.cards.some(
-          (card) => card.dayColorDate && card.dayColorDate !== today
+          (card) => card.dayColorDate && card.dayColorDate !== todayKey
         )
     );
 
     if (hasStale) {
       dispatch(resetAllDayColorsForNewDay());
     }
-  }, [dispatch, tasks]);
+  }, [dispatch, tasks, todayKey]);
 
   useEffect(() => {
     saveToStorage(GRID_COLUMNS_STORAGE_KEY, columnsMode);

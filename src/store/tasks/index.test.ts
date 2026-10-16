@@ -39,6 +39,7 @@ const setupLocalStorage = (taskLists: unknown = storedTaskLists) => {
 
 describe("tasks reducer", () => {
   afterEach(() => {
+    vi.useRealTimers();
     vi.resetModules();
     vi.unstubAllGlobals();
   });
@@ -314,5 +315,116 @@ describe("tasks reducer", () => {
 
     expect(nextState.present[0]?.cards[0]?.dayColor).toBeNull();
     expect(nextState.past).toEqual([state.present]);
+  });
+
+  it("keeps a color marked today when the automatic reset runs after midnight", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date(2026, 9, 16, 0, 5));
+    setupLocalStorage([
+      {
+        _id: "list-id-1",
+        title: "FOCUS",
+        priority: true,
+        dayColor: null,
+        dayColorDate: null,
+        cards: [
+          {
+            _id: "task-id-1",
+            text: "Review plan",
+            description: "",
+            done: false,
+            prioritized: false,
+            dayColor: "green",
+            dayColorDate: "2026-10-15",
+          },
+          {
+            _id: "task-id-2",
+            text: "Write notes",
+            description: "",
+            done: false,
+            prioritized: false,
+            dayColor: null,
+            dayColorDate: null,
+          },
+        ],
+      },
+    ]);
+
+    const {
+      default: reducer,
+      resetAllDayColorsForNewDay,
+      setTaskDayColor,
+    } = await import("./index");
+
+    let state = reducer(undefined, { type: "@@INIT" });
+    state = reducer(
+      state,
+      setTaskDayColor({
+        listId: "list-id-1",
+        cardId: "task-id-2",
+        color: "green",
+      })
+    );
+    state = reducer(state, resetAllDayColorsForNewDay());
+
+    expect(state.present[0]?.cards[0]?.dayColor).toBeNull();
+    expect(state.present[0]?.cards[1]?.dayColor).toBe("green");
+  });
+
+  it("ignores blank list titles and card texts", async () => {
+    setupLocalStorage();
+
+    const {
+      default: reducer,
+      addTaskCard,
+      addTaskList,
+      editTaskCardText,
+      editTaskTitle,
+    } = await import("./index");
+
+    const state = reducer(undefined, { type: "@@INIT" });
+
+    for (const action of [
+      addTaskList("   "),
+      addTaskCard({ listId: "list-id-1", cardText: "   " }),
+      editTaskTitle({ listId: "list-id-1", listTitle: "   " }),
+      editTaskCardText({
+        listId: "list-id-1",
+        cardId: "task-id-1",
+        cardText: "   ",
+      }),
+    ]) {
+      expect(reducer(state, action)).toBe(state);
+    }
+  });
+
+  it("keeps undo and redo history untouched by unchanged actions", async () => {
+    setupLocalStorage();
+
+    const {
+      default: reducer,
+      editTaskTitle,
+      setTaskCardPriority,
+      setTaskListPriority,
+      undoTasks,
+    } = await import("./index");
+
+    let state = reducer(undefined, { type: "@@INIT" });
+    state = reducer(
+      state,
+      setTaskCardPriority({
+        listId: "list-id-1",
+        cardId: "task-id-1",
+        prioritized: true,
+      })
+    );
+    state = reducer(state, undoTasks());
+
+    for (const action of [
+      setTaskListPriority("list-id-1"),
+      editTaskTitle({ listId: "list-id-1", listTitle: "FOCUS" }),
+    ]) {
+      expect(reducer(state, action)).toBe(state);
+    }
   });
 });

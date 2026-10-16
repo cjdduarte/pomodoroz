@@ -40,6 +40,7 @@ import TaskFormButton from "./TaskFormButton";
 import TaskCardDragOverlay from "./TaskCardDragOverlay";
 import TaskInnerList from "./TaskInnerList";
 import TaskListGrid from "./TaskListGrid";
+import { getTaskHistoryShortcutAction } from "./taskHistoryShortcut";
 
 type ViewMode = "list" | "grid";
 const TASKS_VIEW_MODE_STORAGE_KEY = "tasks-view-mode";
@@ -98,9 +99,7 @@ export default function Tasks() {
 
   const onDragStart = ({ active }: DragStartEvent) => {
     const activeData = active.data.current as
-      | DragListData
-      | DragCardData
-      | undefined;
+      DragListData | DragCardData | undefined;
 
     if (!activeData || activeData.type !== "card") {
       setActiveDragCardPreview(null);
@@ -164,15 +163,10 @@ export default function Tasks() {
     }
 
     const activeData = active.data.current as
-      | DragListData
-      | DragCardData
-      | undefined;
+      DragListData | DragCardData | undefined;
 
     const overData = over.data.current as
-      | DragListData
-      | DragCardData
-      | DragCardContainerData
-      | undefined;
+      DragListData | DragCardData | DragCardContainerData | undefined;
 
     if (!activeData || !overData) {
       return;
@@ -289,16 +283,14 @@ export default function Tasks() {
       const activeElement = document.activeElement?.tagName;
 
       if (activeElement !== "INPUT" && activeElement !== "TEXTAREA") {
-        if (e.ctrlKey && e.code === "KeyZ") {
-          if (tasks.past.length > 0) {
-            dispatch(undoTasks());
-          }
+        const action = getTaskHistoryShortcutAction(e);
+
+        if (action === "undo" && tasks.past.length > 0) {
+          dispatch(undoTasks());
         }
 
-        if (e.ctrlKey && e.shiftKey && e.code === "KeyZ") {
-          if (tasks.future.length > 0) {
-            dispatch(redoTasks());
-          }
+        if (action === "redo" && tasks.future.length > 0) {
+          dispatch(redoTasks());
         }
       }
     }
