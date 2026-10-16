@@ -16,6 +16,10 @@
 - **Ações de tarefa sem mudança não poluem mais o histórico de desfazer** — reselecionar uma tarefa ou sair de um título sem alterá-lo não cria mais passos vazios de desfazer nem apaga o refazer.
 - **Modo sem interrupções também protege o reset de sessões** — o botão de reset de rodadas fica bloqueado com o timer rodando e não pula mais uma pausa ativa.
 
+### Alterado
+
+- **Patch de advisory TLS do Rust aplicado** — o `rustls` transitivo usado pelo updater do app agora resolve para 0.23.46 (com `rustls-webpki` 0.103.15), corrigindo RUSTSEC-2026-0285, -0346, -0348 e -0349 para que o gate estrito de auditoria Rust passe sem nova exceção.
+
 ## [26.9.2] - 2026-09-09
 
 ### Corrigido

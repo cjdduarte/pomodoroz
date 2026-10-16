@@ -16,6 +16,10 @@
 - **Unchanged task actions no longer pollute undo history** — reselecting a task or leaving a title unchanged no longer adds empty undo steps or clears redo.
 - **No Interruptions Mode also guards the session reset** — the rounds reset button is blocked while the timer runs, so it can no longer skip an active break.
 
+### Changed
+
+- **Rust TLS advisory patch was applied** — transitive `rustls` used by the in-app updater now resolves to 0.23.46 (with `rustls-webpki` 0.103.15), fixing RUSTSEC-2026-0285, -0346, -0348 and -0349 so the strict Rust audit gate passes without a new exception.
+
 ## [26.9.2] - 2026-09-09
 
 ### Fixed
