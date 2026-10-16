@@ -73,16 +73,6 @@ Do not create loose specs/checklists for topics already covered in the documents
 
 ---
 
-## MCP (Recommended Usage)
-
-| MCP                 | When to use                              |
-| ------------------- | ---------------------------------------- |
-| context7            | API and official documentation questions |
-| sequential-thinking | Planning larger migrations               |
-| playwright          | UI behavior investigation                |
-
-Use MCP as decision support; do not duplicate history or roadmap in this file.
-
 ## OpenSpec
 
 Politica comum: [OpenSpec nos projetos](../../OPENSPEC_PROJETOS.md).
@@ -125,27 +115,27 @@ Para decisoes sem entrega operacional, crie uma ADR curta em
 `docs/decisions/ADR-XXXX-<slug>.md`.
 
 Para revisar ou reconciliar o plano de uma change existente, sem editar codigo,
-use `/opsx:update` (no OpenCode, `/opsx-update`). Use somente quando a change
+use `/opsx-update`. Use somente quando a change
 continuar com entrega operacional verificavel; se a revisao resultar apenas em
 decisao sem entrega, pare o fluxo e registre ADR.
 
 Fluxo padrao:
 
-1. Use `/opsx:explore` quando o pedido estiver vago.
-2. Use `/opsx:propose <descricao>` para gerar os artefatos necessarios do schema
+1. Use `/opsx-explore` quando o pedido estiver vago.
+2. Use `/opsx-propose <descricao>` para gerar os artefatos necessarios do schema
    `spec-driven`: `proposal` e `tasks` sempre, `specs` em Lite mode por padrao e
    `design` somente quando houver trade-off tecnico real.
 3. Revise antes de codar: confira proposta, specs, design quando existir e
    tasks; rode `openspec status --change <change-id>` e espere completos os
    artefatos que a change realmente precisa. Se precisar revisar ou reconciliar
-   o plano, use `/opsx:update`, confirme cada artefato proposto e refaca a
+   o plano, use `/opsx-update`, confirme cada artefato proposto e refaca a
    revisao. Checkpoints: a proposta responde problema, solucao, escopo e
    riscos? As specs tem cenarios e deltas corretos? O design e necessario para
    implementar? As tasks sao numeradas e verificaveis?
-4. Use `/opsx:apply` somente apos a revisao.
-5. Use `/opsx:sync` se a implementacao alterar ou consolidar specs.
+4. Use `/opsx-apply` somente apos a revisao.
+5. Use `/opsx-sync` se a implementacao alterar ou consolidar specs.
 6. Rode `openspec validate --all --strict` antes de finalizar. Para uma change especifica, use `openspec validate <change-id> --strict`.
-7. Use `/opsx:archive` quando a mudanca estiver concluida.
+7. Use `/opsx-archive` quando a mudanca estiver concluida.
 
 Aprovacao antes de arquivar:
 
@@ -168,7 +158,7 @@ Artefatos:
 
 A verificacao pratica e a revisao do passo 3 + `openspec validate --all --strict`.
 
-No OpenCode, se os comandos gerados aparecerem com hifen, use os equivalentes:
+No OMP, os comandos gerados usam hifen:
 `/opsx-explore`, `/opsx-propose`, `/opsx-apply`, `/opsx-update`, `/opsx-sync` e
 `/opsx-archive`.
 
