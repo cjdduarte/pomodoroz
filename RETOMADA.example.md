@@ -1,39 +1,25 @@
-# RETOMADA.md
+# RETOMADA — Pomodoroz
 
-Status: **handoff operacional**.
+Status: snapshot operacional da sessão atual.
+Última revisão: AAAA-MM-DD.
 
-Este arquivo e um template. Para redefinir `RETOMADA.md`:
+Use este modelo somente quando houver trabalho em curso. `RETOMADA.md` é opcional, substituível e não normativo.
 
-1. Copie a estrutura deste arquivo para `RETOMADA.md` somente quando precisar recriar ou resetar o handoff.
-2. Preencha `RETOMADA.md` com o estado operacional atual.
-3. Substitua contexto antigo pelo estado atual; nao acumule historico.
+## Fontes canônicas
 
-`RETOMADA.md` nao substitui `AGENTS.md` como fonte de verdade de governanca/fluxo e nao substitui `docs/IMPROVEMENTS.md` como planejamento.
+- `AGENTS.md`
+- `docs/IMPROVEMENTS.md`
+- `docs/VERSIONS.md`
+- `openspec/changes/`
 
-Nao registrar segredos, tokens, credenciais, endpoints privados, dados pessoais ou informacoes que nao deveriam entrar no repositorio.
+## Estado atual da sessão
 
-Manter somente:
+- <estado imediato necessário para continuar>
 
-- o que foi feito na sessao atual;
-- o estado operacional atual;
-- os proximos passos objetivos.
+## Bloqueios
 
-Revisar e substituir contexto antigo; **nao acumular historico**.
+- <bloqueio externo ou decisão pendente; remover a seção se não houver>
 
----
+## Próximo passo
 
-## Sessao atual
-
-- A preencher.
-
----
-
-## Estado atual
-
-- A preencher.
-
----
-
-## Proximos passos
-
-1. A preencher.
+<uma ação operacional concreta>

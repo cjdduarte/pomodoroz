@@ -1,36 +1,28 @@
-# RETOMADA.md
+# RETOMADA — Pomodoroz
 
-Status: **handoff operacional**.
+Status: snapshot operacional da sessão atual.
+Última revisão: 2026-10-16.
 
-Este arquivo existe para retomar a sessao atual em um novo chat sem reconstruir contexto.
+## Fontes canônicas
 
-Ele **nao** substitui `AGENTS.md` como fonte de verdade de governanca/fluxo e **nao** substitui `docs/IMPROVEMENTS.md` como planejamento.
+- `AGENTS.md`
+- `docs/IMPROVEMENTS.md`
+- `docs/VERSIONS.md`
+- `CHANGELOG.md`
+- `openspec/changes/`
 
-Nao registrar segredos, tokens, credenciais, endpoints privados, dados pessoais ou informacoes que nao deveriam entrar no repositorio.
+## Estado atual da sessão
 
----
+- A baseline publicada é `26.9.2`.
+- Correções da investigação de defeitos de 2026-10-16 (undo/redo, cores do dia na virada, nomes em branco, histórico sem no-op, reset de sessões no modo sem interrupções) estão na seção `26.10.1` dos changelogs, ainda sem commit/release.
+- A change `complete-updater-task-cleanup` está em 9/10 tarefas.
+- A change `align-rust-toolchain-automation` está pronta para leitura guiada e decisão de archive.
 
-## Sessao atual
+## Bloqueios
 
-- Foco: preparar a manutencao da versao `26.9.1`.
-- Implementado: CI e release usam Rust `1.98.1`, igual a `rust-toolchain.toml`; os READMEs declaram o requisito; `docs/VERSIONS.md` exige atualizar toolchain, MSRV e workflows juntos em cada bump; a versão `26.9.1` está sincronizada e o Vite usa configuração `.mts`.
-- Validado: Rust `1.98.1`; `cargo fmt`, clippy, check e 16 testes passaram; `pnpm install --frozen-lockfile` no modo do CI, 38 testes do renderer, build Tauri sem bundle, Prettier dos arquivos alterados e `openspec validate --all --strict` passaram.
-- Correção operacional: `pnpm-lock.yaml` passou a registrar `packageManagerDependencies` do pnpm `12.3.4`; `PNPM_CONFIG_PM_ON_FAIL=download pnpm install --frozen-lockfile` passa, igual ao modo usado pelo CI.
-- Correção de segurança: `event-listener` transitivo foi atualizado de `5.4.1` para `5.4.2`; `cargo audit --deny warnings`, fmt, clippy, check e 16 testes Rust passaram sem novo ignore em `audit.toml`.
+- Falta validar `scripts/check-updates.ps1` em Windows ou ambiente com `pwsh`.
+- Ainda faltam validações manuais de drag durante foco, popup de Tasks e updater N→N+1 para NSIS/AppImage.
 
----
+## Próximo passo
 
-## Estado atual
-
-- Branch atual: `main`.
-- Baseline publicado: `26.9.1`; criar `TBD` / `A definir` apenas na próxima modificação.
-- Alterações preexistentes no worktree incluem pins de pnpm, manifests e habilidades em `.agents/`; preservá-las ao continuar.
-- A change `complete-updater-task-cleanup` permanece em 9/10 tarefas, aguardando validação de `scripts/check-updates.ps1` em Windows ou com `pwsh`.
-
----
-
-## Proximos passos
-
-1. Fazer leitura guiada e obter aprovação explícita antes de arquivar `align-rust-toolchain-automation`.
-2. Validar `scripts/check-updates.ps1` com PowerShell em Windows ou ambiente que tenha `pwsh`.
-3. Validar manualmente drag entre listas durante foco, popup de ações de Tasks e updater N->N+1 para NSIS/AppImage.
+Validar o script PowerShell; depois executar as validações manuais e decidir o archive de `align-rust-toolchain-automation`.
