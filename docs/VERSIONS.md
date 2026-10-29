@@ -40,7 +40,7 @@ aplicavel. Dependencias, edition e lockfiles nao mudam como efeito colateral.
 | `react-dom`       |        `^19.2.8` | `package.json`         | pendente                                                          | auditar antes de mudar      |
 | `react-router`    |         `7.17.0` | `package.json`         | pendente                                                          | auditar antes de mudar      |
 | `typescript`      |          `6.0.3` | `package.json`         | pendente                                                          | auditar antes de mudar      |
-| `vite`            |         `^8.2.2` | `package.json`         | pendente                                                          | auditar antes de mudar      |
+| `vite`            |         `^8.3.5` | `package.json`         | 2026-10-29 ([npm](https://www.npmjs.com/package/vite))            | atualizado (minor)          |
 | `rodio`           |         `0.22.2` | `src-tauri/Cargo.toml` | pendente                                                          | auditar antes de mudar      |
 
 ## Politica de updates
@@ -67,3 +67,8 @@ aplicavel. Dependencias, edition e lockfiles nao mudam como efeito colateral.
 - 2026-10-29: pnpm 12.16.1 confirmado no npm (latest); `packageManager`, pins
   Corepack dos workflows e boot document do `pnpm-lock.yaml` atualizados;
   `pnpm install --frozen-lockfile` passou com o pnpm 12.16.1.
+- 2026-10-29: lote JS de baixo risco aplicado (tooling de build/lint e patches
+  de `react-redux`/`uuid`). Adiados: React 19.3 (transicoes e eventos de
+  resize mudam de comportamento), styled-components 6.6 (`attrs` e
+  interpolacoes), RTK 2.13 (novo build), i18next/react-i18next, os majors
+  `@types/node` 26, `react-router` 8, `typescript` 7, `vitest` 5 e `rodio` 0.23.
