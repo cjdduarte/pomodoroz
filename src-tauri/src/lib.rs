@@ -249,6 +249,10 @@ fn setup_global_shortcuts<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<()> {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        // Precisa ser o primeiro plugin: a 2a instancia encerra antes de criar tray e atalhos globais.
+        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+            show_main_window(app);
+        }))
         .plugin(tauri_plugin_os::init())
         .manage(TrayBehaviorState::default())
         .invoke_handler(tauri::generate_handler![
@@ -300,10 +304,6 @@ pub fn run() {
             if let Err(error) = setup_global_shortcuts(app_handle) {
                 log::warn!("[TAURI] Failed to initialize global shortcuts: {error}");
             }
-
-            app_handle.plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
-                show_main_window(app);
-            }))?;
 
             app_handle.plugin(tauri_plugin_autostart::Builder::new().build())?;
 

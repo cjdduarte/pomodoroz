@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { StyledDescriptionPreviewer } from "styles";
 import ReactMarkdown from "react-markdown";
-import { sanitizeMarkdownLinkUri } from "utils";
+import { openExternalUrl, sanitizeMarkdownLinkUri } from "utils";
 
 type Props = {
   description?: string;
@@ -29,8 +29,20 @@ const MDPreviewer: React.FC<Props> = ({ description, onClick }) => {
       <ReactMarkdown
         urlTransform={sanitizeMarkdownLinkUri}
         components={{
-          a: ({ ...props }) => (
-            <a {...props} target="_blank" rel="noopener noreferrer" />
+          a: ({ href, ...props }) => (
+            <a
+              {...props}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(event) => {
+                // WebView ignora target=_blank; o opener nativo só aceita http(s).
+                event.preventDefault();
+                if (href) {
+                  void openExternalUrl(href);
+                }
+              }}
+            />
           ),
         }}
       >

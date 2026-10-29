@@ -18,12 +18,14 @@ const buildCorruptBackupKey = (name: string): string => {
   return `${name}.corrupt.${timestamp}`;
 };
 
-export const saveToStorage = <T>(name: string, state: T): void => {
+export const saveToStorage = <T>(name: string, state: T): boolean => {
   try {
     const serializedState = JSON.stringify(state);
     localStorage.setItem(name, serializedState);
+    return true;
   } catch (error) {
     console.error(error);
+    return false;
   }
 };
 

@@ -110,7 +110,7 @@ Pomodoroz is not about "fixing flexibility"; it focuses on adding workflow featu
 - **Statistics module** with period report separated from long-term progress.
 - **Period metrics** for focus, break, idle, completed cycles, top focus areas, and daily flow.
 - **Progress overview** with streak, level/XP, today's target, milestones, 30-day heatmap, and last-7-day focus bars.
-- **Per-task-list breakdown** with accumulated time and completed cycles.
+- **Top focus by task**: the 5 list/task pairs with the most focus time in the period, with completed cycles.
 
 **Quality of life**
 
@@ -167,7 +167,7 @@ Pomodoroz is not about "fixing flexibility"; it focuses on adding workflow featu
 - **Period report**: focus time, break time, idle time, completed cycles, top focus areas, and daily flow.
 - **Long-term progress**: streak, level/XP, today's target, explicit milestones, 30-day heatmap, and last-7-day focus bars.
 - **Daily flow chart** (stacked focus/break/idle).
-- **Per-task-list breakdown** with time and cycles.
+- **Top focus by task** (top 5) with time and cycles.
 - Data clearing with confirmation (week, month, or all).
 
 ### Compact Mode
@@ -181,9 +181,9 @@ Pomodoroz is not about "fixing flexibility"; it focuses on adding workflow featu
 
 - **None** — no notifications.
 - **Normal** — notifies on every break.
-- **Extra** — notifies 60s before break, 30s before break ends, and on break start.
+- **Extra** — notifies 30s before the break, 60s before the break ends, and on break start.
 - **Focus extension reminder** — when the app is hidden or in the tray, the extension window can trigger one native reminder.
-- **Custom sound** — default bell or custom audio file.
+- **Notification sound** — app default bell or an alternative bundled sound.
 - **Voice assistance** — audio cue about session status.
 
 ### Appearance & System

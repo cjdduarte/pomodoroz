@@ -272,6 +272,16 @@ export const es = {
     reclassifyFocusToIdleMessage:
       "¿Mover a Ocioso el tiempo transcurrido de la tarea actual?",
   },
+  alerts: {
+    nativeWarningTitle: "Aviso de integración nativa",
+    nativeIpcError:
+      "No se pudo comunicar con el runtime nativo (Tauri). Reinicia la app.",
+    updateInstallFailed:
+      "No se pudo descargar o instalar la actualización. Revisa la conexión e inténtalo más tarde.",
+    storageWarningTitle: "Cambios no guardados",
+    storageWriteFailed:
+      "No se pudieron guardar tus datos en este dispositivo (el almacenamiento puede estar lleno). Los cambios recientes pueden perderse al cerrar la app. Libera espacio en {{location}}.",
+  },
   units: {
     min: "min",
     mins: "mins",

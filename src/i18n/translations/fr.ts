@@ -272,6 +272,16 @@ export const fr = {
     reclassifyFocusToIdleMessage:
       "Deplacer le temps ecoule de la tache actuelle vers Inactif ?",
   },
+  alerts: {
+    nativeWarningTitle: "Avertissement d'integration native",
+    nativeIpcError:
+      "Impossible de communiquer avec le runtime natif (Tauri). Redemarrez l'application.",
+    updateInstallFailed:
+      "Impossible de telecharger ou d'installer la mise a jour. Verifiez la connexion et reessayez plus tard.",
+    storageWarningTitle: "Modifications non enregistrees",
+    storageWriteFailed:
+      "Vos donnees n'ont pas pu etre enregistrees sur cet appareil (stockage peut-etre plein). Les modifications recentes peuvent etre perdues a la fermeture de l'application. Liberez de l'espace dans {{location}}.",
+  },
   units: {
     min: "min",
     mins: "mins",

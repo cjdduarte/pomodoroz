@@ -71,4 +71,13 @@ describe("storage", () => {
     expect(localStorage.getItem(backupKey ?? "")).toBe("{bad json");
     expect(localStorage.getItem("statistics")).toBe("{bad json");
   });
+
+  it("reports write failures such as an exceeded quota", () => {
+    vi.mocked(localStorage.setItem).mockImplementationOnce(() => {
+      throw new DOMException("Quota exceeded", "QuotaExceededError");
+    });
+
+    expect(saveToStorage("state", { tasks: [] })).toBe(false);
+    expect(saveToStorage("state", { tasks: [] })).toBe(true);
+  });
 });

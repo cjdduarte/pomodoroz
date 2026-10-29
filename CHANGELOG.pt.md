@@ -15,6 +15,17 @@
 - **Listas e cartões não aceitam mais nomes em branco** — títulos e textos só com espaços são ignorados, mantendo importáveis as novas exportações de tarefas; itens já existentes com nome em branco precisam ser renomeados antes de exportar.
 - **Ações de tarefa sem mudança não poluem mais o histórico de desfazer** — reselecionar uma tarefa ou sair de um título sem alterá-lo não cria mais passos vazios de desfazer nem apaga o refazer.
 - **Modo sem interrupções também protege o reset de sessões** — o botão de reset de rodadas fica bloqueado com o timer rodando e não pula mais uma pausa ativa.
+- **Falhas ao salvar não são mais silenciosas** — quando o armazenamento local está cheio ou bloqueado, um alerta avisa que alterações recentes podem se perder e indica Relatório > Gerenciar histórico para liberar espaço.
+- **Mover para Ocioso no reset cobre a sessão de foco inteira** — o reset com reclassificação agora também move o foco já gravado em blocos de dois minutos durante a sessão, não só o último bloco.
+- **Pausas especiais não se repetem mais ao reabrir o app** — pausas já disparadas hoje ficam registradas localmente, então reiniciar dentro da mesma janela não as inicia de novo.
+- **Links na descrição das tarefas abrem no navegador** — links Markdown e o link "Ajuda de formatação" agora usam o opener do sistema (só `http`/`https`) em vez de não fazer nada na janela do app.
+- **Detalhes da tarefa mostram a descrição salva** — a visualização acompanha desfazer, refazer e importações com o painel aberto, e a edição começa do texto salvo.
+- **Falhas ao instalar atualização são explicadas** — falha no download ou na instalação mostra uma mensagem específica traduzida, e os alertas de integração nativa foram traduzidos.
+- **Importar com mesclagem mantém a tarefa ativa** — só "substituir" limpa a seleção de tarefa.
+- **Desfazer um arraste entre listas mantém a tarefa ativa** — a seleção resolve para a posição restaurada em vez de pausar o timer e ser limpa.
+- **Segunda abertura encerra antes de criar tray ou atalhos globais** — o plugin de instância única agora é registrado primeiro, como exige a documentação dele.
+- **Scripts de instalação local reportam falhas** — `install.ps1` para no primeiro passo pnpm com erro, `uninstall.ps1` sai com erro quando itens não puderam ser removidos, e a entrada `.desktop` gerada põe o caminho do lançador entre aspas para funcionar com pastas pessoais com espaço.
+- **Descrições do README coincidem com o app** — horários das notificações Extra, o som alternativo incluído e o relatório dos 5 principais focos por tarefa estão descritos corretamente.
 
 ### Alterado
 

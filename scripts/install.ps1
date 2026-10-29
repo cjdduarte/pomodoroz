@@ -15,6 +15,14 @@ function Die($message) {
     exit 1
 }
 
+# $ErrorActionPreference nao interrompe em falha de comando nativo; checa o exit code.
+function Invoke-Pnpm {
+    pnpm @args
+    if ($LASTEXITCODE -ne 0) {
+        Die "pnpm $($args -join ' ') falhou (codigo $LASTEXITCODE)."
+    }
+}
+
 if (-not $IsLinux) {
     Die "Este script suporta apenas Linux."
 }
@@ -57,29 +65,29 @@ if ($nodeMajor -lt 24) {
 if (-not (Test-Path (Join-Path $APP_DIR "node_modules"))) {
     Step "Instalando dependencias pnpm"
     Push-Location $APP_DIR
-    pnpm install
+    Invoke-Pnpm install
     Pop-Location
 }
 
 if (-not $SkipBuild) {
     Step "Lint completo (ESLint renderer)"
     Push-Location $APP_DIR
-    pnpm lint
+    Invoke-Pnpm lint
     Pop-Location
 
     Step "Typecheck do renderer (TypeScript)"
     Push-Location $APP_DIR
-    pnpm typecheck:renderer
+    Invoke-Pnpm typecheck:renderer
     Pop-Location
 
     Step "Testes do renderer (Vitest)"
     Push-Location $APP_DIR
-    pnpm test:run
+    Invoke-Pnpm test:run
     Pop-Location
 
     Step "Build release Tauri sem bundle (--no-bundle)"
     Push-Location $APP_DIR
-    pnpm tauri build --no-bundle
+    Invoke-Pnpm tauri build --no-bundle
     Pop-Location
 } else {
     Step "Pulando pre-check/build (--SkipBuild)"
@@ -136,7 +144,7 @@ Comment[ja]=Pomodoroz タイマー
 Comment[zh]=Pomodoroz 计时器
 Comment[zh_CN]=Pomodoroz 计时器
 Comment[zh_TW]=Pomodoroz 計時器
-Exec=$BIN_PATH %U
+Exec="$BIN_PATH" %U
 Icon=pomodoroz
 Terminal=false
 Categories=Utility;

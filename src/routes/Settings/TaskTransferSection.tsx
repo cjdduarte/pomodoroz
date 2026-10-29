@@ -176,11 +176,11 @@ const TaskTransferSection: React.FC = () => {
 
       if (mode === "replace") {
         dispatch(replaceTaskLists(pendingImport.lists));
+        dispatch(clearTaskSelection());
       } else {
+        // Mesclar preserva as listas atuais; a tarefa selecionada continua válida.
         dispatch(appendTaskLists(pendingImport.lists));
       }
-
-      dispatch(clearTaskSelection());
       setPendingImport(null);
       setNotice({
         tone: "success",

@@ -27,7 +27,11 @@ import {
 import { INSTALL_UPDATE } from "ipc";
 import { TimerStatus } from "store/timer/types";
 import { useAppDispatch, useAppSelector } from "hooks/storeHooks";
-import { isFreshInstallProfile, setEnableInAppAutoUpdate } from "store";
+import {
+  isFreshInstallProfile,
+  setEnableInAppAutoUpdate,
+  subscribePersistenceFailures,
+} from "store";
 import { setUpdateVersion } from "store/update";
 import {
   getFromStorage,
@@ -140,6 +144,7 @@ const Layout: React.FC<Props> = ({ children }) => {
     dismissedUpdatePromptVersion,
     setDismissedUpdatePromptVersion,
   ] = useState("");
+  const [storageWriteFailed, setStorageWriteFailed] = useState(false);
 
   const registerKey = useCallback(
     (e: KeyboardEvent) => {
@@ -155,6 +160,14 @@ const Layout: React.FC<Props> = ({ children }) => {
     document.addEventListener("keydown", registerKey);
     return () => document.removeEventListener("keydown", registerKey);
   }, [registerKey]);
+
+  useEffect(
+    () =>
+      subscribePersistenceFailures(() => {
+        setStorageWriteFailed(true);
+      }),
+    []
+  );
 
   useEffect(() => {
     const isBreakMode =
@@ -242,9 +255,18 @@ const Layout: React.FC<Props> = ({ children }) => {
       )}
       {connectorError && (
         <Alert
-          heading="Native integration warning"
+          heading={t("alerts.nativeWarningTitle")}
           body={connectorError}
           onClose={dismissConnectorError}
+        />
+      )}
+      {storageWriteFailed && (
+        <Alert
+          heading={t("alerts.storageWarningTitle")}
+          body={t("alerts.storageWriteFailed", {
+            location: `${t("statistics.title")} > ${t("statistics.manageHistory")}`,
+          })}
+          onClose={() => setStorageWriteFailed(false)}
         />
       )}
       {showFirstRunAutoUpdatePrompt && (

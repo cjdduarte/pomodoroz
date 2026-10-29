@@ -6,6 +6,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { useTranslation } from "react-i18next";
 import { ConnectorContext } from "../ConnectorContext";
 import { useAppSelector, useAppDispatch } from "hooks/storeHooks";
 import { CounterContext } from "../CounterContext";
@@ -17,6 +18,7 @@ import type { LanguageCode } from "store/settings/types";
 import { detectOS, getFromStorage } from "utils";
 import {
   CLOSE_WINDOW,
+  INSTALL_UPDATE,
   MINIMIZE_WINDOW,
   SET_ALWAYS_ON_TOP,
   SET_COMPACT_MODE,
@@ -45,8 +47,6 @@ import {
   subscribeTauriInvokeConnectorSendErrors,
 } from "./TauriInvokeConnector";
 
-const IPC_ERROR_MESSAGE =
-  "Falha ao comunicar com o runtime nativo (Tauri). Reinicie o app.";
 const AUTO_UPDATE_POLICY_PROMPT_SEEN_KEY =
   "auto-update-policy-prompt-seen";
 const AUTO_UPDATE_POLICY_PROMPT_PENDING_KEY =
@@ -119,6 +119,7 @@ export const TauriConnectorProvider = ({
   children,
 }: PropsWithChildren) => {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const timer = useAppSelector((state) => state.timer);
   const settings = useAppSelector((state) => state.settings);
   const ignoreUpdateRef = useRef(settings.ignoreUpdate);
@@ -131,9 +132,16 @@ export const TauriConnectorProvider = ({
     setConnectorError(null);
   }, []);
 
-  const showConnectorIpcError = useCallback(() => {
-    setConnectorError(IPC_ERROR_MESSAGE);
-  }, []);
+  const showConnectorIpcError = useCallback(
+    (channel: ToMainChannel) => {
+      setConnectorError(
+        channel === INSTALL_UPDATE
+          ? t("alerts.updateInstallFailed")
+          : t("alerts.nativeIpcError")
+      );
+    },
+    [t]
+  );
 
   const sendToMain = useCallback(
     <C extends ToMainChannel>(
@@ -145,7 +153,7 @@ export const TauriConnectorProvider = ({
       } catch (error) {
         console.error("[TAURI IPC] Native communication error.", error);
         if (shouldShowNativeWarning(channel)) {
-          showConnectorIpcError();
+          showConnectorIpcError(channel);
         }
       }
     },
@@ -155,7 +163,7 @@ export const TauriConnectorProvider = ({
   useEffect(() => {
     return subscribeTauriInvokeConnectorSendErrors(({ event }) => {
       if (shouldShowNativeWarning(event)) {
-        showConnectorIpcError();
+        showConnectorIpcError(event);
       }
     });
   }, [showConnectorIpcError]);

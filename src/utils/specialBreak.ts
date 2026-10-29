@@ -10,6 +10,10 @@ export type SpecialBreakTrigger = {
   key: string;
 };
 
+// Disparos do dia persistidos para não repetir a pausa especial após reiniciar o app.
+export const SPECIAL_BREAK_TRIGGERS_STORAGE_KEY =
+  "special-break-triggers";
+
 const SPECIAL_BREAK_ORDER: SpecialBreakId[] = [
   "firstBreak",
   "secondBreak",
@@ -37,6 +41,18 @@ const getDateKey = (date: Date): string => {
   const day = String(date.getDate()).padStart(2, "0");
 
   return `${date.getFullYear()}-${month}-${day}`;
+};
+
+export const keepSpecialBreakKeysForDate = (
+  keys: readonly unknown[],
+  date: Date
+): string[] => {
+  const datePrefix = `${getDateKey(date)}:`;
+
+  return keys.filter(
+    (key): key is string =>
+      typeof key === "string" && key.startsWith(datePrefix)
+  );
 };
 
 const getCurrentMinutes = (date: Date): number =>

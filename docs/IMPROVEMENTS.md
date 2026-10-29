@@ -12,7 +12,7 @@ The project is in a correction-first cycle. Work that changes code, data,
 pipelines, or verifiable runtime behavior requires an OpenSpec change before
 implementation. New dependencies still require an explicit impact review.
 
-The active published baseline is `26.7.2`. The next unreleased changelog
+The active published baseline is `26.9.2`. The next unreleased changelog
 sections are `TBD` / `A definir`.
 
 ## Active Corrections
@@ -27,12 +27,14 @@ sections are `TBD` / `A definir`.
 
 ### P1 — Local Data and Core Behavior
 
-| ID  | Correction                                                           | Status | Next action                                        |
-| --- | -------------------------------------------------------------------- | ------ | -------------------------------------------------- |
-| C5  | Validate persisted `state` and `statistics` schemas before hydration | Open   | Create a local-state resilience OpenSpec change.   |
-| C6  | Apply the latest auto-update preference when a check is in flight    | Open   | Create an updater policy OpenSpec change.          |
-| C9  | Do not reset an active timer when unrelated duration settings change | Open   | Include in the timer/task regression change.       |
-| C10 | Report native notification-audio failures and bound playback work    | Open   | Create a notification reliability OpenSpec change. |
+| ID  | Correction                                                                                                   | Status | Next action                                                 |
+| --- | ------------------------------------------------------------------------------------------------------------ | ------ | ----------------------------------------------------------- |
+| C5  | Validate persisted `state` and `statistics` schemas before hydration                                         | Open   | Create a local-state resilience OpenSpec change.            |
+| C6  | Apply the latest auto-update preference when a check is in flight                                            | Open   | Create an updater policy OpenSpec change.                   |
+| C9  | Do not reset an active timer when unrelated duration settings change                                         | Open   | Include in the timer/task regression change.                |
+| C10 | Report native notification-audio failures and bound playback work                                            | Open   | Create a notification reliability OpenSpec change.          |
+| C18 | Bound statistics growth so history cannot exhaust local storage (audit 2026-10-29 D-01)                      | Open   | Decide retention/compaction (schema) in an OpenSpec change. |
+| C19 | Define the exit-time contract for the open statistics segment and pending state (audit 2026-10-29 C-03/C-04) | Open   | Record the decision in an ADR before any code change.       |
 
 ### P2 — Cross-Platform and Operational Reliability
 
@@ -52,7 +54,7 @@ sections are `TBD` / `A definir`.
 ## Execution Order
 
 1. Secure release supply chain and release admission (C2-C4).
-2. Protect local data and updater behavior (C5-C6).
+2. Protect local data and updater behavior (C5-C6, C18-C19).
 3. Correct timer and notification regressions (C9-C10).
 4. Add cross-platform CI and operational controls (C11, C13).
 5. Expand regression prevention and correct remaining documentation drift (C14-C15, C17).

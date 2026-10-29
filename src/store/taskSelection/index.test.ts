@@ -107,6 +107,43 @@ describe("task selection reducer", () => {
     });
   });
 
+  it("resolves the selected card after undoing its cross-list drag", async () => {
+    const { default: selectionReducer } = await import("./index");
+    const {
+      default: tasksReducer,
+      dragList,
+      undoTasks,
+    } = await import("../tasks");
+    const action = dragList({
+      sourceId: "list-id-1",
+      destinationId: "list-id-2",
+      sourceIndex: 0,
+      destinationIndex: 1,
+      draggableId: "task-id-1",
+      type: "card",
+    });
+
+    const selection = selectionReducer(undefined, action);
+    const tasks = tasksReducer(
+      tasksReducer(
+        { past: [], present: taskLists, future: [] },
+        action
+      ),
+      undoTasks()
+    );
+
+    expect(
+      resolveActiveTaskSelection({
+        taskLists: tasks.present,
+        taskSelection: selection,
+      })
+    ).toMatchObject({
+      listId: "list-id-1",
+      listTitle: "FOCUS",
+      cardId: "task-id-1",
+    });
+  });
+
   it("keeps selection during same-list, unrelated-card, and list drags", async () => {
     const { default: selectionReducer } = await import("./index");
     const { dragList } = await import("../tasks");

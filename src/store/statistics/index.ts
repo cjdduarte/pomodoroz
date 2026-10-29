@@ -1,13 +1,13 @@
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { createSlice } from "@reduxjs/toolkit";
 import { getFromStorage } from "utils";
+import { StatisticsBucket } from "./types";
 import type { StatisticsSessionRecord, StatisticsState } from "./types";
 
 export const STATISTICS_STORAGE_KEY = "statistics";
 
 const getStatisticsStateFromStorage = ():
-  | StatisticsState
-  | undefined => {
+  StatisticsState | undefined => {
   const dedicatedState = getFromStorage<StatisticsState>(
     STATISTICS_STORAGE_KEY
   );
@@ -102,6 +102,68 @@ const statisticsSlice = createSlice({
       state.sessions = action.payload;
     },
 
+    // Move os segundos de foco mais recentes do bloco atual para Ocioso
+    // (reset com "Back may count as Idle"), inclusive os já gravados em chunks.
+    reclassifyRecentFocusAsIdle(
+      state,
+      action: PayloadAction<{ seconds: number; since: number }>
+    ) {
+      let remaining = action.payload.seconds;
+
+      for (
+        let index = state.sessions.length - 1;
+        index >= 0 && remaining > 0;
+        index -= 1
+      ) {
+        const session = state.sessions[index];
+
+        // Sessões ficam em ordem de conclusão; ciclo concluído encerra bloco anterior.
+        if (
+          session.completedAt < action.payload.since ||
+          session.cycleCompleted
+        ) {
+          break;
+        }
+
+        if (session.bucket !== StatisticsBucket.FOCUS) {
+          continue;
+        }
+
+        const movesWholeSession = remaining >= session.durationSeconds;
+        const movedSeconds = movesWholeSession
+          ? session.durationSeconds
+          : remaining;
+        remaining -= movedSeconds;
+
+        const idlePortion: StatisticsSessionRecord = {
+          ...session,
+          bucket: StatisticsBucket.IDLE,
+          timerType: "IDLE",
+          durationSeconds: Number(movedSeconds.toFixed(3)),
+          round: null,
+          totalRounds: null,
+          cycleCompleted: false,
+          listId: null,
+          listTitle: null,
+          taskId: null,
+          taskText: null,
+        };
+
+        if (movesWholeSession) {
+          state.sessions[index] = idlePortion;
+          continue;
+        }
+
+        session.durationSeconds = Number(
+          (session.durationSeconds - movedSeconds).toFixed(3)
+        );
+        state.sessions.splice(index + 1, 0, {
+          ...idlePortion,
+          id: `${session.id}:idle:${action.payload.since}`,
+        });
+      }
+    },
+
     clearStatistics(state) {
       state.sessions = [];
     },
@@ -112,6 +174,7 @@ export const {
   addStatisticsSession,
   setStatisticsSessions,
   clearStatistics,
+  reclassifyRecentFocusAsIdle,
 } = statisticsSlice.actions;
 
 export * from "./types";

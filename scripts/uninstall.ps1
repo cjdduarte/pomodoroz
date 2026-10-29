@@ -11,6 +11,7 @@ param(
 $ErrorActionPreference = "Stop"
 $APP_DIR = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
 $INSTALLERS_BUNDLE_DIR = Join-Path $APP_DIR "src-tauri/target/release/bundle"
+$script:RemovalFailures = 0
 
 function Step($message) {
     Write-Host "`n==> $message" -ForegroundColor Cyan
@@ -31,6 +32,7 @@ function Remove-IfExists($path) {
             Remove-Item -Recurse -Force -LiteralPath $path -ErrorAction Stop
             Write-Host "Removido: $path"
         } catch {
+            $script:RemovalFailures++
             Write-Host "Aviso: nao foi possivel remover $path" -ForegroundColor Yellow
         }
     }
@@ -248,6 +250,10 @@ if ($isLinuxOs) {
 if ($Installers) {
     Step "Removendo instaladores locais gerados pelo validar-tudo"
     Remove-IfExists $INSTALLERS_BUNDLE_DIR
+}
+
+if ($script:RemovalFailures -gt 0) {
+    Die "$($script:RemovalFailures) item(ns) nao puderam ser removidos. Feche o Pomodoroz e rode o script novamente."
 }
 
 Step "Concluido"

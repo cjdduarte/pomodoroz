@@ -23,8 +23,12 @@ import {
   StyledDescriptionHeading,
 } from "styles";
 import { Checkbox, SVG } from "components";
+import { openExternalUrl } from "utils";
 import MDPreviewer from "./MDPreviewer";
 import { useTranslation } from "react-i18next";
+
+const MARKDOWN_CHEATSHEET_URL =
+  "https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet";
 
 type Props = {
   listId: string;
@@ -49,6 +53,7 @@ const TaskDetails = ({ listId, cardId, onExit, ref }: Props) => {
 
   const [editingDescription, setEditingDescription] = useState(false);
 
+  // Rascunho da edição; fora dela a descrição exibida vem do store.
   const [description, setDescription] = useState(card?.description);
 
   const [showPreview, setShowPreview] = useState(false);
@@ -115,10 +120,10 @@ const TaskDetails = ({ listId, cardId, onExit, ref }: Props) => {
     [dispatch, listId, card]
   );
 
-  const editDescriptionCallback = useCallback(
-    () => setEditingDescription(true),
-    []
-  );
+  const editDescriptionCallback = useCallback(() => {
+    setDescription(card?.description);
+    setEditingDescription(true);
+  }, [card?.description]);
 
   const dontEditDescriptionCallback = useCallback(
     () => setEditingDescription(false),
@@ -128,6 +133,14 @@ const TaskDetails = ({ listId, cardId, onExit, ref }: Props) => {
   const setDescriptionCallback = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) =>
       setDescription(e.target.value),
+    []
+  );
+
+  const openFormattingHelp = useCallback(
+    (event: React.MouseEvent<HTMLAnchorElement>) => {
+      event.preventDefault();
+      void openExternalUrl(MARKDOWN_CHEATSHEET_URL);
+    },
     []
   );
 
@@ -200,7 +213,8 @@ const TaskDetails = ({ listId, cardId, onExit, ref }: Props) => {
                 <StyledDescriptionFormatHelp
                   target="_blank"
                   rel="noopener noreferrer"
-                  href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet"
+                  href={MARKDOWN_CHEATSHEET_URL}
+                  onClick={openFormattingHelp}
                 >
                   {t("tasks.formattingHelp")}
                 </StyledDescriptionFormatHelp>
@@ -209,7 +223,7 @@ const TaskDetails = ({ listId, cardId, onExit, ref }: Props) => {
           </StyledDescriptionForm>
         ) : (
           <MDPreviewer
-            description={description}
+            description={card?.description}
             onClick={editDescriptionCallback}
           />
         )}

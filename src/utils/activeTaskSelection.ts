@@ -21,19 +21,20 @@ export const resolveActiveTaskSelection = ({
     return null;
   }
 
-  const selectedList =
-    taskLists.find((list) => list._id === taskSelection.listId) || null;
-
-  if (!selectedList) {
-    return null;
-  }
-
-  const selectedCard =
-    selectedList.cards.find(
+  const findOpenCard = (list: TaskList) =>
+    list.cards.find(
       (card) => card._id === taskSelection.cardId && !card.done
-    ) || null;
+    );
 
-  if (!selectedCard) {
+  const selectedList =
+    taskLists.find(
+      (list) => list._id === taskSelection.listId && findOpenCard(list)
+    ) ??
+    // Undo de drag devolve o card à lista de origem sem mover a seleção.
+    taskLists.find(findOpenCard);
+  const selectedCard = selectedList && findOpenCard(selectedList);
+
+  if (!selectedList || !selectedCard) {
     return null;
   }
 

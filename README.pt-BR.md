@@ -110,7 +110,7 @@ O objetivo do Pomodoroz não é "corrigir flexibilidade", e sim adicionar recurs
 - **Módulo de Estatísticas** com relatório por período separado do progresso de longo prazo.
 - **Métricas por período** para foco, pausa, ocioso, ciclos completos, principais focos e fluxo diário.
 - **Visão de progresso** com sequência, nível/XP, meta de hoje, marcos, heatmap de 30 dias e barras dos últimos 7 dias.
-- **Detalhamento por lista de tarefas** com tempo acumulado e ciclos completos.
+- **Principais focos por tarefa**: as 5 combinações lista/tarefa com mais tempo de foco no período, com ciclos completos.
 
 **Qualidade de vida**
 
@@ -167,7 +167,7 @@ O objetivo do Pomodoroz não é "corrigir flexibilidade", e sim adicionar recurs
 - **Relatório por período**: tempo de foco, pausa, ocioso, ciclos completos, principais focos e fluxo diário.
 - **Progresso de longo prazo**: sequência, nível/XP, meta de hoje, marcos explícitos, heatmap de 30 dias e barras dos últimos 7 dias.
 - **Gráfico diário** (foco/pausa/ocioso empilhados).
-- **Detalhamento por lista de tarefas** com tempo e ciclos.
+- **Principais focos por tarefa** (top 5) com tempo e ciclos.
 - Limpeza de dados com confirmação (semana, mês ou tudo).
 
 ### Modo Compacto
@@ -181,9 +181,9 @@ O objetivo do Pomodoroz não é "corrigir flexibilidade", e sim adicionar recurs
 
 - **Nenhuma** — sem notificação.
 - **Normal** — notifica a cada pausa.
-- **Extra** — notifica 60s antes da pausa, 30s antes do fim e no início.
+- **Extra** — notifica 30s antes da pausa, 60s antes do fim da pausa e no início.
 - **Lembrete de extensão de foco** — quando o app está oculto ou no tray, a janela de extensão pode disparar um aviso nativo.
-- **Som customizável** — sino padrão ou arquivo de áudio personalizado.
+- **Som de notificação** — sino padrão do app ou um som alternativo incluído.
 - **Assistente de voz** — aviso sonoro sobre status da sessão.
 
 ### Aparência e Sistema

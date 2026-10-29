@@ -271,6 +271,16 @@ export const en = {
     reclassifyFocusToIdleMessage:
       "Move the elapsed time of the current task to Idle?",
   },
+  alerts: {
+    nativeWarningTitle: "Native integration warning",
+    nativeIpcError:
+      "Could not communicate with the native runtime (Tauri). Restart the app.",
+    updateInstallFailed:
+      "Could not download or install the update. Check your connection and try again later.",
+    storageWarningTitle: "Changes not saved",
+    storageWriteFailed:
+      "Your data could not be saved on this device (storage may be full). Recent changes may be lost when the app closes. Free up space in {{location}}.",
+  },
   units: {
     min: "min",
     mins: "mins",

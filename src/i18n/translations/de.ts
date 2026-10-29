@@ -274,6 +274,16 @@ export const de = {
     reclassifyFocusToIdleMessage:
       "Die verstrichene Zeit der aktuellen Aufgabe in Leerlauf verschieben?",
   },
+  alerts: {
+    nativeWarningTitle: "Hinweis zur nativen Integration",
+    nativeIpcError:
+      "Kommunikation mit der nativen Laufzeit (Tauri) fehlgeschlagen. Starte die App neu.",
+    updateInstallFailed:
+      "Das Update konnte nicht heruntergeladen oder installiert werden. Pruefe die Verbindung und versuche es spaeter erneut.",
+    storageWarningTitle: "Aenderungen nicht gespeichert",
+    storageWriteFailed:
+      "Deine Daten konnten auf diesem Geraet nicht gespeichert werden (Speicher moeglicherweise voll). Neue Aenderungen koennen beim Schliessen der App verloren gehen. Gib Speicher frei unter {{location}}.",
+  },
   units: {
     min: "min",
     mins: "mins",

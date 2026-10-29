@@ -271,6 +271,16 @@ export const ja = {
     reclassifyFocusToIdleMessage:
       "現在のタスクの経過時間をアイドル時間へ移動しますか？",
   },
+  alerts: {
+    nativeWarningTitle: "ネイティブ連携の警告",
+    nativeIpcError:
+      "ネイティブランタイム (Tauri) と通信できませんでした。アプリを再起動してください。",
+    updateInstallFailed:
+      "アップデートをダウンロードまたはインストールできませんでした。接続を確認して、後でもう一度お試しください。",
+    storageWarningTitle: "変更が保存されていません",
+    storageWriteFailed:
+      "このデバイスにデータを保存できませんでした（ストレージがいっぱいの可能性があります）。アプリを閉じると最近の変更が失われる場合があります。{{location}} で空き容量を確保してください。",
+  },
   units: {
     min: "分",
     mins: "分",

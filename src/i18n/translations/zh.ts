@@ -262,6 +262,15 @@ export const zh = {
     reclassifyFocusToIdleMessage:
       "是否将当前任务的已过时间转为空闲时间？",
   },
+  alerts: {
+    nativeWarningTitle: "原生集成警告",
+    nativeIpcError: "无法与原生运行时 (Tauri) 通信。请重启应用。",
+    updateInstallFailed:
+      "无法下载或安装更新。请检查网络连接并稍后重试。",
+    storageWarningTitle: "更改未保存",
+    storageWriteFailed:
+      "无法在此设备上保存数据（存储空间可能已满）。关闭应用后，最近的更改可能会丢失。请在 {{location}} 中释放空间。",
+  },
   units: {
     min: "分钟",
     mins: "分钟",

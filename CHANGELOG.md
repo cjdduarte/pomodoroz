@@ -15,6 +15,17 @@
 - **Task lists and cards can no longer get blank names** — whitespace-only titles and texts are ignored, so new task exports stay importable; existing blank-named items must be renamed before exporting.
 - **Unchanged task actions no longer pollute undo history** — reselecting a task or leaving a title unchanged no longer adds empty undo steps or clears redo.
 - **No Interruptions Mode also guards the session reset** — the rounds reset button is blocked while the timer runs, so it can no longer skip an active break.
+- **Failed saves are no longer silent** — when local storage is full or blocked, an alert warns that recent changes may be lost and points to Report > Manage history to free space.
+- **Moving a reset focus session to Idle covers the whole session** — resetting with reclassification now also moves the focus already saved in two-minute chunks during that session, not only the last chunk.
+- **Special breaks no longer repeat after reopening the app** — breaks already triggered today are remembered locally, so restarting inside the same break window does not start it again.
+- **Links in task descriptions open in the browser** — Markdown links and the "Formatting Help" link now use the system opener (`http`/`https` only) instead of doing nothing in the app window.
+- **Task details show the saved description** — the read-only view follows undo, redo and imports while the panel is open, and editing starts from the saved text.
+- **Update install failures are explained** — a failed download or install shows a specific translated message, and native warning alerts are translated.
+- **Merge import keeps the active task** — only "replace" clears the task selection.
+- **Undoing a cross-list drag keeps the active task** — the selection resolves to the restored position instead of pausing the timer and clearing it.
+- **Second launch exits before creating tray or global shortcuts** — the single-instance plugin is now registered first, as its documentation requires.
+- **Local install scripts report failures** — `install.ps1` stops at the first failed pnpm step, `uninstall.ps1` exits with an error when items could not be removed, and the generated desktop entry quotes the launcher path so home folders with spaces work.
+- **README feature descriptions match the app** — Extra notification timing, the bundled alternative sound and the top-5 focus-by-task report are described correctly.
 
 ### Changed
 

@@ -9,6 +9,7 @@ import React, {
 import { useTranslation } from "react-i18next";
 import {
   addStatisticsSession,
+  reclassifyRecentFocusAsIdle,
   setPlay,
   setRound,
   setTimerType,
@@ -17,9 +18,13 @@ import {
 } from "store";
 import { useNotification, useWakeLock } from "hooks";
 import {
+  getFromStorage,
   getSpecialBreakTrigger,
   isEqualToOne,
+  keepSpecialBreakKeysForDate,
   resolveActiveTaskSelection,
+  saveToStorage,
+  SPECIAL_BREAK_TRIGGERS_STORAGE_KEY,
   type ResolvedActiveTaskSelection,
 } from "utils";
 
@@ -217,8 +222,11 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
   const focusExtensionUsedRef = useRef(false);
   const previousTimerTypeRef = useRef(timer.timerType);
   const trackingSegmentRef = useRef<TrackingSegment | null>(null);
+  // Início da contagem atual: delimita o bloco de foco reclassificado no reset.
+  const countdownStartedAtRef = useRef(0);
   const pendingCycleCompletionRef = useRef(false);
-  const triggeredSpecialBreakKeysRef = useRef(new Set<string>());
+  // Carregado do storage no primeiro uso (render roda a cada tick).
+  const triggeredSpecialBreakKeysRef = useRef<Set<string> | null>(null);
   const breakTransitionTimeoutRef = useRef<ReturnType<
     typeof setTimeout
   > | null>(null);
@@ -247,6 +255,7 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
   const setTimerDuration = useCallback(
     (time: number) => {
       clearBreakTransitionTimeout();
+      countdownStartedAtRef.current = Date.now();
       setDuration(time * 60);
       setCount(time * 60);
       setLastCountTime(Date.now());
@@ -397,6 +406,21 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
             currentSegment.durationSeconds += elapsedMs / 1000;
           }
 
+          // Chunks de 120 s já gravados como foco neste bloco também vão para Ocioso.
+          const committedBlockFocusSeconds = Math.max(
+            0,
+            duration - count - currentSegment.durationSeconds
+          );
+
+          if (committedBlockFocusSeconds > 0) {
+            dispatch(
+              reclassifyRecentFocusAsIdle({
+                seconds: committedBlockFocusSeconds,
+                since: countdownStartedAtRef.current,
+              })
+            );
+          }
+
           commitTrackingSegment(
             {
               ...currentSegment,
@@ -441,6 +465,8 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
     [
       timer.timerType,
       duration,
+      count,
+      dispatch,
       commitTrackingSegment,
       trackingSnapshot,
       config.longBreak,
@@ -570,16 +596,33 @@ const CounterProvider = ({ children }: PropsWithChildren) => {
 
     if (timer.playing) {
       interval = setInterval(() => {
+        const now = new Date();
+
+        if (!triggeredSpecialBreakKeysRef.current) {
+          const storedKeys = getFromStorage<unknown>(
+            SPECIAL_BREAK_TRIGGERS_STORAGE_KEY
+          );
+          triggeredSpecialBreakKeysRef.current = new Set(
+            keepSpecialBreakKeysForDate(
+              Array.isArray(storedKeys) ? storedKeys : [],
+              now
+            )
+          );
+        }
+
+        const triggeredKeys = triggeredSpecialBreakKeysRef.current;
         const specialBreakTrigger = getSpecialBreakTrigger(
           config.specialBreaks,
-          new Date(),
-          triggeredSpecialBreakKeysRef.current
+          now,
+          triggeredKeys
         );
 
         if (timer.timerType !== TimerStatus.SPECIAL_BREAK) {
           if (specialBreakTrigger) {
-            triggeredSpecialBreakKeysRef.current.add(
-              specialBreakTrigger.key
+            triggeredKeys.add(specialBreakTrigger.key);
+            saveToStorage(
+              SPECIAL_BREAK_TRIGGERS_STORAGE_KEY,
+              keepSpecialBreakKeysForDate([...triggeredKeys], now)
             );
             dispatch(setTimerType(TimerStatus.SPECIAL_BREAK));
             setTimerDuration(specialBreakTrigger.breakConfig.duration);

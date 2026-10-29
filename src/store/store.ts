@@ -30,6 +30,41 @@ const store = configureStore({
   },
 });
 
+type PersistenceFailureListener = () => void;
+
+const persistenceFailureListeners =
+  new Set<PersistenceFailureListener>();
+// Falha de gravação no boot acontece antes de qualquer listener; entrega na inscrição.
+let hasPendingPersistenceFailure = false;
+
+export const subscribePersistenceFailures = (
+  listener: PersistenceFailureListener
+) => {
+  persistenceFailureListeners.add(listener);
+
+  if (hasPendingPersistenceFailure) {
+    hasPendingPersistenceFailure = false;
+    listener();
+  }
+
+  return () => {
+    persistenceFailureListeners.delete(listener);
+  };
+};
+
+const persistToStorage = (name: string, value: unknown) => {
+  if (saveToStorage(name, value)) {
+    return;
+  }
+
+  if (!persistenceFailureListeners.size) {
+    hasPendingPersistenceFailure = true;
+    return;
+  }
+
+  persistenceFailureListeners.forEach((listener) => listener());
+};
+
 const persistedRootStateResult = readFromStorage("state");
 export const isFreshInstallProfile =
   persistedRootStateResult.status === "missing";
@@ -38,7 +73,7 @@ const canPersistRootState =
   backupCorruptStorageValue("state") !== null;
 
 if (canPersistRootState && persistedRootStateResult.status !== "ok") {
-  saveToStorage("state", {
+  persistToStorage("state", {
     config: store.getState().config,
     settings: store.getState().settings,
     taskSelection: store.getState().taskSelection,
@@ -54,12 +89,12 @@ const canPersistStatistics =
   backupCorruptStorageValue(STATISTICS_STORAGE_KEY) !== null;
 
 if (canPersistStatistics && persistedStatisticsResult.status !== "ok") {
-  saveToStorage(STATISTICS_STORAGE_KEY, store.getState().statistics);
+  persistToStorage(STATISTICS_STORAGE_KEY, store.getState().statistics);
 }
 
 const persistRootState = () => {
   if (canPersistRootState) {
-    saveToStorage("state", {
+    persistToStorage("state", {
       config: store.getState().config,
       settings: store.getState().settings,
       taskSelection: store.getState().taskSelection,
@@ -68,7 +103,10 @@ const persistRootState = () => {
   }
 
   if (canPersistStatistics) {
-    saveToStorage(STATISTICS_STORAGE_KEY, store.getState().statistics);
+    persistToStorage(
+      STATISTICS_STORAGE_KEY,
+      store.getState().statistics
+    );
   }
 };
 
