@@ -29,7 +29,9 @@
 
 ### Alterado
 
-- **Patch de advisory TLS do Rust aplicado** — o `rustls` transitivo usado pelo updater do app agora resolve para 0.23.46 (com `rustls-webpki` 0.103.15), corrigindo RUSTSEC-2026-0285, -0346, -0348 e -0349 para que o gate estrito de auditoria Rust passe sem nova exceção.
+- **Patch de advisory TLS do Rust aplicado** — o `rustls` transitivo usado pelo updater do app agora resolve para 0.23.46, corrigindo RUSTSEC-2026-0285, -0346, -0348 e -0349.
+- **Patch de segurança do Tauri aplicado** — Tauri 2.12.5, tauri-build 2.7.4, os plugins nativos (updater 2.14.1, single-instance 2.5.5, opener 2.7.2, notification 2.8.0, dialog 2.8.4, log 2.10.1, global-shortcut 2.4.1, autostart 2.7.0, os 2.4.0) e os pacotes JS `@tauri-apps/*` correspondentes (api/cli 2.12.4, plugin-updater 2.14.1, plugin-opener 2.7.2, plugin-autostart 2.7.0, plugin-os 2.4.0), mais atualizações de lockfile (`zip` 9.1.3, `rustls-webpki` 0.103.16, `webpki-root-certs` 1.0.11, `tokio` 1.54.1, `plist` 1.10.3, `serde_json` 1.0.154), corrigem RUSTSEC-2026-0194, -0195, -0367, -0368, -0369, -0382, -0383 e -0386. As exceções do audit removem advisories que não aparecem mais (GTK3, `unic-*`, `quick-xml`) e passam a aceitar três avisos de crates sem manutenção da pilha zbus, já presentes no lockfile anterior (RUSTSEC-2026-0370, -0371, -0372). O Windows 7 não é mais suportado (wry 0.57), e o AppImage não inclui mais o `xdg-open`, então abrir links depende do sistema.
+- **Pin do pnpm atualizado para 12.16.1** — `packageManager`, os pins do Corepack nos workflows de CI e release e a versão do pnpm registrada no lockfile agora coincidem, mantendo as instalações congeladas alinhadas ao CI.
 
 ## [26.9.2] - 2026-09-09
 

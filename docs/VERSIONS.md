@@ -11,14 +11,14 @@ documental. Elas nao substituem auditoria oficial em registry/changelog.
 
 ## Runtime e app
 
-| Item           | Versao declarada | Fonte local                                                                            | Data consulta oficial | Status                                                                                                       |
-| -------------- | ---------------: | -------------------------------------------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------ |
-| Pomodoroz      |         `26.9.1` | `package.json`, `src-tauri/Cargo.toml`                                                 | local                 | versao interna sincronizada                                                                                  |
-| pnpm           |         `11.9.0` | `packageManager` em `package.json`                                                     | pendente              | auditar antes de mudar                                                                                       |
-| Rust edition   |           `2021` | `src-tauri/Cargo.toml`                                                                 | local                 | edicao do projeto                                                                                            |
-| Rust toolchain |         `1.98.1` | [manifesto stable oficial](https://static.rust-lang.org/dist/channel-rust-stable.toml) | 2026-09-06            | fixada em `rust-toolchain.toml`                                                                              |
-| Rust minimo    |           `1.98` | `src-tauri/Cargo.toml`                                                                 | 2026-09-06            | serie minima suportada                                                                                       |
-| OpenSpec       |         `1.11.0` | [release oficial v1.11.0](https://github.com/Fission-AI/OpenSpec/releases/tag/v1.11.0) | 2026-08-28            | comandos/skills OpenCode regenerados; `.agents/` detectado, mas nao adicionado sem `openspec init` explicito |
+| Item           | Versao declarada | Fonte local                                                                            | Data consulta oficial                                  | Status                                                                                                       |
+| -------------- | ---------------: | -------------------------------------------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| Pomodoroz      |         `26.9.2` | `package.json`, `src-tauri/Cargo.toml`                                                 | local                                                  | versao interna sincronizada                                                                                  |
+| pnpm           |        `12.16.1` | `packageManager` em `package.json`                                                     | 2026-10-29 ([npm](https://www.npmjs.com/package/pnpm)) | pin, workflows e boot document do lockfile alinhados                                                         |
+| Rust edition   |           `2021` | `src-tauri/Cargo.toml`                                                                 | local                                                  | edicao do projeto                                                                                            |
+| Rust toolchain |         `1.98.1` | [manifesto stable oficial](https://static.rust-lang.org/dist/channel-rust-stable.toml) | 2026-09-06                                             | fixada em `rust-toolchain.toml`                                                                              |
+| Rust minimo    |           `1.98` | `src-tauri/Cargo.toml`                                                                 | 2026-09-06                                             | serie minima suportada                                                                                       |
+| OpenSpec       |         `1.11.0` | [release oficial v1.11.0](https://github.com/Fission-AI/OpenSpec/releases/tag/v1.11.0) | 2026-08-28                                             | comandos/skills OpenCode regenerados; `.agents/` detectado, mas nao adicionado sem `openspec init` explicito |
 
 ## Atualizacoes futuras da toolchain Rust
 
@@ -31,17 +31,17 @@ aplicavel. Dependencias, edition e lockfiles nao mudam como efeito colateral.
 
 ## Dependencias principais declaradas
 
-| Pacote/crate      | Versao declarada | Fonte local            | Data consulta oficial | Status                 |
-| ----------------- | ---------------: | ---------------------- | --------------------- | ---------------------- |
-| `@tauri-apps/api` |         `2.11.1` | `package.json`         | pendente              | auditar antes de mudar |
-| `@tauri-apps/cli` |         `2.11.4` | `package.json`         | pendente              | auditar antes de mudar |
-| `tauri`           |         `2.11.5` | `src-tauri/Cargo.toml` | pendente              | auditar antes de mudar |
-| `react`           |        `^19.2.7` | `package.json`         | pendente              | auditar antes de mudar |
-| `react-dom`       |        `^19.2.7` | `package.json`         | pendente              | auditar antes de mudar |
-| `react-router`    |         `7.17.0` | `package.json`         | pendente              | auditar antes de mudar |
-| `typescript`      |          `6.0.3` | `package.json`         | pendente              | auditar antes de mudar |
-| `vite`            |         `^8.1.2` | `package.json`         | pendente              | auditar antes de mudar |
-| `rodio`           |         `0.22.2` | `src-tauri/Cargo.toml` | pendente              | auditar antes de mudar |
+| Pacote/crate      | Versao declarada | Fonte local            | Data consulta oficial                                             | Status                      |
+| ----------------- | ---------------: | ---------------------- | ----------------------------------------------------------------- | --------------------------- |
+| `@tauri-apps/api` |         `2.12.4` | `package.json`         | 2026-10-29 ([npm](https://www.npmjs.com/package/@tauri-apps/api)) | patch de seguranca aplicado |
+| `@tauri-apps/cli` |         `2.12.4` | `package.json`         | 2026-10-29 ([npm](https://www.npmjs.com/package/@tauri-apps/cli)) | patch de seguranca aplicado |
+| `tauri`           |         `2.12.5` | `src-tauri/Cargo.toml` | 2026-10-29 ([crates.io](https://crates.io/crates/tauri))          | patch de seguranca aplicado |
+| `react`           |        `^19.2.8` | `package.json`         | pendente                                                          | auditar antes de mudar      |
+| `react-dom`       |        `^19.2.8` | `package.json`         | pendente                                                          | auditar antes de mudar      |
+| `react-router`    |         `7.17.0` | `package.json`         | pendente                                                          | auditar antes de mudar      |
+| `typescript`      |          `6.0.3` | `package.json`         | pendente                                                          | auditar antes de mudar      |
+| `vite`            |         `^8.2.2` | `package.json`         | pendente                                                          | auditar antes de mudar      |
+| `rodio`           |         `0.22.2` | `src-tauri/Cargo.toml` | pendente                                                          | auditar antes de mudar      |
 
 ## Politica de updates
 
@@ -60,3 +60,10 @@ aplicavel. Dependencias, edition e lockfiles nao mudam como efeito colateral.
 - 2026-07-17: OpenSpec 1.6.0 confirmado na [release oficial](https://github.com/Fission-AI/OpenSpec/releases/tag/v1.6.0); aliases e revisao do fluxo atualizados para `/opsx:update` e `/opsx-update`.
 - 2026-08-27: OpenSpec 1.11.0 confirmado na [release oficial](https://github.com/Fission-AI/OpenSpec/releases/tag/v1.11.0); instrucoes OpenCode regeneradas e validacao strict passou.
 - 2026-09-06: toolchain fixada em Rust 1.98.1 e MSRV elevado para 1.98.
+- 2026-10-29: patch de seguranca Tauri aplicado com versoes confirmadas no
+  npm e no crates.io (`tauri` 2.12.5, `tauri-build` 2.7.4, plugins nativos e
+  `@tauri-apps/*` correspondentes); lock Rust atualizado para `zip`,
+  `rustls-webpki`, `webpki-root-certs`, `tokio`, `plist` e `serde_json`.
+- 2026-10-29: pnpm 12.16.1 confirmado no npm (latest); `packageManager`, pins
+  Corepack dos workflows e boot document do `pnpm-lock.yaml` atualizados;
+  `pnpm install --frozen-lockfile` passou com o pnpm 12.16.1.

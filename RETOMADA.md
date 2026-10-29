@@ -1,7 +1,7 @@
 # RETOMADA — Pomodoroz
 
 Status: snapshot operacional da sessão atual.
-Última revisão: 2026-10-16.
+Última revisão: 2026-10-29.
 
 ## Fontes canônicas
 
@@ -13,16 +13,17 @@ Status: snapshot operacional da sessão atual.
 
 ## Estado atual da sessão
 
-- A baseline publicada é `26.9.2`.
-- Correções da investigação de defeitos de 2026-10-16 (undo/redo, cores do dia na virada, nomes em branco, histórico sem no-op, reset de sessões no modo sem interrupções) estão na seção `26.10.1` dos changelogs, ainda sem commit/release.
+- A baseline publicada é `26.9.2`; a seção `26.10.1` (TBD/A definir) dos changelogs acumula as correções sem release.
+- As correções da auditoria de defeitos de 2026-10-29, o patch de segurança Tauri 2.12.5 e o pin do pnpm 12.16.1 estão commitados localmente em `main` (2 commits), sem push nem release (detalhes na seção `26.10.1`).
+- `cargo audit --deny warnings` passa; as exceções restantes estão em `src-tauri/.cargo/audit.toml` (zbus sem manutenção: RUSTSEC-2026-0370/0371/0372).
 - A change `complete-updater-task-cleanup` está em 9/10 tarefas.
 - A change `align-rust-toolchain-automation` está pronta para leitura guiada e decisão de archive.
 
 ## Bloqueios
 
-- Falta validar `scripts/check-updates.ps1` em Windows ou ambiente com `pwsh`.
-- Ainda faltam validações manuais de drag durante foco, popup de Tasks e updater N→N+1 para NSIS/AppImage.
+- Sem `pwsh` local: `scripts/check-updates.ps1`, `scripts/install.ps1` e `scripts/uninstall.ps1` só foram revisados estaticamente.
+- Validações manuais pendentes no app: reset de foco com "mover para Ocioso" após mais de 2 min de foco; alerta de armazenamento cheio; pausa especial ao reabrir o app dentro da janela; link Markdown da descrição abrindo no navegador; segunda instância sem tray duplicado; drag durante foco, popup de Tasks e updater N→N+1 para NSIS/AppImage.
 
 ## Próximo passo
 
-Validar o script PowerShell; depois executar as validações manuais e decidir o archive de `align-rust-toolchain-automation`.
+Executar as validações manuais acima; depois fazer push, acompanhar o primeiro CI com pnpm 12.16.1 e Tauri 2.12.5, e decidir o archive de `align-rust-toolchain-automation`.

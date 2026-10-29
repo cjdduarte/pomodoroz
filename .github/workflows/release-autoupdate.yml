@@ -50,7 +50,7 @@ jobs:
       - name: Setup pnpm (Corepack)
         run: |
           corepack enable
-          corepack prepare pnpm@12.3.4 --activate
+          corepack prepare pnpm@12.16.1 --activate
 
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@1.98.1
@@ -197,7 +197,7 @@ jobs:
       - name: Setup pnpm (Corepack)
         run: |
           corepack enable
-          corepack prepare pnpm@12.3.4 --activate
+          corepack prepare pnpm@12.16.1 --activate
 
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@1.98.1
