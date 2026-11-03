@@ -6,7 +6,7 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
-## [26.10.1] - 2026-10-29
+## [26.11.1] - 2026-11-03
 
 ### Corrigido
 
@@ -25,14 +25,14 @@
 - **Desfazer um arraste entre listas mantém a tarefa ativa** — a seleção resolve para a posição restaurada em vez de pausar o timer e ser limpa.
 - **Segunda abertura encerra antes de criar tray ou atalhos globais** — o plugin de instância única agora é registrado primeiro, como exige a documentação dele.
 - **Scripts de instalação local reportam falhas** — `install.ps1` para no primeiro passo pnpm com erro, `uninstall.ps1` sai com erro quando itens não puderam ser removidos, e a entrada `.desktop` gerada põe o caminho do lançador entre aspas para funcionar com pastas pessoais com espaço.
-- **Descrições do README coincidem com o app** — horários das notificações Extra, o som alternativo incluído e o relatório dos 5 principais focos por tarefa estão descritos corretamente.
 
 ### Alterado
 
-- **Patch de advisory TLS do Rust aplicado** — o `rustls` transitivo usado pelo updater do app agora resolve para 0.23.46, corrigindo RUSTSEC-2026-0285, -0346, -0348 e -0349.
-- **Patch de segurança do Tauri aplicado** — Tauri 2.12.5, tauri-build 2.7.4, os plugins nativos (updater 2.14.1, single-instance 2.5.5, opener 2.7.2, notification 2.8.0, dialog 2.8.4, log 2.10.1, global-shortcut 2.4.1, autostart 2.7.0, os 2.4.0) e os pacotes JS `@tauri-apps/*` correspondentes (api/cli 2.12.4, plugin-updater 2.14.1, plugin-opener 2.7.2, plugin-autostart 2.7.0, plugin-os 2.4.0), mais atualizações de lockfile (`zip` 9.1.3, `rustls-webpki` 0.103.16, `webpki-root-certs` 1.0.11, `tokio` 1.54.1, `plist` 1.10.3, `serde_json` 1.0.154), corrigem RUSTSEC-2026-0194, -0195, -0367, -0368, -0369, -0382, -0383 e -0386. As exceções do audit removem advisories que não aparecem mais (GTK3, `unic-*`, `quick-xml`) e passam a aceitar três avisos de crates sem manutenção da pilha zbus, já presentes no lockfile anterior (RUSTSEC-2026-0370, -0371, -0372). O Windows 7 não é mais suportado (wry 0.57), e o AppImage não inclui mais o `xdg-open`, então abrir links depende do sistema.
-- **Pin do pnpm atualizado para 12.16.1** — `packageManager`, os pins do Corepack nos workflows de CI e release e a versão do pnpm registrada no lockfile agora coincidem, mantendo as instalações congeladas alinhadas ao CI.
-- **Dependências JavaScript de baixo risco foram atualizadas** — ferramentas de build e lint (vite 8.3.5, @vitejs/plugin-react 6.1.2, eslint 10.13.0, typescript-eslint 8.72.1, @eslint-react 5.28.8, prettier 3.9.10, globals 17.13.0, lint-staged 17.6.0) e patches de runtime (react-redux 9.3.1, uuid 14.0.3) foram atualizados sem mudanças intencionais de comportamento.
+- **Tauri e plugins nativos foram atualizados com correções de segurança** — o Tauri 2.12, seus plugins nativos e os pacotes `@tauri-apps/*` correspondentes foram atualizados juntos, e dependências transitivas do lock Rust (`rustls`, `rustls-webpki`, `webpki-root-certs`, `zip`, `tokio`, `plist`) agora resolvem as vulnerabilidades atuais do `cargo audit`; o Windows 7 não é mais suportado, e o AppImage passa a depender do `xdg-open` do sistema.
+- **Exceções do audit Rust foram revisadas** — advisories que não aparecem mais (GTK3, `unic-*`, `quick-xml`) saíram do `src-tauri/.cargo/audit.toml`, e crates zbus sem manutenção (RUSTSEC-2026-0370, -0371, -0372) ficam temporariamente ignorados enquanto acompanham os plugins Tauri no Linux.
+- **Dependências do projeto foram atualizadas** — o pin do pnpm (12.16.1) em `packageManager`, workflows de CI/release e lockfile, React 19.3, styled-components 6.6, Redux Toolkit 2.13, i18next/react-i18next, patches de runtime de `react-redux`/`uuid`, o tooling JS de build/lint e o crate Rust `log` foram atualizados sem mudanças intencionais de comportamento; o `async-executor` saiu de uma versão retirada (yanked).
+- **Artefatos da versão de release estão sincronizados em 26.11.1** — metadados JavaScript, Tauri, Cargo e lock do Cargo agora declaram a versão de release de forma consistente.
+- **Documentação alinhada ao app e às versões atuais** — as descrições de recursos do README agora coincidem com o app, e as referências de versões, roadmap e handoff foram atualizadas.
 
 ## [26.9.2] - 2026-09-09
 

@@ -6,7 +6,7 @@
 > Forked on 2026-03-25 from Pomatez v1.10.0.
 > Thanks to the original author for the solid foundation.
 
-## [26.10.1] - 2026-10-29
+## [26.11.1] - 2026-11-03
 
 ### Fixed
 
@@ -25,14 +25,14 @@
 - **Undoing a cross-list drag keeps the active task** — the selection resolves to the restored position instead of pausing the timer and clearing it.
 - **Second launch exits before creating tray or global shortcuts** — the single-instance plugin is now registered first, as its documentation requires.
 - **Local install scripts report failures** — `install.ps1` stops at the first failed pnpm step, `uninstall.ps1` exits with an error when items could not be removed, and the generated desktop entry quotes the launcher path so home folders with spaces work.
-- **README feature descriptions match the app** — Extra notification timing, the bundled alternative sound and the top-5 focus-by-task report are described correctly.
 
 ### Changed
 
-- **Rust TLS advisory patch was applied** — transitive `rustls` used by the in-app updater now resolves to 0.23.46, fixing RUSTSEC-2026-0285, -0346, -0348 and -0349.
-- **Tauri security patch was applied** — Tauri 2.12.5, tauri-build 2.7.4, the native plugins (updater 2.14.1, single-instance 2.5.5, opener 2.7.2, notification 2.8.0, dialog 2.8.4, log 2.10.1, global-shortcut 2.4.1, autostart 2.7.0, os 2.4.0) and the matching `@tauri-apps/*` JS packages (api/cli 2.12.4, plugin-updater 2.14.1, plugin-opener 2.7.2, plugin-autostart 2.7.0, plugin-os 2.4.0), plus lockfile updates (`zip` 9.1.3, `rustls-webpki` 0.103.16, `webpki-root-certs` 1.0.11, `tokio` 1.54.1, `plist` 1.10.3, `serde_json` 1.0.154), fix RUSTSEC-2026-0194, -0195, -0367, -0368, -0369, -0382, -0383 and -0386. Audit exceptions drop advisories no longer reported (GTK3, `unic-*`, `quick-xml`) and now accept three unmaintained-crate warnings from the zbus stack already in the previous lockfile (RUSTSEC-2026-0370, -0371, -0372). Windows 7 is no longer supported (wry 0.57), and the AppImage no longer bundles `xdg-open`, so opening links relies on the host system.
-- **pnpm pin updated to 12.16.1** — `packageManager`, the Corepack pins in the CI and release workflows, and the pnpm version recorded in the lockfile now agree, so frozen installs keep matching CI.
-- **Low-risk JavaScript dependencies were refreshed** — build and lint tooling (vite 8.3.5, @vitejs/plugin-react 6.1.2, eslint 10.13.0, typescript-eslint 8.72.1, @eslint-react 5.28.8, prettier 3.9.10, globals 17.13.0, lint-staged 17.6.0) and runtime patches (react-redux 9.3.1, uuid 14.0.3) were updated without intentional behavior changes.
+- **Tauri and native plugins were updated with security fixes** — Tauri 2.12, its native plugins and the matching `@tauri-apps/*` packages were updated together, and Rust lockfile transitives (`rustls`, `rustls-webpki`, `webpki-root-certs`, `zip`, `tokio`, `plist`) now resolve the current `cargo audit` vulnerabilities; Windows 7 is no longer supported, and the AppImage now relies on the system `xdg-open`.
+- **Rust audit exceptions were refreshed** — advisories no longer reported (GTK3, `unic-*`, `quick-xml`) were removed from `src-tauri/.cargo/audit.toml`, and unmaintained zbus crates (RUSTSEC-2026-0370, -0371, -0372) are temporarily ignored while they ship with the Tauri Linux plugins.
+- **Project dependencies were refreshed** — the pnpm pin (12.16.1) across `packageManager`, CI/release workflows and the lockfile, React 19.3, styled-components 6.6, Redux Toolkit 2.13, i18next/react-i18next, `react-redux`/`uuid` runtime patches, JS build/lint tooling, and the Rust `log` crate were updated without intentional behavior changes; `async-executor` moved off a yanked release.
+- **Release version artifacts are synchronized at 26.11.1** — JavaScript, Tauri, Cargo, and Cargo lock metadata now declare the released version consistently.
+- **Documentation was aligned with the app and current versions** — README feature descriptions now match the app, and version, roadmap, and handoff references were refreshed.
 
 ## [26.9.2] - 2026-09-09
 

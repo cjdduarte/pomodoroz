@@ -36,8 +36,8 @@ aplicavel. Dependencias, edition e lockfiles nao mudam como efeito colateral.
 | `@tauri-apps/api` |         `2.12.4` | `package.json`         | 2026-10-29 ([npm](https://www.npmjs.com/package/@tauri-apps/api)) | patch de seguranca aplicado |
 | `@tauri-apps/cli` |         `2.12.4` | `package.json`         | 2026-10-29 ([npm](https://www.npmjs.com/package/@tauri-apps/cli)) | patch de seguranca aplicado |
 | `tauri`           |         `2.12.5` | `src-tauri/Cargo.toml` | 2026-10-29 ([crates.io](https://crates.io/crates/tauri))          | patch de seguranca aplicado |
-| `react`           |        `^19.2.8` | `package.json`         | pendente                                                          | auditar antes de mudar      |
-| `react-dom`       |        `^19.2.8` | `package.json`         | pendente                                                          | auditar antes de mudar      |
+| `react`           |         `19.3.1` | `package.json`         | 2026-11-03 ([npm](https://www.npmjs.com/package/react))           | atualizado (minor)          |
+| `react-dom`       |         `19.3.1` | `package.json`         | 2026-11-03 ([npm](https://www.npmjs.com/package/react-dom))       | atualizado (minor)          |
 | `react-router`    |         `7.17.0` | `package.json`         | pendente                                                          | auditar antes de mudar      |
 | `typescript`      |          `6.0.3` | `package.json`         | pendente                                                          | auditar antes de mudar      |
 | `vite`            |         `^8.3.5` | `package.json`         | 2026-10-29 ([npm](https://www.npmjs.com/package/vite))            | atualizado (minor)          |
@@ -72,3 +72,10 @@ aplicavel. Dependencias, edition e lockfiles nao mudam como efeito colateral.
   resize mudam de comportamento), styled-components 6.6 (`attrs` e
   interpolacoes), RTK 2.13 (novo build), i18next/react-i18next, os majors
   `@types/node` 26, `react-router` 8, `typescript` 7, `vitest` 5 e `rodio` 0.23.
+- 2026-11-03: o operador aplicou via `check-updates` React/react-dom 19.3.1,
+  `@types/react*` 19.3.0, styled-components 6.6.0, RTK 2.13.0, i18next
+  26.7.1, react-i18next 17.1.11, `@vitejs/plugin-react` 6.2.1, eslint
+  10.14.0, globals 17.14.0 e `log` 0.4.35; `async-executor` 1.14.0 (yanked)
+  foi trocado por 1.14.1. Gates e `cargo audit` passaram; continuam adiados os
+  majors `@types/node` 26, `react-router` 8, `typescript` 7, `vitest` 5 e
+  `rodio` 0.23.
