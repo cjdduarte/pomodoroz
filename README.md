@@ -61,7 +61,7 @@ Pomodoroz is not about "fixing flexibility"; it focuses on adding workflow featu
 | Runtime architecture         | Mixed workspace (`app/electron` + `app/tauri`) with legacy Electron scripts still present | Tauri-only runtime with dedicated `src-tauri/` and no Electron runtime path                 |
 | Frontend base                | React 16                                                                                  | React 19                                                                                    |
 | Package manager              | Yarn (historical)                                                                         | pnpm                                                                                        |
-| Tauri baseline               | Tauri 2 (alpha)                                                                           | Tauri `2.11.x` with explicit capabilities and pinned plugins                                |
+| Tauri baseline               | Tauri 2 (alpha)                                                                           | Tauri `2.12.x` with explicit capabilities and pinned plugins                                |
 | Statistics                   | No                                                                                        | Yes (period report, long-term progress, breakdowns, and history cleanup)                    |
 | Grid view                    | No                                                                                        | Yes (**Study Rotation Grid** with daily color cycle, Draw button, and right-click to Timer) |
 | Grid footer (current status) | No                                                                                        | Yes (total, visited, and remaining counters)                                                |
@@ -251,7 +251,7 @@ pnpm tauri build --bundles nsis
 ### Requirements
 
 - Node.js v24
-- pnpm v11
+- pnpm v12
 - Rust 1.99.1 (pinned in `rust-toolchain.toml`)
 
 ### Commands
@@ -268,9 +268,9 @@ cargo check --manifest-path src-tauri/Cargo.toml
 
 ### Stack
 
-- Tauri 2.11
+- Tauri 2.12
 - React 19 + Vite 8 + TypeScript 6
-- React Router 7 + Redux Toolkit 2
+- React Router 8 + Redux Toolkit 2
 - @dnd-kit (drag-and-drop)
 - Styled Components
 - i18next
