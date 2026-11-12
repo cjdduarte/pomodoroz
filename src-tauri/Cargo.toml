@@ -30,5 +30,5 @@ tauri-plugin-autostart = "=2.7.0"
 tauri-plugin-single-instance = "=2.5.5"
 tauri-plugin-dialog = "=2.8.4"
 tauri-plugin-os = "=2.4.0"
-rodio = { version = "=0.22.2", default-features = false, features = ["playback", "wav"] }
+rodio = { version = "=0.23.0", default-features = false, features = ["playback", "wav"] }
 tauri-plugin-updater = "=2.14.1"
