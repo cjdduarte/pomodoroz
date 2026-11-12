@@ -807,7 +807,6 @@ function Check-FrameworkInventory {
     Write-Host "    react: $(Get-PackageJsonVersion $rootPkg 'react')"
     Write-Host "    react-dom: $(Get-PackageJsonVersion $rootPkg 'react-dom')"
     Write-Host "    react-router: $(Get-PackageJsonVersion $rootPkg 'react-router')"
-    Write-Host "    react-router-dom: $(Get-PackageJsonVersion $rootPkg 'react-router-dom')"
     Write-Host "    @reduxjs/toolkit: $(Get-PackageJsonVersion $rootPkg '@reduxjs/toolkit')"
     Write-Host "    styled-components: $(Get-PackageJsonVersion $rootPkg 'styled-components')"
     Write-Host "    i18next: $(Get-PackageJsonVersion $rootPkg 'i18next')"
@@ -1173,8 +1172,10 @@ function Invoke-WorkspaceUpdate {
             }
 
             $useExact = $false
-            if ((-not $UseLatest) -and ($row.Current -eq $row.Wanted) -and ($row.Latest -ne $row.Current) -and (-not [string]::IsNullOrWhiteSpace($row.Latest))) {
-                # Versao fixa detectada: manter semver exata.
+            # Versao fixa = spec declarado sem ^/~. O pnpm devolve Wanted==Current tambem para
+            # ranges, entao essa comparacao sozinha trocava ^x por versao exata.
+            $declaredPrefix = Get-SupportedSemverPrefix -DeclaredVersionSpec (Get-DeclaredDependencySpec -WorkspacePath $wsPath -PackageType "$($row.PackageType)" -PackageName "$($row.Package)")
+            if ((-not $UseLatest) -and [string]::IsNullOrWhiteSpace($declaredPrefix) -and ($row.Current -eq $row.Wanted) -and ($row.Latest -ne $row.Current) -and (-not [string]::IsNullOrWhiteSpace($row.Latest))) {
                 $targetVersion = "$($row.Latest)"
                 $useExact = $true
             } elseif ($UseLatest -and (Should-PreserveExactVersion -PackageName "$($row.Package)")) {

@@ -993,7 +993,6 @@ check_framework_inventory() {
   echo "    react: $(get_pkg_version "$root_pkg" "react")"
   echo "    react-dom: $(get_pkg_version "$root_pkg" "react-dom")"
   echo "    react-router: $(get_pkg_version "$root_pkg" "react-router")"
-  echo "    react-router-dom: $(get_pkg_version "$root_pkg" "react-router-dom")"
   echo "    @reduxjs/toolkit: $(get_pkg_version "$root_pkg" "@reduxjs/toolkit")"
   echo "    styled-components: $(get_pkg_version "$root_pkg" "styled-components")"
   echo "    i18next: $(get_pkg_version "$root_pkg" "i18next")"
@@ -1172,9 +1171,11 @@ run_updates_for_selected() {
     fi
 
     if [ "$mode" = "safe" ]; then
-      # Ex.: versao fixa sem prefixo semver (range fixa). Precisamos aplicar target explicito.
-      # Quando current==wanted e latest!=current, aplicamos versao explicita.
-      if [ "$current" = "$wanted" ] && [ "$latest" != "$current" ]; then
+      # Versao fixa = spec declarado sem ^/~. O pnpm devolve wanted==current tambem para
+      # ranges, entao essa comparacao sozinha trocava ^x por versao exata.
+      local declared_prefix
+      declared_prefix="$(get_supported_semver_prefix "$(get_declared_dependency_spec "$ws_dir" "$pkg" "$ptype")")"
+      if [ -z "$declared_prefix" ] && [ "$current" = "$wanted" ] && [ "$latest" != "$current" ]; then
         echo "  -> [$ws] versao fixa detectada para $pkg"
         apply_exact_update_by_type "$ws" "$ws_dir" "$pkg" "$latest" "$ptype"
       else
