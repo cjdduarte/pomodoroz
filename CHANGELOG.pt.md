@@ -6,6 +6,20 @@
 > Fork iniciado em 2026-03-25 a partir do Pomatez v1.10.0.
 > Agradecimento ao autor original pela base sólida.
 
+## [26.11.2] - A definir
+
+### Corrigido
+
+- **Verificador de updates preserva os ranges declarados** — aplicar um update seguro pelo `scripts/check-updates` não reescreve mais ranges `^` do `package.json` como versão exata, e a linha obsoleta `react-router-dom` do inventário foi removida.
+
+### Alterado
+
+- **Majors que estavam seguradas foram adotadas** — i18next 27 com react-i18next 18, React Router 8, Vitest 5, `@types/node` 26 e o crate Rust de áudio `rodio` 0.23 foram atualizados sem mudanças de código-fonte nem mudanças intencionais de comportamento; o TypeScript continua em 6.0 até o tooling de lint suportar o TypeScript 7.
+- **Toolchain e edition Rust foram atualizadas** — a toolchain fixada agora é Rust 1.99.1 (mínimo suportado 1.99) em `rust-toolchain.toml`, workflows de CI/release e documentação de contribuição, e o crate passou para a edition 2024.
+- **Dependências do projeto foram atualizadas** — o pin do pnpm (12.18.0) em `packageManager`, workflows de CI/release e lockfile, Redux Toolkit 2.14, Vite 8.3.8, o tooling JS de lint/build, os plugins Tauri de log/notificação/opener e as transitivas dos lockfiles JS e Rust foram atualizados sem mudanças intencionais de comportamento; o `rustix` passou para uma versão que resolve o RUSTSEC-2026-0486.
+- **Actions do CI foram atualizadas** — `actions/checkout` e `actions/setup-node` agora usam a v7.
+- **Configuração do TypeScript não depende mais de opções obsoletas** — `baseUrl` e `ignoreDeprecations` foram removidos do `tsconfig.json`.
+
 ## [26.11.1] - 2026-11-03
 
 ### Corrigido

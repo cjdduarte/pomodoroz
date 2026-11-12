@@ -11,14 +11,15 @@ documental. Elas nao substituem auditoria oficial em registry/changelog.
 
 ## Runtime e app
 
-| Item           | Versao declarada | Fonte local                                                                            | Data consulta oficial                                  | Status                                                                                                       |
-| -------------- | ---------------: | -------------------------------------------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
-| Pomodoroz      |         `26.9.2` | `package.json`, `src-tauri/Cargo.toml`                                                 | local                                                  | versao interna sincronizada                                                                                  |
-| pnpm           |        `12.16.1` | `packageManager` em `package.json`                                                     | 2026-10-29 ([npm](https://www.npmjs.com/package/pnpm)) | pin, workflows e boot document do lockfile alinhados                                                         |
-| Rust edition   |           `2021` | `src-tauri/Cargo.toml`                                                                 | local                                                  | edicao do projeto                                                                                            |
-| Rust toolchain |         `1.98.1` | [manifesto stable oficial](https://static.rust-lang.org/dist/channel-rust-stable.toml) | 2026-09-06                                             | fixada em `rust-toolchain.toml`                                                                              |
-| Rust minimo    |           `1.98` | `src-tauri/Cargo.toml`                                                                 | 2026-09-06                                             | serie minima suportada                                                                                       |
-| OpenSpec       |         `1.11.0` | [release oficial v1.11.0](https://github.com/Fission-AI/OpenSpec/releases/tag/v1.11.0) | 2026-08-28                                             | comandos/skills OpenCode regenerados; `.agents/` detectado, mas nao adicionado sem `openspec init` explicito |
+| Item           | Versao declarada | Fonte local                                                                            | Data consulta oficial                                                  | Status                                                                                                      |
+| -------------- | ---------------: | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Pomodoroz      |        `26.11.1` | `package.json`, `src-tauri/Cargo.toml`                                                 | local                                                                  | versao interna sincronizada                                                                                 |
+| pnpm           |        `12.18.0` | `packageManager` em `package.json`                                                     | 2026-11-12 ([npm](https://www.npmjs.com/package/pnpm))                 | pin, workflows e boot document do lockfile alinhados                                                        |
+| Node           |             `24` | `node-version` nos workflows                                                           | 2026-11-12 ([nodejs.org](https://nodejs.org/dist/index.json))          | mantido: 24 segue LTS; Node e so build-time e nada no typecheck consome tipos do Node                       |
+| Rust edition   |           `2024` | `src-tauri/Cargo.toml`                                                                 | local                                                                  | edicao do projeto                                                                                           |
+| Rust toolchain |         `1.99.1` | [manifesto stable oficial](https://static.rust-lang.org/dist/channel-rust-stable.toml) | 2026-11-12                                                             | fixada em `rust-toolchain.toml`                                                                             |
+| Rust minimo    |           `1.99` | `src-tauri/Cargo.toml`                                                                 | 2026-11-12                                                             | serie minima suportada                                                                                      |
+| OpenSpec       |         `1.14.1` | CLI instalada (`openspec --version`)                                                   | 2026-11-12 ([npm](https://www.npmjs.com/package/@fission-ai/openspec)) | segurado: 2.0.0 (2026-11-11) remove os comandos `/opsx:*`; atualizar e tarefa propria pela politica central |
 
 ## Atualizacoes futuras da toolchain Rust
 
@@ -31,17 +32,17 @@ aplicavel. Dependencias, edition e lockfiles nao mudam como efeito colateral.
 
 ## Dependencias principais declaradas
 
-| Pacote/crate      | Versao declarada | Fonte local            | Data consulta oficial                                             | Status                      |
-| ----------------- | ---------------: | ---------------------- | ----------------------------------------------------------------- | --------------------------- |
-| `@tauri-apps/api` |         `2.12.4` | `package.json`         | 2026-10-29 ([npm](https://www.npmjs.com/package/@tauri-apps/api)) | patch de seguranca aplicado |
-| `@tauri-apps/cli` |         `2.12.4` | `package.json`         | 2026-10-29 ([npm](https://www.npmjs.com/package/@tauri-apps/cli)) | patch de seguranca aplicado |
-| `tauri`           |         `2.12.5` | `src-tauri/Cargo.toml` | 2026-10-29 ([crates.io](https://crates.io/crates/tauri))          | patch de seguranca aplicado |
-| `react`           |         `19.3.1` | `package.json`         | 2026-11-03 ([npm](https://www.npmjs.com/package/react))           | atualizado (minor)          |
-| `react-dom`       |         `19.3.1` | `package.json`         | 2026-11-03 ([npm](https://www.npmjs.com/package/react-dom))       | atualizado (minor)          |
-| `react-router`    |         `7.17.0` | `package.json`         | pendente                                                          | auditar antes de mudar      |
-| `typescript`      |          `6.0.3` | `package.json`         | pendente                                                          | auditar antes de mudar      |
-| `vite`            |         `^8.3.5` | `package.json`         | 2026-10-29 ([npm](https://www.npmjs.com/package/vite))            | atualizado (minor)          |
-| `rodio`           |         `0.22.2` | `src-tauri/Cargo.toml` | pendente                                                          | auditar antes de mudar      |
+| Pacote/crate      | Versao declarada | Fonte local            | Data consulta oficial                                             | Status                                                                             |
+| ----------------- | ---------------: | ---------------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `@tauri-apps/api` |         `2.12.4` | `package.json`         | 2026-10-29 ([npm](https://www.npmjs.com/package/@tauri-apps/api)) | patch de seguranca aplicado                                                        |
+| `@tauri-apps/cli` |         `2.12.4` | `package.json`         | 2026-10-29 ([npm](https://www.npmjs.com/package/@tauri-apps/cli)) | patch de seguranca aplicado                                                        |
+| `tauri`           |         `2.12.5` | `src-tauri/Cargo.toml` | 2026-10-29 ([crates.io](https://crates.io/crates/tauri))          | patch de seguranca aplicado                                                        |
+| `react`           |         `19.3.1` | `package.json`         | 2026-11-03 ([npm](https://www.npmjs.com/package/react))           | atualizado (minor)                                                                 |
+| `react-dom`       |         `19.3.1` | `package.json`         | 2026-11-03 ([npm](https://www.npmjs.com/package/react-dom))       | atualizado (minor)                                                                 |
+| `react-router`    |          `8.5.1` | `package.json`         | 2026-11-12 ([npm](https://www.npmjs.com/package/react-router))    | atualizado (major)                                                                 |
+| `typescript`      |          `6.0.3` | `package.json`         | 2026-11-12 ([npm](https://www.npmjs.com/package/typescript))      | segurado: `@typescript-eslint` 8.72.2 exige `typescript <6.1.0` e quebra com 7.0.2 |
+| `vite`            |         `^8.3.8` | `package.json`         | 2026-11-12 ([npm](https://www.npmjs.com/package/vite))            | atualizado (patch)                                                                 |
+| `rodio`           |         `0.23.0` | `src-tauri/Cargo.toml` | 2026-11-12 ([crates.io](https://crates.io/crates/rodio))          | atualizado (0.x minor)                                                             |
 
 ## Politica de updates
 
@@ -79,3 +80,15 @@ aplicavel. Dependencias, edition e lockfiles nao mudam como efeito colateral.
   foi trocado por 1.14.1. Gates e `cargo audit` passaram; continuam adiados os
   majors `@types/node` 26, `react-router` 8, `typescript` 7, `vitest` 5 e
   `rodio` 0.23.
+- 2026-11-12: migracao das versoes seguradas na branch `chore/deps-upgrade`,
+  um commit por bloco, com o gate do CI passando localmente em cada um:
+  patches/minors JS e Rust (RTK 2.14.0, vite 8.3.8, `@vitejs/plugin-react`
+  6.3.0, `@eslint-react/eslint-plugin` 5.30.1, `@typescript-eslint/*` 8.72.2,
+  `rimraf` 6.1.4, plugins Tauri log 2.10.2, notification 2.8.1 e opener 2.7.3
+  em JS e Rust), pnpm 12.18.0, `@types/node` 26.6.6, `vitest` 5.1.0, `i18next`
+  27.1.1 com `react-i18next` 18.0.1, `react-router` 8.5.1, `rodio` 0.23.0
+  (`cpal` 0.18.2), toolchain Rust 1.99.1 com MSRV 1.99, edition 2024,
+  `actions/checkout` e `actions/setup-node` v7 e lockfiles JS e Rust renovados
+  (`pnpm update --lockfile-only`, `cargo update`). `rustix` 1.1.6 resolve o
+  RUSTSEC-2026-0486. Continuam segurados `typescript` 7 (lint sem suporte),
+  Node 26 e OpenSpec 2.0.0.
