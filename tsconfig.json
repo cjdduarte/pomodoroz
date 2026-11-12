@@ -11,10 +11,8 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
-    "ignoreDeprecations": "6.0",
-    "baseUrl": ".",
     "paths": {
-      "*": ["src/*"]
+      "*": ["./src/*"]
     },
     "resolveJsonModule": true,
     "isolatedModules": true,
