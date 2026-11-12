@@ -252,7 +252,7 @@ pnpm tauri build --bundles nsis
 
 - Node.js v24
 - pnpm v11
-- Rust 1.98.1 (pinned in `rust-toolchain.toml`)
+- Rust 1.99.1 (pinned in `rust-toolchain.toml`)
 
 ### Commands
 
