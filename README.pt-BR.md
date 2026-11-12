@@ -61,7 +61,7 @@ O objetivo do Pomodoroz não é "corrigir flexibilidade", e sim adicionar recurs
 | Arquitetura de runtime          | Workspace misto (`app/electron` + `app/tauri`) com scripts legados de Electron ainda presentes | Runtime Tauri-only com `src-tauri/` dedicado e sem caminho de execução Electron                 |
 | Base de frontend                | React 16                                                                                       | React 19                                                                                        |
 | Gerenciador de pacotes          | Yarn (histórico)                                                                               | pnpm                                                                                            |
-| Base Tauri                      | Tauri 2 (alpha)                                                                                | Tauri `2.11.x`, com capabilities explícitas e plugins pinados                                   |
+| Base Tauri                      | Tauri 2 (alpha)                                                                                | Tauri `2.12.x`, com capabilities explícitas e plugins pinados                                   |
 | Estatísticas                    | Não                                                                                            | Sim (relatório por período, progresso de longo prazo, detalhamentos e limpeza de histórico)     |
 | Visualização em grade (grid)    | Não                                                                                            | Sim (**Grade de Rotação de Estudos** com ciclo diário, Sortear e clique direito para Timer)     |
 | Rodapé da grade (status atual)  | Não                                                                                            | Sim (contadores de total, visitadas e restantes)                                                |
@@ -251,7 +251,7 @@ pnpm tauri build --bundles nsis
 ### Requisitos
 
 - Node.js v24
-- pnpm v11
+- pnpm v12
 - Rust 1.99.1 (fixado em `rust-toolchain.toml`)
 
 ### Comandos
@@ -268,9 +268,9 @@ cargo check --manifest-path src-tauri/Cargo.toml
 
 ### Stack
 
-- Tauri 2.11
+- Tauri 2.12
 - React 19 + Vite 8 + TypeScript 6
-- React Router 7 + Redux Toolkit 2
+- React Router 8 + Redux Toolkit 2
 - @dnd-kit (arrastar e soltar)
 - Styled Components
 - i18next
