@@ -13,7 +13,7 @@ Status: snapshot operacional da sessão atual.
 
 ## Estado atual da sessão
 
-- A baseline publicada é `26.11.1`. A próxima versão é `26.11.2` (`TBD` nos changelogs), sem tag.
+- A baseline publicada é `26.11.1`. A próxima release é `26.11.2`, com changelogs datados de 2026-11-12; a tag ainda não foi criada e `package.json`, `tauri.conf.json` e `Cargo.toml` seguem em `26.11.1` até o `release.sh` rodar o `version:sync`.
 - A migração de dependências está na `main` local (sem push), um commit por bloco: patches/minors JS e Rust, pnpm 12.18.0, `@types/node` 26, vitest 5, i18next 27/react-i18next 18, react-router 8, rodio 0.23, limpeza do `tsconfig.json`, Rust 1.99.1, edition 2024, Actions v7 e lockfiles JS/Rust renovados.
 - O gate do CI (lint, typecheck, testes, build, fmt, clippy, check, test e `cargo audit --deny warnings`) passou localmente em cada bloco, só no Linux; as exceções do audit continuam as de `src-tauri/.cargo/audit.toml`.
 - Em 2026-11-12 o operador validou no app em modo dev (Linux): modo compacto, navegação Tasks/Statistics, edição de task e descrição, troca de idioma, som de fim de sessão e notificação nativa.
@@ -28,4 +28,4 @@ Status: snapshot operacional da sessão atual.
 
 ## Próximo passo
 
-Fazer `git push origin main` e conferir o CI em Linux e Windows; se o job Windows falhar, corrigir antes de qualquer tag.
+Fazer `git push origin main` e conferir o CI em Linux e Windows; com o CI verde, rodar `./scripts/release.sh 26.11.2` (ou `--no-push` e enviar à mão). Se o job Windows falhar, corrigir antes da tag.
