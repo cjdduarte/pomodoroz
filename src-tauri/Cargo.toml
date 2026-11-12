@@ -5,7 +5,7 @@ description = "Pomodoroz desktop app (Tauri runtime scaffold)"
 authors = ["Carlos Duarte <cjdduarte@gmail.com>"]
 license = "MIT"
 repository = "https://github.com/cjdduarte/pomodoroz"
-edition = "2021"
+edition = "2024"
 rust-version = "1.99"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

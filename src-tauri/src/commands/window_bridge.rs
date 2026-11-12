@@ -1,14 +1,14 @@
 #[cfg(target_os = "linux")]
 use crate::constants::WINDOW_RESTORED_EVENT;
 use crate::constants::{MAIN_TRAY_ID, TRAY_MENU_QUIT_ID, TRAY_MENU_RESTORE_ID};
-use rodio::{play, DeviceSinkBuilder};
+use rodio::{DeviceSinkBuilder, play};
 use serde::Serialize;
 use std::{fs, io::Cursor, path::Path, sync::Mutex, time::Duration};
 use tauri::{
+    AppHandle, Emitter, LogicalSize, Manager, Runtime, State, Theme, Window,
     image::Image,
     menu::{MenuBuilder, MenuItemBuilder},
     utils::{config::BundleType, platform::bundle_type},
-    AppHandle, Emitter, LogicalSize, Manager, Runtime, State, Theme, Window,
 };
 use tauri_plugin_dialog::DialogExt;
 
@@ -137,10 +137,10 @@ fn validate_existing_json_file(path: &Path) -> Result<fs::Metadata, String> {
 fn validate_writable_json_file(path: &Path) -> Result<(), String> {
     validate_json_path(path)?;
 
-    if let Ok(metadata) = fs::metadata(path) {
-        if !metadata.is_file() {
-            return Err("Selected path is not a file.".to_string());
-        }
+    if let Ok(metadata) = fs::metadata(path)
+        && !metadata.is_file()
+    {
+        return Err("Selected path is not a file.".to_string());
     }
 
     Ok(())
